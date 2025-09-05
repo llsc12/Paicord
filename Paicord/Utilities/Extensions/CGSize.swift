@@ -1,0 +1,14 @@
+//
+//  CGSize.swift
+//  PaiCord
+//
+//  Created by Lakhan Lothiyi on 05/09/2025.
+//
+
+import CoreGraphics
+
+extension CGSize {
+  init(_ value: CGFloat) {
+	self.init(width: value, height: value)
+  }
+}

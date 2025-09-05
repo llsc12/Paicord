@@ -6,14 +6,23 @@
 //
 
 import SwiftUI
+import SDWebImageSVGCoder
 
 @main
 struct PaiCordApp: App {
-	
+  init() {
+	let SVGCoder = SDImageSVGCoder.shared
+	SDImageCodersManager.shared.addCoder(SVGCoder)
+  }
 	var body: some Scene {
 		WindowGroup {
-			ContentView()
+		  Group {
+			//			ContentView()
+			LoginView()
+		  }
+		  .fontDesign(.rounded)
 		}
+		.windowStyle(.hiddenTitleBar)
 	}
 }
 
