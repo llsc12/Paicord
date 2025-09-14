@@ -259,6 +259,6 @@ public struct JSONError: Sendable, Codable {
   public var message: String
   /// Might be `nil` in case of something like a rate-limit error.
   public var code: JSONErrorCode?
-  /// Might exist for MFA required error.
-  public var mfa: MFAVerificationRequest?
+  /// Might exist for MFA required error. This goes unused by the library.
+  public var mfa: MFAVerificationData?
 }

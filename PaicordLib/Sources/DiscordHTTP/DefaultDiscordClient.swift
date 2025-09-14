@@ -7,9 +7,6 @@ import NIOCore
 import NIOFoundationCompat
 import NIOHTTP1
 
-public typealias CaptchaChallengeHandler = @Sendable (CaptchaChallengeData)
-	async -> (CaptchaSubmitData?)
-
 public struct DefaultDiscordClient: DiscordClient {
 	public let client: HTTPClient
 	public let authentication: AuthenticationHeader
@@ -20,6 +17,7 @@ public struct DefaultDiscordClient: DiscordClient {
 	)
 
 	public var captchaCallback: CaptchaChallengeHandler? = nil
+	public var mfaCallback: MFAVerificationHandler? = nil
 
 	/// Discord apparently looks at this for figuring out library-usages.
 	/// Technically they could also look at the info passed in Gateway's identify payload, for that.
@@ -63,9 +61,11 @@ public struct DefaultDiscordClient: DiscordClient {
 		token: Secret,
 		appId: ApplicationSnowflake? = nil,
 		configuration: ClientConfiguration = .init(),
-		captchaCallback: CaptchaChallengeHandler? = nil
+		captchaCallback: CaptchaChallengeHandler? = nil,
+		mfaCallback: MFAVerificationHandler? = nil
 	) async {
 		self.captchaCallback = captchaCallback
+		self.mfaCallback = mfaCallback
 		self.client = httpClient
 		self.authentication = .botToken(token)
 		self.appId = appId ?? self.authentication.extractAppIdIfAvailable()
@@ -107,9 +107,11 @@ public struct DefaultDiscordClient: DiscordClient {
 		header: AuthenticationHeader,
 		appId: ApplicationSnowflake? = nil,
 		configuration: ClientConfiguration = .init(),
-		captchaCallback: CaptchaChallengeHandler? = nil
+		captchaCallback: CaptchaChallengeHandler? = nil,
+		mfaCallback: MFAVerificationHandler? = nil
 	) async {
 		self.captchaCallback = captchaCallback
+		self.mfaCallback = mfaCallback
 		self.client = httpClient
 		self.authentication = header
 		self.appId = appId ?? self.authentication.extractAppIdIfAvailable()
@@ -196,12 +198,13 @@ public struct DefaultDiscordClient: DiscordClient {
 	public init(
 		httpClient: HTTPClient = .shared,
 		configuration: ClientConfiguration = .init(),
-		captchaCallback: CaptchaChallengeHandler? = nil
+		captchaCallback: CaptchaChallengeHandler? = nil,
+		mfaCallback: MFAVerificationHandler? = nil
 	) {
 		self.captchaCallback = captchaCallback
+		self.mfaCallback = mfaCallback
 		self.client = httpClient
 		self.authentication = captchaCallback == nil ? .none : .userNone
-		print(captchaCallback != nil)
 		self.configuration = configuration
 		self._authCache = .global
 		self.appId = nil
@@ -223,7 +226,7 @@ public struct DefaultDiscordClient: DiscordClient {
 			if self.configuration.shouldRetry(
 				status: .tooManyRequests,
 				retriesSoFar: retriesSoFar,
-				captchaSolved: false
+				challengeSolved: false
 			) {
 				logger.debug(
 					"HTTP bucket is exhausted. Will wait before making the request",
@@ -446,7 +449,9 @@ public struct DefaultDiscordClient: DiscordClient {
 			await _cookieStore.checkIncomingHeaders(headers)
 
 			// Check for captcha challenge
-			var captchaSolved = false
+			// this variable will be flipped to true if either captcha was solved or mfa was passed
+			var challengeSolved = false
+			
 			if let captchaData = extractCaptchaChallenge(from: response) {
 				if let captchaHeaderData = await captchaCallback?(captchaData) {
 					headers.replaceOrAdd(
@@ -459,14 +464,21 @@ public struct DefaultDiscordClient: DiscordClient {
 						headers.replaceOrAdd(
 							name: "X-Captcha-Rqtoken", value: rqToken)
 					}
-					captchaSolved = true
+					challengeSolved = true
+				}
+			}
+			
+			if let mfaHeader = extractMFAVerification(from: response) {
+				if let mfaResponse = await mfaCallback?(mfaHeader) {
+					headers.replaceOrAdd(name: "X-Discord-MFA-Authorization", value: mfaResponse.token)
+					challengeSolved = true
 				}
 			}
 
 			while configuration.shouldRetry(
 				status: response.status,
 				retriesSoFar: retriesSoFar,
-				captchaSolved: captchaSolved
+				challengeSolved: challengeSolved
 			) {
 				try await waitForRetryAndIncreaseRetryCount(
 					retriesSoFar: &retriesSoFar,
@@ -832,17 +844,24 @@ public struct DefaultDiscordClient: DiscordClient {
 		)
 	}
 
-	@inlinable
-	func addUserHeaders(_ headers: inout HTTPHeaders) throws {
-		let superProperties = SuperProperties.GenerateSuperPropertiesHeader()
-		let locale = SuperProperties.GenerateLocaleHeader()
-		let timezone = SuperProperties.GenerateTimezoneHeader()
-		headers.add(name: "X-Super-Properties", value: superProperties)
-		headers.add(name: "X-Discord-Locale", value: locale)
-		headers.add(name: "X-Discord-Timezone", value: timezone)
-		headers.add(name: "X-Debug-Options", value: "bugReporterEnabled")
+	@usableFromInline
+	func extractMFAVerification(from response: DiscordHTTPResponse)
+		-> MFAVerificationData?
+	{
+		guard response.status.code == 401,
+			let data = response.body,
+			let json = try? JSONSerialization.jsonObject(with: data, options: [])
+				as? [String: Any], // error object but with mfa field
+			json["code"] as? Int == 60003,  // MFA required error code
+			let mfa = json["mfa"] as? String,  // MFA verification request object
+			let mfaData = mfa.data(using: .utf8),
+			let mfaRequest = try? DiscordGlobalConfiguration.decoder.decode(
+				MFAVerificationData.self, from: mfaData)
+		else { return nil }
+
+		return mfaRequest
 	}
-	
+
 	@inlinable
 	func addUserHeaders(_ headers: inout HTTPHeaders) throws {
 		// discord special headers
@@ -855,35 +874,26 @@ public struct DefaultDiscordClient: DiscordClient {
 		headers.add(name: "X-Debug-Options", value: "bugReporterEnabled")
 
 		// general
-//		headers.add(name: "Sec-Fetch-Dest", value: "empty")
-//		headers.add(name: "Sec-Fetch-Mode", value: "cors")
-//		headers.add(name: "Sec-Fetch-Site", value: "same-origin")
+		headers.add(name: "Accept", value: "*/*")
+		headers.add(name: "Accept-Language", value: locale)
+		headers.add(name: "Accept-Encoding", value: "gzip, br, deflate")
+		headers.add(name: "Priority", value: "u=1, i")
 
-				headers.add(name: "Accept", value: "*/*")
 		#if os(macOS)
+			headers.add(name: "Sec-Fetch-Dest", value: "empty")
+			headers.add(name: "Sec-Fetch-Mode", value: "cors")
+			headers.add(name: "Sec-Fetch-Site", value: "same-origin")
+			headers.add(name: "Sec-CH-UA-Mobile", value: "?0")
+			headers.add(name: "Sec-CH-UA-Platform", value: "\"macOS\"")  // in speechmarks
+			headers.add(
+				name: "Sec-CH-UA",
+				value: "\"Not:A-Brand\";v=\"24\", \"Chromium\";v=\"134\"")  // in speechmarks
+			/// dolfies says this being static is ok, though im thinking about login flows bc it'd have like https://discord.com/login as referer
+			headers.add(name: "Referer", value: "https://discord.com/channels/@me")
+			headers.add(name: "Origin", value: "https://discord.com")
 
 		#elseif os(iOS)
-
+			// lol theres no special headers on ios, they all mirror the shared headers
 		#endif
-		
-		// shared headers
-		//    accept  */*
-
-		// all macos discord client headers
-		//    sec-ch-ua-platform  "macOS"
-		//    accept-language  en-US,en-GB;q=0.9
-		//    sec-ch-ua  "Not:A-Brand";v="24", "Chromium";v="134"
-		//    sec-ch-ua-mobile  ?0
-		//    sec-fetch-site  same-origin
-		//    sec-fetch-mode  cors
-		//    sec-fetch-dest  empty
-		//    referer  https://discord.com/channels/@me
-		//    accept-encoding  gzip, deflate, br, zstd
-		//		priority  u=1, i
-
-		// all ios discord client headers
-		//    priority  u=3, i
-		//    accept-encoding  gzip, deflate, br
-		//    accept-language  en-GB
 	}
 }

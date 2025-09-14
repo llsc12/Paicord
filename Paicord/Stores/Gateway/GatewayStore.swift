@@ -13,17 +13,22 @@ import PaicordLib
 final class GatewayStore {
 	let accounts = TokenStore()
 	
+	@ObservationIgnored
 	var captchaCallback: CaptchaChallengeHandler? = nil
-
+	@ObservationIgnored
+	var mfaCallback: MFAVerificationHandler? = nil
+	
+	@ObservationIgnored
 	var gateway: UserGatewayManager?
 	
+	@ObservationIgnored
 	var client: DiscordClient {
 		(gateway?.client) ?? _unauthenticatedClient
 	}
 	
 	@ObservationIgnored
 	private lazy var _unauthenticatedClient: DefaultDiscordClient = {
-		return DefaultDiscordClient.init(captchaCallback: self.captchaCallback)
+		return DefaultDiscordClient.init(captchaCallback: self.captchaCallback, mfaCallback: self.mfaCallback) // mfa callback wont happen this is not logged in
 	}()
 
 	var state: GatewayState {

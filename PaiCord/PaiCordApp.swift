@@ -17,7 +17,10 @@ struct PaiCordApp: App {
 	// captcha handling
 	@State private var captchaChallenge: CaptchaChallengeData?
 	@State private var captchaContinuation:
-		CheckedContinuation<CaptchaSubmitData, Never>?
+		CheckedContinuation<CaptchaSubmitData?, Never>?
+	// mfa handling
+	@State private var mfaVerification: MFAVerificationData?
+	@State private var mfaContinuation: CheckedContinuation<MFAResponse?, Never>?
 
 	init() {
 		let SVGCoder = SDImageSVGCoder.shared
@@ -33,29 +36,44 @@ struct PaiCordApp: App {
 				LoginView()
 			}
 			.fontDesign(.rounded)
-			.environment(gatewayStore)
-			.onAppear {
-				gatewayStore.captchaCallback = { captcha in
-					await withCheckedContinuation { continuation in
-						captchaChallenge = captcha
-						captchaContinuation = continuation
-					}
-				}
-			}
 			.sheet(item: $captchaChallenge) { challenge in
-				CaptchaSheet(challenge: challenge)
-				{ submitData in
-					// Resume continuation with solution or empty if nil
-					if let submitData {
-						captchaContinuation?.resume(returning: submitData)
-					} else {
-						captchaContinuation?.resume(
-							returning: CaptchaSubmitData(challenge: challenge, token: ""))
-					}
+				CaptchaSheet(challenge: challenge) { submitData in
+					// Resume continuation with solution or nil
+					captchaContinuation?.resume(returning: submitData)
 					captchaContinuation = nil
 					captchaChallenge = nil
 				}
 				.frame(idealWidth: 400, idealHeight: 400)
+				.environment(gatewayStore)
+			}
+			.sheet(item: $mfaVerification) { mfaData in
+				MFASheet(verificationData: mfaData) { response in
+					mfaContinuation?.resume(returning: response)
+					mfaContinuation = nil
+					mfaVerification = nil
+				}
+				.frame(idealWidth: 400, idealHeight: 300)
+				.environment(gatewayStore)
+			}
+			.environment(gatewayStore)
+			.onAppear {
+				gatewayStore.captchaCallback = { captcha in
+					await withCheckedContinuation { continuation in
+						// Idk why but this looks horror,,
+						DispatchQueue.main.async {
+							captchaChallenge = captcha
+							captchaContinuation = continuation
+						}
+					}
+				}
+				gatewayStore.mfaCallback = { mfaData in
+					await withCheckedContinuation { continuation in
+						DispatchQueue.main.async {
+							mfaVerification = mfaData
+							mfaContinuation = continuation
+						}
+					}
+				}
 			}
 		}
 		.windowStyle(.hiddenTitleBar)

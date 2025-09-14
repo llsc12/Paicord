@@ -18,7 +18,7 @@
                BlueprintIdentifier = "AA1096DA2E63BE84005BC3D2"
                BuildableName = "Paicord.app"
                BlueprintName = "Paicord"
-               ReferencedContainer = "container:PaiCord.xcodeproj">
+               ReferencedContainer = "container:Paicord.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -47,7 +47,7 @@
             BlueprintIdentifier = "AA1096DA2E63BE84005BC3D2"
             BuildableName = "Paicord.app"
             BlueprintName = "Paicord"
-            ReferencedContainer = "container:PaiCord.xcodeproj">
+            ReferencedContainer = "container:Paicord.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -64,7 +64,7 @@
             BlueprintIdentifier = "AA1096DA2E63BE84005BC3D2"
             BuildableName = "Paicord.app"
             BlueprintName = "Paicord"
-            ReferencedContainer = "container:PaiCord.xcodeproj">
+            ReferencedContainer = "container:Paicord.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

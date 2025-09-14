@@ -29,12 +29,13 @@ extension Gateway {
 			public var os_arch: String?
 			public var app_arch: String?  // set this to os_arch for simplicity (also bc its true)
 			public var system_locale: String?
-			public var has_client_mods: String?
+			public var has_client_mods: Bool?
 			public var client_launch_id: String?
 			public var browser_user_agent: String?
 			public var browser_version: String?
 			public var os_sdk_version: String?  // first segment of os_version
-			public var client_build_number: String?
+			public var client_build_number: Int?
+			public var client_app_state: String?
 
 			public var client_event_source: String? = nil
 

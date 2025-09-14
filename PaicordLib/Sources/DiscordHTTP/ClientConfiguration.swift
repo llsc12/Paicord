@@ -260,9 +260,9 @@ public struct ClientConfiguration: Sendable {
 		/// Should retry a request or not.
 		@usableFromInline
 		func shouldRetry(
-			status: HTTPResponseStatus, retriesSoFar times: Int, captchaSolved: Bool
+			status: HTTPResponseStatus, retriesSoFar times: Int, challengeSolved: Bool
 		) -> Bool {
-			(captchaSolved && times <= 1)
+			(challengeSolved && times <= 1)
 				|| self.maxRetries > times && self.statuses.contains(status)
 		}
 	}
@@ -298,10 +298,10 @@ public struct ClientConfiguration: Sendable {
 
 	@inlinable
 	func shouldRetry(
-		status: HTTPResponseStatus, retriesSoFar times: Int, captchaSolved: Bool
+		status: HTTPResponseStatus, retriesSoFar times: Int, challengeSolved: Bool
 	) -> Bool {
 		self.retryPolicy?.shouldRetry(
-			status: status, retriesSoFar: times, captchaSolved: captchaSolved)
+			status: status, retriesSoFar: times, challengeSolved: challengeSolved)
 			?? false
 	}
 

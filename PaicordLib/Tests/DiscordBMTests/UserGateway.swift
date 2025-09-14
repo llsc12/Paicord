@@ -20,7 +20,7 @@ class UserGatewayTests: XCTestCase {
 
     let gateway = await UserGatewayManager(
       token:
-        "redacted"
+        "OTMzMTI0MzIzMDM4ODU5MzE1.GgHeou.k7b3Ar40tj4Qr4v0hSoBnV15yKoNRLnW3uDRqs"
     )
 
     await gateway.connect()

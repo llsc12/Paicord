@@ -71,7 +71,7 @@ extension DiscordClient {
 	/// https://docs.discord.food/authentication#verify-mfa-login
 	@inlinable
 	public func verifyMFALogin(
-		type: Payloads.AuthenticationMFA.MFAType,
+		type: Payloads.MFASubmitData.MFAKind,
 		code: String,
 		ticket: Secret,
 		fingerprint: String
@@ -130,5 +130,24 @@ extension DiscordClient {
 					"X-Fingerprint": fingerprint
 				]),
 			payload: Payloads.ForgotPassword(login: login))
+	}
+
+	/// Verifies a user's identity using multi-factor authentication. On success, returns a cookie that can be used to bypass MFA for the next 5 minutes.
+	/// https://docs.discord.food/authentication#verify-mfa
+	@inlinable
+	public func verifyMFA(
+		type: Payloads.MFASubmitData.MFAKind,
+		ticket: Secret,
+		code: String
+	) async throws -> DiscordClientResponse<MFAResponse> {
+		let endpoint = UserAPIEndpoint.verifyMFA
+		return try await self.send(
+			request: .init(to: endpoint),
+			payload: Payloads.MFASubmitData(
+				ticket: ticket,
+				mfa_type: type,
+				data: code
+			)
+		)
 	}
 }

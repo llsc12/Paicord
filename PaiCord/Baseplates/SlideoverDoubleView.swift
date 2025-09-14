@@ -28,9 +28,8 @@ struct SlideoverDoubleView<Primary: View, Secondary: View>: View {
 		ZStack {
 			primary
 				.frame(maxWidth: .infinity, maxHeight: .infinity)
-			//
-			//			// paul hudson said this fixes swift 6 concurrency issues with visualEffect
-			//			// since its closure doesn't always run on the main thread.
+			// paul hudson said this fixes swift 6 concurrency issues with visualEffect
+			// since its closure doesn't always run on the main thread.
 			let swap = swap
 			let dragOffset = dragOffset
 			secondary

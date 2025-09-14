@@ -133,7 +133,7 @@ struct LoginView: View {
 							.clipShape(.rounded)
 							.font(.title3)
 					}
-					.buttonStyle(.plain)
+					.buttonStyle(.borderless)
 				}
 				.padding(20)
 				.frame(maxWidth: 400)

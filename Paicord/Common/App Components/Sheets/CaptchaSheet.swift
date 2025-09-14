@@ -23,6 +23,8 @@ struct CaptchaSheet: ViewControllerRepresentable {
 	func makeCoordinator() -> Coordinator {
 		Coordinator(challenge: challenge, onToken: onToken)
 	}
+	
+	@Environment(\.colorScheme) private var colorScheme
 
 	#if os(iOS)
 		func makeUIViewController(context: Context) -> UIViewController {
@@ -41,7 +43,7 @@ struct CaptchaSheet: ViewControllerRepresentable {
 					equalTo: controller.view.bottomAnchor),
 			])
 
-			context.coordinator.startCaptcha(on: placeholder)
+			context.coordinator.startCaptcha(on: placeholder, theme: colorScheme == .dark ? "dark" : "light")
 			return controller
 		}
 
@@ -66,7 +68,7 @@ struct CaptchaSheet: ViewControllerRepresentable {
 					equalTo: controller.view.bottomAnchor),
 			])
 
-			context.coordinator.startCaptcha(on: placeholder)
+			context.coordinator.startCaptcha(on: placeholder, theme: colorScheme == .dark ? "dark" : "light")
 			return controller
 		}
 
@@ -89,7 +91,7 @@ struct CaptchaSheet: ViewControllerRepresentable {
 		}
 
 		#if os(iOS)
-			func startCaptcha(on hostView: UIView) {
+		func startCaptcha(on hostView: UIView, theme: String = "light") {
 				guard let siteKey = challenge.captchaSiteKey else {
 					DispatchQueue.main.async { [onToken] in onToken(nil) }
 					return
@@ -98,6 +100,7 @@ struct CaptchaSheet: ViewControllerRepresentable {
 					apiKey: siteKey,
 					baseURL: URL(string: "https://discord.com"),
 					rqdata: challenge.captchaRqdata,
+					theme: theme,
 					diagnosticLog: true
 				)
 				hcaptcha?.configureWebView { webview in
@@ -113,7 +116,7 @@ struct CaptchaSheet: ViewControllerRepresentable {
 				}
 			}
 		#else
-			func startCaptcha(on hostView: NSView) {
+		func startCaptcha(on hostView: NSView, theme: String = "light") {
 				guard let siteKey = challenge.captchaSiteKey else {
 					DispatchQueue.main.async { [onToken] in onToken(nil) }
 					return
@@ -122,6 +125,7 @@ struct CaptchaSheet: ViewControllerRepresentable {
 					apiKey: siteKey,
 					baseURL: URL(string: "https://discord.com"),
 					rqdata: challenge.captchaRqdata,
+					theme: theme,
 					diagnosticLog: true
 				)
 				hcaptcha?.configureWebView { webview in

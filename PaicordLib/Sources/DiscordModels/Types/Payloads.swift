@@ -8,6 +8,7 @@ import NIOFoundationCompat
 public enum Payloads {
 
   /// Used to authenticate and retrieve credentials.
+	/// https://docs.discord.food/authentication#login-account
   public struct Authentication: Sendable, Encodable, ValidatablePayload {
     var login: String
     var password: Secret
@@ -30,52 +31,18 @@ public enum Payloads {
     /// Where a login is initiated from outside of the normal login flow.
     enum LoginSource: String, Sendable, Encodable {
       case
-        /**
-		 * Login request initiated from a gift code
-		 *
-		 * Value: gift
-		 */
         gift,
-        /**
-		 * Login request initiated from a guild template
-		 *
-		 * Value: guild_template
-		 */
         guild_template,
-        /**
-		 * Login request initiated from a guild invite
-		 *
-		 * Value: guild_invite
-		 */
         guild_invite,
-        /**
-		 * Login request initiated from a group DM invite
-		 *
-		 * Value: dm_invite
-		 */
         dm_invite,
-        /**
-		 * Login request initiated from a friend invite
-		 *
-		 * Value: friend_invite
-		 */
         friend_invite,
-        /**
-		 * Login request initiated from a role subscription redirect
-		 *
-		 * Value: role_subscription
-		 */
         role_subscription,
-        /**
-		 * Login request initiated from a role subscription settings redirect
-		 *
-		 * Value: role_subscription_setting
-		 */
         role_subscription_setting
     }
   }
 
   /// Used to send an SMS to the user's phone for MFA.
+	/// https://docs.discord.food/authentication#send-mfa-sms
   public struct AuthenticationMFASendSMS: Sendable, Encodable,
     ValidatablePayload
   {
@@ -89,6 +56,7 @@ public enum Payloads {
   }
 
   /// Used to complete MFA verify process when you've received a ticket rather than a token from the login endpoint.
+	/// https://docs.discord.food/authentication#verify-mfa-login
   public struct AuthenticationMFA: Sendable, Encodable, ValidatablePayload {
     var code: String
     var ticket: Secret
@@ -104,12 +72,9 @@ public enum Payloads {
     public func validate() -> [ValidationFailure] {
       validateCharacterCountInRange(code, min: 6, max: 6, name: "code")
     }
-
-    public enum MFAType: String, Sendable, Codable {
-      case totp, sms, backup, /* webauthn, */ password
-    }
   }
   
+	/// https://docs.discord.food/authentication#logout-auth-sessions
   public struct LogoutSessions: Sendable, Encodable, ValidatablePayload {
     public var session_id_hashes: [String]
     
@@ -120,6 +85,7 @@ public enum Payloads {
     public func validate() -> [ValidationFailure] { }
   }
   
+	/// https://docs.discord.food/authentication#forgot-password
   public struct ForgotPassword: Sendable, Encodable, ValidatablePayload {
     public var login: String
     
@@ -129,6 +95,29 @@ public enum Payloads {
     
     public func validate() -> [ValidationFailure] { }
   }
+	
+	/// https://docs.discord.food/authentication#mfa-verification
+	public struct MFASubmitData: Sendable, Codable, ValidatablePayload {
+		public var ticket: Secret
+		public var mfa_type: MFAKind
+		public var data: String
+		
+		public init(ticket: Secret, mfa_type: MFAKind, data: String) {
+			self.ticket = ticket
+			self.mfa_type = mfa_type
+			self.data = data
+		}
+		
+		public enum MFAKind: String, Sendable, Codable {
+			case totp // totp
+			case sms // sms
+			case backup // backup
+			case webauthn // webauthn
+			case password // password
+		}
+		
+		public func validate() -> [ValidationFailure] { }
+	}
 
   /// An attachment object, but for sending.
   /// https://discord.com/developers/docs/resources/channel#attachment-object

@@ -32,12 +32,13 @@ extension Gateway.Identify.ConnectionProperties {
 		self.os_version = SuperProperties.os_version()
 		self.os_arch = SuperProperties.os_arch()
 		self.app_arch = SuperProperties.os_arch()
-		self.system_locale = Locale.current.identifier  // e.g. en-GB
-		self.has_client_mods = "false"
+		self.system_locale = SuperProperties.GenerateLocaleHeader()
+		self.has_client_mods = false
 		self.browser_user_agent = SuperProperties.useragent(ws: ws)
 		self.browser_version = SuperProperties.browser_version()
 		self.os_sdk_version = SuperProperties.os_sdk_version()
 		self.client_build_number = SuperProperties.client_build_number()
+		self.client_app_state = "focused"
 	}
 
 	public static var __defaultOS: String {
@@ -225,19 +226,19 @@ public enum SuperProperties {
 		}
 	}
 
-	public static func client_build_number() -> String? {
+	public static func client_build_number() -> Int? {
 		switch Gateway.Identify.ConnectionProperties.__defaultOS {
 		case "iOS":
-			return "83647"
+			return 83647
 		case "Mac OS X":
-			return "439729"
+			return 439729
 		default:
 			return nil
 		}
 	}
 
 	public static func client_launch_id() -> String {
-		return _client_launch_id.uuidString
+		return _client_launch_id.uuidString.lowercased()
 	}
 
 	public static func cfnetwork_version() -> String {

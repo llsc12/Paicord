@@ -2,9 +2,12 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "container:PaiCord.xcodeproj">
+      location = "container:Paicord.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:PaicordLib">
+   </FileRef>
+   <FileRef
+      location = "group:DiscordMarkdownParser">
    </FileRef>
 </Workspace>

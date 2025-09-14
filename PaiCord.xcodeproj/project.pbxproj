@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5724CD6F2E733D0E00931FEF /* MFASheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5724CD6E2E733D0900931FEF /* MFASheet.swift */; };
 		572B694C2E7079FB00BCED00 /* PaicordLib in Frameworks */ = {isa = PBXBuildFile; productRef = 572B694B2E7079FB00BCED00 /* PaicordLib */; };
+		574D24DC2E76C78000CAB95E /* HighlightSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 574D24DB2E76C78000CAB95E /* HighlightSwift */; };
 		5783AA902E6B8F6500F73F6D /* MeshGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 5783AA8F2E6B8F6500F73F6D /* MeshGradient */; };
 		5783AA922E6B8F6500F73F6D /* MeshGradientCHeaders in Frameworks */ = {isa = PBXBuildFile; productRef = 5783AA912E6B8F6500F73F6D /* MeshGradientCHeaders */; };
 		5783AA942E6B8FD100F73F6D /* MeshGradient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5783AA932E6B8FCD00F73F6D /* MeshGradient.swift */; };
@@ -17,6 +19,9 @@
 		57A4E70E2E6B400F00470131 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 57A4E70D2E6B400F00470131 /* SDWebImageSwiftUI */; };
 		57A4E7112E6B411A00470131 /* SDWebImageSVGCoder in Frameworks */ = {isa = PBXBuildFile; productRef = 57A4E7102E6B411A00470131 /* SDWebImageSVGCoder */; };
 		57A4E7152E6B44C900470131 /* CGSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A4E7142E6B44C200470131 /* CGSize.swift */; };
+		57A55C572E7560CF005C8226 /* Markdown.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A55C562E7560CC005C8226 /* Markdown.swift */; };
+		57A55C5D2E75634B005C8226 /* ImageFrameScheduler.m in Sources */ = {isa = PBXBuildFile; fileRef = 57A55C5C2E756344005C8226 /* ImageFrameScheduler.m */; };
+		57A55C622E7563D6005C8226 /* Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A55C612E7563D4005C8226 /* Test.swift */; };
 		57CDD87F2E71CB6000022203 /* HCaptcha in Frameworks */ = {isa = PBXBuildFile; productRef = 57CDD87E2E71CB6000022203 /* HCaptcha */; };
 		57CDD8812E71FF7600022203 /* CaptchaSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57CDD8802E71FF7600022203 /* CaptchaSheet.swift */; };
 		57E05C592E6C6AE400B81AA7 /* Design Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57E05C582E6C6ADF00B81AA7 /* Design Constants.swift */; };
@@ -39,10 +44,16 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5724CD6E2E733D0900931FEF /* MFASheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MFASheet.swift; sourceTree = "<group>"; };
 		5783AA932E6B8FCD00F73F6D /* MeshGradient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeshGradient.swift; sourceTree = "<group>"; };
 		578E1CE02E67780B00C6DEA3 /* GradientText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientText.swift; sourceTree = "<group>"; };
 		57A4E70A2E6B315C00470131 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		57A4E7142E6B44C200470131 /* CGSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGSize.swift; sourceTree = "<group>"; };
+		57A55C562E7560CC005C8226 /* Markdown.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Markdown.swift; sourceTree = "<group>"; };
+		57A55C592E75630F005C8226 /* ImageFrameScheduler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ImageFrameScheduler.h; sourceTree = "<group>"; };
+		57A55C5C2E756344005C8226 /* ImageFrameScheduler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ImageFrameScheduler.m; sourceTree = "<group>"; };
+		57A55C5E2E75634D005C8226 /* Paicord-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Paicord-Bridging-Header.h"; sourceTree = "<group>"; };
+		57A55C612E7563D4005C8226 /* Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Test.swift; sourceTree = "<group>"; };
 		57CDD8802E71FF7600022203 /* CaptchaSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptchaSheet.swift; sourceTree = "<group>"; };
 		57E05C582E6C6ADF00B81AA7 /* Design Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Design Constants.swift"; sourceTree = "<group>"; };
 		57E05C5A2E6C745300B81AA7 /* String+LocalizedError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+LocalizedError.swift"; sourceTree = "<group>"; };
@@ -69,6 +80,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				57A4E70E2E6B400F00470131 /* SDWebImageSwiftUI in Frameworks */,
+				574D24DC2E76C78000CAB95E /* HighlightSwift in Frameworks */,
 				5783AA902E6B8F6500F73F6D /* MeshGradient in Frameworks */,
 				579DF34B2E6D9B9800BD8B97 /* SwiftUIX in Frameworks */,
 				572B694C2E7079FB00BCED00 /* PaicordLib in Frameworks */,
@@ -83,6 +95,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5724CD6D2E72FE6A00931FEF /* Login */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Login;
+			sourceTree = "<group>";
+		};
 		578E1CDE2E6777DE00C6DEA3 /* macOS */ = {
 			isa = PBXGroup;
 			children = (
@@ -94,8 +113,8 @@
 		578E1CDF2E6777F900C6DEA3 /* App Components */ = {
 			isa = PBXGroup;
 			children = (
-				57CDD8802E71FF7600022203 /* CaptchaSheet.swift */,
-				AA9C81822E6660BE0086B1DA /* ServerButton.swift */,
+				57A55C542E7560B3005C8226 /* Sheets */,
+				57A55C552E7560BB005C8226 /* Guilds */,
 			);
 			path = "App Components";
 			sourceTree = "<group>";
@@ -119,6 +138,8 @@
 		57A4E7122E6B44B500470131 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				57A55C612E7563D4005C8226 /* Test.swift */,
+				57A55C582E7562EF005C8226 /* Bridging */,
 				57A4E7132E6B44BC00470131 /* Extensions */,
 			);
 			path = Utilities;
@@ -132,6 +153,33 @@
 				57A4E7142E6B44C200470131 /* CGSize.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		57A55C542E7560B3005C8226 /* Sheets */ = {
+			isa = PBXGroup;
+			children = (
+				5724CD6E2E733D0900931FEF /* MFASheet.swift */,
+				57CDD8802E71FF7600022203 /* CaptchaSheet.swift */,
+			);
+			path = Sheets;
+			sourceTree = "<group>";
+		};
+		57A55C552E7560BB005C8226 /* Guilds */ = {
+			isa = PBXGroup;
+			children = (
+				AA9C81822E6660BE0086B1DA /* ServerButton.swift */,
+			);
+			path = Guilds;
+			sourceTree = "<group>";
+		};
+		57A55C582E7562EF005C8226 /* Bridging */ = {
+			isa = PBXGroup;
+			children = (
+				57A55C592E75630F005C8226 /* ImageFrameScheduler.h */,
+				57A55C5C2E756344005C8226 /* ImageFrameScheduler.m */,
+				57A55C5E2E75634D005C8226 /* Paicord-Bridging-Header.h */,
+			);
+			path = Bridging;
 			sourceTree = "<group>";
 		};
 		57E05C5E2E6CBCF400B81AA7 /* Gateway */ = {
@@ -172,6 +220,7 @@
 		AA1097082E64C181005BC3D2 /* Chat */ = {
 			isa = PBXGroup;
 			children = (
+				57A55C562E7560CC005C8226 /* Markdown.swift */,
 				AA10971C2E64C189005BC3D2 /* ChatView.swift */,
 			);
 			path = Chat;
@@ -230,6 +279,7 @@
 		AA9C817E2E665E010086B1DA /* iOS */ = {
 			isa = PBXGroup;
 			children = (
+				5724CD6D2E72FE6A00931FEF /* Login */,
 				AA10970F2E64C181005BC3D2 /* Tabs */,
 			);
 			path = iOS;
@@ -297,6 +347,7 @@
 				579DF34A2E6D9B9800BD8B97 /* SwiftUIX */,
 				572B694B2E7079FB00BCED00 /* PaicordLib */,
 				57CDD87E2E71CB6000022203 /* HCaptcha */,
+				574D24DB2E76C78000CAB95E /* HighlightSwift */,
 			);
 			productName = PaiCord;
 			productReference = AA1096DB2E63BE84005BC3D2 /* Paicord.app */;
@@ -314,10 +365,11 @@
 				TargetAttributes = {
 					AA1096DA2E63BE84005BC3D2 = {
 						CreatedOnToolsVersion = 16.4;
+						LastSwiftMigration = 1620;
 					};
 				};
 			};
-			buildConfigurationList = AA1096D62E63BE84005BC3D2 /* Build configuration list for PBXProject "PaiCord" */;
+			buildConfigurationList = AA1096D62E63BE84005BC3D2 /* Build configuration list for PBXProject "Paicord" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -334,6 +386,7 @@
 				5783AA8E2E6B8F6500F73F6D /* XCRemoteSwiftPackageReference "MeshGradient" */,
 				579DF3492E6D9B9800BD8B97 /* XCRemoteSwiftPackageReference "SwiftUIX" */,
 				57CDD87D2E71CB6000022203 /* XCRemoteSwiftPackageReference "hcaptcha" */,
+				574D24DA2E76C78000CAB95E /* XCRemoteSwiftPackageReference "HighlightSwift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = AA1096DC2E63BE84005BC3D2 /* Products */;
@@ -371,9 +424,13 @@
 				57CDD8812E71FF7600022203 /* CaptchaSheet.swift in Sources */,
 				57E05C5B2E6C745900B81AA7 /* String+LocalizedError.swift in Sources */,
 				AA9C81832E6660BE0086B1DA /* ServerButton.swift in Sources */,
+				57A55C572E7560CF005C8226 /* Markdown.swift in Sources */,
+				5724CD6F2E733D0E00931FEF /* MFASheet.swift in Sources */,
 				57E05C592E6C6AE400B81AA7 /* Design Constants.swift in Sources */,
 				57E05C5D2E6CBCDC00B81AA7 /* GatewayStore.swift in Sources */,
 				5783AA942E6B8FD100F73F6D /* MeshGradient.swift in Sources */,
+				57A55C622E7563D6005C8226 /* Test.swift in Sources */,
+				57A55C5D2E75634B005C8226 /* ImageFrameScheduler.m in Sources */,
 				578E1CE12E67781700C6DEA3 /* GradientText.swift in Sources */,
 				AA1097192E64C181005BC3D2 /* NotificationsView.swift in Sources */,
 				57A4E7152E6B44C900470131 /* CGSize.swift in Sources */,
@@ -507,6 +564,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Paicord/Paicord.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -536,6 +594,8 @@
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Paicord/Utilities/Bridging/Paicord-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				XROS_DEPLOYMENT_TARGET = 1.3;
@@ -547,6 +607,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Paicord/Paicord.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -576,6 +637,7 @@
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Paicord/Utilities/Bridging/Paicord-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				XROS_DEPLOYMENT_TARGET = 1.3;
@@ -585,7 +647,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		AA1096D62E63BE84005BC3D2 /* Build configuration list for PBXProject "PaiCord" */ = {
+		AA1096D62E63BE84005BC3D2 /* Build configuration list for PBXProject "Paicord" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AA1096E52E63BE8C005BC3D2 /* Debug */,
@@ -606,6 +668,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		574D24DA2E76C78000CAB95E /* XCRemoteSwiftPackageReference "HighlightSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/appstefan/HighlightSwift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.9;
+			};
+		};
 		5783AA8E2E6B8F6500F73F6D /* XCRemoteSwiftPackageReference "MeshGradient" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/patskovn/MeshGradient";
@@ -668,6 +738,11 @@
 		572B694B2E7079FB00BCED00 /* PaicordLib */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PaicordLib;
+		};
+		574D24DB2E76C78000CAB95E /* HighlightSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 574D24DA2E76C78000CAB95E /* XCRemoteSwiftPackageReference "HighlightSwift" */;
+			productName = HighlightSwift;
 		};
 		5783AA8F2E6B8F6500F73F6D /* MeshGradient */ = {
 			isa = XCSwiftPackageProductDependency;

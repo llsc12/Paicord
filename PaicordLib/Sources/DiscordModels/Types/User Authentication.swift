@@ -6,6 +6,8 @@
 // Copyright © 2025 Lakhan Lothiyi.
 //
 
+// only logins have a unique mfa verification process. otherwise its like captchas 
+
 public struct UserAuthenticationSessions: Sendable, Codable {
   public var user_sessions: [Session]
   
@@ -19,16 +21,6 @@ public struct UserAuthenticationSessions: Sendable, Codable {
 	  public var platform: String?
 	  public var location: String?
 	}
-  }
-}
-
-public struct MFAVerificationRequest: Sendable, Codable {
-  public var ticket: String
-  public var methods: [MFAMethod]
-  
-  public struct MFAMethod: Sendable, Codable {
-    public var type: Payloads.AuthenticationMFA.MFAType
-    public var backup_codes_allowed: Bool
   }
 }
 

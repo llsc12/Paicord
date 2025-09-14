@@ -8,6 +8,9 @@
 
 import Foundation
 
+public typealias CaptchaChallengeHandler = @Sendable (CaptchaChallengeData)
+	async -> (CaptchaSubmitData?)
+
 public struct CaptchaChallengeData: Sendable, Identifiable {
 	public var id: String { captchaSessionId ?? UUID().uuidString }
 	

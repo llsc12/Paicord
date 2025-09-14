@@ -15,7 +15,7 @@ private class ConfigurationStorage: @unchecked Sendable {
 /// A container for **on-boot & one-time-only** configuration options.
 public enum DiscordGlobalConfiguration {
     /// Currently only 10 is supported.
-    public static let apiVersion = 10
+    public static let apiVersion = 9 // official client is on v9, not v10. 
     /// The global decoder to decode JSONs with.
     public static var decoder: any DiscordDecoder {
         get { ConfigurationStorage.shared.decoder }
