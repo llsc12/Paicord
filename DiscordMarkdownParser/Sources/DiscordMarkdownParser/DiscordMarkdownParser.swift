@@ -251,36 +251,10 @@ public final class DiscordMarkdownParser: Sendable {
 			if let listItemNode = item as? AST.ListItemNode,
 				let paragraphNode = listItemNode.children.first as? AST.ParagraphNode
 			{
-
-				// Reconstruct the text content from the paragraph's nodes (including inline formatting)
-				let fullText = AST.GFMTableCellNode.extractPlainText(
-					from: paragraphNode.children)
-
-				// Check if this looks like a task list item
-				if GFMUtils.isTaskListItem("- " + fullText) {  // Add dummy marker since isTaskListItem expects it
-					// Parse the task list item (add dummy marker for parsing)
-					if let taskInfo = GFMUtils.parseTaskListItem("- " + fullText) {
-						// Extract the task content nodes directly from the paragraph, preserving inline formatting
-						let taskContentNodes = extractTaskContentFromParagraph(
-							paragraphNode)
-						let taskListItem = AST.GFMTaskListItemNode(
-							isChecked: taskInfo.isChecked,
-							children: taskContentNodes,
-							sourceLocation: listItemNode.sourceLocation
-						)
-						processedItems.append(taskListItem)
-					} else {
-						// Fall back to regular list item
-						let processedItem = try await processListItemForInlineContent(
-							listItemNode, using: inlineParser)
-						processedItems.append(processedItem)
-					}
-				} else {
-					// Regular list item - process normally
-					let processedItem = try await processListItemForInlineContent(
-						listItemNode, using: inlineParser)
-					processedItems.append(processedItem)
-				}
+				// Regular list item - process normally
+				let processedItem = try await processListItemForInlineContent(
+					listItemNode, using: inlineParser)
+				processedItems.append(processedItem)
 			} else {
 				// Regular list item (not containing a paragraph or different structure)
 				let processedItem = try await processNodeForInlineContent(
@@ -525,29 +499,6 @@ public final class DiscordMarkdownParser: Sendable {
 					sourceLocation: linkNode.sourceLocation
 				)
 			}
-
-		case .table:
-			if let tableNode = originalNode as? AST.GFMTableNode {
-				return AST.GFMTableNode(
-					rows: children.compactMap { $0 as? AST.GFMTableRowNode },
-					alignments: tableNode.alignments,
-					sourceLocation: tableNode.sourceLocation
-				)
-			}
-
-		case .tableRow:
-			if let rowNode = originalNode as? AST.GFMTableRowNode {
-				return AST.GFMTableRowNode(
-					cells: children.compactMap { $0 as? AST.GFMTableCellNode },
-					isHeader: rowNode.isHeader,
-					sourceLocation: rowNode.sourceLocation
-				)
-			}
-
-		case .tableCell:
-			// Table cells typically don't have children that need processing
-			// Return the original node unchanged
-			return originalNode
 
 		default:
 			// For unknown node types, return original

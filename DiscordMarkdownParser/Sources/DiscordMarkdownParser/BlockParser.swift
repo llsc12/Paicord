@@ -107,23 +107,12 @@ public final class BlockParser {
 		case .indentedCodeBlock:
 			return try parseIndentedCodeBlock()
 
-		case .thematicBreak:
-			return parseThematicBreak()
-
-		case .htmlTag:
-			return try parseHTMLBlock()
-
 		case .newline:
 			// Empty line - skip
 			tokenStream.advance()
 			return nil
 
 		default:
-			// Check for GFM table
-			if let table = try parseSimpleGFMTable() {
-				return table
-			}
-
 			// Check for setext heading
 			if let setextHeading = try parseSetextHeading() {
 				return setextHeading
@@ -518,129 +507,6 @@ public final class BlockParser {
 
 	// MARK: - Other Block Parsers
 
-	private func parseThematicBreak() -> AST.ThematicBreakNode {
-		let startLocation = tokenStream.current.location
-		let token = tokenStream.consume()
-		let character = token.content.first { !$0.isWhitespace } ?? "-"
-
-		return AST.ThematicBreakNode(
-			character: character, sourceLocation: startLocation)
-	}
-
-	private func parseHTMLBlock() throws -> AST.HTMLBlockNode {
-		let startLocation = tokenStream.current.location
-		var content = ""
-
-		// Simple HTML block parsing - collect until blank line
-		while !tokenStream.isAtEnd {
-			let token = tokenStream.consume()
-			content += token.content
-
-			if token.type == .newline {
-				// Check if next line is blank
-				if tokenStream.check(.newline) {
-					break
-				}
-			}
-		}
-
-		return AST.HTMLBlockNode(
-			content: content.trimmingCharacters(in: .whitespacesAndNewlines),
-			sourceLocation: startLocation
-		)
-	}
-
-	// MARK: - GFM Table Parser
-
-	private func parseSimpleGFMTable() throws -> AST.GFMTableNode? {
-		// Save current position for backtracking
-		let startPosition = tokenStream.currentPosition
-
-		// Simple approach: collect a few lines and check if they form a table
-		var lines: [String] = []
-		var lineCount = 0
-		let maxLines = 10  // Limit to prevent infinite loops
-
-		// Collect up to maxLines or until we hit a clear boundary
-		while !tokenStream.isAtEnd && lineCount < maxLines {
-			if let line = collectCurrentLine() {
-				lines.append(line.content)
-				lineCount += 1
-
-				// Advance past newline if present
-				if tokenStream.check(.newline) {
-					tokenStream.advance()
-				}
-
-				// Stop if we hit a blank line or non-table content
-				if line.content.isEmpty || !GFMUtils.isTableRow(line.content) {
-					break
-				}
-			} else {
-				break
-			}
-		}
-
-		// Need at least 2 lines for a table (header + separator)
-		guard lines.count >= 2 else {
-			tokenStream.setPosition(startPosition)
-			return nil
-		}
-
-		// Check if first line is table row and second is separator
-		guard
-			GFMUtils.isTableRow(lines[0]) && GFMUtils.isTableHeaderSeparator(lines[1])
-		else {
-			tokenStream.setPosition(startPosition)
-			return nil
-		}
-
-		// Parse the table
-		let headerCells = GFMUtils.parseTableRow(lines[0])
-		let alignments = GFMUtils.parseTableHeaderSeparator(lines[1])
-
-		var rows: [AST.GFMTableRowNode] = []
-
-		// Create header row
-		let headerRow = AST.GFMTableRowNode(
-			cells: headerCells.map {
-				AST.GFMTableCellNode(
-					content: $0.trimmingCharacters(in: .whitespaces), isHeader: true)
-			},
-			isHeader: true,
-			sourceLocation: SourceLocation(line: 1, column: 1, offset: 0)
-		)
-		rows.append(headerRow)
-
-		// Create body rows (skip separator line at index 1)
-		for i in 2..<lines.count {
-			if GFMUtils.isTableRow(lines[i]) {
-				let rowCells = GFMUtils.parseTableRow(lines[i])
-				let cells = rowCells.enumerated().map { index, content in
-					let alignment = index < alignments.count ? alignments[index] : .none
-					return AST.GFMTableCellNode(
-						content: content.trimmingCharacters(in: .whitespaces),
-						isHeader: false,
-						alignment: alignment
-					)
-				}
-
-				let row = AST.GFMTableRowNode(
-					cells: cells,
-					isHeader: false,
-					sourceLocation: SourceLocation(line: i + 1, column: 1, offset: 0)
-				)
-				rows.append(row)
-			}
-		}
-
-		return AST.GFMTableNode(
-			rows: rows,
-			alignments: alignments,
-			sourceLocation: SourceLocation(line: 1, column: 1, offset: 0)
-		)
-	}
-
 	private func collectCurrentLine() -> (
 		content: String, location: SourceLocation
 	)? {
@@ -681,7 +547,7 @@ public final class BlockParser {
 		case .newline:
 			// Check if followed by another newline (blank line)
 			return tokenStream.peek().type == .newline
-		case .atxHeaderStart, .blockQuoteMarker, .listMarker, .thematicBreak:
+		case .atxHeaderStart, .blockQuoteMarker, .listMarker:
 			return true
 		case .backtick, .tildeCodeFence:
 			return token.content.count >= 3

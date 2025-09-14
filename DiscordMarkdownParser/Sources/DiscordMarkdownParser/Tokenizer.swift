@@ -61,16 +61,11 @@ public enum TokenType: String, CaseIterable, Sendable, Equatable {
 	// Block quotes
 	case blockQuoteMarker  // >
 
-	// Thematic breaks
-	case thematicBreak  // --- *** ___
-
-	// HTML
-	case htmlTag  // <tag> </tag>
-	case htmlComment  // <!-- -->
-
 	// Tables (GFM)
 	case pipe  // |
-	case tableAlignment  // :---: :--- ---:
+
+	// Discord spoiler syntax
+	case doublePipe  // ||
 
 	// Strikethrough (GFM)
 	case tilde  // ~
@@ -80,6 +75,15 @@ public enum TokenType: String, CaseIterable, Sendable, Equatable {
 
 	// URLs and emails (GFM)
 	case autolink  // http://... or email@...
+
+	// Discord-specific tokens
+	case userMention  // <@123456789>
+	case roleMention  // <@&123456789>
+	case channelMention  // <#123456789>
+	case everyoneMention  // @everyone
+	case hereMention  // @here
+	case timestamp  // <t:1757847540:R>
+	case customEmoji  // <:name:123456789> or <a:name:123456789>
 
 	// Escapes
 	case backslash  // \
@@ -214,14 +218,15 @@ public final class MarkdownTokenizer {
 		case ">":
 			return tokenizeBlockQuote()
 		case "|":
-			advance()
-			return Token(type: .pipe, content: "|", location: startLocation)
+			return tokenizePipeOrSpoiler()
 		case "\\":
 			return tokenizeBackslash()
 		case "&":
 			return tokenizeEntity()
 		case "<":
-			return tokenizeHTMLOrAutolink()
+			return tokenizeDiscordEntityOrAutolink()
+		case "@":
+			return tokenizeAtMention()
 		case "-":
 			return tokenizeDashOrList()
 		case "+":
@@ -307,11 +312,6 @@ public final class MarkdownTokenizer {
 			}
 		}
 
-		// Check for thematic breaks (--- *** ___)
-		if let thematicBreak = tokenizeThematicBreak() {
-			return thematicBreak
-		}
-
 		// Check for indented code blocks (4+ spaces)
 		if currentChar == " " {
 			if let codeBlock = tokenizeIndentedCodeBlock() {
@@ -364,7 +364,7 @@ public final class MarkdownTokenizer {
 	}
 
 	private func isSpecialCharacter(_ char: Character) -> Bool {
-		return "*_#`~[]()!>|\\&<-+".contains(char) || char.isWhitespace
+		return "*_#`~[]()!>|\\&<-+@".contains(char) || char.isWhitespace
 	}
 
 	private func tokenizeAsterisk() -> Token {
@@ -590,11 +590,10 @@ public final class MarkdownTokenizer {
 		return Token(type: .entity, content: content, location: startLocation)
 	}
 
-	private func tokenizeHTMLOrAutolink() -> Token {
-
-		// Check if this looks like an HTML tag
-		if isHTMLTag() {
-			return tokenizeHTMLTag()
+	private func tokenizeDiscordEntityOrAutolink() -> Token {
+		// Check if this looks like a Discord entity
+		if isDiscordEntity() {
+			return tokenizeDiscordEntity()
 		}
 
 		// Check if this looks like an autolink
@@ -606,45 +605,243 @@ public final class MarkdownTokenizer {
 		return tokenizeText()
 	}
 
-	private func isHTMLTag() -> Bool {
+	private func isDiscordEntity() -> Bool {
 		guard currentChar == "<" else { return false }
 
 		var pos = position + 1
 		guard pos < characters.count else { return false }
 
-		// Check for closing tag
-		if characters[pos] == "/" {
+		let nextChar = characters[pos]
+
+		// Check for Discord entity patterns:
+		// <@123> - user mention
+		// <@&123> - role mention
+		// <#123> - channel mention
+		// <t:123:R> - timestamp
+		// <:name:123> or <a:name:123> - custom emoji
+
+		// User mention: <@123>
+		if nextChar == "@" {
 			pos += 1
+			// Skip optional & for role mentions
+			if pos < characters.count && characters[pos] == "&" {
+				pos += 1
+			}
+			// Must have digits
+			if pos < characters.count && characters[pos].isNumber {
+				while pos < characters.count && characters[pos].isNumber {
+					pos += 1
+				}
+				return pos < characters.count && characters[pos] == ">"
+			}
 		}
 
-		// Must start with letter
-		guard pos < characters.count && characters[pos].isLetter else {
-			return false
-		}
-
-		// Look for closing >
-		while pos < characters.count && characters[pos] != ">" {
+		// Channel mention: <#123>
+		if nextChar == "#" {
 			pos += 1
+			// Must have digits
+			if pos < characters.count && characters[pos].isNumber {
+				while pos < characters.count && characters[pos].isNumber {
+					pos += 1
+				}
+				return pos < characters.count && characters[pos] == ">"
+			}
 		}
 
-		return pos < characters.count && characters[pos] == ">"
+		// Timestamp: <t:123:R>
+		if nextChar == "t" && pos + 1 < characters.count
+			&& characters[pos + 1] == ":"
+		{
+			pos += 2
+			// Must have digits
+			if pos < characters.count && characters[pos].isNumber {
+				while pos < characters.count && characters[pos].isNumber {
+					pos += 1
+				}
+				// Must have : and style character
+				if pos + 1 < characters.count && characters[pos] == ":" {
+					pos += 2  // Skip : and style char
+					return pos < characters.count && characters[pos] == ">"
+				}
+			}
+		}
+
+		// Custom emoji: <:name:123> or <a:name:123>
+		if nextChar == ":"
+			|| (nextChar == "a" && pos + 1 < characters.count
+				&& characters[pos + 1] == ":")
+		{
+			if nextChar == "a" {
+				pos += 2  // Skip "a:"
+			} else {
+				pos += 1  // Skip ":"
+			}
+			// Must have name
+			if pos < characters.count
+				&& (characters[pos].isLetter || characters[pos] == "_")
+			{
+				while pos < characters.count
+					&& (characters[pos].isLetter || characters[pos].isNumber
+						|| characters[pos] == "_")
+				{
+					pos += 1
+				}
+				// Must have : and digits
+				if pos < characters.count && characters[pos] == ":" {
+					pos += 1
+					if pos < characters.count && characters[pos].isNumber {
+						while pos < characters.count && characters[pos].isNumber {
+							pos += 1
+						}
+						return pos < characters.count && characters[pos] == ">"
+					}
+				}
+			}
+		}
+
+		return false
 	}
 
-	private func tokenizeHTMLTag() -> Token {
+	private func tokenizeDiscordEntity() -> Token {
 		let startLocation = currentLocation
 		var content = ""
 
-		while !isAtEnd && currentChar != ">" {
+		content.append(currentChar)  // <
+		advance()
+
+		let nextChar = currentChar
+
+		// User mention: <@123> or <@&123>
+		if nextChar == "@" {
 			content.append(currentChar)
 			advance()
+
+			// Check for role mention marker
+			let isRole = currentChar == "&"
+			if isRole {
+				content.append(currentChar)
+				advance()
+			}
+
+			// Read digits
+			while !isAtEnd && currentChar.isNumber {
+				content.append(currentChar)
+				advance()
+			}
+
+			// Must end with >
+			if currentChar == ">" {
+				content.append(currentChar)
+				advance()
+
+				let tokenType: TokenType = isRole ? .roleMention : .userMention
+				return Token(type: tokenType, content: content, location: startLocation)
+			}
 		}
 
-		if currentChar == ">" {
+		// Channel mention: <#123>
+		else if nextChar == "#" {
 			content.append(currentChar)
 			advance()
+
+			// Read digits
+			while !isAtEnd && currentChar.isNumber {
+				content.append(currentChar)
+				advance()
+			}
+
+			// Must end with >
+			if currentChar == ">" {
+				content.append(currentChar)
+				advance()
+
+				return Token(
+					type: .channelMention, content: content, location: startLocation)
+			}
 		}
 
-		return Token(type: .htmlTag, content: content, location: startLocation)
+		// Timestamp: <t:123:R>
+		else if nextChar == "t" && peek() == ":" {
+			content.append(currentChar)  // t
+			advance()
+			content.append(currentChar)  // :
+			advance()
+
+			// Read timestamp digits
+			while !isAtEnd && currentChar.isNumber {
+				content.append(currentChar)
+				advance()
+			}
+
+			// Must have : and style
+			if currentChar == ":" {
+				content.append(currentChar)
+				advance()
+
+				// Read style character
+				if !isAtEnd {
+					content.append(currentChar)
+					advance()
+				}
+
+				// Must end with >
+				if currentChar == ">" {
+					content.append(currentChar)
+					advance()
+
+					return Token(
+						type: .timestamp, content: content, location: startLocation)
+				}
+			}
+		}
+
+		// Custom emoji: <:name:123> or <a:name:123>
+		else if nextChar == ":" || (nextChar == "a" && peek() == ":") {
+			let isAnimated = nextChar == "a"
+
+			if isAnimated {
+				content.append(currentChar)  // a
+				advance()
+			}
+
+			content.append(currentChar)  // :
+			advance()
+
+			// Read emoji name
+			while !isAtEnd
+				&& (currentChar.isLetter || currentChar.isNumber || currentChar == "_")
+			{
+				content.append(currentChar)
+				advance()
+			}
+
+			// Must have : and digits
+			if currentChar == ":" {
+				content.append(currentChar)
+				advance()
+
+				// Read emoji ID digits
+				while !isAtEnd && currentChar.isNumber {
+					content.append(currentChar)
+					advance()
+				}
+
+				// Must end with >
+				if currentChar == ">" {
+					content.append(currentChar)
+					advance()
+
+					return Token(
+						type: .customEmoji, content: content, location: startLocation)
+				}
+			}
+		}
+
+		// If we get here, it's not a valid Discord entity, backtrack and return as text
+		position = startLocation.offset
+		line = startLocation.line
+		column = startLocation.column
+		return tokenizeText()
 	}
 
 	private func isAutolink() -> Bool {
@@ -673,11 +870,6 @@ public final class MarkdownTokenizer {
 		// Check if this is a list marker
 		if let listToken = tokenizeListMarker() {
 			return listToken
-		}
-
-		// Check if this is a thematic break
-		if let thematicBreak = tokenizeThematicBreak() {
-			return thematicBreak
 		}
 
 		// Default to text
@@ -783,45 +975,6 @@ public final class MarkdownTokenizer {
 
 		// List markers can be indented by 0-3 spaces
 		return spaceCount <= 3
-	}
-
-	private func tokenizeThematicBreak() -> Token? {
-		let startLocation = currentLocation
-		let char = currentChar
-
-		guard char == "-" || char == "*" || char == "_" else { return nil }
-
-		var count = 0
-		var pos = position
-
-		// Count consecutive characters, allowing spaces
-		while pos < characters.count {
-			let c = characters[pos]
-			if c == char {
-				count += 1
-			} else if c == " " || c == "\t" {
-				// Spaces are allowed
-			} else if c == "\n" || c == "\r" {
-				break
-			} else {
-				// Other characters break the pattern
-				return nil
-			}
-			pos += 1
-		}
-
-		// Must have at least 3 characters
-		guard count >= 3 else { return nil }
-
-		// Consume the entire line
-		var content = ""
-		while !isAtEnd && currentChar != "\n" && currentChar != "\r" {
-			content.append(currentChar)
-			advance()
-		}
-
-		return Token(
-			type: .thematicBreak, content: content, location: startLocation)
 	}
 
 	private func tokenizeIndentedCodeBlock() -> Token? {
@@ -1007,6 +1160,54 @@ public final class MarkdownTokenizer {
 			pos -= 1
 		}
 		return true
+	}
+
+	private func tokenizePipeOrSpoiler() -> Token {
+		let startLocation = currentLocation
+
+		// Check if this is a double pipe (spoiler)
+		if peek() == "|" {
+			advance()  // First |
+			advance()  // Second |
+			return Token(type: .doublePipe, content: "||", location: startLocation)
+		}
+
+		// Single pipe for tables
+		advance()
+		return Token(type: .pipe, content: "|", location: startLocation)
+	}
+
+	private func tokenizeAtMention() -> Token {
+		let startLocation = currentLocation
+
+		// Check for @everyone
+		if String(characters[position...]).hasPrefix("@everyone") {
+			var content = ""
+			for _ in 0..<9 {  // "@everyone".count
+				if !isAtEnd {
+					content.append(currentChar)
+					advance()
+				}
+			}
+			return Token(
+				type: .everyoneMention, content: content, location: startLocation)
+		}
+
+		// Check for @here
+		if String(characters[position...]).hasPrefix("@here") {
+			var content = ""
+			for _ in 0..<5 {  // "@here".count
+				if !isAtEnd {
+					content.append(currentChar)
+					advance()
+				}
+			}
+			return Token(
+				type: .hereMention, content: content, location: startLocation)
+		}
+
+		// Not a special mention, treat as text
+		return tokenizeText()
 	}
 }
 

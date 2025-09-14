@@ -216,23 +216,6 @@ public enum AST {
 		}
 	}
 
-	/// Thematic break node (horizontal rule)
-	public struct ThematicBreakNode: ASTNode, Sendable {
-		public let nodeType: ASTNodeType = .thematicBreak
-		public let children: [ASTNode] = []
-		public let sourceLocation: SourceLocation?
-
-		/// Character used for the break (-, *, _)
-		public let character: Character
-
-		public init(
-			character: Character = "-", sourceLocation: SourceLocation? = nil
-		) {
-			self.character = character
-			self.sourceLocation = sourceLocation
-		}
-	}
-
 	// MARK: - Inline Elements
 
 	/// Plain text node
