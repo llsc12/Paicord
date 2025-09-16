@@ -23,7 +23,7 @@ struct CaptchaSheet: ViewControllerRepresentable {
 	func makeCoordinator() -> Coordinator {
 		Coordinator(challenge: challenge, onToken: onToken)
 	}
-	
+
 	@Environment(\.colorScheme) private var colorScheme
 
 	#if os(iOS)
@@ -43,7 +43,8 @@ struct CaptchaSheet: ViewControllerRepresentable {
 					equalTo: controller.view.bottomAnchor),
 			])
 
-			context.coordinator.startCaptcha(on: placeholder, theme: colorScheme == .dark ? "dark" : "light")
+			context.coordinator.startCaptcha(
+				on: placeholder, theme: colorScheme == .dark ? "dark" : "light")
 			return controller
 		}
 
@@ -68,7 +69,8 @@ struct CaptchaSheet: ViewControllerRepresentable {
 					equalTo: controller.view.bottomAnchor),
 			])
 
-			context.coordinator.startCaptcha(on: placeholder, theme: colorScheme == .dark ? "dark" : "light")
+			context.coordinator.startCaptcha(
+				on: placeholder, theme: colorScheme == .dark ? "dark" : "light")
 			return controller
 		}
 
@@ -91,7 +93,7 @@ struct CaptchaSheet: ViewControllerRepresentable {
 		}
 
 		#if os(iOS)
-		func startCaptcha(on hostView: UIView, theme: String = "light") {
+			func startCaptcha(on hostView: UIView, theme: String = "light") {
 				guard let siteKey = challenge.captchaSiteKey else {
 					DispatchQueue.main.async { [onToken] in onToken(nil) }
 					return
@@ -111,12 +113,17 @@ struct CaptchaSheet: ViewControllerRepresentable {
 				hcaptcha?.onEvent { event, _ in
 					print("HCaptcha event: \(event.rawValue)")
 				}
-				hcaptcha?.validate(on: hostView) { [weak self] result in
-					self?.handleResult(result)
+				hcaptcha?.validate(on: hostView) { result in
+					do {
+						let str = try result.dematerialize()
+						self.handleResult(.success(str))
+					} catch {
+						self.handleResult(.failure(error))
+					}
 				}
 			}
 		#else
-		func startCaptcha(on hostView: NSView, theme: String = "light") {
+			func startCaptcha(on hostView: NSView, theme: String = "light") {
 				guard let siteKey = challenge.captchaSiteKey else {
 					DispatchQueue.main.async { [onToken] in onToken(nil) }
 					return

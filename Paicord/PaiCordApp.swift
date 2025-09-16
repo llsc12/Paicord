@@ -124,7 +124,9 @@ struct PaiCordApp: App {
 					}
 				})
 		}
+		#if os(macOS)
 		.windowToolbarStyle(.unifiedCompact)
+		#endif
 		.commands {
 			CommandMenu("Account") {
 				Button("Log Out") {

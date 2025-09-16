@@ -30,14 +30,7 @@ struct SidebarView: View {
 			}
 			.scrollIndicators(.hidden)
 			.frame(width: 60)
-			.introspect(.scrollView, on: .macOS(.v14...)) { scrollView in
-				scrollView.hasVerticalScroller = false
-				scrollView.hasHorizontalScroller = false
-				scrollView.scrollerStyle = .overlay
-				scrollView.autohidesScrollers = true
-				scrollView.verticalScroller?.alphaValue = 0
-				scrollView.horizontalScroller?.alphaValue = 0
-			}
+			.scrollviewForceDisableScrollBars()
 
 			ScrollView {
 				VStack {
@@ -57,5 +50,23 @@ struct SidebarView: View {
 			.roundedCorners(radius: 10, corners: .topLeft)
 		}
 		.navigationSplitViewColumnWidth(min: 200, ideal: 240, max: 350)
+	}
+}
+
+fileprivate extension View {
+	func scrollviewForceDisableScrollBars() -> some View {
+		#if os(macOS)
+		self
+		.introspect(.scrollView, on: .macOS(.v14...)) { scrollView in
+			scrollView.hasVerticalScroller = false
+			scrollView.hasHorizontalScroller = false
+			scrollView.scrollerStyle = .overlay
+			scrollView.autohidesScrollers = true
+			scrollView.verticalScroller?.alphaValue = 0
+			scrollView.horizontalScroller?.alphaValue = 0
+		}
+		#else
+		self
+		#endif
 	}
 }

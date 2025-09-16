@@ -97,7 +97,7 @@ struct LoginView: View {
 				.padding(.bottom, 10)
 
 			Text("Password")
-			TextField("", text: $password)
+			SecureField("", text: $password)
 				.textFieldStyle(.plain)
 				.padding(10)
 				.frame(maxWidth: .infinity)

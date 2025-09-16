@@ -9,9 +9,10 @@
 import MeshGradient
 import simd
 import protocol SwiftUI.View
-import struct SwiftUICore.Environment
-import struct SwiftUICore.EnvironmentValues
-import struct SwiftUICore.State
+import struct SwiftUI.Environment
+import struct SwiftUI.EnvironmentValues
+import struct SwiftUI.State
+import struct SwiftUI.Group
 
 extension LoginView {
   struct MeshGradientBackground: View {
@@ -79,11 +80,21 @@ extension LoginView {
     @Environment(\.colorScheme) var cs
 
     var body: some View {
-      MeshGradient(
-        initialGrid: generatePlainGrid(),
-        animatorConfiguration: .init(
-          animationSpeedRange: 2...4, meshRandomizer: meshRandomizer)
-      )
+			Group {
+#if os(iOS)
+				LegacyMeshGradient(
+					initialGrid: generatePlainGrid(),
+					animatorConfiguration: .init(
+						animationSpeedRange: 2...4, meshRandomizer: meshRandomizer)
+				)
+#elseif os(macOS)
+				MeshGradient(
+					initialGrid: generatePlainGrid(),
+					animatorConfiguration: .init(
+						animationSpeedRange: 2...4, meshRandomizer: meshRandomizer)
+				)
+#endif
+			}
       .onAppear {
         let colors = cs == .light ? Self.meshColorsLight : Self.meshColorsDark
         self.meshRandomizer = MeshRandomizer(
