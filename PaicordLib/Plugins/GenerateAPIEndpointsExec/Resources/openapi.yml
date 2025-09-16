@@ -1,0 +1,6591 @@
+openapi: 3.0.0
+info:
+  title: Discord REST API
+  description: HTTP-based API to interact with Discord
+  version: 1.0.0
+servers:
+  - url: http://{{baseurl}}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+    apikeyAuth:
+      type: http
+      scheme: apikey
+security:
+  - apikeyAuth: []
+tags:
+  - name: AutoMod
+    description: >-
+      Manage Auto Moderation rules and filters that detect and take action on
+      content posted in servers
+  - name: Audit Log
+    description: View a list of administrative actions taken in a server
+  - name: Channels
+    description: >-
+      Manage channels, a container for messages, posts, and voice activity in
+      Discord
+  - name: Commands
+    description: >-
+      Configure and manage application commands, a user-invokable entry points
+      for apps
+  - name: Emoji
+    description: Configure custom emoji in a server
+  - name: Gateway
+    description: Fetch information about the Gateway API
+  - name: Guilds
+    description: Manage servers in Discord
+  - name: Guild Templates
+    description: >-
+      Create and manage snapshots of a server, including its channels, roles,
+      permissions, and settings
+  - name: Interactions
+    description: Handle and respond to interactions between an app and a user
+  - name: Invites
+    description: Manage unique codes to invite users to a server or channel
+  - name: Members
+    description: Manage users in a server
+  - name: Messages
+    description: Manage, post, and pin messages in a channel
+  - name: OAuth
+    description: Fetch authorization information
+  - name: Roles
+    description: Manage groups of users with defined permissions in a server
+  - name: Role Connections
+    description: Configure role connection metadata, and set it for users
+  - name: Scheduled Events
+    description: Manage scheduled events in a server
+  - name: Stages
+    description: Manage instances of a stage within a stage channel
+  - name: Stickers
+    description: Configure custom stickers in a server
+  - name: Threads
+    description: >-
+      Manage threads, a container in channels for sub-conversations about a
+      topic or message
+  - name: Users
+    description: Manage users in Discord
+  - name: Voice
+    description: Manage voice connection state for a user
+  - name: Webhooks
+    description: >-
+      Configure automated messages sent to a channel when something happens in a
+      3rd party service
+paths:
+  /guilds/{guild_id}/auto-moderation/rules/{rule_id}:
+    get:
+      tags:
+        - AutoMod
+      summary: get auto moderation rule
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: rule_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    delete:
+      tags:
+        - AutoMod
+      summary: delete auto moderation rule
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: rule_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    patch:
+      tags:
+        - AutoMod
+      summary: update auto moderation rule
+      requestBody:
+        content: {}
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: rule_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/auto-moderation/rules:
+    get:
+      tags:
+        - AutoMod
+      summary: list auto moderation rules
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    post:
+      tags:
+        - AutoMod
+      summary: create auto moderation rule
+      requestBody:
+        content: {}
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/audit-logs:
+    get:
+      tags:
+        - Audit Log
+      summary: list guild audit log entries
+      parameters:
+        - name: user_id
+          in: query
+          schema:
+            type: string
+          example: <string,null-snowflake>
+        - name: action_type
+          in: query
+          schema:
+            type: string
+          example: <integer,null>
+        - name: before
+          in: query
+          schema:
+            type: string
+          example: <string,null-snowflake>
+        - name: after
+          in: query
+          schema:
+            type: string
+          example: <string,null-snowflake>
+        - name: limit
+          in: query
+          schema:
+            type: string
+          example: <integer,null>
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /users/@me/channels:
+    post:
+      tags:
+        - Channels
+      summary: create dm
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    post-2:
+      tags:
+        - Channels
+      summary: create group dm
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /channels/{channel_id}/permissions/{overwrite_id}:
+    put:
+      tags:
+        - Channels
+      summary: set channel permission overwrite
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                type: <integer,null>
+                allow: <integer,null>
+                deny: <integer,null>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: overwrite_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    delete:
+      tags:
+        - Channels
+      summary: delete channel permission overwrite
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: overwrite_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /channels/{channel_id}/polls/{message_id}/answers/{answer_id}:
+    get:
+      tags:
+        - Polls
+      summary: list poll answer voters
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: message_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: answer_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /channels/{channel_id}/polls/{message_id}/expire:
+    post:
+      tags:
+        - Polls
+      summary: end poll
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: message_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /channels/{channel_id}/recipients/{user_id}:
+    put:
+      tags:
+        - Channels
+      summary: add group dm user
+      requestBody:
+        content: {}
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: user_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    delete:
+      tags:
+        - Channels
+      summary: delete group dm user
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: user_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /channels/{channel_id}/followers:
+    post:
+      tags:
+        - Channels
+      summary: follow announcement channel
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                webhook_channel_id: <snowflake>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /channels/{channel_id}/typing:
+    post:
+      tags:
+        - Channels
+      summary: trigger typing indicator
+      requestBody:
+        content: {}
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /channels/{channel_id}/pins/{message_id}:
+    put:
+      tags:
+        - Channels
+      summary: pin message
+      requestBody:
+        content: {}
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: message_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    delete:
+      tags:
+        - Channels
+      summary: unpin message
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: message_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /channels/{channel_id}/pins:
+    get:
+      tags:
+        - Channels
+      summary: list pinned messages
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/channels:
+    get:
+      tags:
+        - Guilds
+      summary: list guild channels
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    post:
+      tags:
+        - Guilds
+      summary: create guild channel
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    patch:
+      tags:
+        - Guilds
+      summary: update guild channel positions
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+  /channels/{channel_id}:
+    get:
+      tags:
+        - Channels
+      summary: get channel
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    delete:
+      tags:
+        - Channels
+      summary: delete channel
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    patch:
+      tags:
+        - Channels
+      summary: update channel
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: <string,null>
+                icon: <string,null>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /applications/{application_id}/guilds/{guild_id}/commands/permissions:
+    get:
+      tags:
+        - Commands
+      summary: list guild application command permissions
+      parameters:
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions:
+    get:
+      tags:
+        - Commands
+      summary: get guild application command permissions
+      parameters:
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: command_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    put:
+      tags:
+        - Commands
+      summary: set guild application command permissions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                permissions:
+                  - id: <snowflake>
+                    type: <integer>
+                    permission: <boolean>
+                  - id: <snowflake>
+                    type: <integer>
+                    permission: <boolean>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: command_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /applications/{application_id}/guilds/{guild_id}/commands/{command_id}:
+    get:
+      tags:
+        - Commands
+      summary: get guild application command
+      parameters:
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: command_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    delete:
+      tags:
+        - Commands
+      summary: delete guild application command
+      parameters:
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: command_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    patch:
+      tags:
+        - Commands
+      summary: update guild application command
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: command_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /applications/{application_id}/guilds/{guild_id}/commands:
+    get:
+      tags:
+        - Commands
+      summary: list guild application commands
+      parameters:
+        - name: with_localizations
+          in: query
+          schema:
+            type: string
+          example: <boolean,null>
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    put:
+      tags:
+        - Commands
+      summary: bulk set guild application commands
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                - name: <string>
+                  type: <integer>
+                  id: <string,null-snowflake>
+                  name_localizations:
+                    laborume: <string>
+                    ea_ae: <string>
+                    nisi_671: <string>
+                    dolorea_c: <string>
+                    Utc: <string>
+                    elit_5c: <string>
+                  description: <string,null>
+                  description_localizations:
+                    eu_7: <string>
+                    dolorea5: <string>
+                    tempor_1a_: <string>
+                    dolore_2: <string>
+                    ea5_e: <string>
+                    et6: <string>
+                    aute8e: <string>
+                    ut5: <string>
+                    reprehenderit_1: <string>
+                    voluptate0bf: <string>
+                    in95: <string>
+                    do_e1: <string>
+                    nulla4: <string>
+                    fugiat_1a7: <string>
+                    adipisicingcbe: <string>
+                    amet93a: <string>
+                    labore_ab: <string>
+                    ut_5: <string>
+                    autec6: <string>
+                  options:
+                    - type: <integer>
+                      name: <string>
+                      description: <string>
+                      name_localizations:
+                        occaecat_a: <string>
+                        in9: <string>
+                        proident_69: <string>
+                        officia_0d: <string>
+                        irure3b3: <string>
+                        sed_ca: <string>
+                        dolore_3: <string>
+                        magna6f0: <string>
+                        Excepteur_5a: <string>
+                      description_localizations:
+                        irure_b: <string>
+                        aliquipa: <string>
+                        Lorem17: <string>
+                        ex9: <string>
+                        laborum890: <string>
+                        adipisicing_6ff: <string>
+                      required: <boolean,null>
+                    - type: <integer>
+                      name: <string>
+                      description: <string>
+                      name_localizations:
+                        amet_3: <string>
+                        veniamb: <string>
+                        ipsum_fa_: <string>
+                        aute6f: <string>
+                        fugiat_442: <string>
+                        ut_8: <string>
+                        dolor2_f: <string>
+                        magna_a7: <string>
+                        sint_cc: <string>
+                        esse_9: <string>
+                        ut167: <string>
+                        irure_d4: <string>
+                        est_71a: <string>
+                        fugiat_: <string>
+                        ut_7: <string>
+                      description_localizations:
+                        anima68: <string>
+                        inb: <string>
+                        ipsum7: <string>
+                        Lorem6: <string>
+                        ex_9: <string>
+                        irure13e: <string>
+                        id_c7_: <string>
+                        nostrud_ec6: <string>
+                        enim346: <string>
+                        commodo_fb0: <string>
+                        irure970: <string>
+                        ad_cf1: <string>
+                        ut1: <string>
+                        labore_9: <string>
+                        ex0: <string>
+                        mollit1ed: <string>
+                        deserunt7_8: <string>
+                        sit_e07: <string>
+                        ad_8: <string>
+                        laborumac: <string>
+                        ullamco67: <string>
+                        aliqua_23f: <string>
+                        cupidatat6f: <string>
+                        elit_de2: <string>
+                        occaecat_e: <string>
+                        velit_5b: <string>
+                        dolor_2d: <string>
+                        commodo5: <string>
+                        officiad: <string>
+                        commodo78c: <string>
+                        utc: <string>
+                        in_43: <string>
+                      required: <boolean,null>
+                  default_permission: <boolean,null>
+                  default_member_permissions: <integer,null>
+                  dm_permission: <boolean,null>
+                - name: <string>
+                  type: <integer>
+                  id: <string,null-snowflake>
+                  name_localizations:
+                    et_8: <string>
+                    irure4c: <string>
+                    ipsum_25: <string>
+                    quic: <string>
+                    ea_8c: <string>
+                    Duis_320: <string>
+                    proident_0: <string>
+                    qui__3a: <string>
+                    cillumb3_: <string>
+                    nulla_1: <string>
+                    occaecat_13a: <string>
+                    est810: <string>
+                    Duis_3: <string>
+                    est_eb6: <string>
+                    culpa_3: <string>
+                    aute833: <string>
+                    in_b4: <string>
+                    occaecat_5: <string>
+                    veniam5b: <string>
+                    dolore_dd: <string>
+                    irure95: <string>
+                    irurea2f: <string>
+                    inf: <string>
+                  description: <string,null>
+                  description_localizations:
+                    do_bf6: <string>
+                    labore_d37: <string>
+                    enim_4: <string>
+                    irure_913: <string>
+                    incididunt49_: <string>
+                    cillum__: <string>
+                    minim1: <string>
+                    quifc: <string>
+                  options:
+                    - type: <integer>
+                      name: <string>
+                      description: <string>
+                      name_localizations:
+                        do6: <string>
+                        irure_42: <string>
+                        officia_0: <string>
+                        sitbb: <string>
+                        Duis10: <string>
+                        Excepteur85: <string>
+                        dolored90: <string>
+                        ullamcoe: <string>
+                        Ut58: <string>
+                      description_localizations:
+                        in_0: <string>
+                        in_56: <string>
+                        ullamco92: <string>
+                        pariatur58: <string>
+                        ullamco_c: <string>
+                        do_5ef: <string>
+                        Duis_0e: <string>
+                        aliqua86: <string>
+                        pariatur65: <string>
+                        eu_e73: <string>
+                        et_b: <string>
+                        animd13: <string>
+                        amet_15: <string>
+                        ut31_: <string>
+                        Ut43: <string>
+                        voluptate_8c: <string>
+                        id0: <string>
+                        Duisda2: <string>
+                        ut4: <string>
+                        id_f: <string>
+                        ullamco_7a: <string>
+                        cupidatate5: <string>
+                        occaecat_44: <string>
+                        fugiat_74: <string>
+                        amet4ca: <string>
+                        adipisicing6: <string>
+                        ameta01: <string>
+                        dolor21: <string>
+                        quis_c56: <string>
+                        consequat_11: <string>
+                      required: <boolean,null>
+                    - type: <integer>
+                      name: <string>
+                      description: <string>
+                      name_localizations:
+                        commodo26: <string>
+                        exercitation_e33: <string>
+                        Duis_93: <string>
+                        sed_d: <string>
+                        do7: <string>
+                        enim_b3: <string>
+                        sunt_350: <string>
+                        culpa_24: <string>
+                        sint_a55: <string>
+                        qui_4: <string>
+                        elit_6e: <string>
+                        elit_40: <string>
+                        cupidatat43d: <string>
+                        Excepteur_9: <string>
+                        est119: <string>
+                        nostrud_21: <string>
+                        cillum17f: <string>
+                        Duisa: <string>
+                        ametbf: <string>
+                        dolore92: <string>
+                        deserunt806: <string>
+                        sunt5ba: <string>
+                        id_2: <string>
+                      description_localizations:
+                        laboris4c: <string>
+                        aliquip_12b: <string>
+                        mollit_99: <string>
+                        in9c: <string>
+                        in_: <string>
+                        in_e0d: <string>
+                        proidentff: <string>
+                        anim0b: <string>
+                        cupidatat_8: <string>
+                        ipsum_7: <string>
+                        incididunt_5: <string>
+                        nonc70: <string>
+                        ullamco0: <string>
+                        dolore_4: <string>
+                        non_1_9: <string>
+                        elit_2: <string>
+                        estee: <string>
+                        non9b9: <string>
+                        sunt0e5: <string>
+                      required: <boolean,null>
+                  default_permission: <boolean,null>
+                  default_member_permissions: <integer,null>
+                  dm_permission: <boolean,null>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    post:
+      tags:
+        - Commands
+      summary: create guild application command
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: <string>
+                type: <integer>
+                description: <string,null>
+                options:
+                  - type: <integer>
+                    name: <string>
+                    description: <string>
+                    required: <boolean,null>
+                  - type: <integer>
+                    name: <string>
+                    description: <string>
+                    required: <boolean,null>
+                default_permission: <boolean,null>
+                default_member_permissions: <integer,null>
+                dm_permission: <boolean,null>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /applications/{application_id}/commands/{command_id}:
+    get:
+      tags:
+        - Commands
+      summary: get application command
+      parameters:
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: command_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    delete:
+      tags:
+        - Commands
+      summary: delete application command
+      parameters:
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: command_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    patch:
+      tags:
+        - Commands
+      summary: update application command
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: <string>
+                description: <string,null>
+                options:
+                  - type: <integer>
+                    name: <string>
+                    description: <string>
+                    required: <boolean,null>
+                  - type: <integer>
+                    name: <string>
+                    description: <string>
+                    required: <boolean,null>
+                default_permission: <boolean,null>
+                default_member_permissions: <integer,null>
+                dm_permission: <boolean,null>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: command_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /applications/{application_id}/commands:
+    get:
+      tags:
+        - Commands
+      summary: list application commands
+      parameters:
+        - name: with_localizations
+          in: query
+          schema:
+            type: string
+          example: <boolean,null>
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    put:
+      tags:
+        - Commands
+      summary: bulk set application commands
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                - name: <string>
+                  type: <integer>
+                  id: <string,null-snowflake>
+                  name_localizations:
+                    laborume: <string>
+                    ea_ae: <string>
+                    nisi_671: <string>
+                    dolorea_c: <string>
+                    Utc: <string>
+                    elit_5c: <string>
+                  description: <string,null>
+                  description_localizations:
+                    eu_7: <string>
+                    dolorea5: <string>
+                    tempor_1a_: <string>
+                    dolore_2: <string>
+                    ea5_e: <string>
+                    et6: <string>
+                    aute8e: <string>
+                    ut5: <string>
+                    reprehenderit_1: <string>
+                    voluptate0bf: <string>
+                    in95: <string>
+                    do_e1: <string>
+                    nulla4: <string>
+                    fugiat_1a7: <string>
+                    adipisicingcbe: <string>
+                    amet93a: <string>
+                    labore_ab: <string>
+                    ut_5: <string>
+                    autec6: <string>
+                  options:
+                    - type: <integer>
+                      name: <string>
+                      description: <string>
+                      name_localizations:
+                        occaecat_a: <string>
+                        in9: <string>
+                        proident_69: <string>
+                        officia_0d: <string>
+                        irure3b3: <string>
+                        sed_ca: <string>
+                        dolore_3: <string>
+                        magna6f0: <string>
+                        Excepteur_5a: <string>
+                      description_localizations:
+                        irure_b: <string>
+                        aliquipa: <string>
+                        Lorem17: <string>
+                        ex9: <string>
+                        laborum890: <string>
+                        adipisicing_6ff: <string>
+                      required: <boolean,null>
+                    - type: <integer>
+                      name: <string>
+                      description: <string>
+                      name_localizations:
+                        amet_3: <string>
+                        veniamb: <string>
+                        ipsum_fa_: <string>
+                        aute6f: <string>
+                        fugiat_442: <string>
+                        ut_8: <string>
+                        dolor2_f: <string>
+                        magna_a7: <string>
+                        sint_cc: <string>
+                        esse_9: <string>
+                        ut167: <string>
+                        irure_d4: <string>
+                        est_71a: <string>
+                        fugiat_: <string>
+                        ut_7: <string>
+                      description_localizations:
+                        anima68: <string>
+                        inb: <string>
+                        ipsum7: <string>
+                        Lorem6: <string>
+                        ex_9: <string>
+                        irure13e: <string>
+                        id_c7_: <string>
+                        nostrud_ec6: <string>
+                        enim346: <string>
+                        commodo_fb0: <string>
+                        irure970: <string>
+                        ad_cf1: <string>
+                        ut1: <string>
+                        labore_9: <string>
+                        ex0: <string>
+                        mollit1ed: <string>
+                        deserunt7_8: <string>
+                        sit_e07: <string>
+                        ad_8: <string>
+                        laborumac: <string>
+                        ullamco67: <string>
+                        aliqua_23f: <string>
+                        cupidatat6f: <string>
+                        elit_de2: <string>
+                        occaecat_e: <string>
+                        velit_5b: <string>
+                        dolor_2d: <string>
+                        commodo5: <string>
+                        officiad: <string>
+                        commodo78c: <string>
+                        utc: <string>
+                        in_43: <string>
+                      required: <boolean,null>
+                  default_permission: <boolean,null>
+                  default_member_permissions: <integer,null>
+                  dm_permission: <boolean,null>
+                - name: <string>
+                  type: <integer>
+                  id: <string,null-snowflake>
+                  name_localizations:
+                    et_8: <string>
+                    irure4c: <string>
+                    ipsum_25: <string>
+                    quic: <string>
+                    ea_8c: <string>
+                    Duis_320: <string>
+                    proident_0: <string>
+                    qui__3a: <string>
+                    cillumb3_: <string>
+                    nulla_1: <string>
+                    occaecat_13a: <string>
+                    est810: <string>
+                    Duis_3: <string>
+                    est_eb6: <string>
+                    culpa_3: <string>
+                    aute833: <string>
+                    in_b4: <string>
+                    occaecat_5: <string>
+                    veniam5b: <string>
+                    dolore_dd: <string>
+                    irure95: <string>
+                    irurea2f: <string>
+                    inf: <string>
+                  description: <string,null>
+                  description_localizations:
+                    do_bf6: <string>
+                    labore_d37: <string>
+                    enim_4: <string>
+                    irure_913: <string>
+                    incididunt49_: <string>
+                    cillum__: <string>
+                    minim1: <string>
+                    quifc: <string>
+                  options:
+                    - type: <integer>
+                      name: <string>
+                      description: <string>
+                      name_localizations:
+                        do6: <string>
+                        irure_42: <string>
+                        officia_0: <string>
+                        sitbb: <string>
+                        Duis10: <string>
+                        Excepteur85: <string>
+                        dolored90: <string>
+                        ullamcoe: <string>
+                        Ut58: <string>
+                      description_localizations:
+                        in_0: <string>
+                        in_56: <string>
+                        ullamco92: <string>
+                        pariatur58: <string>
+                        ullamco_c: <string>
+                        do_5ef: <string>
+                        Duis_0e: <string>
+                        aliqua86: <string>
+                        pariatur65: <string>
+                        eu_e73: <string>
+                        et_b: <string>
+                        animd13: <string>
+                        amet_15: <string>
+                        ut31_: <string>
+                        Ut43: <string>
+                        voluptate_8c: <string>
+                        id0: <string>
+                        Duisda2: <string>
+                        ut4: <string>
+                        id_f: <string>
+                        ullamco_7a: <string>
+                        cupidatate5: <string>
+                        occaecat_44: <string>
+                        fugiat_74: <string>
+                        amet4ca: <string>
+                        adipisicing6: <string>
+                        ameta01: <string>
+                        dolor21: <string>
+                        quis_c56: <string>
+                        consequat_11: <string>
+                      required: <boolean,null>
+                    - type: <integer>
+                      name: <string>
+                      description: <string>
+                      name_localizations:
+                        commodo26: <string>
+                        exercitation_e33: <string>
+                        Duis_93: <string>
+                        sed_d: <string>
+                        do7: <string>
+                        enim_b3: <string>
+                        sunt_350: <string>
+                        culpa_24: <string>
+                        sint_a55: <string>
+                        qui_4: <string>
+                        elit_6e: <string>
+                        elit_40: <string>
+                        cupidatat43d: <string>
+                        Excepteur_9: <string>
+                        est119: <string>
+                        nostrud_21: <string>
+                        cillum17f: <string>
+                        Duisa: <string>
+                        ametbf: <string>
+                        dolore92: <string>
+                        deserunt806: <string>
+                        sunt5ba: <string>
+                        id_2: <string>
+                      description_localizations:
+                        laboris4c: <string>
+                        aliquip_12b: <string>
+                        mollit_99: <string>
+                        in9c: <string>
+                        in_: <string>
+                        in_e0d: <string>
+                        proidentff: <string>
+                        anim0b: <string>
+                        cupidatat_8: <string>
+                        ipsum_7: <string>
+                        incididunt_5: <string>
+                        nonc70: <string>
+                        ullamco0: <string>
+                        dolore_4: <string>
+                        non_1_9: <string>
+                        elit_2: <string>
+                        estee: <string>
+                        non9b9: <string>
+                        sunt0e5: <string>
+                      required: <boolean,null>
+                  default_permission: <boolean,null>
+                  default_member_permissions: <integer,null>
+                  dm_permission: <boolean,null>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    post:
+      tags:
+        - Commands
+      summary: create application command
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: <string>
+                type: <integer>
+                description: <string,null>
+                options:
+                  - type: <integer>
+                    name: <string>
+                    description: <string>
+                    required: <boolean,null>
+                  - type: <integer>
+                    name: <string>
+                    description: <string>
+                    required: <boolean,null>
+                default_permission: <boolean,null>
+                default_member_permissions: <integer,null>
+                dm_permission: <boolean,null>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/emojis/{emoji_id}:
+    get:
+      tags:
+        - Emoji
+      summary: get guild emoji
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: emoji_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    delete:
+      tags:
+        - Emoji
+      summary: delete guild emoji
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: emoji_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    patch:
+      tags:
+        - Emoji
+      summary: update guild emoji
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: <string>
+                roles:
+                  - <string,null-snowflake>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: emoji_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/emojis:
+    get:
+      tags:
+        - Emoji
+      summary: list guild emojis
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    post:
+      tags:
+        - Emoji
+      summary: create guild emoji
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: <string>
+                image: <string>
+                roles:
+                  - <string,null-snowflake>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /gateway/bot:
+    get:
+      tags:
+        - Gateway
+      summary: get bot gateway
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /gateway:
+    get:
+      tags:
+        - Gateway
+      summary: get gateway
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /users/@me/guilds:
+    get:
+      tags:
+        - Guilds
+      summary: list own guilds
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: before
+          in: query
+          schema:
+            type: string
+          example: <string,null-snowflake>
+        - name: after
+          in: query
+          schema:
+            type: string
+          example: <string,null-snowflake>
+        - name: limit
+          in: query
+          schema:
+            type: string
+          example: <integer,null>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds:
+    post:
+      tags:
+        - Guilds
+      summary: create guild
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: <string>
+                description: <string,null>
+                region: <string,null>
+                icon: <string,null>
+                verification_level: <integer,null>
+                default_message_notifications: <integer,null>
+                explicit_content_filter: <integer,null>
+                preferred_locale: <string,null>
+                afk_timeout: <integer,null>
+                roles:
+                  - <null>
+                  - <null>
+                channels:
+                  - <null>
+                  - <null>
+                afk_channel_id: <string,null-snowflake>
+                system_channel_id: <string,null-snowflake>
+                system_channel_flags: <integer,null>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /users/@me/guilds/{guild_id}:
+    delete:
+      tags:
+        - Guilds
+      summary: leave guild
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/welcome-screen:
+    get:
+      tags:
+        - Guilds
+      summary: get guild welcome screen
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    patch:
+      tags:
+        - Guilds
+      summary: update guild welcome screen
+      requestBody:
+        content: {}
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/integrations/{integration_id}:
+    delete:
+      tags:
+        - Guilds
+      summary: delete guild integration
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: integration_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/integrations:
+    get:
+      tags:
+        - Guilds
+      summary: list guild integrations
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/widget.json:
+    get:
+      tags:
+        - Guilds
+      summary: get guild widget
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/vanity-url:
+    get:
+      tags:
+        - Guilds
+      summary: get guild vanity url
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/widget.png:
+    get:
+      tags:
+        - Guilds
+      summary: get guild widget png
+      parameters:
+        - name: style
+          in: query
+          schema:
+            type: string
+          example: <string,null>
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/preview:
+    get:
+      tags:
+        - Guilds
+      summary: get guild preview
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/widget:
+    get:
+      tags:
+        - Guilds
+      summary: get guild widget settings
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    patch:
+      tags:
+        - Guilds
+      summary: update guild widget settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                channel_id: <string,null-snowflake>
+                enabled: <boolean,null>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/prune:
+    get:
+      tags:
+        - Guilds
+      summary: preview prune guild
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    post:
+      tags:
+        - Guilds
+      summary: prune guild
+      requestBody:
+        content: {}
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/bans/{user_id}:
+    get:
+      tags:
+        - Guilds
+      summary: get guild ban
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: user_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    put:
+      tags:
+        - Guilds
+      summary: ban user from guild
+      requestBody:
+        content: {}
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: user_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    delete:
+      tags:
+        - Guilds
+      summary: unban user from guild
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: user_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/bulk-ban:
+    post:
+      tags:
+        - Guilds
+      summary: bulk ban users from guild
+      requestBody:
+        content: {}
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/bans:
+    get:
+      tags:
+        - Guilds
+      summary: list guild bans
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: string
+          example: <integer,null>
+        - name: before
+          in: query
+          schema:
+            type: string
+          example: <string,null-snowflake>
+        - name: after
+          in: query
+          schema:
+            type: string
+          example: <string,null-snowflake>
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/mfa:
+    post:
+      tags:
+        - Guilds
+      summary: set guild mfa level
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                level: <integer>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}:
+    get:
+      tags:
+        - Guilds
+      summary: get guild
+      parameters:
+        - name: with_counts
+          in: query
+          schema:
+            type: string
+          example: <boolean,null>
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    delete:
+      tags:
+        - Guilds
+      summary: delete guild
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    patch:
+      tags:
+        - Guilds
+      summary: update guild
+      requestBody:
+        content: {}
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/onboarding:
+    get:
+      tags:
+        - Guilds
+      summary: get guild onboarding
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+    put:
+      tags:
+        - Guilds
+      summary: update guild onboarding
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+  /guilds/templates/{code}:
+    get:
+      tags:
+        - Guild Templates
+      summary: get guild template
+      parameters:
+        - name: code
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    post:
+      tags:
+        - Guild Templates
+      summary: create guild from template
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: <string>
+                icon: <string,null>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: code
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/templates/{code}:
+    put:
+      tags:
+        - Guild Templates
+      summary: sync guild template
+      requestBody:
+        content: {}
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: code
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    delete:
+      tags:
+        - Guild Templates
+      summary: delete guild template
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: code
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    patch:
+      tags:
+        - Guild Templates
+      summary: update guild template
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: <string>
+                description: <string,null>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: code
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/templates:
+    get:
+      tags:
+        - Guild Templates
+      summary: list guild templates
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    post:
+      tags:
+        - Guild Templates
+      summary: create guild template
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: <string>
+                description: <string,null>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /interactions/{interaction_id}/{interaction_token}/callback:
+    post:
+      tags:
+        - Interactions
+      summary: create interaction response
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  example: <integer>
+                choices:
+                  type: string
+                  example: '["<null>","<null>"]'
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/x-www-form-urlencoded
+        - name: interaction_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: interaction_token
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /webhooks/{application_id}/{interaction_token}/messages/@original:
+    get:
+      tags:
+        - Interactions
+      summary: get original interaction response
+      parameters:
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: interaction_token
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+    patch:
+      tags:
+        - Interactions
+      summary: update original interaction response
+      parameters:
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: interaction_token
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+    delete:
+      tags:
+        - Interactions
+      summary: delete original interaction response
+      parameters:
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: interaction_token
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+  /webhooks/{application_id}/{interaction_token}:
+    post:
+      tags:
+        - Interactions
+      summary: create followup message
+      parameters:
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: interaction_token
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+  /webhooks/{application_id}/{interaction_token}/messages/{message_id}:
+    get:
+      tags:
+        - Interactions
+      summary: get followup message
+      parameters:
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: interaction_token
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+        - name: message_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+    patch:
+      tags:
+        - Interactions
+      summary: update followup message
+      parameters:
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: interaction_token
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+        - name: message_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+    delete:
+      tags:
+        - Interactions
+      summary: delete followup message
+      parameters:
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: interaction_token
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+        - name: message_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+  /webhooks/{webhook_id}/{webhook_token}/messages/{message_id}:
+    get:
+      tags:
+        - Webhooks
+      summary: get webhook message
+      parameters:
+        - name: thread_id
+          in: query
+          schema:
+            type: string
+          example: <string,null-snowflake>
+        - name: webhook_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: webhook_token
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+        - name: message_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    delete:
+      tags:
+        - Webhooks
+      summary: delete webhook message
+      parameters:
+        - name: thread_id
+          in: query
+          schema:
+            type: string
+          example: <string,null-snowflake>
+        - name: webhook_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: webhook_token
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+        - name: message_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    patch:
+      tags:
+        - Webhooks
+      summary: update webhook message
+      requestBody:
+        content: {}
+      parameters:
+        - name: thread_id
+          in: query
+          schema:
+            type: string
+          example: <string,null-snowflake>
+        - name: webhook_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: webhook_token
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+        - name: message_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /channels/{channel_id}/invites:
+    get:
+      tags:
+        - Invites
+      summary: list channel invites
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    post:
+      tags:
+        - Invites
+      summary: create channel invite
+      requestBody:
+        content: {}
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/invites:
+    get:
+      tags:
+        - Invites
+      summary: list guild invites
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /invites/{code}:
+    get:
+      tags:
+        - Invites
+      summary: resolve invite
+      parameters:
+        - name: with_counts
+          in: query
+          schema:
+            type: string
+          example: <boolean,null>
+        - name: guild_scheduled_event_id
+          in: query
+          schema:
+            type: string
+          example: <string,null-snowflake>
+        - name: code
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    delete:
+      tags:
+        - Invites
+      summary: revoke invite
+      parameters:
+        - name: code
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /users/@me/guilds/{guild_id}/member:
+    get:
+      tags:
+        - Members
+      summary: get own guild member
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/members/search:
+    get:
+      tags:
+        - Members
+      summary: search guild members
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: string
+          description: "(Required) "
+          example: <integer>
+        - name: query
+          in: query
+          schema:
+            type: string
+          description: "(Required) "
+          example: <string>
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/members/@me:
+    patch:
+      tags:
+        - Members
+      summary: update own guild member
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                nick: <string,null>
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/members/{user_id}:
+    get:
+      tags:
+        - Members
+      summary: get guild member
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: user_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    put:
+      tags:
+        - Members
+      summary: add guild member
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                access_token: <string>
+                nick: <string,null>
+                roles:
+                  - <string,null-snowflake>
+                mute: <boolean,null>
+                deaf: <boolean,null>
+                flags: <integer,null>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: user_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    delete:
+      tags:
+        - Members
+      summary: delete guild member
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: user_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    patch:
+      tags:
+        - Members
+      summary: update guild member
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                nick: <string,null>
+                roles:
+                  - <string,null-snowflake>
+                mute: <boolean,null>
+                deaf: <boolean,null>
+                channel_id: <string,null-snowflake>
+                communication_disabled_until: <string,null-date-time>
+                flags: <integer,null>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: user_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/members:
+    get:
+      tags:
+        - Members
+      summary: list guild members
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: string
+          example: <integer,null>
+        - name: after
+          in: query
+          schema:
+            type: string
+          example: <integer,null>
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /channels/{channel_id}/messages/{message_id}/reactions/{emoji_name}/@me:
+    put:
+      tags:
+        - Messages
+      summary: add message reaction
+      requestBody:
+        content: {}
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: message_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: emoji_name
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    delete:
+      tags:
+        - Messages
+      summary: delete own message reaction
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: message_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: emoji_name
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /channels/{channel_id}/messages/bulk-delete:
+    post:
+      tags:
+        - Messages
+      summary: bulk delete messages
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                messages:
+                  - <snowflake>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /channels/{channel_id}/messages/{message_id}/reactions/{emoji_name}/{user_id}:
+    delete:
+      tags:
+        - Messages
+      summary: delete user message reaction
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: message_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: emoji_name
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+        - name: user_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /channels/{channel_id}/messages/{message_id}/reactions/{emoji_name}:
+    get:
+      tags:
+        - Messages
+      summary: list message reactions by emoji
+      parameters:
+        - name: after
+          in: query
+          schema:
+            type: string
+          example: <string,null-snowflake>
+        - name: limit
+          in: query
+          schema:
+            type: string
+          example: <integer,null>
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: message_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: emoji_name
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    delete:
+      tags:
+        - Messages
+      summary: delete all message reactions by emoji
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: message_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: emoji_name
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /channels/{channel_id}/messages/{message_id}/reactions:
+    delete:
+      tags:
+        - Messages
+      summary: delete all message reactions
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: message_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /channels/{channel_id}/messages/{message_id}/crosspost:
+    post:
+      tags:
+        - Messages
+      summary: crosspost message
+      requestBody:
+        content: {}
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: message_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /channels/{channel_id}/messages/{message_id}:
+    get:
+      tags:
+        - Messages
+      summary: get message
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: message_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    delete:
+      tags:
+        - Messages
+      summary: delete message
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: message_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    patch:
+      tags:
+        - Messages
+      summary: update message
+      requestBody:
+        content: {}
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: message_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /channels/{channel_id}/messages:
+    get:
+      tags:
+        - Messages
+      summary: list messages
+      parameters:
+        - name: around
+          in: query
+          schema:
+            type: string
+          example: <string,null-snowflake>
+        - name: before
+          in: query
+          schema:
+            type: string
+          example: <string,null-snowflake>
+        - name: after
+          in: query
+          schema:
+            type: string
+          example: <string,null-snowflake>
+        - name: limit
+          in: query
+          schema:
+            type: string
+          example: <integer,null>
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    post:
+      tags:
+        - Messages
+      summary: create message
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  example: <string,null>
+                embeds:
+                  type: string
+                  example: >-
+                    {"type":"<string,null>","url":"<string,null>","title":"<string,null>","color":"<integer,null>","timestamp":"<string,null-date-time>","description":"<string,null>","author":"<null>","image":"<null>","thumbnail":"<null>","footer":"<null>","fields":[{"name":"<string>","value":"<string>","inline":"<boolean,null>"},{"name":"<string>","value":"<string>","inline":"<boolean,null>"}],"provider":"<null>","video":"<null>"}
+                allowed_mentions:
+                  type: string
+                  example: <null>
+                sticker_ids:
+                  type: string
+                  example: <string,null-snowflake>
+                components:
+                  type: string
+                  example: >-
+                    {"type":"<integer>","custom_id":"<string>","placeholder":"<string,null>","min_values":"<integer,null>","max_values":"<integer,null>","disabled":"<boolean,null>"}
+                flags:
+                  type: string
+                  example: <integer,null>
+                attachments:
+                  type: string
+                  example: >-
+                    {"id":"<snowflake>","filename":"<string,null>","description":"<string,null>"}
+                message_reference:
+                  type: string
+                  example: <null>
+                nonce:
+                  type: string
+                  example: <string,null>
+                tts:
+                  type: string
+                  example: <boolean,null>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/x-www-form-urlencoded
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /applications/@me:
+    get:
+      tags:
+        - Users
+      summary: get own application
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    patch:
+      tags:
+        - Users
+      summary: update own application
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+
+  /oauth2/applications/@me:
+    get:
+      tags:
+        - OAuth
+      summary: get own oauth2 application
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/members/{user_id}/roles/{role_id}:
+    put:
+      tags:
+        - Roles
+      summary: add guild member role
+      requestBody:
+        content: {}
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: user_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: role_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    delete:
+      tags:
+        - Roles
+      summary: delete guild member role
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: user_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: role_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/roles/{role_id}:
+    delete:
+      tags:
+        - Roles
+      summary: delete guild role
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: role_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    patch:
+      tags:
+        - Roles
+      summary: update guild role
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: <string,null>
+                permissions: <integer,null>
+                color: <integer,null>
+                hoist: <boolean,null>
+                mentionable: <boolean,null>
+                icon: <string,null>
+                unicode_emoji: <string,null>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: role_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/roles:
+    get:
+      tags:
+        - Roles
+      summary: list guild roles
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    post:
+      tags:
+        - Roles
+      summary: create guild role
+      requestBody:
+        content: {}
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    patch:
+      tags:
+        - Roles
+      summary: update guild role positions
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+  /users/@me/applications/{application_id}/role-connection:
+    get:
+      tags:
+        - Role Connections
+      summary: get application user role connection
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    put:
+      tags:
+        - Role Connections
+      summary: update application user role connection
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                platform_name: <string,null>
+                platform_username: <string,null>
+                metadata:
+                  commodo8: <string>
+                  incididunt_111: <string>
+                  elit_f8: <string>
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /applications/{application_id}/role-connections/metadata:
+    get:
+      tags:
+        - Role Connections
+      summary: list application role connection metadata
+      parameters:
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    put:
+      tags:
+        - Role Connections
+      summary: bulk overwrite application role connection metadata
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /applications/{application_id}/entitlements:
+    get:
+      tags:
+        - Entitlements
+      summary: list entitlements
+      parameters:
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+    post:
+      tags:
+        - Entitlements
+      summary: create test entitlement
+      parameters:
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+  /applications/{application_id}/entitlements/{entitlement_id}:
+    delete:
+      tags:
+        - Entitlements
+      summary: delete test entitlement
+      parameters:
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+        - name: entitlement_id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+  /applications/{application_id}/entitlements/{entitlement_id}/consume:
+    post:
+      tags:
+        - Entitlements
+      summary: consume entitlement
+      parameters:
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+        - name: entitlement_id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+  /applications/{application_id}/skus:
+    get:
+      tags:
+        - SKUs
+      summary: list SKUs
+      parameters:
+        - name: application_id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+  /guilds/{guild_id}/scheduled-events/{guild_scheduled_event_id}/users:
+    get:
+      tags:
+        - Scheduled Events
+      summary: list guild scheduled event users
+      parameters:
+        - name: with_member
+          in: query
+          schema:
+            type: string
+          example: <boolean,null>
+        - name: limit
+          in: query
+          schema:
+            type: string
+          example: <integer,null>
+        - name: before
+          in: query
+          schema:
+            type: string
+          example: <string,null-snowflake>
+        - name: after
+          in: query
+          schema:
+            type: string
+          example: <string,null-snowflake>
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: guild_scheduled_event_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/scheduled-events/{guild_scheduled_event_id}:
+    get:
+      tags:
+        - Scheduled Events
+      summary: get guild scheduled event
+      parameters:
+        - name: with_user_count
+          in: query
+          schema:
+            type: string
+          example: <boolean,null>
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: guild_scheduled_event_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    delete:
+      tags:
+        - Scheduled Events
+      summary: delete guild scheduled event
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: guild_scheduled_event_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    patch:
+      tags:
+        - Scheduled Events
+      summary: update guild scheduled event
+      requestBody:
+        content: {}
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: guild_scheduled_event_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/scheduled-events:
+    get:
+      tags:
+        - Scheduled Events
+      summary: list guild scheduled events
+      parameters:
+        - name: with_user_count
+          in: query
+          schema:
+            type: string
+          example: <boolean,null>
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    post:
+      tags:
+        - Scheduled Events
+      summary: create guild scheduled event
+      requestBody:
+        content: {}
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /stage-instances:
+    post:
+      tags:
+        - Stages
+      summary: create stage instance
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                topic: <string>
+                channel_id: <snowflake>
+                privacy_level: <integer,null>
+                send_start_notification: <boolean,null>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /stage-instances/{channel_id}:
+    get:
+      tags:
+        - Stages
+      summary: get stage instance
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    delete:
+      tags:
+        - Stages
+      summary: delete stage instance
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    patch:
+      tags:
+        - Stages
+      summary: update stage instance
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                topic: <string>
+                privacy_level: <integer>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /sticker-packs:
+    get:
+      tags:
+        - Stickers
+      summary: list sticker packs
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/stickers/{sticker_id}:
+    get:
+      tags:
+        - Stickers
+      summary: get guild sticker
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: sticker_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    delete:
+      tags:
+        - Stickers
+      summary: delete guild sticker
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: sticker_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    patch:
+      tags:
+        - Stickers
+      summary: update guild sticker
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: <string>
+                tags: <string>
+                description: <string,null>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: sticker_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/stickers:
+    get:
+      tags:
+        - Stickers
+      summary: list guild stickers
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    post:
+      tags:
+        - Stickers
+      summary: create guild sticker
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: "(Required) "
+                  example: <string>
+                tags:
+                  type: string
+                  description: "(Required) "
+                  example: <string>
+                description:
+                  type: string
+                  example: <string,null>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/x-www-form-urlencoded
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /stickers/{sticker_id}:
+    get:
+      tags:
+        - Stickers
+      summary: get sticker
+      parameters:
+        - name: sticker_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /channels/{channel_id}/users/@me/threads/archived/private:
+    get:
+      tags:
+        - Threads
+      summary: list own private archived threads
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: before
+          in: query
+          schema:
+            type: string
+          example: <string,null-snowflake>
+        - name: limit
+          in: query
+          schema:
+            type: string
+          example: <integer,null>
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /channels/{channel_id}/threads/archived/private:
+    get:
+      tags:
+        - Threads
+      summary: list private archived threads
+      parameters:
+        - name: before
+          in: query
+          schema:
+            type: string
+          example: <string,null-date-time>
+        - name: limit
+          in: query
+          schema:
+            type: string
+          example: <integer,null>
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /channels/{channel_id}/threads/archived/public:
+    get:
+      tags:
+        - Threads
+      summary: list public archived threads
+      parameters:
+        - name: before
+          in: query
+          schema:
+            type: string
+          example: <string,null-date-time>
+        - name: limit
+          in: query
+          schema:
+            type: string
+          example: <integer,null>
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /channels/{channel_id}/thread-members/@me:
+    put:
+      tags:
+        - Threads
+      summary: join thread
+      requestBody:
+        content: {}
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    delete:
+      tags:
+        - Threads
+      summary: leave thread
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /channels/{channel_id}/messages/{message_id}/threads:
+    post:
+      tags:
+        - Threads
+      summary: create thread from message
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: <string>
+                auto_archive_duration: <integer,null>
+                rate_limit_per_user: <integer,null>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: message_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/threads/active:
+    get:
+      tags:
+        - Threads
+      summary: list active guild threads
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /channels/{channel_id}/thread-members/{user_id}:
+    get:
+      tags:
+        - Threads
+      summary: get thread member
+      parameters:
+        - name: with_member
+          in: query
+          schema:
+            type: string
+          example: <boolean,null>
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: user_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    put:
+      tags:
+        - Threads
+      summary: add thread member
+      requestBody:
+        content: {}
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: user_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    delete:
+      tags:
+        - Threads
+      summary: delete thread member
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: user_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /channels/{channel_id}/thread-members:
+    get:
+      tags:
+        - Threads
+      summary: list thread members
+      parameters:
+        - name: with_member
+          in: query
+          schema:
+            type: string
+          example: <boolean,null>
+        - name: limit
+          in: query
+          schema:
+            type: string
+          example: <integer,null>
+        - name: after
+          in: query
+          schema:
+            type: string
+          example: <string,null-snowflake>
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /channels/{channel_id}/threads:
+    post:
+      tags:
+        - Threads
+      summary: create thread
+      requestBody:
+        content: {}
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    post-2:
+      tags:
+        - Threads
+      summary: create thread in forum channel
+      requestBody:
+        content: {}
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+  /users/@me/connections:
+    get:
+      tags:
+        - Users
+      summary: list own connections
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /users/@me:
+    get:
+      tags:
+        - Users
+      summary: get own user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    patch:
+      tags:
+        - Users
+      summary: update own user
+      requestBody:
+        content: {}
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /users/{user_id}:
+    get:
+      tags:
+        - Users
+      summary: get user
+      parameters:
+        - name: user_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /voice/regions:
+    get:
+      tags:
+        - Voice
+      summary: list voice regions
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/voice-states/@me:
+    patch:
+      tags:
+        - Voice
+      summary: update self voice state
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                request_to_speak_timestamp: <string,null-date-time>
+                suppress: <boolean,null>
+                channel_id: <string,null-snowflake>
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/voice-states/{user_id}:
+    patch:
+      tags:
+        - Voice
+      summary: update voice state
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                suppress: <boolean,null>
+                channel_id: <string,null-snowflake>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: user_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/regions:
+    get:
+      tags:
+        - Voice
+      summary: list guild voice regions
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /channels/{channel_id}/webhooks:
+    get:
+      tags:
+        - Webhooks
+      summary: list channel webhooks
+      parameters:
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    post:
+      tags:
+        - Webhooks
+      summary: create webhook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: <string>
+                avatar: <string,null>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: channel_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /guilds/{guild_id}/webhooks:
+    get:
+      tags:
+        - Webhooks
+      summary: get guild webhooks
+      parameters:
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /webhooks/{webhook_id}/{webhook_token}:
+    get:
+      tags:
+        - Webhooks
+      summary: get webhook by token
+      parameters:
+        - name: webhook_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: webhook_token
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    post:
+      tags:
+        - Webhooks
+      summary: execute webhook
+      requestBody:
+        content: {}
+      parameters:
+        - name: wait
+          in: query
+          schema:
+            type: string
+          example: <boolean,null>
+        - name: thread_id
+          in: query
+          schema:
+            type: string
+          example: <string,null-snowflake>
+        - name: webhook_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: webhook_token
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    delete:
+      tags:
+        - Webhooks
+      summary: delete webhook by token
+      parameters:
+        - name: webhook_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: webhook_token
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    patch:
+      tags:
+        - Webhooks
+      summary: update webhook by token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: <string>
+                avatar: <string,null>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: webhook_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: webhook_token
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <string>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+  /webhooks/{webhook_id}:
+    get:
+      tags:
+        - Webhooks
+      summary: get webhook
+      parameters:
+        - name: webhook_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    delete:
+      tags:
+        - Webhooks
+      summary: delete webhook
+      parameters:
+        - name: webhook_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
+    patch:
+      tags:
+        - Webhooks
+      summary: update webhook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                name: <string>
+                avatar: <string,null>
+                channel_id: <string,null-snowflake>
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: webhook_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
