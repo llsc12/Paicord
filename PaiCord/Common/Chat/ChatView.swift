@@ -59,66 +59,172 @@ import SwiftUI
 //	ContentView()
 //}
 
-import SwiftUI
-
 // MARK: - Simple Message model
 struct Message: Identifiable {
-		let id = UUID()
-		let text: String
+	let id = UUID()
+	let text: String
+	let date: Date = .now
+	let username: String = "User \(Int.random(in: 1...100))"
 }
 
 // MARK: - Tiny ViewModel
+@Observable
 @MainActor
-final class ChatViewModel: ObservableObject {
-		@Published var messages: [Message] = [
-				Message(text: "Welcome to ChatView 👋")
-		]
-		
-		init() {
-				// Simulate new incoming messages every 2 seconds
-				Task {
-						let sample = [
-								"Hey there!",
-								"This is a test message.",
-								"SwiftUI on iOS 17 is great.",
-								"Bottom anchored scrolling ✅",
-								"No more rotation hacks!",
-								"🚀"
-						]
-						
-						while true {
-								try? await Task.sleep(for: .seconds(2))
-								let msg = Message(text: sample.randomElement() ?? "...")
-								messages.append(msg)
-						}
-				}
+final class ChatViewModel {
+	var messages: [Message] = [
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+		Message(text: "gm"),
+	]
+	var latestMessageID: UUID? {
+		messages.last?.id
+	}
+
+	init() {
+		// Simulate new incoming messages every 2 seconds
+		Task {
+			let sample = [
+				"test message 1",
+				"test message 2",
+				"test message 3",
+				"test message 4",
+				"test message 5",
+				"test message 6",
+				"test message 7",
+			]
+
+			while true {
+				try? await Task.sleep(for: .seconds(.random(in: 0.5...2.5)))
+				let msg = Message(text: sample.randomElement() ?? "...")
+				messages.append(msg)
+			}
 		}
+	}
 }
 
 // MARK: - ChatView
 struct ChatView: View {
-		@StateObject private var vm = ChatViewModel()
-		
-		var body: some View {
-				ScrollView {
-						LazyVStack(alignment: .leading, spacing: 8) {
-								ForEach(vm.messages) { msg in
-										Text(msg.text)
-												.padding(8)
-												.background(.blue.opacity(0.1))
-												.clipShape(RoundedRectangle(cornerRadius: 8))
-												.frame(maxWidth: .infinity, alignment: .leading)
-								}
-						}
-						.padding()
-						.scrollTargetLayout() // 👈 mark children as scroll targets
+	private var vm = ChatViewModel()
+	@State private var isNearBottom = true
+
+	var body: some View {
+		ScrollViewReader { proxy in
+			List {
+				ForEach(vm.messages) { msg in
+					MessageCell(for: msg)
 				}
-				.scrollTargetBehavior(.viewAligned)
-				.defaultScrollAnchor(.bottom) // 👈 anchor at bottom
+				.listRowInsets(.init(top: 10, leading: 0, bottom: 10, trailing: 0))  // remove padding
+				.listRowSeparator(.hidden)  // hide divider
+
+				Color.clear
+					.frame(height: 1)  // zero height
+					.id("BOTTOM")
+					.listRowInsets(EdgeInsets())  // remove padding
+					.listRowSeparator(.hidden)  // hide divider
+					.onAppear { self.isNearBottom = true }
+					.onDisappear { self.isNearBottom = false }
+					.padding(.top, -10)
+
+			}
+			.defaultScrollAnchor(.bottom)
+			.scrollDismissesKeyboard(.interactively)
+			.onAppear { proxy.scrollTo("BOTTOM", anchor: .bottom) }
+			.onChange(of: vm.latestMessageID) {
+				if isNearBottom {
+					proxy.scrollTo("BOTTOM", anchor: .bottom)
+				}
+			}
 		}
+		.toolbar {
+			ToolbarItem(placement: .navigation) {
+				VStack(alignment: .leading) {
+					Text("Title").font(.headline)
+					Text("Subtitle").font(.subheadline)
+				}
+			}
+		}
+	}
+
+	struct MessageCell: View {
+		var message: Message
+		@State var profileOpen = false
+
+		init(for message: Message) {
+			self.message = message
+		}
+
+		var body: some View {
+			HStack {
+				Button {
+					profileOpen = true
+				} label: {
+					Circle()
+						.scaledToFit()
+						.frame(maxWidth: 35)
+				}
+				.buttonStyle(.borderless)
+				.popover(isPresented: $profileOpen) {
+					Text("Profile for \(message.username)")
+						.padding()
+				}
+
+				VStack {
+					HStack {
+						Text(message.username)
+							.font(.headline)
+						Text(message.date, style: .time)
+							.font(.caption)
+							.foregroundStyle(.secondary)
+					}
+					.frame(maxWidth: .infinity, alignment: .leading)
+
+					Text(message.text)
+						.font(.body)
+						.foregroundStyle(.primary)
+						.frame(maxWidth: .infinity, alignment: .leading)
+				}
+			}
+		}
+	}
 }
 
 // MARK: - Preview
 #Preview {
-		ChatView()
+	ChatView()
 }

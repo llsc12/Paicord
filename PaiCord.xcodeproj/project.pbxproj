@@ -20,10 +20,13 @@
 		57A4E7112E6B411A00470131 /* SDWebImageSVGCoder in Frameworks */ = {isa = PBXBuildFile; productRef = 57A4E7102E6B411A00470131 /* SDWebImageSVGCoder */; };
 		57A4E7152E6B44C900470131 /* CGSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A4E7142E6B44C200470131 /* CGSize.swift */; };
 		57A55C572E7560CF005C8226 /* Markdown.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A55C562E7560CC005C8226 /* Markdown.swift */; };
-		57A55C5D2E75634B005C8226 /* ImageFrameScheduler.m in Sources */ = {isa = PBXBuildFile; fileRef = 57A55C5C2E756344005C8226 /* ImageFrameScheduler.m */; };
 		57A55C622E7563D6005C8226 /* Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A55C612E7563D4005C8226 /* Test.swift */; };
+		57AA8A032E7875D100B4CA9C /* Sidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57AA8A022E7875CD00B4CA9C /* Sidebar.swift */; };
 		57CDD87F2E71CB6000022203 /* HCaptcha in Frameworks */ = {isa = PBXBuildFile; productRef = 57CDD87E2E71CB6000022203 /* HCaptcha */; };
 		57CDD8812E71FF7600022203 /* CaptchaSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57CDD8802E71FF7600022203 /* CaptchaSheet.swift */; };
+		57DA042A2E79894500DB4C7C /* ConnectionStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57DA04292E79894500DB4C7C /* ConnectionStateView.swift */; };
+		57DA042C2E79B26200DB4C7C /* AsyncButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57DA042B2E79B25F00DB4C7C /* AsyncButton.swift */; };
+		57DA042F2E79DC4C00DB4C7C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57DA042E2E79DC4900DB4C7C /* SettingsView.swift */; };
 		57E05C592E6C6AE400B81AA7 /* Design Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57E05C582E6C6ADF00B81AA7 /* Design Constants.swift */; };
 		57E05C5B2E6C745900B81AA7 /* String+LocalizedError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57E05C5A2E6C745300B81AA7 /* String+LocalizedError.swift */; };
 		57E05C5D2E6CBCDC00B81AA7 /* GatewayStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57E05C5C2E6CBCD700B81AA7 /* GatewayStore.swift */; };
@@ -50,11 +53,12 @@
 		57A4E70A2E6B315C00470131 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		57A4E7142E6B44C200470131 /* CGSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGSize.swift; sourceTree = "<group>"; };
 		57A55C562E7560CC005C8226 /* Markdown.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Markdown.swift; sourceTree = "<group>"; };
-		57A55C592E75630F005C8226 /* ImageFrameScheduler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ImageFrameScheduler.h; sourceTree = "<group>"; };
-		57A55C5C2E756344005C8226 /* ImageFrameScheduler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ImageFrameScheduler.m; sourceTree = "<group>"; };
-		57A55C5E2E75634D005C8226 /* Paicord-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Paicord-Bridging-Header.h"; sourceTree = "<group>"; };
 		57A55C612E7563D4005C8226 /* Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Test.swift; sourceTree = "<group>"; };
+		57AA8A022E7875CD00B4CA9C /* Sidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sidebar.swift; sourceTree = "<group>"; };
 		57CDD8802E71FF7600022203 /* CaptchaSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptchaSheet.swift; sourceTree = "<group>"; };
+		57DA04292E79894500DB4C7C /* ConnectionStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionStateView.swift; sourceTree = "<group>"; };
+		57DA042B2E79B25F00DB4C7C /* AsyncButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncButton.swift; sourceTree = "<group>"; };
+		57DA042E2E79DC4900DB4C7C /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		57E05C582E6C6ADF00B81AA7 /* Design Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Design Constants.swift"; sourceTree = "<group>"; };
 		57E05C5A2E6C745300B81AA7 /* String+LocalizedError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+LocalizedError.swift"; sourceTree = "<group>"; };
 		57E05C5C2E6CBCD700B81AA7 /* GatewayStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayStore.swift; sourceTree = "<group>"; };
@@ -95,28 +99,12 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		5724CD6D2E72FE6A00931FEF /* Login */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Login;
-			sourceTree = "<group>";
-		};
 		578E1CDE2E6777DE00C6DEA3 /* macOS */ = {
 			isa = PBXGroup;
 			children = (
-				57A4E7092E6B315700470131 /* Login */,
+				57AA8A012E7875A300B4CA9C /* Sidebar */,
 			);
 			path = macOS;
-			sourceTree = "<group>";
-		};
-		578E1CDF2E6777F900C6DEA3 /* App Components */ = {
-			isa = PBXGroup;
-			children = (
-				57A55C542E7560B3005C8226 /* Sheets */,
-				57A55C552E7560BB005C8226 /* Guilds */,
-			);
-			path = "App Components";
 			sourceTree = "<group>";
 		};
 		579848C62E6C5A07004CC343 /* Frameworks */ = {
@@ -139,7 +127,6 @@
 			isa = PBXGroup;
 			children = (
 				57A55C612E7563D4005C8226 /* Test.swift */,
-				57A55C582E7562EF005C8226 /* Bridging */,
 				57A4E7132E6B44BC00470131 /* Extensions */,
 			);
 			path = Utilities;
@@ -172,20 +159,35 @@
 			path = Guilds;
 			sourceTree = "<group>";
 		};
-		57A55C582E7562EF005C8226 /* Bridging */ = {
+		57AA8A012E7875A300B4CA9C /* Sidebar */ = {
 			isa = PBXGroup;
 			children = (
-				57A55C592E75630F005C8226 /* ImageFrameScheduler.h */,
-				57A55C5C2E756344005C8226 /* ImageFrameScheduler.m */,
-				57A55C5E2E75634D005C8226 /* Paicord-Bridging-Header.h */,
+				57AA8A022E7875CD00B4CA9C /* Sidebar.swift */,
 			);
-			path = Bridging;
+			path = Sidebar;
+			sourceTree = "<group>";
+		};
+		57DA04282E79893B00DB4C7C /* Launch */ = {
+			isa = PBXGroup;
+			children = (
+				57DA04292E79894500DB4C7C /* ConnectionStateView.swift */,
+			);
+			path = Launch;
+			sourceTree = "<group>";
+		};
+		57DA042D2E79DC4400DB4C7C /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				57DA042E2E79DC4900DB4C7C /* SettingsView.swift */,
+			);
+			path = Settings;
 			sourceTree = "<group>";
 		};
 		57E05C5E2E6CBCF400B81AA7 /* Gateway */ = {
 			isa = PBXGroup;
 			children = (
 				57E05C5C2E6CBCD700B81AA7 /* GatewayStore.swift */,
+				AAEEC71E2E6511F800EB5FC9 /* TokenStore.swift */,
 			);
 			path = Gateway;
 			sourceTree = "<group>";
@@ -279,7 +281,6 @@
 		AA9C817E2E665E010086B1DA /* iOS */ = {
 			isa = PBXGroup;
 			children = (
-				5724CD6D2E72FE6A00931FEF /* Login */,
 				AA10970F2E64C181005BC3D2 /* Tabs */,
 			);
 			path = iOS;
@@ -288,10 +289,13 @@
 		AA9C81802E665E190086B1DA /* Common */ = {
 			isa = PBXGroup;
 			children = (
-				578E1CDF2E6777F900C6DEA3 /* App Components */,
+				57DA042D2E79DC4400DB4C7C /* Settings */,
+				57A4E7092E6B315700470131 /* Login */,
 				AA9C81842E6667050086B1DA /* Utilities */,
-				AA9C81812E6660AB0086B1DA /* Components */,
 				AA1097082E64C181005BC3D2 /* Chat */,
+				57DA04282E79893B00DB4C7C /* Launch */,
+				57A55C542E7560B3005C8226 /* Sheets */,
+				57A55C552E7560BB005C8226 /* Guilds */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -299,6 +303,7 @@
 		AA9C81812E6660AB0086B1DA /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				57DA042B2E79B25F00DB4C7C /* AsyncButton.swift */,
 				578E1CE02E67780B00C6DEA3 /* GradientText.swift */,
 			);
 			path = Components;
@@ -307,6 +312,7 @@
 		AA9C81842E6667050086B1DA /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				AA9C81812E6660AB0086B1DA /* Components */,
 				AA9C81852E66670E0086B1DA /* CornerRadius.swift */,
 			);
 			path = Utilities;
@@ -316,7 +322,6 @@
 			isa = PBXGroup;
 			children = (
 				57E05C5E2E6CBCF400B81AA7 /* Gateway */,
-				AAEEC71E2E6511F800EB5FC9 /* TokenStore.swift */,
 			);
 			path = Stores;
 			sourceTree = "<group>";
@@ -425,18 +430,21 @@
 				57E05C5B2E6C745900B81AA7 /* String+LocalizedError.swift in Sources */,
 				AA9C81832E6660BE0086B1DA /* ServerButton.swift in Sources */,
 				57A55C572E7560CF005C8226 /* Markdown.swift in Sources */,
+				57DA042C2E79B26200DB4C7C /* AsyncButton.swift in Sources */,
 				5724CD6F2E733D0E00931FEF /* MFASheet.swift in Sources */,
 				57E05C592E6C6AE400B81AA7 /* Design Constants.swift in Sources */,
 				57E05C5D2E6CBCDC00B81AA7 /* GatewayStore.swift in Sources */,
 				5783AA942E6B8FD100F73F6D /* MeshGradient.swift in Sources */,
 				57A55C622E7563D6005C8226 /* Test.swift in Sources */,
-				57A55C5D2E75634B005C8226 /* ImageFrameScheduler.m in Sources */,
+				57DA042A2E79894500DB4C7C /* ConnectionStateView.swift in Sources */,
 				578E1CE12E67781700C6DEA3 /* GradientText.swift in Sources */,
 				AA1097192E64C181005BC3D2 /* NotificationsView.swift in Sources */,
 				57A4E7152E6B44C900470131 /* CGSize.swift in Sources */,
 				57A4E70B2E6B315F00470131 /* LoginView.swift in Sources */,
+				57AA8A032E7875D100B4CA9C /* Sidebar.swift in Sources */,
 				AA10971A2E64C181005BC3D2 /* ProfileView.swift in Sources */,
 				AA10971B2E64C181005BC3D2 /* PaiCordApp.swift in Sources */,
+				57DA042F2E79DC4C00DB4C7C /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -594,7 +602,6 @@
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "Paicord/Utilities/Bridging/Paicord-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
@@ -637,7 +644,6 @@
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "Paicord/Utilities/Bridging/Paicord-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				XROS_DEPLOYMENT_TARGET = 1.3;

@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-#if canImport(UIKit)
+@available(macOS, unavailable)
 struct SmallBaseplate: View {
 	@SceneStorage("Baseplate.ChatVisibility") private var chatVisibility = false
 
@@ -51,8 +51,3 @@ struct SmallBaseplate: View {
 		case home, notifications, profile
 	}
 }
-
-#Preview {
-	ContentView()
-}
-#endif

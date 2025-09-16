@@ -1028,22 +1028,28 @@ extension BotGatewayManager {
 }
 
 //MARK: - GatewayState
+/// Represents the current state of the gateway connection lifecycle.
 public enum GatewayState: Int, Sendable, AtomicValue, CustomStringConvertible {
-	case stopped
-	case noConnection
-	case connecting
-	case configured
-	case connected
+		/// The gateway manager has been intentionally stopped and will not reconnect.
+		case stopped
+		/// No active connection exists; the gateway is disconnected and idle.
+		case noConnection
+		/// The gateway is in the process of establishing a connection.
+		case connecting
+		/// The gateway connection is established at the protocol level, but not yet fully ready (awaiting identification/resume).
+		case configured
+		/// The gateway has successfully connected, identified/resumed, and is fully ready to send/receive events.
+		case connected
 
-    public var description: String {
-		switch self {
-		case .stopped: return "stopped"
-		case .noConnection: return "noConnection"
-		case .connecting: return "connecting"
-		case .configured: return "configured"
-		case .connected: return "connected"
+		public var description: String {
+				switch self {
+				case .stopped: return "stopped"
+				case .noConnection: return "noConnection"
+				case .connecting: return "connecting"
+				case .configured: return "configured"
+				case .connected: return "connected"
+				}
 		}
-	}
 }
 
 // MARK: - +Gateway.Opcode

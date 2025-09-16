@@ -10,7 +10,6 @@ import SwiftUI
 
 /// Discord iOS Home View, the left side is a list of servers, with the right being the selected server's channels etc.
 /// The left side should be 1/5th of the width of both scroll views
-#if canImport(UIKit)
 struct HomeView: View {
 	var body: some View {
 		HStack(spacing: 0) {
@@ -48,14 +47,9 @@ struct HomeView: View {
 			}
 			.background {
 				Color.tableBackground
-					.cornerRadius(30, corners: .topLeft)
+					.roundedCorners(radius: 30, corners: .topLeft)
 			}
 		}
 		.padding(.top, 4)
 	}
 }
-
-#Preview {
-	ContentView()
-}
-#endif

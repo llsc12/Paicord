@@ -1,8 +1,5 @@
 import SwiftUI
 
-#if canImport(UIKit)
-@available(macOS, unavailable) // idk why this didnt work
-@available(iOS 17.0, *)
 struct SlideoverDoubleView<Primary: View, Secondary: View>: View {
 	@Binding var swap: Bool
 	var primary: Primary
@@ -10,7 +7,7 @@ struct SlideoverDoubleView<Primary: View, Secondary: View>: View {
 
 	@State private var dragOffset: CGFloat = 0
 	private let animationDuration: Double = 0.2
-	@State var width: CGFloat = UIScreen.main.bounds.width
+	@State var width: CGFloat = 0
 
 	@Environment(\.slideoverDisabled) var slideoverDisabled
 
@@ -67,7 +64,7 @@ struct SlideoverDoubleView<Primary: View, Secondary: View>: View {
 
 					let shouldSwap: Bool = {
 						if abs(velocity) > 600 { return velocity < 0 }
-						if abs(translation) > width / 2 { return translation < 0 }
+						if abs(translation) > self.width / 2 { return translation < 0 }
 						return swap
 					}()
 
@@ -103,7 +100,6 @@ extension View {
 	}
 }
 
-@available(macOS, unavailable)
 #Preview {
 	struct PreviewWrapper: View {
 		@State var current: Bool = true
@@ -123,4 +119,3 @@ extension View {
 	}
 	return PreviewWrapper()
 }
-#endif

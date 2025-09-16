@@ -8,11 +8,13 @@
 
 import PaicordLib
 import SDWebImageSVGCoder
-import SwiftUI
+@_spi(Advanced) import SwiftUIIntrospect
+import SwiftUIX
 
 @main
 struct PaiCordApp: App {
 	let gatewayStore: GatewayStore
+	@Bindable var appState = PaicordAppState()
 
 	// captcha handling
 	@State private var captchaChallenge: CaptchaChallengeData?
@@ -22,6 +24,8 @@ struct PaiCordApp: App {
 	@State private var mfaVerification: MFAVerificationData?
 	@State private var mfaContinuation: CheckedContinuation<MFAResponse?, Never>?
 
+	@Environment(\.userInterfaceIdiom) var idiom
+
 	init() {
 		let SVGCoder = SDImageSVGCoder.shared
 		SDImageCodersManager.shared.addCoder(SVGCoder)
@@ -29,11 +33,38 @@ struct PaiCordApp: App {
 		let store = GatewayStore()
 		self.gatewayStore = store
 	}
+
 	var body: some Scene {
 		WindowGroup {
 			Group {
-				//			ContentView()
-				LoginView()
+				if gatewayStore.accounts.currentAccountID == nil {
+					LoginView()
+						.environment(gatewayStore)
+						.environment(appState)
+				} else {
+					if gatewayStore.state != .connected {
+						ConnectionStateView(state: gatewayStore.state)
+							.transition(
+								.opacity.combined(with: .scale(scale: 1.1)).animation(
+									.easeInOut(duration: 0.5))
+							)
+							.task {
+								await gatewayStore.connectIfNeeded()
+							}
+					} else {
+						Group {
+							if idiom == .phone {
+								#if os(iOS)
+									SmallBaseplate()  // iphone
+								#endif
+							} else {
+								LargeBaseplate()  // mac, ipad
+							}
+						}
+						.navigationTitle("")
+					}
+
+				}
 			}
 			.fontDesign(.rounded)
 			.sheet(item: $captchaChallenge) { challenge in
@@ -56,6 +87,7 @@ struct PaiCordApp: App {
 				.environment(gatewayStore)
 			}
 			.environment(gatewayStore)
+			.environment(appState)
 			.onAppear {
 				gatewayStore.captchaCallback = { captcha in
 					await withCheckedContinuation { continuation in
@@ -75,21 +107,49 @@ struct PaiCordApp: App {
 					}
 				}
 			}
+			.alert(
+				"Error", isPresented: $appState.showingError,
+				actions: {
+					Button("OK", role: .cancel) {
+						appState.error = nil
+					}
+				},
+				message: {
+					if let error = appState.error as? DiscordHTTPErrorResponse {
+						Text(error.description)
+					} else if let error = appState.error {
+						Text(error.localizedDescription)
+					} else {
+						Text("An unknown error occurred.")
+					}
+				})
 		}
-		.windowStyle(.hiddenTitleBar)
-	}
-}
+		.windowToolbarStyle(.unifiedCompact)
+		.commands {
+			CommandMenu("Account") {
+				Button("Log Out") {
+					gatewayStore.logOut()
+				}
+			}
+		}
 
-struct ContentView: View {
-	var body: some View {
-		#if os(iOS)
-			SmallBaseplate()
-		#else
-			LargeBaseplate()
+		#if os(macOS)
+			Settings {
+				SettingsView()
+			}
 		#endif
 	}
 }
 
-#Preview {
-	ContentView()
+@Observable
+final class PaicordAppState {
+	var selectedServer: GuildSnowflake? = nil  // nil means dms
+	var selectedChannel: ChannelSnowflake? = nil  // idk man
+
+	var showingError = false
+	var error: Error? = nil {
+		didSet {
+			showingError = error != nil
+		}
+	}
 }

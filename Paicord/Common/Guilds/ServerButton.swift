@@ -17,6 +17,7 @@ struct ServerButton: View {
 		} label: {
 			Circle()
 		}
+		.buttonStyle(.borderless)
 	}
 }
 
