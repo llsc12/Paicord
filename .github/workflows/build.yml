@@ -165,11 +165,6 @@ jobs:
                     "inline": true
                   },
                   {
-                    "name": "|",
-                    "value": "|\n|",
-                    "inline": true
-                  },
-                  {
                     "name": "iOS",
                     "value": "[Download (${IOS_SIZE})](${NIGHTLY_IOS_URL})",
                     "inline": true
