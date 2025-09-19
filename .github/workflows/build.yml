@@ -18,6 +18,11 @@ jobs:
         run: |
           defaults write com.apple.dt.Xcode IDESkipMacroFingerprintValidation -bool YES
 
+      - name: Install ldid
+        run: |
+            curl -LO https://github.com/ProcursusTeam/ldid/releases/latest/download/ldid_macosx_x86_64
+            sudo install -m755 ldid_macosx_x86_64 /usr/local/bin/ldid
+
       - name: Cache Xcode DerivedData
         uses: actions/cache@v4
         with:
@@ -49,24 +54,42 @@ jobs:
       # iOS build (.ipa)
       - name: Build iOS .ipa
         run: |
-          xcodebuild clean archive \
-            -workspace Paicord.xcworkspace \
+          xcodebuild -workspace Paicord.xcworkspace \
             -scheme Paicord \
             -configuration Release \
-            -destination "generic/platform=iOS" \
+            -arch arm64 \
+            -sdk iphoneos \
             -derivedDataPath build-ios \
-            -archivePath build-ios/Paicord.xcarchive \
-            CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
-          xcodebuild -exportArchive \
-            -archivePath build-ios/Paicord.xcarchive \
-            -exportPath output \
-            -exportOptionsPlist ExportOptions.plist || echo "Skipping export if plist is missing"
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY=""
 
-      - name: Rename iOS .ipa (if present)
+      - name: Package .ipa (strip, ldid, zip)
         run: |
-          if [ -f output/Paicord.ipa ]; then
-            mv output/Paicord.ipa output/Paicord-iOS.ipa
+          set -e
+          APP_PATH="build-ios/Build/Products/Release-iphoneos/Paicord.app"
+          STAGE_DIR="stage-ios"
+          rm -rf Payload "$STAGE_DIR"
+          mkdir -p "$STAGE_DIR/Payload"
+          cp -R "$APP_PATH" "$STAGE_DIR/Payload/Paicord.app"
+          # Strip binary
+          if command -v strip; then
+            strip "$STAGE_DIR/Payload/Paicord.app/Paicord" || true
           fi
+          # Entitlements (if present)
+          if [ -f Paicord/Paicord.entitlements ]; then
+            ldid -SPaicord/Paicord.entitlements "$STAGE_DIR/Payload/Paicord.app/"
+          else
+            ldid -S"$STAGE_DIR/Payload/Paicord.app/"
+          fi
+          # Remove possible _CodeSignature
+          rm -rf "$STAGE_DIR/Payload/Paicord.app/_CodeSignature"
+          # Zip as IPA
+          cd "$STAGE_DIR"
+          zip -r9 ../Paicord.ipa Payload
+          cd ..
+          mkdir -p output
+          mv Paicord.ipa output/Paicord-iOS.ipa
 
       # Upload artifacts and get download URLs
       - name: Upload macOS Artifact
@@ -76,13 +99,12 @@ jobs:
           name: Paicord-macOS
           path: output/Paicord-macOS.zip
 
-      - name: Upload iOS Artifact (if present)
+      - name: Upload iOS Artifact
         id: upload-ios
         uses: actions/upload-artifact@v4
         with:
           name: Paicord-iOS
           path: output/Paicord-iOS.ipa
-          if-no-files-found: ignore
 
       # Gather commit info and artifact sizes
       - name: Gather Info for Discord Embed
@@ -98,21 +120,21 @@ jobs:
           # Artifact sizes
           macos_size=$(ls -lh output/Paicord-macOS.zip | awk '{print $5}')
           echo "macos_size=$macos_size" >> $GITHUB_OUTPUT
-          if [ -f output/Paicord-iOS.ipa ]; then
-            ios_size=$(ls -lh output/Paicord-iOS.ipa | awk '{print $5}')
-          else
-            ios_size="N/A"
-          fi
+          ios_size=$(ls -lh output/Paicord-iOS.ipa | awk '{print $5}')
           echo "ios_size=$ios_size" >> $GITHUB_OUTPUT
 
-          # Artifact URLs (run-level, not direct download)
-          echo "artifact_url=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_OUTPUT
+          # Nightly.link URLs for artifacts
+          nightly_mac_url="https://nightly.link/llsc12/Paicord/actions/runs/${GITHUB_RUN_ID}/Paicord-macOS.zip?h=${NIGHTLY_LINK_TOKEN}"
+          nightly_ios_url="https://nightly.link/llsc12/Paicord/actions/runs/${GITHUB_RUN_ID}/Paicord-iOS.ipa?h=${NIGHTLY_LINK_TOKEN}"
+          echo "nightly_mac_url=$nightly_mac_url" >> $GITHUB_OUTPUT
+          echo "nightly_ios_url=$nightly_ios_url" >> $GITHUB_OUTPUT
 
       # Send to Discord
       - name: Notify Discord Webhook
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          ARTIFACT_URL: ${{ steps.info.outputs.artifact_url }}
+          NIGHTLY_MAC_URL: ${{ steps.info.outputs.nightly_mac_url }}
+          NIGHTLY_IOS_URL: ${{ steps.info.outputs.nightly_ios_url }}
           MACOS_SIZE: ${{ steps.info.outputs.macos_size }}
           IOS_SIZE: ${{ steps.info.outputs.ios_size }}
           COMMIT_HASH: ${{ steps.info.outputs.commit_hash }}
@@ -139,7 +161,7 @@ jobs:
                 "fields": [
                   {
                     "name": "macOS",
-                    "value": "[Download (${MACOS_SIZE})](${ARTIFACT_URL})",
+                    "value": "[Download (${MACOS_SIZE})](${NIGHTLY_MAC_URL})",
                     "inline": true
                   },
                   {
@@ -149,7 +171,7 @@ jobs:
                   },
                   {
                     "name": "iOS",
-                    "value": "[Download (${IOS_SIZE})](${ARTIFACT_URL})",
+                    "value": "[Download (${IOS_SIZE})](${NIGHTLY_IOS_URL})",
                     "inline": true
                   }
                 ],
@@ -169,11 +191,11 @@ jobs:
           sed -i '' "s|\${COMMIT_TITLE}|$COMMIT_TITLE|g" payload.json
           sed -i '' "s|\${COMMIT_DESC}|$COMMIT_DESC|g" payload.json
           sed -i '' "s|\${REPO}|$REPO|g" payload.json
-          sed -i '' "s|\${ARTIFACT_URL}|$ARTIFACT_URL|g" payload.json
           sed -i '' "s|\${MACOS_SIZE}|$MACOS_SIZE|g" payload.json
           sed -i '' "s|\${IOS_SIZE}|$IOS_SIZE|g" payload.json
           sed -i '' "s|\${COMMIT_AUTHOR}|$COMMIT_AUTHOR|g" payload.json
           sed -i '' "s|\${COMMIT_AUTHOR_LOGIN}|$COMMIT_AUTHOR_LOGIN|g" payload.json
           sed -i '' "s|\${author_icon}|$author_icon|g" payload.json
-
+          sed -i '' "s|\${NIGHTLY_MAC_URL}|$NIGHTLY_MAC_URL|g" payload.json
+          sed -i '' "s|\${NIGHTLY_IOS_URL}|$NIGHTLY_IOS_URL|g" payload.json
           curl -H "Content-Type: application/json" -X POST -d @payload.json "$DISCORD_WEBHOOK_URL"
