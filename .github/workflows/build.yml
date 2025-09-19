@@ -111,42 +111,42 @@ jobs:
 
         # Compose Discord embed JSON
         cat <<'EOF' > payload.json
-{
-  "content": null,
-  "embeds": [
-    {
-      "title": "Paicord Build",
-      "description": "Commit ${COMMIT_HASH}\n\n${COMMIT_TITLE}\n${COMMIT_DESC}",
-      "url": "https://github.com/${REPO}/commit/${COMMIT_HASH}",
-      "color": 4063045,
-      "fields": [
         {
-          "name": "macOS",
-          "value": "[Download (${MACOS_SIZE})](${ARTIFACT_URL})",
-          "inline": true
-        },
-        {
-          "name": "|",
-          "value": "|\n|",
-          "inline": true
-        },
-        {
-          "name": "iOS",
-          "value": "[Download (${IOS_SIZE})](${ARTIFACT_URL})",
-          "inline": true
+          "content": null,
+          "embeds": [
+            {
+              "title": "Paicord Build",
+              "description": "Commit ${COMMIT_HASH}\n\n${COMMIT_TITLE}\n${COMMIT_DESC}",
+              "url": "https://github.com/${REPO}/commit/${COMMIT_HASH}",
+              "color": 4063045,
+              "fields": [
+                {
+                  "name": "macOS",
+                  "value": "[Download (${MACOS_SIZE})](${ARTIFACT_URL})",
+                  "inline": true
+                },
+                {
+                  "name": "|",
+                  "value": "|\n|",
+                  "inline": true
+                },
+                {
+                  "name": "iOS",
+                  "value": "[Download (${IOS_SIZE})](${ARTIFACT_URL})",
+                  "inline": true
+                }
+              ],
+              "author": {
+                "name": "${COMMIT_AUTHOR}",
+                "url": "https://github.com/${COMMIT_AUTHOR_LOGIN}",
+                "icon_url": "${author_icon}"
+              }
+            }
+          ],
+          "username": "Paicord Builds",
+          "attachments": []
         }
-      ],
-      "author": {
-        "name": "${COMMIT_AUTHOR}",
-        "url": "https://github.com/${COMMIT_AUTHOR_LOGIN}",
-        "icon_url": "${author_icon}"
-      }
-    }
-  ],
-  "username": "Paicord Builds",
-  "attachments": []
-}
-EOF
+        EOF
         # Now replace placeholders in the JSON (since heredoc is single quoted)
         sed -i '' "s|\${COMMIT_HASH}|$COMMIT_HASH|g" payload.json
         sed -i '' "s|\${COMMIT_TITLE}|$COMMIT_TITLE|g" payload.json
