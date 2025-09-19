@@ -110,14 +110,14 @@ jobs:
         author_icon=$(curl -s $author_api | grep '"avatar_url"' | head -1 | cut -d '"' -f4)
 
         # Compose Discord embed JSON
-        cat <<EOF > payload.json
+        cat <<'EOF' > payload.json
 {
   "content": null,
   "embeds": [
     {
       "title": "Paicord Build",
-      "description": "Commit $COMMIT_HASH\n\n$COMMIT_TITLE\n$COMMIT_DESC",
-      "url": "https://github.com/$REPO/commit/$COMMIT_HASH",
+      "description": "Commit ${COMMIT_HASH}\n\n${COMMIT_TITLE}\n${COMMIT_DESC}",
+      "url": "https://github.com/${REPO}/commit/${COMMIT_HASH}",
       "color": 4063045,
       "fields": [
         {
@@ -137,9 +137,9 @@ jobs:
         }
       ],
       "author": {
-        "name": "$COMMIT_AUTHOR",
-        "url": "https://github.com/$COMMIT_AUTHOR_LOGIN",
-        "icon_url": "$author_icon"
+        "name": "${COMMIT_AUTHOR}",
+        "url": "https://github.com/${COMMIT_AUTHOR_LOGIN}",
+        "icon_url": "${author_icon}"
       }
     }
   ],
@@ -147,4 +147,16 @@ jobs:
   "attachments": []
 }
 EOF
+        # Now replace placeholders in the JSON (since heredoc is single quoted)
+        sed -i '' "s|\${COMMIT_HASH}|$COMMIT_HASH|g" payload.json
+        sed -i '' "s|\${COMMIT_TITLE}|$COMMIT_TITLE|g" payload.json
+        sed -i '' "s|\${COMMIT_DESC}|$COMMIT_DESC|g" payload.json
+        sed -i '' "s|\${REPO}|$REPO|g" payload.json
+        sed -i '' "s|\${ARTIFACT_URL}|$ARTIFACT_URL|g" payload.json
+        sed -i '' "s|\${MACOS_SIZE}|$MACOS_SIZE|g" payload.json
+        sed -i '' "s|\${IOS_SIZE}|$IOS_SIZE|g" payload.json
+        sed -i '' "s|\${COMMIT_AUTHOR}|$COMMIT_AUTHOR|g" payload.json
+        sed -i '' "s|\${COMMIT_AUTHOR_LOGIN}|$COMMIT_AUTHOR_LOGIN|g" payload.json
+        sed -i '' "s|\${author_icon}|$author_icon|g" payload.json
+
         curl -H "Content-Type: application/json" -X POST -d @payload.json "$DISCORD_WEBHOOK_URL"
