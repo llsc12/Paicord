@@ -11,152 +11,166 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    # macOS build (.app)
-    - name: Build macOS .app
-      run: |
-        xcodebuild clean build \
-          -workspace Paicord.xcworkspace \
-          -scheme Paicord \
-          -configuration Release \
-          -destination "platform=macOS" \
-          -derivedDataPath build-mac
+      - name: Disable Swift macro plugin consent prompt
+        run: |
+          defaults write com.apple.dt.Xcode IDESkipMacroFingerprintValidation -bool YES
 
-    - name: Archive macOS .app
-      run: |
-        mkdir -p output
-        cp -R build-mac/Build/Products/Release/Paicord.app output/Paicord-macOS.app
-        cd output
-        zip -r Paicord-macOS.zip Paicord-macOS.app
+      - name: Cache Xcode DerivedData
+        uses: actions/cache@v4
+        with:
+          path: |
+            build-mac
+            ~/Library/Developer/Xcode/DerivedData
+          key: ${{ runner.os }}-deriveddata-${{ hashFiles('**/Podfile.lock', '**/Package.resolved', '.github/workflows/build.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-deriveddata-
 
-    # iOS build (.ipa)
-    - name: Build iOS .ipa
-      run: |
-        xcodebuild clean archive \
-          -workspace Paicord.xcworkspace \
-          -scheme Paicord \
-          -configuration Release \
-          -destination "generic/platform=iOS" \
-          -archivePath build-ios/Paicord.xcarchive
-        xcodebuild -exportArchive \
-          -archivePath build-ios/Paicord.xcarchive \
-          -exportPath output \
-          -exportOptionsPlist ExportOptions.plist || echo "Skipping export if plist is missing"
+      # macOS build (.app)
+      - name: Build macOS .app
+        run: |
+          xcodebuild clean build \
+            -workspace Paicord.xcworkspace \
+            -scheme Paicord \
+            -configuration Release \
+            -destination "platform=macOS" \
+            -derivedDataPath build-mac
 
-    - name: Rename iOS .ipa (if present)
-      run: |
-        if [ -f output/Paicord.ipa ]; then
-          mv output/Paicord.ipa output/Paicord-iOS.ipa
-        fi
+      - name: Archive macOS .app
+        run: |
+          mkdir -p output
+          cp -R build-mac/Build/Products/Release/Paicord.app output/Paicord-macOS.app
+          cd output
+          zip -r Paicord-macOS.zip Paicord-macOS.app
 
-    # Upload artifacts and get download URLs
-    - name: Upload macOS Artifact
-      id: upload-macos
-      uses: actions/upload-artifact@v4
-      with:
-        name: Paicord-macOS
-        path: output/Paicord-macOS.zip
+      # iOS build (.ipa)
+      - name: Build iOS .ipa
+        run: |
+          xcodebuild clean archive \
+            -workspace Paicord.xcworkspace \
+            -scheme Paicord \
+            -configuration Release \
+            -destination "generic/platform=iOS" \
+            -archivePath build-ios/Paicord.xcarchive
+          xcodebuild -exportArchive \
+            -archivePath build-ios/Paicord.xcarchive \
+            -exportPath output \
+            -exportOptionsPlist ExportOptions.plist || echo "Skipping export if plist is missing"
 
-    - name: Upload iOS Artifact (if present)
-      id: upload-ios
-      uses: actions/upload-artifact@v4
-      with:
-        name: Paicord-iOS
-        path: output/Paicord-iOS.ipa
-        if-no-files-found: ignore
+      - name: Rename iOS .ipa (if present)
+        run: |
+          if [ -f output/Paicord.ipa ]; then
+            mv output/Paicord.ipa output/Paicord-iOS.ipa
+          fi
 
-    # Gather commit info and artifact sizes
-    - name: Gather Info for Discord Embed
-      id: info
-      run: |
-        # Commit info
-        echo "commit_hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-        echo "commit_title=$(git log -1 --pretty=%s)" >> $GITHUB_OUTPUT
-        echo "commit_desc=$(git log -1 --pretty=%b)" >> $GITHUB_OUTPUT
-        echo "commit_author=$(git log -1 --pretty=%an)" >> $GITHUB_OUTPUT
-        echo "commit_author_login=${{ github.actor }}" >> $GITHUB_OUTPUT
+      # Upload artifacts and get download URLs
+      - name: Upload macOS Artifact
+        id: upload-macos
+        uses: actions/upload-artifact@v4
+        with:
+          name: Paicord-macOS
+          path: output/Paicord-macOS.zip
 
-        # Artifact sizes
-        macos_size=$(ls -lh output/Paicord-macOS.zip | awk '{print $5}')
-        echo "macos_size=$macos_size" >> $GITHUB_OUTPUT
-        if [ -f output/Paicord-iOS.ipa ]; then
-          ios_size=$(ls -lh output/Paicord-iOS.ipa | awk '{print $5}')
-        else
-          ios_size="N/A"
-        fi
-        echo "ios_size=$ios_size" >> $GITHUB_OUTPUT
+      - name: Upload iOS Artifact (if present)
+        id: upload-ios
+        uses: actions/upload-artifact@v4
+        with:
+          name: Paicord-iOS
+          path: output/Paicord-iOS.ipa
+          if-no-files-found: ignore
 
-        # Artifact URLs (run-level, not direct download)
-        echo "artifact_url=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_OUTPUT
+      # Gather commit info and artifact sizes
+      - name: Gather Info for Discord Embed
+        id: info
+        run: |
+          # Commit info
+          echo "commit_hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "commit_title=$(git log -1 --pretty=%s)" >> $GITHUB_OUTPUT
+          echo "commit_desc=$(git log -1 --pretty=%b)" >> $GITHUB_OUTPUT
+          echo "commit_author=$(git log -1 --pretty=%an)" >> $GITHUB_OUTPUT
+          echo "commit_author_login=${{ github.actor }}" >> $GITHUB_OUTPUT
 
-    # Send to Discord
-    - name: Notify Discord Webhook
-      env:
-        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        ARTIFACT_URL: ${{ steps.info.outputs.artifact_url }}
-        MACOS_SIZE: ${{ steps.info.outputs.macos_size }}
-        IOS_SIZE: ${{ steps.info.outputs.ios_size }}
-        COMMIT_HASH: ${{ steps.info.outputs.commit_hash }}
-        COMMIT_TITLE: ${{ steps.info.outputs.commit_title }}
-        COMMIT_DESC: ${{ steps.info.outputs.commit_desc }}
-        COMMIT_AUTHOR: ${{ steps.info.outputs.commit_author }}
-        COMMIT_AUTHOR_LOGIN: ${{ steps.info.outputs.commit_author_login }}
-        REPO: ${{ github.repository }}
-      run: |
-        # Get commit author avatar
-        author_api="https://api.github.com/users/$COMMIT_AUTHOR_LOGIN"
-        author_icon=$(curl -s $author_api | grep '"avatar_url"' | head -1 | cut -d '"' -f4)
+          # Artifact sizes
+          macos_size=$(ls -lh output/Paicord-macOS.zip | awk '{print $5}')
+          echo "macos_size=$macos_size" >> $GITHUB_OUTPUT
+          if [ -f output/Paicord-iOS.ipa ]; then
+            ios_size=$(ls -lh output/Paicord-iOS.ipa | awk '{print $5}')
+          else
+            ios_size="N/A"
+          fi
+          echo "ios_size=$ios_size" >> $GITHUB_OUTPUT
 
-        # Compose Discord embed JSON
-        cat <<'EOF' > payload.json
-        {
-          "content": null,
-          "embeds": [
-            {
-              "title": "Paicord Build",
-              "description": "Commit ${COMMIT_HASH}\n\n${COMMIT_TITLE}\n${COMMIT_DESC}",
-              "url": "https://github.com/${REPO}/commit/${COMMIT_HASH}",
-              "color": 4063045,
-              "fields": [
-                {
-                  "name": "macOS",
-                  "value": "[Download (${MACOS_SIZE})](${ARTIFACT_URL})",
-                  "inline": true
-                },
-                {
-                  "name": "|",
-                  "value": "|\n|",
-                  "inline": true
-                },
-                {
-                  "name": "iOS",
-                  "value": "[Download (${IOS_SIZE})](${ARTIFACT_URL})",
-                  "inline": true
+          # Artifact URLs (run-level, not direct download)
+          echo "artifact_url=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_OUTPUT
+
+      # Send to Discord
+      - name: Notify Discord Webhook
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          ARTIFACT_URL: ${{ steps.info.outputs.artifact_url }}
+          MACOS_SIZE: ${{ steps.info.outputs.macos_size }}
+          IOS_SIZE: ${{ steps.info.outputs.ios_size }}
+          COMMIT_HASH: ${{ steps.info.outputs.commit_hash }}
+          COMMIT_TITLE: ${{ steps.info.outputs.commit_title }}
+          COMMIT_DESC: ${{ steps.info.outputs.commit_desc }}
+          COMMIT_AUTHOR: ${{ steps.info.outputs.commit_author }}
+          COMMIT_AUTHOR_LOGIN: ${{ steps.info.outputs.commit_author_login }}
+          REPO: ${{ github.repository }}
+        run: |
+          # Get commit author avatar
+          author_api="https://api.github.com/users/$COMMIT_AUTHOR_LOGIN"
+          author_icon=$(curl -s $author_api | grep '"avatar_url"' | head -1 | cut -d '"' -f4)
+
+          # Compose Discord embed JSON
+          cat <<'EOF' > payload.json
+          {
+            "content": null,
+            "embeds": [
+              {
+                "title": "Paicord Build",
+                "description": "Commit ${COMMIT_HASH}\n\n${COMMIT_TITLE}\n${COMMIT_DESC}",
+                "url": "https://github.com/${REPO}/commit/${COMMIT_HASH}",
+                "color": 4063045,
+                "fields": [
+                  {
+                    "name": "macOS",
+                    "value": "[Download (${MACOS_SIZE})](${ARTIFACT_URL})",
+                    "inline": true
+                  },
+                  {
+                    "name": "|",
+                    "value": "|\n|",
+                    "inline": true
+                  },
+                  {
+                    "name": "iOS",
+                    "value": "[Download (${IOS_SIZE})](${ARTIFACT_URL})",
+                    "inline": true
+                  }
+                ],
+                "author": {
+                  "name": "${COMMIT_AUTHOR}",
+                  "url": "https://github.com/${COMMIT_AUTHOR_LOGIN}",
+                  "icon_url": "${author_icon}"
                 }
-              ],
-              "author": {
-                "name": "${COMMIT_AUTHOR}",
-                "url": "https://github.com/${COMMIT_AUTHOR_LOGIN}",
-                "icon_url": "${author_icon}"
               }
-            }
-          ],
-          "username": "Paicord Builds",
-          "attachments": []
-        }
-        EOF
-        # Now replace placeholders in the JSON (since heredoc is single quoted)
-        sed -i '' "s|\${COMMIT_HASH}|$COMMIT_HASH|g" payload.json
-        sed -i '' "s|\${COMMIT_TITLE}|$COMMIT_TITLE|g" payload.json
-        sed -i '' "s|\${COMMIT_DESC}|$COMMIT_DESC|g" payload.json
-        sed -i '' "s|\${REPO}|$REPO|g" payload.json
-        sed -i '' "s|\${ARTIFACT_URL}|$ARTIFACT_URL|g" payload.json
-        sed -i '' "s|\${MACOS_SIZE}|$MACOS_SIZE|g" payload.json
-        sed -i '' "s|\${IOS_SIZE}|$IOS_SIZE|g" payload.json
-        sed -i '' "s|\${COMMIT_AUTHOR}|$COMMIT_AUTHOR|g" payload.json
-        sed -i '' "s|\${COMMIT_AUTHOR_LOGIN}|$COMMIT_AUTHOR_LOGIN|g" payload.json
-        sed -i '' "s|\${author_icon}|$author_icon|g" payload.json
+            ],
+            "username": "Paicord Builds",
+            "attachments": []
+          }
+          EOF
+          # Now replace placeholders in the JSON (since heredoc is single quoted)
+          sed -i '' "s|\${COMMIT_HASH}|$COMMIT_HASH|g" payload.json
+          sed -i '' "s|\${COMMIT_TITLE}|$COMMIT_TITLE|g" payload.json
+          sed -i '' "s|\${COMMIT_DESC}|$COMMIT_DESC|g" payload.json
+          sed -i '' "s|\${REPO}|$REPO|g" payload.json
+          sed -i '' "s|\${ARTIFACT_URL}|$ARTIFACT_URL|g" payload.json
+          sed -i '' "s|\${MACOS_SIZE}|$MACOS_SIZE|g" payload.json
+          sed -i '' "s|\${IOS_SIZE}|$IOS_SIZE|g" payload.json
+          sed -i '' "s|\${COMMIT_AUTHOR}|$COMMIT_AUTHOR|g" payload.json
+          sed -i '' "s|\${COMMIT_AUTHOR_LOGIN}|$COMMIT_AUTHOR_LOGIN|g" payload.json
+          sed -i '' "s|\${author_icon}|$author_icon|g" payload.json
 
-        curl -H "Content-Type: application/json" -X POST -d @payload.json "$DISCORD_WEBHOOK_URL"
+          curl -H "Content-Type: application/json" -X POST -d @payload.json "$DISCORD_WEBHOOK_URL"
