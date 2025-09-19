@@ -36,8 +36,7 @@ jobs:
       # macOS build (.app)
       - name: Build macOS .app
         run: |
-          xcodebuild clean build \
-            -workspace Paicord.xcworkspace \
+          xcodebuild -workspace Paicord.xcworkspace \
             -scheme Paicord \
             -configuration Release \
             -destination "platform=macOS" \
