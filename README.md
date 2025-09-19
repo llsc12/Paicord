@@ -14,7 +14,7 @@ Paicord handles many things correctly this time. It can handle Captchas and MFA 
 
 I really wanna see someone take PaicordLib and make a Linux client using one of those cool libraries for bringing some semblance of SwiftUI on Linux and Windows. If that person is you, reach out to me!
 
-PaicordLib needs
+PaicordLib needs some additions, mainly user API routes and some client-sent gateway payloads. The gateway payloads will probably be implemented by myself soon. User API routes will take time to go through.
 
 ## References
 
