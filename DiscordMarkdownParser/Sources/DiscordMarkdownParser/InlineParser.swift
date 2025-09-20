@@ -130,9 +130,31 @@ public final class InlineParser {
 				return [AST.TextNode(content: tokenStream.consume().content)]
 			}
 		case .underscore:
-			// Handle emphasis and strong emphasis with _
-			if let emphasisNode = try parseEmphasisOrStrong(delimiter: "_") {
-				return [emphasisNode]
+			// Discord: double underscore is underline, single is italics, triple is underline+italics
+			if tokenStream.current.content == "__" {
+				if let underlineNode = try? parseUnderline() {
+					return [underlineNode].compactMap { $0 }
+				} else {
+					return [AST.TextNode(content: tokenStream.consume().content)]
+				}
+			} else if tokenStream.current.content == "_" {
+				if let emphasisNode = try parseEmphasisOrStrong(delimiter: "_") {
+					return [emphasisNode]
+				} else {
+					return [AST.TextNode(content: tokenStream.consume().content)]
+				}
+			} else if tokenStream.current.content == "___" {
+				// Discord: triple underscore is underline+italics
+				// Parse underline, then parse italics inside
+				if let underlineNode = try? parseUnderline() {
+					if let italicNode = try? parseEmphasisOrStrong(delimiter: "_") {
+						return [AST.UnderlineNode(children: [italicNode], sourceLocation: tokenStream.current.location)]
+					} else {
+						return [underlineNode].compactMap { $0 }
+					}
+				} else {
+					return [AST.TextNode(content: tokenStream.consume().content)]
+				}
 			} else {
 				return [AST.TextNode(content: tokenStream.consume().content)]
 			}
@@ -255,10 +277,10 @@ public final class InlineParser {
 		let startPosition = tokenStream.currentPosition
 		
 		while !tokenStream.isAtEnd
-						&& (tokenStream.current.type == .asterisk
-								|| tokenStream.current.type == .underscore)
-						&& tokenStream.current.content.first == delimiterChar
-		{
+					&& (tokenStream.current.type == .asterisk
+						|| tokenStream.current.type == .underscore)
+					&& tokenStream.current.content.first == delimiterChar
+			{
 			delimiterCount += tokenStream.current.content.count
 			tokenStream.advance()
 		}
@@ -284,17 +306,30 @@ public final class InlineParser {
 				let closingPosition = tokenStream.currentPosition
 				
 				while !tokenStream.isAtEnd
-								&& (tokenStream.current.type == .asterisk
-										|| tokenStream.current.type == .underscore)
-								&& tokenStream.current.content.first == delimiterChar
+						&& (tokenStream.current.type == .asterisk
+							|| tokenStream.current.type == .underscore)
+						&& tokenStream.current.content.first == delimiterChar
 				{
 					closingCount += tokenStream.current.content.count
 					tokenStream.advance()
 				}
-				
-				// Strong emphasis (2+ delimiters)
-				if delimiterCount >= 2 && closingCount >= 2 {
-					// Put back extra delimiters
+
+				// Discord: double underscore is underline
+				if delimiterChar == "_" && delimiterCount == 2 && closingCount == 2 {
+					return AST.UnderlineNode(
+						children: content,
+						sourceLocation: startLocation
+					)
+				}
+				// Discord: triple underscore is underline+italics
+				if delimiterChar == "_" && delimiterCount == 3 && closingCount == 3 {
+					return AST.UnderlineNode(
+						children: [AST.ItalicNode(children: content, sourceLocation: startLocation)],
+						sourceLocation: startLocation
+					)
+				}
+				// Standard Markdown: double asterisk is bold
+				if delimiterChar == "*" && delimiterCount >= 2 && closingCount >= 2 {
 					let extraDelimiters = closingCount - 2
 					if extraDelimiters > 0 {
 						tokenStream.setPosition(tokenStream.currentPosition - 1)
@@ -308,7 +343,6 @@ public final class InlineParser {
 				
 				// Emphasis (1 delimiter)
 				if delimiterCount >= 1 && closingCount >= 1 {
-					// Put back extra delimiters
 					let extraDelimiters = closingCount - 1
 					if extraDelimiters > 0 {
 						tokenStream.setPosition(tokenStream.currentPosition - 1)
@@ -336,9 +370,9 @@ public final class InlineParser {
 		}
 		
 		// No closing delimiters found, treat as regular text
-		tokenStream.setPosition(startPosition)
-		return parseText()
-	}
+			tokenStream.setPosition(startPosition)
+			return parseText()
+		}
 	
 	// MARK: - Code Spans
 	
@@ -620,13 +654,28 @@ public final class InlineParser {
 		let token = tokenStream.consume()
 		let url = token.content
 		
-		let displayText =
-		if url.contains("@") {
-			url
-		} else {
-			url
+		// Discord mention patterns (should not be autolinks)
+		let mentionPatterns = [
+			"^<@>$", "^<@&>$", "^<#>$", "^<t:>$", "^<a:[^:]*:>$", "^<:[^:]*:>$"
+		]
+		for pattern in mentionPatterns {
+			if url.range(of: pattern, options: .regularExpression) != nil {
+				// Incomplete Discord mention, treat as text
+				return nil
+			}
 		}
 		
+		// If it looks like a valid Discord mention but is incomplete, treat as text
+		if url.hasPrefix("<@") || url.hasPrefix("<@&") || url.hasPrefix("<#") || url.hasPrefix("<t:") || url.hasPrefix("<a:") || url.hasPrefix("<:") {
+			// Check for missing required fields (e.g., no ID)
+			let discordMentionRegex = "^<(?:@|@&|#|t:|a:[^:]+:|:[^:]+:)[0-9]+.*>$"
+			if url.range(of: discordMentionRegex, options: .regularExpression) == nil {
+				return nil
+			}
+		}
+		
+		// Otherwise, treat as autolink (URL/email)
+		let displayText = url
 		return AST.AutolinkNode(
 			url: url, text: displayText, sourceLocation: token.location)
 	}

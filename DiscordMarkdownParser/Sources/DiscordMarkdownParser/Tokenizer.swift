@@ -95,6 +95,7 @@ public enum TokenType: String, CaseIterable, Sendable, Equatable {
 
 	// Special
 	case eof  // End of file
+	case footnoteHeaderMarker // Discord '-#' footnote header
 }
 
 // MARK: - Tokenizer
@@ -287,6 +288,22 @@ public final class MarkdownTokenizer {
 	// MARK: - Token Recognition Methods
 
 	private func checkLineStartPatterns() -> Token? {
+
+		// Discord footnote header: -#
+		if currentChar == "-" && peek() == "#" {
+			let startLocation = currentLocation
+			advance() // "-"
+			advance() // "#"
+			// Must be followed by whitespace or end of line
+			if isAtEnd || currentChar.isWhitespace {
+				return Token(type: .footnoteHeaderMarker, content: "-#", location: startLocation)
+			} else {
+				// Not a valid footnote header, backtrack and treat as text
+				position = startLocation.offset
+				line = startLocation.line
+				column = startLocation.column
+			}
+		}
 
 		// Check for ATX headers (# ## ###)
 		if currentChar == "#" {
@@ -845,10 +862,22 @@ public final class MarkdownTokenizer {
 	}
 
 	private func isAutolink() -> Bool {
-		// Simple check for http:// https:// or email patterns
+//		return remaining.hasPrefix("http://") || remaining.hasPrefix("https://")
+//					|| remaining.contains("@")
+		
+		// Only match valid URLs or valid emails
 		let remaining = String(characters[position...])
-		return remaining.hasPrefix("http://") || remaining.hasPrefix("https://")
-			|| remaining.contains("@")
+		if remaining.hasPrefix("http://") || remaining.hasPrefix("https://") {
+			return true
+		}
+		
+		// Better email check
+		let emailRegex = "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"
+		if remaining.range(of: emailRegex, options: .regularExpression) != nil {
+			return true
+		}
+		return false
+		// all of that should fix testInvalidMentionEdgeCases
 	}
 
 	private func tokenizeAutolink() -> Token {

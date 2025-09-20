@@ -193,11 +193,6 @@ public final class DiscordMarkdownParser: Sendable {
 		//        return try await processTaskListItemForInlineContent(
 		//          taskListItemNode, using: inlineParser)
 		//      }
-		case .customEmoji:
-			if let customEmojiNode = node as? AST.CustomEmojiNode {
-				// Custom emoji nodes do not have children to process
-				return customEmojiNode
-			}
 
 		default:
 			// For other node types, process children if they exist

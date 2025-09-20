@@ -52,6 +52,7 @@ public struct ASTNodeType: RawRepresentable, Hashable, Sendable {
 	// Inline elements Discord specific
 	public static let underline = ASTNodeType(rawValue: "underline")
 	public static let spoiler = ASTNodeType(rawValue: "spoiler")
+	public static let footnote = ASTNodeType(rawValue: "footnote")
 	public static let customEmoji = ASTNodeType(rawValue: "customEmoji")
 	public static let userMention = ASTNodeType(rawValue: "userMention")
 	public static let roleMention = ASTNodeType(rawValue: "roleMention")
@@ -574,6 +575,18 @@ public enum AST {
 	/// This should be flattened and removed from the final AST.
 	public struct FragmentNode: ASTNode, Sendable {
 		public let nodeType: ASTNodeType = .text  // Behaves like text for most purposes
+		public let children: [ASTNode]
+		public let sourceLocation: SourceLocation?
+
+		public init(children: [ASTNode], sourceLocation: SourceLocation? = nil) {
+			self.children = children
+			self.sourceLocation = sourceLocation
+		}
+	}
+
+	/// Footnote header node (Discord '-# ...' syntax)
+	public struct FootnoteNode: ASTNode, Sendable {
+		public let nodeType: ASTNodeType = .footnote
 		public let children: [ASTNode]
 		public let sourceLocation: SourceLocation?
 

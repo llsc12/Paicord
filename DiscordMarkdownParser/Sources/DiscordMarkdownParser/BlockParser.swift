@@ -87,6 +87,11 @@ public final class BlockParser {
 
 		let token = tokenStream.current
 
+		// Discord footnote header: -# ...
+		if token.type == .footnoteHeaderMarker {
+			return try parseFootnoteHeader()
+		}
+
 		switch token.type {
 		case .atxHeaderStart:
 			return try parseATXHeading()
@@ -121,6 +126,17 @@ public final class BlockParser {
 			// Default to paragraph
 			return try parseParagraph()
 		}
+	}
+
+	private func parseFootnoteHeader() throws -> AST.FootnoteNode {
+		let startLocation = tokenStream.current.location
+		// Consume '-' and '#' tokens
+		tokenStream.consume() // '-'
+		tokenStream.consume() // '#'
+		skipWhitespace()
+		let inlineParser = InlineParser(tokenStream: tokenStream, configuration: configuration)
+		let children = try inlineParser.parseInlines(until: [.newline, .eof])
+		return AST.FootnoteNode(children: children, sourceLocation: startLocation)
 	}
 
 	// MARK: - Heading Parsers
