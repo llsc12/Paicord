@@ -118,12 +118,18 @@ public final class InlineParser {
 	
 	/// Parse a single inline element
 	private func parseInline() throws -> [ASTNode] {
-		if shouldConsolidateAsText(tokenStream.current.type) {
-			return [try parseConsolidatedText()]
-		}
-		
 		let token = tokenStream.current
 		switch token.type {
+		case .text, .whitespace:
+			var content = ""
+			let startLocation = tokenStream.current.location
+			
+			while !tokenStream.isAtEnd &&
+					(tokenStream.current.type == .text || tokenStream.current.type == .whitespace) {
+				content += tokenStream.consume().content
+			}
+			
+			return [AST.TextNode(content: content, sourceLocation: startLocation)]
 		case .asterisk:
 			// Handle emphasis and strong emphasis with *
 			if let emphasisNode = try parseEmphasisOrStrong(delimiter: "*") {
