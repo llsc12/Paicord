@@ -40,7 +40,7 @@ jobs:
       - name: Build macOS .app
         run: |
           xcodebuild -workspace Paicord.xcworkspace \
-            -scheme Paicord \
+            -scheme "Paicord Release" \
             -configuration Release \
             -destination "platform=macOS" \
             -derivedDataPath build-mac \
@@ -50,6 +50,10 @@ jobs:
         run: |
           mkdir -p output
           cp -R build-mac/Build/Products/Release/Paicord.app output/Paicord-macOS.app
+          cd output
+          zip -r Paicord-macOS.zip Paicord-macOS.app
+          rm -rf Paicord-macOS.app
+          cd ..
 
       # iOS build (.ipa)
       - name: Build iOS .ipa
@@ -96,7 +100,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Paicord-macOS
-          path: output/Paicord-macOS.app
+          path: output/Paicord-macOS.zip
 
       - name: Upload iOS Artifact
         id: upload-ios
