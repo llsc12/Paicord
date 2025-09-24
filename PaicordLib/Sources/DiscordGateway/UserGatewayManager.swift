@@ -20,24 +20,6 @@ import struct NIOWebSocket.WebSocketOpcode
 
 public actor UserGatewayManager: GatewayManager {
 
-	/// The info related to the shard status of this gateway-manager.
-	struct ShardInfo {
-		var shardConnectedOnceBefore = false
-		let shard: IntPair
-		let maxConcurrency: Int
-		let shardCoordinator: ShardCoordinator
-
-		init(
-			shard: IntPair,
-			maxConcurrency: Int,
-			shardCoordinator: ShardCoordinator
-		) {
-			self.shard = shard
-			self.maxConcurrency = maxConcurrency
-			self.shardCoordinator = shardCoordinator
-		}
-	}
-
 	private struct Message {
 		let payload: Gateway.Event
 		let opcode: WebSocketOpcode?
@@ -122,9 +104,6 @@ public actor UserGatewayManager: GatewayManager {
 	/// Gateway URL for resuming the connection, so we don't need to make an api call.
 	var resumeGatewayURL: String? = nil
 
-	//MARK: Shard-ing
-	var shardInfo: ShardInfo? = nil
-
 	//MARK: Backoff
 
 	/// Discord cares about the identify payload for rate-limiting and if you send
@@ -173,7 +152,6 @@ public actor UserGatewayManager: GatewayManager {
 			.lazyUserNotes,
 			.authTokenRefresh,
 			.userSettingsProto,
-			.dedupeUserObjects,
 			.debounceMessageReactions,
 		],
 		captchaCallback: CaptchaChallengeHandler? = nil,
@@ -461,12 +439,10 @@ extension UserGatewayManager {
 		case let .hello(hello):
 			logger.debug("Received 'hello'")
 			/// Start heart-beating right-away.
-			/// Don't wait for shards first, as that might take too long.
 			self.setupPingTask(
 				forConnectionWithId: self.connectionId.load(ordering: .relaxed),
 				every: .milliseconds(Int64(hello.heartbeat_interval))
 			)
-			await waitInShardQueueIfNeeded()
 			logger.trace("Will resume or identify")
 			await self.sendResumeOrIdentify()
 		case let .ready(payload):
@@ -935,26 +911,6 @@ extension UserGatewayManager {
 		await self.sendQueue.reset()
 	}
 
-	/// Discord says: "you must start the shard buckets in "order". That means that you can start shard 0 -> shard 15 concurrently, and then you can start shard 16 -> shard 31."
-	/// https://discord.com/developers/docs/topics/gateway#sharding
-	///
-	/// This shard-ing logic can't handle out-of-process shards yet.
-	/// Maybe soon with some `DistributedActor`s magic.
-	private func waitInShardQueueIfNeeded() async {
-		if let shardInfo,
-			/// If shard already connected once before, then skip the wait.
-			!shardInfo.shardConnectedOnceBefore
-		{
-			logger.trace("Will wait for other shards")
-			/// `shardManager` must exist. Initializer must enforce this.
-			await shardInfo.shardCoordinator.waitForOtherShards(
-				shard: shardInfo.shard,
-				maxConcurrency: max(shardInfo.maxConcurrency, 1)/// Avoid an unlikely division-by-zero
-			)
-			logger.trace("Done waiting for other shards")
-		}
-	}
-
 	func setupOutboundWriter(_ outboundWriter: WebSocketOutboundWriter) {
 		self.outboundWriter = outboundWriter
 	}
@@ -975,7 +931,6 @@ extension UserGatewayManager {
 	}
 }
 
-// MARK: For ShardingGatewayManager
 extension UserGatewayManager {
 	func addEventsContinuation(
 		_ continuation: AsyncStream<Gateway.Event>.Continuation

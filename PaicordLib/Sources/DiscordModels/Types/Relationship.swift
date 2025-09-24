@@ -10,7 +10,6 @@
 /// https://docs.discord.food/resources/relationships#relationship-object
 public struct DiscordRelationship: Sendable, Codable {
 
-	/// https://discord.com/developers/docs/resources/poll#layout-type
 	@UnstableEnum<Int>
 	public enum Kind: Sendable, Codable {
 		case none  // 0
@@ -29,7 +28,7 @@ public struct DiscordRelationship: Sendable, Codable {
 	public var is_spam_request: Bool?
 	public var stranger_request: Bool?
 	public var origin_application_id: ApplicationSnowflake?
-	public var since: DiscordTimestamp
+	public var since: DiscordTimestamp?
 	
 	// Sent when this payload came from RelationshipAdd
 	public var should_notify: Bool?

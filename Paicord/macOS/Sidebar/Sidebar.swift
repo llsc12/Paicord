@@ -6,50 +6,37 @@
 //  Copyright © 2025 Lakhan Lothiyi.
 //  
 
-import SwiftUI
+import SwiftUIX
 import SDWebImageSwiftUI
 @_spi(Advanced) import SwiftUIIntrospect
 
 struct SidebarView: View {
+	@Environment(GatewayStore.self) var gw
+	@Environment(PaicordAppState.self) var appState
+	
 	var body: some View {
 		HStack(spacing: 0) {
-			ScrollView {
-				LazyVStack {
-					ServerButton()
-						.padding(2)
-
-					Divider()
-						.padding(.horizontal, 8)
-
-					ForEach(0..<20) { index in
-						ServerButton()
-							.padding(2)
-					}
+			guildScroller
+				.frame(width: 65)
+			
+			if appState.selectedGuild == nil {
+				DMsView()
+			} else {
+				if let guild = gw.currentUser.guilds.first(where: { $0.id == appState.selectedGuild }) {
+					GuildView(guild: guild)
+				} else {
+					ActivityIndicator()
 				}
-				.safeAreaPadding(.all, 10)
 			}
-			.scrollIndicators(.hidden)
-			.frame(width: 60)
-			.scrollviewForceDisableScrollBars()
-
-			ScrollView {
-				VStack {
-					AnimatedImage(url: .init(string: "https://cdn.discordapp.com/banners/1015060230222131221/a_a42646da37160e4053f1823649177f0a.webp?size=300&animated=true"))
-						.resizable()
-						.scaledToFill()
-
-					ForEach(0..<100) { index in
-						Text("\nStuff")
-					}
-				}
-				.frame(maxWidth: .infinity)
-			}
-			.background {
-				Color.tableBackground.opacity(0.25)
-			}
-			.roundedCorners(radius: 10, corners: .topLeft)
 		}
-		.navigationSplitViewColumnWidth(min: 200, ideal: 240, max: 350)
+		.navigationSplitViewColumnWidth(min: 280, ideal: 300, max: 360)
+	}
+	
+	@ViewBuilder
+	var guildScroller: some View {
+		GuildScrollBar()
+		.scrollIndicators(.hidden)
+		.scrollviewForceDisableScrollBars()
 	}
 }
 

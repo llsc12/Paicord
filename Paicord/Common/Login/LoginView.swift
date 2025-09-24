@@ -29,7 +29,7 @@ struct LoginView: View {
 				.frame(maxWidth: .infinity, maxHeight: .infinity)
 				
 
-			if viewModel.loginClient != nil {
+			if viewModel.gw != nil {
 				VStack {
 					if viewModel.gw.accounts.accounts.isEmpty
 						|| viewModel.addingNewAccount
@@ -66,18 +66,23 @@ struct LoginView: View {
 				.shadow(radius: 10)
 				.padding(5)
 				.transition(.scale(scale: 0.8).combined(with: .opacity))
+			} else {
+				ProgressView()
+					.task {
+						try? await Task.sleep(for: .seconds(0.5)) // edge case problem when logging out ???
+						viewModel.gw = gw
+						viewModel.appState = appState
+						Task {
+							await viewModel.fingerprintSetup()
+						}
+					}
 			}
 		}
-		.animation(.default, value: viewModel.loginClient == nil)
+		.animation(.default, value: viewModel.gw == nil)
 		.animation(.default, value: viewModel.handleMFA == nil)
 		.animation(.default, value: viewModel.gw?.accounts.accounts.isEmpty)
 		.animation(.default, value: viewModel.addingNewAccount)
 		.animation(.default, value: chosenMFAMethod)
-		.task {
-			viewModel.gw = gw
-			viewModel.appState = appState
-			await viewModel.fingerprintSetup()
-		}
 	}
 }
 

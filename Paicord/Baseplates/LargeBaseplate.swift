@@ -14,6 +14,9 @@ struct LargeBaseplate: View {
 	var body: some View {
 		NavigationSplitView {
 			SidebarView()
+				.safeAreaInset(edge: .bottom) {
+					ProfileBar()
+				}
 		} detail: {
 			ChatView()
 		}

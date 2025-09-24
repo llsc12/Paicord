@@ -34,7 +34,7 @@ struct RootView: View {
 			} else {
 				if idiom == .phone {
 					#if os(iOS)
-						SmallBaseplate()
+					SmallBaseplate(appState: self.appState)
 					#endif
 				} else {
 					LargeBaseplate()
@@ -42,7 +42,7 @@ struct RootView: View {
 			}
 		}
 		.navigationTitle("")
-		.animation(.default, value: gatewayStore.state != .connected)
+		.animation(.default, value: gatewayStore.state.hashValue)
 		.fontDesign(.rounded)
 		.modifier(
 			PaicordSheetsAlerts(
@@ -56,13 +56,19 @@ struct RootView: View {
 		#if os(macOS)
 			.introspect(.window, on: .macOS(.v14...)) { window in
 				self.window = window
-				updateWindow(window)
+				DispatchQueue.main.async {
+					updateWindow(window)
+				}
 			}
 			.onAppear {
-				updateWindow(window)
+				DispatchQueue.main.async {
+					updateWindow(window)
+				}
 			}
 			.onChange(of: gatewayStore.accounts.currentAccountID) {
-				updateWindow(window)
+				DispatchQueue.main.async {
+					updateWindow(window)
+				}
 			}
 		#endif
 	}

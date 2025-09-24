@@ -11,8 +11,9 @@ import PaicordLib
 
 @Observable
 final class GatewayStore {
-	let accounts = TokenStore()
-
+	static let shared = GatewayStore()
+	
+	// Some setup for the gateway
 	@ObservationIgnored var captchaCallback: CaptchaChallengeHandler?
 	@ObservationIgnored var mfaCallback: MFAVerificationHandler?
 	@ObservationIgnored private(set) var gateway: UserGatewayManager?
@@ -23,7 +24,7 @@ final class GatewayStore {
 	}
 
 	@ObservationIgnored
-	private lazy var unauthenticatedClient: DefaultDiscordClient = {
+	lazy var unauthenticatedClient: DefaultDiscordClient = {
 		DefaultDiscordClient(
 			captchaCallback: captchaCallback,
 			mfaCallback: mfaCallback
@@ -35,7 +36,11 @@ final class GatewayStore {
 			print("Gateway state changed to \(state)")
 		}
 	}
+
+	@ObservationIgnored
 	var eventTask: Task<Void, Never>? = nil
+	
+	// MARK: - Gateway Management
 
 	/// Disconnects current gateway and cancels event task if needed
 	private func disconnectIfNeeded() async {
@@ -46,7 +51,9 @@ final class GatewayStore {
 
 	/// Connects to the gateway if it is not already connected
 	func connectIfNeeded() async {
-		guard [.stopped, .noConnection].contains(state), eventTask == nil else { return }
+		guard [.stopped, .noConnection].contains(state), eventTask == nil else {
+			return
+		}
 		if let accountID = accounts.currentAccountID {
 			let account = accounts.account(for: accountID)!
 			await logIn(as: account)
@@ -65,22 +72,76 @@ final class GatewayStore {
 		setupEventHandling()
 		await gateway?.connect()
 	}
-	
+
 	/// Disconnects from the gateway. You must remove the current account from TokenStore before calling this.
+	/// This will reset all stores.
 	func logOut() async {
 		await disconnectIfNeeded()
+		gateway = nil
+		resetStores()
 	}
 
-	private func setupEventHandling() {
+	func setupEventHandling() {
 		eventTask = Task { @MainActor in
 			guard let gateway else { return }
 			for await event in await gateway.events {
-//				print(event.data)
+				//				print(event.data)
 				switch event.data {
+
 				default: break
 				}
 			}
 		}
+		
+		// Set up stores with gateway
+		currentUser.setGateway(self.gateway)
+		settings.setGateway(self.gateway)
+		
+		// Update existing channel stores
+		for channelStore in channels.values {
+			channelStore.setGateway(self.gateway)
+		}
+		
+		// Update existing guild stores
+		for guildStore in guilds.values {
+			guildStore.setGateway(self.gateway)
+		}
+	}
+	
+	func resetStores() {
+		currentUser = CurrentUserStore()
+		settings = SettingsStore()
+		channels = [:]
+		guilds = [:]
+	}
+
+	// MARK: - Data Stores
+	
+	let accounts = TokenStore()
+	var currentUser = CurrentUserStore()
+	var settings = SettingsStore()
+
+	private var channels: [ChannelSnowflake: ChannelStore] = [:]
+	func getChannelStore(for id: ChannelSnowflake) -> ChannelStore {
+		if let store = channels[id] {
+			return store
+		} else {
+			let store = ChannelStore(id: id)
+			store.setGateway(self.gateway)
+			channels[id] = store
+			return store
+		}
+	}
+	
+	private var guilds: [GuildSnowflake: GuildStore] = [:]
+	func getGuildStore(for id: GuildSnowflake) -> GuildStore {
+		if let store = guilds[id] {
+			return store
+		} else {
+			let store = GuildStore(id: id)
+			store.setGateway(self.gateway)
+			guilds[id] = store
+			return store
+		}
 	}
 }
-

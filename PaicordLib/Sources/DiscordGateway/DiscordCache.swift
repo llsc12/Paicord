@@ -441,7 +441,6 @@ public actor DiscordCache {
 			.requestPresenceUpdate, .requestVoiceStateUpdate, .interactionCreate:
 			break
 		case let .ready(ready):
-			self.application = ready.application
 			self.botUser = ready.user
 		case let .guildCreate(guildCreate):
 			self.guilds[guildCreate.id] = guildCreate
@@ -953,12 +952,13 @@ public actor DiscordCache {
 			}
 		case let .presenceUpdate(presence):
 			print("Willllll update presence: \(presence)")
-			if let idx = self.guilds[presence.guild_id]?.presences
+			guard let guild_id = presence.guild_id else { break }
+			if let idx = self.guilds[guild_id]?.presences
 				.firstIndex(where: { $0.user?.id == presence.user.id })
 			{
-				self.guilds[presence.guild_id]?.presences[idx].update(with: presence)
+				self.guilds[guild_id]?.presences[idx].update(with: presence)
 			} else {
-				self.guilds[presence.guild_id]?.presences.append(
+				self.guilds[guild_id]?.presences.append(
 					.init(presenceUpdate: presence)
 				)
 			}

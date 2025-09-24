@@ -159,6 +159,83 @@ extension DiscordChannel {
 	/// https://discord.com/developers/docs/resources/channel#message-object
 	public struct Message: Sendable, Codable {
 
+		public init(
+			id: MessageSnowflake,
+			channel_id: ChannelSnowflake,
+			author: DiscordUser? = nil,
+			content: String,
+			timestamp: DiscordTimestamp,
+			edited_timestamp: DiscordTimestamp? = nil,
+			tts: Bool,
+			mention_everyone: Bool,
+			mentions: [MentionUser],
+			mention_roles: [RoleSnowflake],
+			mention_channels: [ChannelMention]? = nil,
+			attachments: [Attachment],
+			embeds: [Embed],
+			reactions: [Reaction]? = nil,
+			nonce: StringOrInt? = nil,
+			pinned: Bool,
+			webhook_id: WebhookSnowflake? = nil,
+			type: Kind,
+			activity: Activity? = nil,
+			application: PartialApplication? = nil,
+			application_id: ApplicationSnowflake? = nil,
+			message_reference: MessageReference? = nil,
+			flags: IntBitField<Flag>? = nil,
+			referenced_message: DereferenceBox<Message>? = nil,
+			interaction: MessageInteraction? = nil,
+			thread: DiscordChannel? = nil,
+			components: [Interaction.ActionRow]? = nil,
+			sticker_items: [StickerItem]? = nil,
+			stickers: [Sticker]? = nil,
+			position: Int? = nil,
+			role_subscription_data: RoleSubscriptionData? = nil,
+			resolved: Interaction.ApplicationCommand.ResolvedData? = nil,
+			poll: Poll? = nil,
+			call: Call? = nil,
+			guild_id: GuildSnowflake? = nil,
+			member: Guild.PartialMember? = nil
+		) {
+			self.id = id
+			self.channel_id = channel_id
+			self.author = author
+			self.content = content
+			self.timestamp = timestamp
+			self.edited_timestamp = edited_timestamp
+			self.tts = tts
+			self.mention_everyone = mention_everyone
+			self.mentions = mentions
+			self.mention_roles = mention_roles
+			self.mention_channels = mention_channels
+			self.attachments = attachments
+			self.embeds = embeds
+			self.reactions = reactions
+			self.nonce = nonce
+			self.pinned = pinned
+			self.webhook_id = webhook_id
+			self.type = type
+			self.activity = activity
+			self.application = application
+			self.application_id = application_id
+			self.message_reference = message_reference
+			self.flags = flags
+			self.referenced_message = referenced_message
+//			self.interaction_metadata = interaction_metadata
+			self.interaction = interaction
+			self.thread = thread
+			self.components = components
+			self.sticker_items = sticker_items
+			self.stickers = stickers
+			self.position = position
+			self.role_subscription_data = role_subscription_data
+			self.resolved = resolved
+			self.poll = poll
+			self.call = call
+			self.guild_id = guild_id
+			self.member = member
+		}
+
 		/// https://discord.com/developers/docs/resources/channel#message-reference-object-message-reference-structure
 		public struct MessageReference: Sendable, Codable {
 			public var message_id: MessageSnowflake?
@@ -297,7 +374,8 @@ extension DiscordChannel {
 			}
 
 			@available(
-				*, deprecated,
+				*,
+				deprecated,
 				renamed: "init(count:count_details:me:me_burst:emoji:burst_colors:)"
 			)
 			public init(count: Int, me: Bool, emoji: Emoji) {
@@ -329,7 +407,9 @@ extension DiscordChannel {
 				let container = try decoder.container(keyedBy: CodingKeys.self)
 				self.count = try container.decode(Int.self, forKey: .count)
 				self.count_details = try container.decode(
-					CountDetails.self, forKey: .count_details)
+					CountDetails.self,
+					forKey: .count_details
+				)
 				self.me = try container.decode(Bool.self, forKey: .me)
 				self.me_burst = try container.decode(Bool.self, forKey: .me_burst)
 				self.emoji = try container.decode(Emoji.self, forKey: .emoji)
@@ -374,18 +454,18 @@ extension DiscordChannel {
 		}
 
 		/// https://discord.com/developers/docs/resources/channel#message-interaction-metadata-object-message-interaction-metadata-structure
-		@_spi(UserInstallableApps)
-		public struct InteractionMetadata: Sendable, Codable {
-			public var id: InteractionSnowflake
-			public var type: Interaction.Kind
-			public var user: DiscordUser
-			public var authorizing_integration_owners:
-				[DiscordApplication.IntegrationKind: AnySnowflake]
-			public var original_response_message_id: MessageSnowflake?
-			public var interacted_message_id: MessageSnowflake?
-			public var triggering_interaction_metadata:
-				DereferenceBox<InteractionMetadata>?
-		}
+//		@_spi(UserInstallableApps)
+//		public struct InteractionMetadata: Sendable, Codable {
+//			public var id: InteractionSnowflake
+//			public var type: Interaction.Kind
+//			public var user: DiscordUser
+//			public var authorizing_integration_owners:
+//				[DiscordApplication.IntegrationKind: AnySnowflake]
+//			public var original_response_message_id: MessageSnowflake?
+//			public var interacted_message_id: MessageSnowflake?
+//			public var triggering_interaction_metadata:
+//				DereferenceBox<InteractionMetadata>?
+//		}
 
 		public struct Call: Sendable, Codable {
 			public var participants: [UserSnowflake]
@@ -416,8 +496,8 @@ extension DiscordChannel {
 		public var message_reference: MessageReference?
 		public var flags: IntBitField<Flag>?
 		public var referenced_message: DereferenceBox<Message>?
-		@_spi(UserInstallableApps) @DecodeOrNil
-		public var interaction_metadata: InteractionMetadata?
+//		@_spi(UserInstallableApps) @DecodeOrNil
+//		public var interaction_metadata: InteractionMetadata?
 		public var interaction: MessageInteraction?
 		public var thread: DiscordChannel?
 		public var components: [Interaction.ActionRow]?
@@ -461,8 +541,8 @@ extension DiscordChannel {
 		public var message_reference: DiscordChannel.Message.MessageReference?
 		public var flags: IntBitField<DiscordChannel.Message.Flag>?
 		public var referenced_message: DereferenceBox<PartialMessage>?
-		@_spi(UserInstallableApps) @DecodeOrNil
-		public var interaction_metadata: DiscordChannel.Message.InteractionMetadata?
+//		@_spi(UserInstallableApps) @DecodeOrNil
+//		public var interaction_metadata: DiscordChannel.Message.InteractionMetadata?
 		public var interaction: MessageInteraction?
 		public var thread: DiscordChannel?
 		public var components: [Interaction.ActionRow]?
@@ -502,14 +582,14 @@ public struct ThreadMember: Sendable, Codable {
 		self.join_timestamp = threadMemberUpdate.join_timestamp
 		self.flags = threadMemberUpdate.flags
 	}
-	
+
 	/// https://docs.discord.food/resources/channel#thread-member-flags
 	@UnstableEnum<UInt>
 	public enum Flag: Sendable {
-		case hasInteracted // 0
-		case allMessages // 1
-		case onlyMentions // 2
-		case noMessages // 3
+		case hasInteracted  // 0
+		case allMessages  // 1
+		case onlyMentions  // 2
+		case noMessages  // 3
 		case __undocumented(UInt)
 	}
 }
@@ -620,7 +700,9 @@ public struct Embed: Sendable, Codable, ValidatablePayload {
 		public var proxy_icon_url: String?
 
 		public init(
-			text: String, icon_url: DynamicURL? = nil, proxy_icon_url: String? = nil
+			text: String,
+			icon_url: DynamicURL? = nil,
+			proxy_icon_url: String? = nil
 		) {
 			self.text = text
 			self.icon_url = icon_url
@@ -636,7 +718,9 @@ public struct Embed: Sendable, Codable, ValidatablePayload {
 		public var width: Int?
 
 		public init(
-			url: DynamicURL, proxy_url: String? = nil, height: Int? = nil,
+			url: DynamicURL,
+			proxy_url: String? = nil,
+			height: Int? = nil,
 			width: Int? = nil
 		) {
 			self.url = url
@@ -665,7 +749,9 @@ public struct Embed: Sendable, Codable, ValidatablePayload {
 		public var proxy_icon_url: String?
 
 		public init(
-			name: String, url: String? = nil, icon_url: DynamicURL? = nil,
+			name: String,
+			url: String? = nil,
+			icon_url: DynamicURL? = nil,
 			proxy_icon_url: String? = nil
 		) {
 			self.name = name
@@ -748,16 +834,31 @@ public struct Embed: Sendable, Codable, ValidatablePayload {
 		validateElementCountDoesNotExceed(fields, max: 25, name: "fields")
 		validateCharacterCountDoesNotExceed(title, max: 256, name: "title")
 		validateCharacterCountDoesNotExceed(
-			description, max: 4_096, name: "description")
+			description,
+			max: 4_096,
+			name: "description"
+		)
 		validateCharacterCountDoesNotExceed(
-			footer?.text, max: 2_048, name: "footer.text")
+			footer?.text,
+			max: 2_048,
+			name: "footer.text"
+		)
 		validateCharacterCountDoesNotExceed(
-			author?.name, max: 256, name: "author.name")
+			author?.name,
+			max: 256,
+			name: "author.name"
+		)
 		for field in fields ?? [] {
 			validateCharacterCountDoesNotExceed(
-				field.name, max: 256, name: "field.name")
+				field.name,
+				max: 256,
+				name: "field.name"
+			)
 			validateCharacterCountDoesNotExceed(
-				field.value, max: 1_024, name: "field.value")
+				field.value,
+				max: 1_024,
+				name: "field.value"
+			)
 		}
 	}
 }
@@ -812,7 +913,7 @@ public struct ConversationSummary: Sendable, Codable {
 	public var count: Int
 	public var source: Source
 	public var type: Kind
-	
+
 	@UnstableEnum<UInt>
 	public enum Source: Sendable, Codable {
 		case source0  // 0
@@ -820,7 +921,7 @@ public struct ConversationSummary: Sendable, Codable {
 		case source2  // 2
 		case __undocumented(UInt)
 	}
-	
+
 	@UnstableEnum<UInt>
 	public enum Kind: Sendable, Codable {
 		case unset  // 0

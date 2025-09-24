@@ -10,14 +10,14 @@ import SwiftUI
 
 @available(macOS, unavailable)
 struct SmallBaseplate: View {
-	@SceneStorage("Baseplate.ChatVisibility") private var chatVisibility = false
+	@Bindable var appState: PaicordAppState
 
 	@State private var currentTab: CurrentTab = .home
 	var disableSlideover: Bool {
 		self.currentTab != .home
 	}
 	var body: some View {
-		SlideoverDoubleView(swap: $chatVisibility) {
+		SlideoverDoubleView(swap: $appState.chatOpen) {
 			TabView(selection: $currentTab) {
 				HomeView()
 					.frame(maxWidth: .infinity, maxHeight: .infinity)

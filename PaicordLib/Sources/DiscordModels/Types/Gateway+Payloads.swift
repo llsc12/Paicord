@@ -245,10 +245,11 @@ extension Gateway {
 		public var shard: IntPair?
 
 		// bot only
-		public var application: PartialApplication?
-		//    public var guilds: [UnavailableGuild] // TODO: Add support for both?
+//		public var application: PartialApplication?
+//		public var guilds: [UnavailableGuild] 	
 
 		// user only
+		public var sessions: [Session]
 		public var user_settings_proto:
 			DiscordProtos_DiscordUsers_V1_PreloadedUserSettings?
 		//		public var connected_accounts
@@ -259,9 +260,9 @@ extension Gateway {
 		public var users: [PartialUser]?
 		//		public var read_state: ReadState?
 		//		public var notification_settings
-		//		public relationships
+		public var relationships: [DiscordRelationship]
 		//		public var friend_suggestion_count
-		//		public var private_channels
+		public var private_channels: [DiscordChannel]
 		public var guilds: [Guild]
 		public var geo_ordered_rtc_regions: [String]?
 	}
@@ -353,8 +354,7 @@ extension Gateway {
 		public var widget_enabled: Bool?
 		public var widget_channel_id: ChannelSnowflake?
 		public var verification_level: Guild.VerificationLevel
-		public var default_message_notifications:
-			Guild.DefaultMessageNotificationLevel
+		public var default_message_notifications: Guild.DefaultMessageNotificationLevel
 		public var explicit_content_filter: Guild.ExplicitContentFilterLevel
 		public var roles: [Role]
 		public var emojis: [Emoji]
@@ -702,8 +702,8 @@ extension Gateway {
 		public var message_reference: DiscordChannel.Message.MessageReference?
 		public var flags: IntBitField<DiscordChannel.Message.Flag>?
 		public var referenced_message: DereferenceBox<MessageCreate>?
-		@_spi(UserInstallableApps) @DecodeOrNil
-		public var interaction_metadata: DiscordChannel.Message.InteractionMetadata?
+//		@_spi(UserInstallableApps) @DecodeOrNil
+//		public var interaction_metadata: DiscordChannel.Message.InteractionMetadata?
 		public var interaction: MessageInteraction?
 		public var thread: DiscordChannel?
 		public var components: [Interaction.ActionRow]?
@@ -952,7 +952,7 @@ extension Gateway {
 	/// https://discord.com/developers/docs/topics/gateway-events#presence-update-presence-update-event-fields
 	public struct PresenceUpdate: Sendable, Codable {
 		public var user: PartialUser
-		public var guild_id: GuildSnowflake
+		public var guild_id: GuildSnowflake?
 		public var status: Status
 		public var activities: [Activity]
 		public var client_status: ClientStatus

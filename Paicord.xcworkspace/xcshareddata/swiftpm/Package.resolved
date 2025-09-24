@@ -1,5 +1,5 @@
 {
-  "originHash" : "7a3c2567f741f9138b81ad5838dea4e3f5705633bd99c37fd267c73389ce5d98",
+  "originHash" : "dc32f76771b50c87ad3f038b5c2593a4991dc95af3c0d15980fec613f8624275",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -17,6 +17,15 @@
       "state" : {
         "revision" : "e1caa19077dda4b00441142ef57da3db02acd466",
         "version" : "1.4.2"
+      }
+    },
+    {
+      "identity" : "flex",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/FLEXTool/FLEX",
+      "state" : {
+        "revision" : "e0acf59d06d498041f65bbea1e5914b6e4b39733",
+        "version" : "5.22.10"
       }
     },
     {

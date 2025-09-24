@@ -11,8 +11,13 @@ import PaicordLib
 
 @Observable
 final class LoginViewModel {
+	init() {
+		
+		Task { await fingerprintSetup() }
+	}
+	
 	// Necessary stuff
-	var loginClient: (any DiscordClient)! { gw?.client }
+	var loginClient: any DiscordClient { GatewayStore.shared.unauthenticatedClient }
 	var fingerprint: String?
 
 	// for when we're adding a new account to the app when we already have accounts

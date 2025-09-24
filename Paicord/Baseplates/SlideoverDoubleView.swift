@@ -1,4 +1,12 @@
-import SwiftUI
+//
+//  SlideoverDoubleView.swift
+//  Paicord
+//
+//  Created by Lakhan Lothiyi on 23/09/2025.
+//  Copyright © 2025 Lakhan Lothiyi.
+//  
+
+import SwiftUIX
 
 struct SlideoverDoubleView<Primary: View, Secondary: View>: View {
 	@Binding var swap: Bool
@@ -24,19 +32,22 @@ struct SlideoverDoubleView<Primary: View, Secondary: View>: View {
 	var body: some View {
 		ZStack {
 			primary
+				.id("primary")
 				.frame(maxWidth: .infinity, maxHeight: .infinity)
-			// paul hudson said this fixes swift 6 concurrency issues with visualEffect
-			// since its closure doesn't always run on the main thread.
+			
+			// fixes some swift 6 warnings
 			let swap = swap
 			let dragOffset = dragOffset
 			secondary
 				.frame(maxWidth: .infinity, maxHeight: .infinity)
 				.background(.background)
 				.shadow(radius: 10)
+				.equatable(by: true) // prevent unnecessary updates
 				.visualEffect { vs, proxy in
-					vs
+					return vs
 						.offset(x: swap ? dragOffset : proxy.size.width + 10 + dragOffset)
 				}
+				.id("secondary")
 		}
 		.onGeometryChange(for: CGFloat.self, of: { $0.size.width }) {
 			self.width = $0

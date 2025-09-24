@@ -154,6 +154,7 @@ struct SixDigitInput: View {
 	@Binding var input: String
 	let onCommit: (String) -> Void
 	@FocusState var textfield
+	
 	var body: some View {
 		HStack(spacing: 10) {
 			ForEach(0..<6, id: \.self) { index in
@@ -177,8 +178,12 @@ struct SixDigitInput: View {
 			}
 		}
 		.opacity(enabled ? 1 : 0.25)
-		.onTapGesture { textfield = true }
-		.onAppear { textfield = true }
+		.onTapGesture {
+			textfield = true
+		}
+		.onAppear {
+			textfield = true
+		}
 		.background(.appBackground.opacity(0.001))
 		.background(
 			TextField("", text: $input)

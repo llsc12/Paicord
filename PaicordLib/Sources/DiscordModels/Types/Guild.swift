@@ -1,6 +1,58 @@
 /// https://discord.com/developers/docs/resources/guild#guild-object-guild-structure
 public struct Guild: Sendable, Codable {
 
+	public init(id: GuildSnowflake, name: String, icon: String? = nil, icon_hash: String? = nil, splash: String? = nil, discovery_splash: String? = nil, owner: Bool? = nil, owner_id: UserSnowflake, channels: [DiscordChannel], permissions: StringBitField<Permission>? = nil, afk_channel_id: ChannelSnowflake? = nil, afk_timeout: AFKTimeout, widget_enabled: Bool? = nil, widget_channel_id: ChannelSnowflake? = nil, verification_level: VerificationLevel, default_message_notifications: DefaultMessageNotificationLevel, explicit_content_filter: ExplicitContentFilterLevel, roles: [Role], emojis: [Emoji], features: [Feature], mfa_level: MFALevel, application_id: ApplicationSnowflake? = nil, system_channel_id: ChannelSnowflake? = nil, system_channel_flags: IntBitField<SystemChannelFlag>, rules_channel_id: ChannelSnowflake? = nil, safety_alerts_channel_id: ChannelSnowflake? = nil, max_presences: Int? = nil, max_members: Int? = nil, vanity_url_code: String? = nil, description: String? = nil, banner: String? = nil, premium_tier: PremiumTier, premium_subscription_count: Int? = nil, preferred_locale: DiscordLocale, public_updates_channel_id: ChannelSnowflake? = nil, max_video_channel_users: Int? = nil, max_stage_video_channel_users: Int? = nil, approximate_member_count: Int? = nil, approximate_presence_count: Int? = nil, welcome_screen: [WelcomeScreen]? = nil, nsfw_level: NSFWLevel, stickers: [Sticker]? = nil, premium_progress_bar_enabled: Bool, hub_type: String? = nil, nsfw: Bool, application_command_counts: [String : Int]? = nil, embedded_activities: [Gateway.Activity]? = nil, version: Int? = nil, guild_id: GuildSnowflake? = nil) {
+		self.id = id
+		self.name = name
+		self.icon = icon
+		self.icon_hash = icon_hash
+		self.splash = splash
+		self.discovery_splash = discovery_splash
+		self.owner = owner
+		self.owner_id = owner_id
+		self.channels = channels
+		self.permissions = permissions
+		self.afk_channel_id = afk_channel_id
+		self.afk_timeout = afk_timeout
+		self.widget_enabled = widget_enabled
+		self.widget_channel_id = widget_channel_id
+		self.verification_level = verification_level
+		self.default_message_notifications = default_message_notifications
+		self.explicit_content_filter = explicit_content_filter
+		self.roles = roles
+		self.emojis = emojis
+		self.features = features
+		self.mfa_level = mfa_level
+		self.application_id = application_id
+		self.system_channel_id = system_channel_id
+		self.system_channel_flags = system_channel_flags
+		self.rules_channel_id = rules_channel_id
+		self.safety_alerts_channel_id = safety_alerts_channel_id
+		self.max_presences = max_presences
+		self.max_members = max_members
+		self.vanity_url_code = vanity_url_code
+		self.description = description
+		self.banner = banner
+		self.premium_tier = premium_tier
+		self.premium_subscription_count = premium_subscription_count
+		self.preferred_locale = preferred_locale
+		self.public_updates_channel_id = public_updates_channel_id
+		self.max_video_channel_users = max_video_channel_users
+		self.max_stage_video_channel_users = max_stage_video_channel_users
+		self.approximate_member_count = approximate_member_count
+		self.approximate_presence_count = approximate_presence_count
+		self.welcome_screen = welcome_screen
+		self.nsfw_level = nsfw_level
+		self.stickers = stickers
+		self.premium_progress_bar_enabled = premium_progress_bar_enabled
+		self.hub_type = hub_type
+		self.nsfw = nsfw
+		self.application_command_counts = application_command_counts
+		self.embedded_activities = embedded_activities
+		self.version = version
+		self.guild_id = guild_id
+	}
+	
 	/// https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-structure
 	public struct Member: Sendable, Codable {
 		/// https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-flags
