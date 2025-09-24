@@ -123,12 +123,8 @@ jobs:
           echo "commit_author_login=${{ github.actor }}" >> $GITHUB_OUTPUT
 
           # Artifact sizes
-          cd output
-          zip -r Paicord-macOS-temp.zip Paicord-macOS.app
-          macos_size=$(ls -lh Paicord-macOS-temp.zip | awk '{print $5}')
+          macos_size=$(ls -lh Paicord-macOS.zip | awk '{print $5}')
           echo "macos_size=$macos_size" >> $GITHUB_OUTPUT
-          rm Paicord-macOS-temp.zip
-          cd ..
           ios_size=$(ls -lh output/Paicord-iOS.ipa | awk '{print $5}')
           echo "ios_size=$ios_size" >> $GITHUB_OUTPUT
 
