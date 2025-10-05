@@ -42,7 +42,9 @@ struct SlideoverDoubleView<Primary: View, Secondary: View>: View {
 				.frame(maxWidth: .infinity, maxHeight: .infinity)
 				.background(.background)
 				.shadow(radius: 10)
-				.equatable(by: true) // prevent unnecessary updates
+			// FIXME: the below causes the view to never update
+			// but this means changing the viewmodel won't update the view to use it.
+//				.equatable(by: true) // prevent unnecessary updates
 				.visualEffect { vs, proxy in
 					return vs
 						.offset(x: swap ? dragOffset : proxy.size.width + 10 + dragOffset)
