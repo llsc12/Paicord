@@ -309,11 +309,11 @@ extension Gateway {
 		/// A ``ThreadMember`` with some extra fields.
 		/// https://discord.com/developers/docs/resources/channel#thread-member-object-thread-member-structure
 		/// https://discord.com/developers/docs/topics/gateway-events#thread-members-update-thread-members-update-event-fields
-		public struct ThreadMember: Sendable, Codable {
+		public struct ThreadMember: Sendable, Codable, Equatable {
 
 			/// A ``PresenceUpdate`` with nullable `guild_id`.
 			/// https://discord.com/developers/docs/topics/gateway-events#presence-update-presence-update-event-fields
-			public struct ThreadMemberPresenceUpdate: Sendable, Codable {
+			public struct ThreadMemberPresenceUpdate: Sendable, Codable, Equatable {
 				public var user: PartialUser
 				public var guild_id: GuildSnowflake?
 				public var status: Status
@@ -942,7 +942,7 @@ extension Gateway {
 	}
 
 	/// https://discord.com/developers/docs/topics/gateway-events#client-status-object
-	public struct ClientStatus: Sendable, Codable {
+	public struct ClientStatus: Sendable, Codable, Equatable {
 		public var desktop: Status?
 		public var mobile: Status?
 		public var web: Status?
@@ -984,7 +984,7 @@ extension Gateway {
 	}
 
 	/// https://discord.com/developers/docs/topics/gateway-events#activity-object
-	public struct Activity: Sendable, Codable {
+	public struct Activity: Sendable, Codable, Equatable {
 
 		/// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-types
 		@UnstableEnum<Int>
@@ -999,7 +999,7 @@ extension Gateway {
 		}
 
 		/// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-timestamps
-		public struct Timestamps: Sendable, Codable {
+		public struct Timestamps: Sendable, Codable, Equatable {
 			public var start: Int?
 			public var end: Int?
 
@@ -1010,7 +1010,7 @@ extension Gateway {
 		}
 
 		/// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-emoji
-		public struct ActivityEmoji: Sendable, Codable {
+		public struct ActivityEmoji: Sendable, Codable, Equatable {
 			public var name: String
 			public var id: EmojiSnowflake?
 			public var animated: Bool?
@@ -1027,7 +1027,7 @@ extension Gateway {
 		}
 
 		/// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-party
-		public struct Party: Sendable, Codable {
+		public struct Party: Sendable, Codable, Equatable {
 			public var id: String?
 			public var size: IntPair?
 
@@ -1038,7 +1038,7 @@ extension Gateway {
 		}
 
 		/// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-assets
-		public struct Assets: Sendable, Codable {
+		public struct Assets: Sendable, Codable, Equatable {
 			public var large_image: String?
 			public var large_text: String?
 			public var small_image: String?
@@ -1058,7 +1058,7 @@ extension Gateway {
 		}
 
 		/// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-secrets
-		public struct Secrets: Sendable, Codable {
+		public struct Secrets: Sendable, Codable, Equatable {
 			public var join: String?
 			public var spectate: String?
 			public var match: String?
@@ -1090,7 +1090,7 @@ extension Gateway {
 		}
 
 		/// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-buttons
-		public struct Button: Sendable, Codable {
+		public struct Button: Sendable, Codable, Equatable {
 			public var label: String
 			public var url: String
 
@@ -1375,14 +1375,14 @@ extension Gateway {
 			public var activities: Bool
 			public var threads: Bool
 
-			public var channels: [ChannelSnowflake: [(lower: Int, upper: Int)]]
+			public var channels: [ChannelSnowflake: [IntPair]]
 			public var thread_member_lists: [ChannelSnowflake]?
 
 			public init(
 				typing: Bool,
 				activities: Bool,
 				threads: Bool,
-				channels: [ChannelSnowflake: [(lower: Int, upper: Int)]],
+				channels: [ChannelSnowflake: [IntPair]],
 				thread_member_lists: [ChannelSnowflake]? = nil
 			) {
 				self.typing = typing
@@ -1390,55 +1390,6 @@ extension Gateway {
 				self.threads = threads
 				self.channels = channels
 				self.thread_member_lists = thread_member_lists
-			}
-
-			public init(from decoder: any Decoder) throws {
-				let container = try decoder.container(keyedBy: CodingKeys.self)
-				self.typing = try container.decode(Bool.self, forKey: .typing)
-				self.activities = try container.decode(Bool.self, forKey: .activities)
-				self.threads = try container.decode(Bool.self, forKey: .threads)
-
-				let channels = try container.decode(
-					[ChannelSnowflake: [[Int]]].self, forKey: .channels)
-				self.channels = Self.convertChannelsToTuples(channels)
-				self.thread_member_lists = try container.decodeIfPresent(
-					[ChannelSnowflake].self, forKey: .thread_member_lists)
-			}
-
-			public func encode(to encoder: any Encoder) throws {
-				var container = encoder.container(keyedBy: CodingKeys.self)
-				try container.encode(self.typing, forKey: .typing)
-				try container.encode(self.activities, forKey: .activities)
-				try container.encode(self.threads, forKey: .threads)
-
-				let channels = Self.convertChannelsToArrays(self.channels)
-				try container.encode(channels, forKey: .channels)
-				try container.encodeIfPresent(
-					thread_member_lists, forKey: .thread_member_lists)
-			}
-
-			enum CodingKeys: String, CodingKey {
-				case typing, activities, threads, channels, thread_member_lists
-			}
-
-			private static func convertChannelsToTuples(_ c: [ChannelSnowflake: [[Int]]])
-				-> [ChannelSnowflake: [(lower: Int, upper: Int)]]
-			{
-				// the tuple needs values 0 and 1 from the array
-				var channels = [ChannelSnowflake: [(lower: Int, upper: Int)]]()
-				for (id, data) in c {
-					channels[id] = data.map { ($0[0], $0[1]) }
-				}
-				return channels
-			}
-			private static func convertChannelsToArrays(
-				_ c: [ChannelSnowflake: [(lower: Int, upper: Int)]]
-			) -> [ChannelSnowflake: [[Int]]] {
-				var channels = [ChannelSnowflake: [[Int]]]()
-				for (id, data) in c {
-					channels[id] = data.map { [$0.lower, $0.upper] }
-				}
-				return channels
 			}
 		}
 	}

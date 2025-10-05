@@ -1,8 +1,8 @@
 /// https://discord.com/developers/docs/topics/teams#data-models-team-object
-public struct Team: Sendable, Codable {
+public struct Team: Sendable, Codable, Equatable {
 
     /// https://discord.com/developers/docs/topics/teams#data-models-team-member-object
-    public struct Member: Sendable, Codable {
+    public struct Member: Sendable, Codable, Equatable {
 
         /// https://discord.com/developers/docs/topics/teams#data-models-membership-state-enum
         @UnstableEnum<Int>

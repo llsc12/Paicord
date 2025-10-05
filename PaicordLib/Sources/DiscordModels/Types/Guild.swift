@@ -54,7 +54,7 @@ public struct Guild: Sendable, Codable {
 	}
 	
 	/// https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-structure
-	public struct Member: Sendable, Codable {
+	public struct Member: Sendable, Codable, Equatable {
 		/// https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-flags
 		@UnstableEnum<UInt>
 		public enum Flag: Sendable {
@@ -242,10 +242,10 @@ public struct Guild: Sendable, Codable {
 	}
 
 	/// https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-structure
-	public struct WelcomeScreen: Sendable, Codable {
+	public struct WelcomeScreen: Sendable, Codable, Equatable {
 
 		/// https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-channel-structure
-		public struct Channel: Sendable, Codable {
+		public struct Channel: Sendable, Codable, Equatable {
 			public var channel_id: ChannelSnowflake
 			public var description: String
 			public var emoji_id: EmojiSnowflake?
@@ -342,7 +342,7 @@ public struct Guild: Sendable, Codable {
 }
 
 /// https://discord.com/developers/docs/resources/guild#guild-object-guild-structure
-public struct PartialGuild: Sendable, Codable {
+public struct PartialGuild: Sendable, Codable, Equatable {
 	public var id: GuildSnowflake
 	public var name: String?
 	public var icon: String?
@@ -399,7 +399,7 @@ public struct PartialGuild: Sendable, Codable {
 extension Guild {
 	/// A partial ``Guild.Member`` object.
 	/// https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-structure
-	public struct PartialMember: Sendable, Codable {
+	public struct PartialMember: Sendable, Codable, Equatable {
 		public var user: DiscordUser?
 		public var nick: String?
 		public var avatar: String?

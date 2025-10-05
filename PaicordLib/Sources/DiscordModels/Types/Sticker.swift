@@ -1,5 +1,5 @@
 /// https://discord.com/developers/docs/resources/sticker#sticker-object-sticker-structure
-public struct Sticker: Sendable, Codable {
+public struct Sticker: Sendable, Codable, Equatable {
 
     /// https://discord.com/developers/docs/resources/sticker#sticker-object-sticker-types
     @UnstableEnum<Int>
@@ -34,7 +34,7 @@ public struct Sticker: Sendable, Codable {
 }
 
 /// https://discord.com/developers/docs/resources/sticker#sticker-item-object
-public struct StickerItem: Sendable, Codable {
+public struct StickerItem: Sendable, Codable, Equatable {
     public var id: StickerSnowflake
     public var name: String
     public var format_type: Sticker.FormatKind

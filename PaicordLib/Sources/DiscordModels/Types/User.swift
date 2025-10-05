@@ -1,5 +1,5 @@
 /// https://discord.com/developers/docs/resources/user#user-object-user-structure
-public struct DiscordUser: Sendable, Codable {
+public struct DiscordUser: Sendable, Codable, Equatable {
 
     /// https://discord.com/developers/docs/resources/user#user-object-premium-types
     @UnstableEnum<Int>
@@ -33,7 +33,7 @@ public struct DiscordUser: Sendable, Codable {
     }
 
     /// https://discord.com/developers/docs/resources/user#avatar-decoration-data-object
-    public struct AvatarDecoration: Sendable, Codable {
+    public struct AvatarDecoration: Sendable, Codable, Equatable {
         public var asset: String
         public var sku_id: SKUSnowflake
     }
@@ -61,7 +61,7 @@ public struct DiscordUser: Sendable, Codable {
 
 /// A partial ``DiscordUser`` object.
 /// https://discord.com/developers/docs/resources/user#user-object-user-structure
-public struct PartialUser: Sendable, Codable {
+public struct PartialUser: Sendable, Codable, Equatable {
     public var id: UserSnowflake
     public var username: String?
     public var discriminator: String?
@@ -86,7 +86,7 @@ public struct PartialUser: Sendable, Codable {
 /// A ``DiscordUser`` with an extra `member` field.
 /// https://discord.com/developers/docs/topics/gateway-events#message-create-message-create-extra-fields
 /// https://discord.com/developers/docs/resources/user#user-object-user-structure
-public struct MentionUser: Sendable, Codable {
+public struct MentionUser: Sendable, Codable, Equatable {
     public var id: UserSnowflake
     public var username: String
     public var discriminator: String

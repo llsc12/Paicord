@@ -24,6 +24,8 @@ extension DecodeOrNil: Codable {
     }
 }
 
+extension DecodeOrNil: Equatable where C: Equatable {}
+
 @_spi(UserInstallableApps)
 extension KeyedDecodingContainer {
     public func decode<C>(

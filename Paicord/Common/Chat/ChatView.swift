@@ -8,9 +8,9 @@
 
 import Combine
 import PaicordLib
+import SDWebImageSwiftUI
 @_spi(Advanced) import SwiftUIIntrospect
 import SwiftUIX
-import SDWebImageSwiftUI
 
 struct ChatView: View {
 	var vm: ChannelStore
@@ -18,11 +18,11 @@ struct ChatView: View {
 	@State private var isScrolling = false
 
 	@State private var showChannelInfo = false
-	
+
 	@Environment(GatewayStore.self) var gw
 
 	init(vm: ChannelStore) { self.vm = vm }
-	
+
 	@State private var text: String = ""
 
 	var channelName: String {
@@ -37,27 +37,30 @@ struct ChatView: View {
 	}
 
 	var body: some View {
-
 		ScrollViewReader { proxy in
 			List {
-				ForEach(vm.messageHistory) { msgID in
-					if let msg = vm.messages[msgID] {
-						MessageCell(for: msg)
-							.id(msg.id)
-					}
+				ForEach(vm.messages.values) { msg in
+					// check if prior message is from same author and within 5 minutes, and ensure there are no replies
+					let priorMessage = vm.getMessage(before: msg)
+					let isInline =
+						priorMessage?.author?.id == msg.author?.id
+						&& msg.timestamp.date.timeIntervalSince(
+							priorMessage?.timestamp.date ?? Date.distantPast
+						) < 300 && msg.referenced_message == nil
+					MessageCell(for: msg, inline: isInline)
 				}
-				.listRowInsets(.init(top: 10, leading: 5, bottom: 10, trailing: 0))  // remove padding
+				.listRowInsets(.init())  // remove padding
 				.listRowSeparator(.hidden)  // hide divider
 				.listRowBackground(Color.clear)  // make background clear
 			}
 			.listStyle(.plain)
 			.defaultScrollAnchor(.bottom)
 			.onAppear {
-				proxy.scrollTo(vm.messageHistory.last, anchor: .bottom)
+				proxy.scrollTo(vm.messages.values.last?.id, anchor: .bottom)
 			}
-			.onChange(of: vm.messageHistory) {
+			.onChange(of: vm.messages) {
 				if isNearBottom && !isScrolling {
-					proxy.scrollTo(vm.messageHistory.last, anchor: .bottom)
+					proxy.scrollTo(vm.messages.values.last?.id, anchor: .bottom)
 				}
 			}
 			.background(.tableBackground)
@@ -75,7 +78,10 @@ struct ChatView: View {
 					let text = self.text
 					self.text = ""
 					Task {
-						try await gw.client.createMessage(channelId: vm.channelId, payload: .init(content: text))
+						try await gw.client.createMessage(
+							channelId: vm.channelId,
+							payload: .init(content: text)
+						)
 					}
 				}
 			}
@@ -108,65 +114,127 @@ struct ChatView: View {
 
 	struct MessageCell: View {
 		var message: DiscordChannel.Message
+		var inline: Bool
 		@State var profileOpen = false
 		@State var avatarAnimated = false
-		
-		init(for message: DiscordChannel.Message) {
+
+		init(for message: DiscordChannel.Message, inline: Bool) {
 			self.message = message
+			self.inline = inline
 		}
 
 		var body: some View {
-			HStack(alignment: .top) {
-				Button {
-					profileOpen = true
-				} label: {
-					AnimatedImage(
-						url: avatarURL(animated: avatarAnimated)
-					)
-					.resizable()
-					.scaledToFill()
-					.frame(width: 35, height: 35)
-					.clipShape(.circle)
-				}
-				.buttonStyle(.borderless)
-				.popover(isPresented: $profileOpen) {
-					Text("Profile for \(message.author?.username ?? "Unknown")")
-						.padding()
-				}
-
-				VStack {
-					HStack {
-						Text(message.author?.username ?? "Unknown")
-							.font(.headline)
-						Text(message.timestamp.date, style: .time)
-							.font(.caption)
-							.foregroundStyle(.secondary)
+			if inline {
+				HStack(alignment: .top) {
+					Button {
+					} label: {
+						Text("")
+							.frame(width: 35)
 					}
-					.frame(maxWidth: .infinity, alignment: .leading)
+					.buttonStyle(.borderless)
+					.height(1)
+					.disabled(true)  // btn used for spacing only
 
-					Text(message.content)
-						.font(.body)
-						.foregroundStyle(.primary)
-						.frame(maxWidth: .infinity, alignment: .leading)
+					content
 				}
+			} else {
+				VStack {
+					if let ref = message.referenced_message {
+						HStack {
+							// line thing
+							//   ________  (pfp) <username> <content>
+							//  /
+							// |
+
+							ReplyLine()
+								.padding(.leading, 18)  // align with pfp
+
+							Text("\(ref.author?.username ?? "Unknown") • \(ref.content)")
+								.font(.caption)
+								.foregroundStyle(.secondary)
+								.lineLimit(1)
+								.frame(maxWidth: .infinity, alignment: .leading)
+						}
+					}
+					HStack(alignment: .top) {
+						Button {
+							profileOpen = true
+						} label: {
+							AnimatedImage(
+								url: avatarURL(animated: avatarAnimated)
+							)
+							.resizable()
+							.scaledToFill()
+							.frame(width: 35, height: 35)
+							.clipShape(.circle)
+						}
+						.buttonStyle(.borderless)
+						.popover(isPresented: $profileOpen) {
+							Text("Profile for \(message.author?.username ?? "Unknown")")
+								.padding()
+						}
+
+						VStack {
+							HStack {
+								Text(message.author?.username ?? "Unknown")
+									.font(.headline)
+								Text(message.timestamp.date, style: .time)
+									.font(.caption)
+									.foregroundStyle(.secondary)
+							}
+							.frame(maxWidth: .infinity, alignment: .leading)
+
+							content
+						}
+					}
+				}
+				.onHover { self.avatarAnimated = $0 }
+				.padding(.top)
 			}
-			.onHover { self.avatarAnimated = $0 }
 		}
-		
+
+		@ViewBuilder
+		var content: some View {
+			#warning("make this show markdown")
+			Text(markdown: message.content)
+				.font(.body)
+				.foregroundStyle(.primary)
+				.frame(maxWidth: .infinity, alignment: .leading)
+		}
+
 		func avatarURL(animated: Bool) -> URL? {
 			if let id = message.author?.id,
-			   let avatar = message.author?.avatar
+				let avatar = message.author?.avatar
 			{
-				return URL(
-					string: CDNEndpoint.userAvatar(userId: id, avatar: avatar).url
-						+ "?size=128&animated=\(animated.description)"
-				)
+				if avatar.starts(with: "a_"), animated {
+					return URL(
+						string: CDNEndpoint.userAvatar(userId: id, avatar: avatar).url
+							+ ".gif?size=128&animated=true"
+					)
+				} else {
+					return URL(
+						string: CDNEndpoint.userAvatar(userId: id, avatar: avatar).url
+							+ ".png?size=128&animated=false"
+					)
+				}
 			} else {
 				let discrim = message.author?.discriminator ?? "0"
 				return URL(
 					string: CDNEndpoint.defaultUserAvatar(discriminator: discrim).url
 						+ "?size=128"
 				)
+			}
+		}
+
+		struct ReplyLine: View {
+			var body: some View {
+				RoundedRectangle(cornerRadius: 5)
+					.trim(from: 0.5, to: 0.75)
+					.stroke(.gray.opacity(0.4), lineWidth: 2)
+					.frame(width: 60, height: 20)
+					.padding(.top, 8)
+					.padding(.bottom, -12)
+					.padding(.trailing, -30)
 			}
 		}
 	}
@@ -287,5 +355,23 @@ struct ScrollStateDetector: ViewModifier {
 				cancellables.forEach { $0.cancel() }
 				cancellables.removeAll()
 			}
+	}
+}
+
+extension Text {
+	init(
+		markdown: String,
+		fallback: AttributedString = "",
+		syntax: AttributedString.MarkdownParsingOptions.InterpretedSyntax =
+			.inlineOnlyPreservingWhitespace
+	) {
+		self.init(
+			(try? AttributedString(
+				markdown: markdown,
+				options: AttributedString.MarkdownParsingOptions(
+					interpretedSyntax: syntax
+				)
+			)) ?? fallback
+		)
 	}
 }

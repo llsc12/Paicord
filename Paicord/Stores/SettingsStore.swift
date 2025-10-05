@@ -11,7 +11,7 @@ import PaicordLib
 
 @Observable
 class SettingsStore: DiscordDataStore {
-	var gateway: (any DiscordGateway.GatewayManager)?
+	var gateway: UserGatewayManager?
 	var eventTask: Task<Void, Never>?
 	
 	// MARK: - Settings State
@@ -33,7 +33,7 @@ class SettingsStore: DiscordDataStore {
 	}
 	
 	// MARK: - Protocol Methods
-	func setGateway(_ gateway: (any DiscordGateway.GatewayManager)?) {
+	func setGateway(_ gateway: UserGatewayManager?) {
 		cancelEventHandling()
 		self.gateway = gateway
 		if gateway != nil {

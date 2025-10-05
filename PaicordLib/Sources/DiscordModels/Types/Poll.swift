@@ -1,8 +1,8 @@
 /// https://discord.com/developers/docs/resources/poll#poll-object-poll-object-structure
-public struct Poll: Sendable, Codable {
+public struct Poll: Sendable, Codable, Equatable {
 
     /// https://discord.com/developers/docs/resources/poll#poll-media-object-poll-media-object-structure
-    public struct Media: Sendable, Codable, ValidatablePayload {
+    public struct Media: Sendable, Codable, Equatable, ValidatablePayload {
         /// "text should always be non-null for both questions and answers, but please do not depend on that in the future."
         public var text: String?
         /// "When creating a poll answer with an emoji, one only needs to send either the id (custom emoji) or name (default emoji) as the only field."
@@ -31,7 +31,7 @@ public struct Poll: Sendable, Codable {
     }
 
     /// https://discord.com/developers/docs/resources/poll#poll-answer-object-poll-answer-object-structure
-    public struct Answer: Sendable, Codable {
+    public struct Answer: Sendable, Codable, Equatable {
         public var answer_id: Int?
         public var poll_media: Media
 
@@ -49,10 +49,10 @@ public struct Poll: Sendable, Codable {
     }
 
     /// https://discord.com/developers/docs/resources/poll#poll-results-object-poll-results-object-structure
-    public struct Results: Sendable, Codable {
+    public struct Results: Sendable, Codable, Equatable {
 
         /// https://discord.com/developers/docs/resources/poll#poll-results-object-poll-answer-count-object-structure
-        public struct AnswerCount: Sendable, Codable {
+        public struct AnswerCount: Sendable, Codable, Equatable {
             public var id: Int
             public var count: Int
             public var me_voted: Bool

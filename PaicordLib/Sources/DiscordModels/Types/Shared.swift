@@ -99,7 +99,7 @@ public enum StringIntDoubleBool: Sendable, Codable {
 //MARK: - StringOrInt
 
 /// To dynamically decode/encode String or Int.
-public enum StringOrInt: Sendable, Codable {
+public enum StringOrInt: Sendable, Codable, Equatable {
 	case string(String)
 	case int(Int)
 
@@ -404,7 +404,7 @@ extension DiscordTimestamp: Comparable {
 //MARK: - IntPair
 
 /// An array consisting of two integers.
-public struct IntPair: Sendable, Codable, CustomStringConvertible {
+public struct IntPair: Sendable, Codable, CustomStringConvertible, Equatable {
 	public var first: Int
 	public var second: Int
 
@@ -820,6 +820,11 @@ public final class DereferenceBox<C>: Codable where C: Codable {
 }
 
 extension DereferenceBox: Sendable where C: Sendable {}
+extension DereferenceBox: Equatable where C: Equatable {
+	public static func == (lhs: DereferenceBox<C>, rhs: DereferenceBox<C>) -> Bool {
+		return lhs.value == rhs.value
+	}
+}
 
 //MARK: +Calendar
 
