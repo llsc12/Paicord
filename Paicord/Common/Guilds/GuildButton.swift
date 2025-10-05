@@ -110,7 +110,7 @@ struct GuildButton: View {
 				if isExpanded {
 					let guilds = folder.guildIds.compactMap { guildID in
 						let guildID = GuildSnowflake(guildID.description)
-						return gw.currentUser.guilds.first(where: { $0.id == guildID })
+						return gw.currentUser.guilds[guildID]
 					}
 					ForEach(guilds) { guild in
 						GuildButton(guild: guild)  // imagine recursion lol (i joke)

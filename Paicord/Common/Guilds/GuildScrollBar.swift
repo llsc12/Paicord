@@ -25,16 +25,14 @@ struct GuildScrollBar: View {
 						if folder.hasID == false {
 							// anon folder, should have only one guild id
 							if let guildIDString = folder.guildIds.first?.description,
-								let guild = gw.currentUser.guilds.first(where: {
-									$0.id == GuildSnowflake(guildIDString)
-								})
+								let guild = gw.currentUser.guilds[GuildSnowflake(guildIDString)]
 							{
 								GuildButton(guild: guild)
 							}
 						} else {
 							let guilds = folder.guildIds.compactMap { guildID in
 								let guildID = GuildSnowflake(guildID.description)
-								return gw.currentUser.guilds.first(where: { $0.id == guildID })
+								return gw.currentUser.guilds[guildID]
 							}
 							GuildButton(folder: folder, guilds: guilds)
 						}

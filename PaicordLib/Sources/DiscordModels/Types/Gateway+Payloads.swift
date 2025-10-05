@@ -1365,7 +1365,7 @@ extension Gateway {
 	public struct UpdateGuildSubscriptions: Sendable, Codable {
 		public var subscriptions: [GuildSnowflake: GuildSubscription]
 
-		init(subscriptions: [GuildSnowflake: GuildSubscription]) {
+		public init(subscriptions: [GuildSnowflake: GuildSubscription]) {
 			self.subscriptions = subscriptions
 		}
 
@@ -1378,7 +1378,7 @@ extension Gateway {
 			public var channels: [ChannelSnowflake: [(lower: Int, upper: Int)]]
 			public var thread_member_lists: [ChannelSnowflake]?
 
-			init(
+			public init(
 				typing: Bool,
 				activities: Bool,
 				threads: Bool,
@@ -1421,7 +1421,7 @@ extension Gateway {
 				case typing, activities, threads, channels, thread_member_lists
 			}
 
-			static func convertChannelsToTuples(_ c: [ChannelSnowflake: [[Int]]])
+			private static func convertChannelsToTuples(_ c: [ChannelSnowflake: [[Int]]])
 				-> [ChannelSnowflake: [(lower: Int, upper: Int)]]
 			{
 				// the tuple needs values 0 and 1 from the array
@@ -1431,7 +1431,7 @@ extension Gateway {
 				}
 				return channels
 			}
-			static func convertChannelsToArrays(
+			private static func convertChannelsToArrays(
 				_ c: [ChannelSnowflake: [(lower: Int, upper: Int)]]
 			) -> [ChannelSnowflake: [[Int]]] {
 				var channels = [ChannelSnowflake: [[Int]]]()

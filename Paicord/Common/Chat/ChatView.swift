@@ -8,100 +8,29 @@
 
 import Combine
 @_spi(Advanced) import SwiftUIIntrospect
+import PaicordLib
 import SwiftUIX
 
-// MARK: - Simple Message model
-struct Message: Identifiable {
-	let id = UUID()
-	let text: String
-	let date: Date = .now
-	let username: String = "User \(Int.random(in: 1...100))"
-}
-
-// MARK: - Tiny ViewModel
-@Observable
-@MainActor
-final class ChatViewModel {
-	var messages: [Message] = [
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-		Message(text: "gm"),
-	]
-	var latestMessageID: UUID? {
-		messages.last?.id
-	}
-
-	init() {
-		// Simulate new incoming messages every 2 seconds
-		Task {
-			let sample = [
-				"test message 1",
-				"test message 2",
-				"test message 3",
-				"test message 4",
-				"test message 5",
-				"test message 6",
-				"test message 7",
-			]
-
-			while true {
-				try? await Task.sleep(for: .seconds(.random(in: 0.5...2.5)))
-				let msg = Message(text: sample.randomElement() ?? "...")
-				messages.append(msg)
-			}
-		}
-	}
-}
-
-// MARK: - ChatView
 struct ChatView: View {
-	private var vm = ChatViewModel()
+	var vm: ChannelStore
 	@State private var isNearBottom = true
 	@State private var isScrolling = false
+	
+	@State private var showChannelInfo = false
 
+	init(vm: ChannelStore) {
+		self.vm = vm
+	}
+	
 	var body: some View {
 
 		ScrollViewReader { proxy in
 			List {
-				ForEach(vm.messages) { msg in
-					MessageCell(for: msg)
-						.id(msg.id)
+				ForEach(vm.messageHistory) { msgID in
+					if let msg = vm.messages[msgID] {
+						MessageCell(for: msg)
+							.id(msg.id)
+					}
 				}
 				.listRowInsets(.init(top: 10, leading: 5, bottom: 10, trailing: 0))  // remove padding
 				.listRowSeparator(.hidden)  // hide divider
@@ -110,11 +39,11 @@ struct ChatView: View {
 			.listStyle(.plain)
 			.defaultScrollAnchor(.bottom)
 			.onAppear {
-				proxy.scrollTo(vm.latestMessageID, anchor: .bottom)
+				proxy.scrollTo(vm.messageHistory.last, anchor: .bottom)
 			}
-			.onChange(of: vm.latestMessageID) {
+			.onChange(of: vm.messageHistory) {
 				if isNearBottom && !isScrolling {
-					proxy.scrollTo(vm.latestMessageID, anchor: .bottom)
+					proxy.scrollTo(vm.messageHistory.last, anchor: .bottom)
 				}
 			}
 			.background(.tableBackground)
@@ -128,19 +57,31 @@ struct ChatView: View {
 		.scrollDismissesKeyboard(.interactively)
 		.toolbar {
 			ToolbarItem(placement: .navigation) {
-				VStack(alignment: .leading) {
-					Text("Title").font(.headline)
-					Text("Subtitle").font(.subheadline)
+				if let name = vm.channel?.name {
+					Text(name)
+				} else if let ppl = vm.channel?.recipients {
+					Text(ppl.map({
+							$0.global_name ?? $0.username
+						}).joined(separator: ", "))
+				}
+				if let topic = vm.channel?.topic, !topic.isEmpty {
+					Text(vm.channel?.topic ?? "")
+						.font(.caption)
+						.foregroundStyle(.secondary)
+						.sheet(isPresented: $showChannelInfo) {
+							Text(topic)
+								.padding()
+						}
 				}
 			}
 		}
 	}
 
 	struct MessageCell: View {
-		var message: Message
+		var message: DiscordChannel.Message
 		@State var profileOpen = false
 
-		init(for message: Message) {
+		init(for message: DiscordChannel.Message) {
 			self.message = message
 		}
 
@@ -155,21 +96,21 @@ struct ChatView: View {
 				}
 				.buttonStyle(.borderless)
 				.popover(isPresented: $profileOpen) {
-					Text("Profile for \(message.username)")
+					Text("Profile for \(message.author?.username ?? "Unknown")")
 						.padding()
 				}
 
 				VStack {
 					HStack {
-						Text(message.username)
+						Text(message.author?.username ?? "Unknown")
 							.font(.headline)
-						Text(message.date, style: .time)
+						Text(message.timestamp.date, style: .time)
 							.font(.caption)
 							.foregroundStyle(.secondary)
 					}
 					.frame(maxWidth: .infinity, alignment: .leading)
 
-					Text(message.text)
+					Text(message.content)
 						.font(.body)
 						.foregroundStyle(.primary)
 						.frame(maxWidth: .infinity, alignment: .leading)
@@ -295,9 +236,4 @@ struct ScrollStateDetector: ViewModifier {
 				cancellables.removeAll()
 			}
 	}
-}
-
-// MARK: - Preview
-#Preview {
-	ChatView()
 }

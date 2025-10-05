@@ -22,45 +22,48 @@ final class PaicordAppState {
 		set {
 			// If the guild is changing, reset the selected channel to nil or get the last selected one.
 			// the view will handle when the channel is nil automatically.
+//			selectedChannel = prevSelectedChannels[newValue]
 			withMutation(keyPath: \.selectedGuild) {
-				selectedChannel = prevSelectedChannels[newValue]
 				_selectedGuild = newValue
 			}
 		}
 	}
-	var selectedChannel: ChannelSnowflake? = nil {
-		didSet {
-			prevSelectedChannels[selectedGuild] = selectedChannel
-		}
-	}
-	
+	var selectedChannel: ChannelSnowflake? = nil // {
+//		didSet {
+//			prevSelectedChannels[selectedGuild] = selectedChannel
+//		}
+//	}
+
 	var chatOpen: Bool = false
 
-	private var prevSelectedChannels: [GuildSnowflake?: ChannelSnowflake] = {
-		// load from user defaults
-		if let data = UserDefaults.standard.data(
-			forKey: "AppState.PrevSelectedChannels"
-		),
-			let dict = try? JSONSerialization.jsonObject(with: data)
-				as? [String: String]
-		{
-			var result: [GuildSnowflake?: ChannelSnowflake] = [:]
-			for (key, value) in dict {
-				let guildID = key == "nil" ? nil : GuildSnowflake(key)
-				let channelID = ChannelSnowflake(value)
-				result[guildID] = channelID
-			}
-			return result
-		}
-		return [:]
-	}()
-	{
-		didSet {
-			// store new previous selected channel in the dictionary
-			let data = try? JSONSerialization.data(withJSONObject: prevSelectedChannels)
-			UserDefaults.standard.set(data, forKey: "AppState.PrevSelectedChannels")
-		}
-	}
+//	@ObservationIgnored
+//	private var prevSelectedChannels: [GuildSnowflake?: ChannelSnowflake] = {
+//		// load from user defaults
+//		if let data = UserDefaults.standard.data(
+//			forKey: "AppState.PrevSelectedChannels"
+//		),
+//			let dict = try? JSONSerialization.jsonObject(with: data)
+//				as? [String: String]
+//		{
+//			var result: [GuildSnowflake?: ChannelSnowflake] = [:]
+//			for (key, value) in dict {
+//				let guildID = key == "nil" ? nil : GuildSnowflake(key)
+//				let channelID = ChannelSnowflake(value)
+//				result[guildID] = channelID
+//			}
+//			return result
+//		}
+//		return [:]
+//	}()
+//	{
+//		didSet {
+//			// store new previous selected channel in the dictionary
+//			let data = try? JSONSerialization.data(
+//				withJSONObject: prevSelectedChannels
+//			)
+//			UserDefaults.standard.set(data, forKey: "AppState.PrevSelectedChannels")
+//		}
+//	}
 
 	var showingError = false
 	var showingErrorSheet = false

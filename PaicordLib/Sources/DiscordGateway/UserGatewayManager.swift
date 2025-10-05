@@ -303,19 +303,6 @@ public actor UserGatewayManager: GatewayManager {
 		}
 	}
 
-	/// https://discord.com/developers/docs/topics/gateway-events#request-guild-members
-	public func requestGuildMembersChunk(payload: Gateway.RequestGuildMembers) {
-		self.send(
-			message: .init(
-				payload: .init(
-					opcode: .requestGuildMembers,
-					data: .requestGuildMembers(payload)
-				),
-				opcode: .text
-			)
-		)
-	}
-
 	/// https://discord.com/developers/docs/topics/gateway-events#update-presence
 	public func updatePresence(payload: Gateway.Identify.Presence) {
 		self.send(
@@ -342,12 +329,40 @@ public actor UserGatewayManager: GatewayManager {
 		)
 	}
 
+	/// https://docs.discord.food/topics/gateway-events#ping-voice-server
 	public func pingVoiceServer() {
 		self.send(
 			message: .init(
 				payload: .init(
 					opcode: .voiceServerPing,
 					data: nil
+				),
+				opcode: .text
+			)
+		)
+	}
+	
+	/// https://discord.com/developers/docs/topics/gateway-events#request-guild-members
+	/// https://docs.discord.food/topics/gateway-events#request-guild-members
+	public func requestGuildMembersChunk(payload: Gateway.RequestGuildMembers) {
+		self.send(
+			message: .init(
+				payload: .init(
+					opcode: .requestGuildMembers,
+					data: .requestGuildMembers(payload)
+				),
+				opcode: .text
+			)
+		)
+	}
+	
+	/// https://docs.discord.food/topics/gateway-events#update-guild-subscriptions
+	public func updateGuildSubscriptions(payload: Gateway.UpdateGuildSubscriptions) {
+		self.send(
+			message: .init(
+				payload: .init(
+					opcode: .guildSubscriptionsBulk,
+					data: .updateGuildSubscriptions(payload)
 				),
 				opcode: .text
 			)
@@ -391,8 +406,8 @@ public actor UserGatewayManager: GatewayManager {
 			return
 		}
 		self.connectionId.wrappingIncrement(ordering: .relaxed)
-		self.state.store(.stopped, ordering: .relaxed)
-		self.stateCallback?(.stopped)
+		self.state.store(.noConnection, ordering: .relaxed)
+		self.stateCallback?(.noConnection)
 		connectionBackoff.resetTryCount()
 		await self.sendQueue.reset()
 		await self.closeWebSocket()

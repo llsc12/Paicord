@@ -6,16 +6,19 @@
 // Copyright © 2025 Lakhan Lothiyi.
 //
 
-import SwiftUI
+import SwiftUIX
+import PaicordLib
 
 @available(macOS, unavailable)
 struct SmallBaseplate: View {
 	@Bindable var appState: PaicordAppState
-
+	@Environment(GatewayStore.self) var gw
+	@State private var store: ChannelStore?
 	@State private var currentTab: CurrentTab = .home
 	var disableSlideover: Bool {
 		self.currentTab != .home
 	}
+	
 	var body: some View {
 		SlideoverDoubleView(swap: $appState.chatOpen) {
 			TabView(selection: $currentTab) {
@@ -42,9 +45,20 @@ struct SmallBaseplate: View {
 					.tag(CurrentTab.profile)
 			}
 		} secondary: {
-			ChatView()
+			if let store {
+				ChatView(vm: store)
+			} else {
+				ActivityIndicator()
+			}
 		}
 		.slideoverDisabled(disableSlideover)
+		.task(id: appState.selectedChannel) {
+			if let selected = appState.selectedChannel {
+				self.store = gw.getChannelStore(for: selected)
+			} else {
+				self.store = nil
+			}
+		}
 	}
 
 	enum CurrentTab {

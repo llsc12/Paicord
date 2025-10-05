@@ -8,6 +8,7 @@
 
 import Foundation
 import PaicordLib
+import Collections
 
 @Observable
 class ChannelStore: DiscordDataStore {
@@ -27,8 +28,9 @@ class ChannelStore: DiscordDataStore {
 	var hasMoreHistory = true
 	var lastReadMessageId: MessageSnowflake?
 	
-	init(id: ChannelSnowflake) {
+	init(id: ChannelSnowflake, from channel: DiscordChannel? = nil) {
 		self.channelId = id
+		self.channel = channel
 	}
 	
 	// MARK: - Protocol Methods

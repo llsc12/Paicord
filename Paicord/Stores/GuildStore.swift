@@ -30,8 +30,34 @@ class GuildStore: DiscordDataStore {
 	var isLoadingMembers = false
 	var hasAllMembers = false
 
-	init(id: GuildSnowflake) {
+	init(id: GuildSnowflake, from: Guild? = nil) {
 		self.guildId = id
+		self.guild = guild
+		
+		// populate properties based on initial guild data
+		guard let guild else { return }
+		
+		// channels
+		guild.channels.forEach { channel in
+			channels[channel.id] = channel
+		}
+		
+		// roles
+		guild.roles.forEach { role in
+			roles[role.id] = role
+		}
+		
+		// emojis
+		guild.emojis.forEach { emoji in
+			if let id = emoji.id {
+				emojis[id] = emoji
+			}
+		}
+		
+		// stickers
+		guild.stickers?.forEach { sticker in
+			stickers[sticker.id] = sticker
+		}
 	}
 
 	// MARK: - Protocol Methods
@@ -203,6 +229,7 @@ class GuildStore: DiscordDataStore {
 	private func handleGuildMembersChunk(
 		_ membersChunk: Gateway.GuildMembersChunk
 	) {
+		// TODO: Handle this
 	}
 
 	private func handleGuildRoleCreate(_ roleCreate: Gateway.GuildRole) {

@@ -14,15 +14,16 @@ struct SidebarView: View {
 	@Environment(GatewayStore.self) var gw
 	@Environment(PaicordAppState.self) var appState
 	
+	@Binding var currentGuildStore: GuildStore?
+	
 	var body: some View {
 		HStack(spacing: 0) {
 			guildScroller
 				.frame(width: 65)
-			
 			if appState.selectedGuild == nil {
 				DMsView()
 			} else {
-				if let guild = gw.currentUser.guilds.first(where: { $0.id == appState.selectedGuild }) {
+				if let guild = currentGuildStore {
 					GuildView(guild: guild)
 				} else {
 					ActivityIndicator()

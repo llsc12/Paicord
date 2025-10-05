@@ -23,16 +23,11 @@ struct HomeView: View {
 				}
 
 			Group {
-				if appState.selectedGuild == nil {
-					DMsView()
+				if let guildID = appState.selectedGuild {
+					let guild = gw.getGuildStore(for: guildID)
+					GuildView(guild: guild)
 				} else {
-					if let guild = gw.currentUser.guilds.first(where: {
-						$0.id == appState.selectedGuild
-					}) {
-						GuildView(guild: guild)
-					} else {
-						ActivityIndicator()
-					}
+					DMsView()
 				}
 			}
 			.background(.tableBackground)

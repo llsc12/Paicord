@@ -317,7 +317,7 @@ extension GatewayEventHandler {
 		}
 
 		switch event.data {
-		case .none, .resume, .identify:
+		case .none, .resume, .identify, .updateGuildSubscriptions:
 			/// Only sent, never received.
 			break
 		case let .heartbeat(lastSequenceNumber):

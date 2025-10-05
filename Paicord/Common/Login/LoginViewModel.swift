@@ -87,6 +87,7 @@ final class LoginViewModel {
 				}
 				let user = try await TokenStore.getSelf(token: token)
 				gw.accounts.addAccount(token: token, user: user)
+				// 
 			}
 		} catch {
 			self.appState.error = error

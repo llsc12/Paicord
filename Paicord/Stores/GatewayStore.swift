@@ -12,7 +12,7 @@ import PaicordLib
 @Observable
 final class GatewayStore {
 	static let shared = GatewayStore()
-	
+
 	// Some setup for the gateway
 	@ObservationIgnored var captchaCallback: CaptchaChallengeHandler?
 	@ObservationIgnored var mfaCallback: MFAVerificationHandler?
@@ -39,12 +39,12 @@ final class GatewayStore {
 
 	@ObservationIgnored
 	var eventTask: Task<Void, Never>? = nil
-	
+
 	// MARK: - Gateway Management
 
 	/// Disconnects current gateway and cancels event task if needed
 	private func disconnectIfNeeded() async {
-		guard ![.stopped, .noConnection].contains(state) else { return }
+		guard !([.stopped, .noConnection].contains(state)) else { return }
 		await gateway?.disconnect()
 		eventTask?.cancel()
 	}
@@ -85,29 +85,28 @@ final class GatewayStore {
 		eventTask = Task { @MainActor in
 			guard let gateway else { return }
 			for await event in await gateway.events {
-				//				print(event.data)
 				switch event.data {
-
+				
 				default: break
 				}
 			}
 		}
-		
+
 		// Set up stores with gateway
 		currentUser.setGateway(self.gateway)
 		settings.setGateway(self.gateway)
-		
+
 		// Update existing channel stores
 		for channelStore in channels.values {
 			channelStore.setGateway(self.gateway)
 		}
-		
+
 		// Update existing guild stores
 		for guildStore in guilds.values {
 			guildStore.setGateway(self.gateway)
 		}
 	}
-	
+
 	func resetStores() {
 		currentUser = CurrentUserStore()
 		settings = SettingsStore()
@@ -116,32 +115,56 @@ final class GatewayStore {
 	}
 
 	// MARK: - Data Stores
-	
+
 	let accounts = TokenStore()
 	var currentUser = CurrentUserStore()
 	var settings = SettingsStore()
 
 	private var channels: [ChannelSnowflake: ChannelStore] = [:]
-	func getChannelStore(for id: ChannelSnowflake) -> ChannelStore {
+	func getChannelStore(for id: ChannelSnowflake, from guild: GuildStore? = nil) -> ChannelStore {
 		if let store = channels[id] {
 			return store
 		} else {
-			let store = ChannelStore(id: id)
+			let channel = guild?.channels[id] ?? currentUser.privateChannels[id]
+			let store = ChannelStore(id: id, from: channel)
 			store.setGateway(self.gateway)
 			channels[id] = store
 			return store
 		}
 	}
-	
+
 	private var guilds: [GuildSnowflake: GuildStore] = [:]
 	func getGuildStore(for id: GuildSnowflake) -> GuildStore {
+		print("Requesting guild store for \(id)")
+		defer {
+			if !subscribedGuilds.contains(id) {
+				subscribedGuilds.insert(id)
+				Task {
+					await gateway?.updateGuildSubscriptions(
+						payload:
+								.init(subscriptions: [
+									id: .init(
+										typing: true,
+										activities: false,
+										threads: false,
+										channels: [:],
+										thread_member_lists: nil
+									)
+								])
+					)
+					print("Subscribed to guild \(id)")
+				}
+			}
+		}
 		if let store = guilds[id] {
 			return store
 		} else {
-			let store = GuildStore(id: id)
+			let store = GuildStore(id: id, from: currentUser.guilds[id])
 			store.setGateway(self.gateway)
 			guilds[id] = store
 			return store
 		}
 	}
+	private var subscribedGuilds: Set<GuildSnowflake> = []
+
 }

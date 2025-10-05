@@ -12,7 +12,7 @@ import SwiftUIX
 
 struct GuildView: View {
 	@Environment(PaicordAppState.self) var appState
-	var guild: Guild
+	var guild: GuildStore
 	
 	var body: some View {
 		ZStack(alignment: .top) {
@@ -24,7 +24,7 @@ struct GuildView: View {
 				} else {
 					// acts as a spacer for title
 					HStack {
-						Text(guild.name)
+						Text(guild.guild?.name ?? "Unknown Guild")
 							.font(.title3)
 							.bold()
 					}
@@ -33,7 +33,7 @@ struct GuildView: View {
 					.hidden()
 				}
 
-				ForEach(guild.channels) { channel in
+				ForEach(guild.channels.map({$0.value})) { channel in
 					Button {
 						appState.selectedChannel = channel.id
 					} label: {
@@ -44,7 +44,7 @@ struct GuildView: View {
 			
 			// header text
 			HStack {
-				Text(guild.name)
+				Text(guild.guild?.name ?? "Unknown Guild")
 					.font(.title3)
 					.bold()
 			}
@@ -63,9 +63,9 @@ struct GuildView: View {
 	}
 
 	func bannerURL(animated: Bool) -> URL? {
-		guard let banner = guild.banner else { return nil }
+		guard let banner = guild.guild?.banner else { return nil }
 		return URL(
-			string: CDNEndpoint.guildBanner(guildId: guild.id, banner: banner).url
+			string: CDNEndpoint.guildBanner(guildId: guild.guildId, banner: banner).url
 				+ ".\(animated ? "gif" : "png")?size=600&animated=\(animated.description)"
 		)
 	}

@@ -11,6 +11,7 @@ import SwiftUIX
 
 struct DMsView: View {
 	@Environment(GatewayStore.self) var gw
+	@Environment(PaicordAppState.self) var appState
 	var body: some View {
 		ZStack(alignment: .top) {
 			ScrollView {
@@ -24,12 +25,12 @@ struct DMsView: View {
 				.frame(maxWidth: .infinity, alignment: .leading)
 				.hidden()
 
-				ForEach(gw.currentUser.privateChannels, id: \.id) { channel in
-					Text(
-						channel.name ?? channel.recipients?.map({
+				ForEach(gw.currentUser.privateChannels.map({ $0.value}), id: \.id) { channel in
+					Button(channel.name ?? channel.recipients?.map({
 							$0.global_name ?? $0.username
-						}).joined(separator: ", ") ?? "Unknown Channel"
-					)
+						}).joined(separator: ", ") ?? "Unknown Channel") {
+						appState.selectedChannel = channel.id
+					}
 				}
 			}
 
