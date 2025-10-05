@@ -30,7 +30,7 @@ class GuildStore: DiscordDataStore {
 	var isLoadingMembers = false
 	var hasAllMembers = false
 
-	init(id: GuildSnowflake, from: Guild? = nil) {
+	init(id: GuildSnowflake, from guild: Guild?) {
 		self.guildId = id
 		self.guild = guild
 		

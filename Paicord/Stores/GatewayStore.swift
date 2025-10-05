@@ -135,9 +135,9 @@ final class GatewayStore {
 
 	private var guilds: [GuildSnowflake: GuildStore] = [:]
 	func getGuildStore(for id: GuildSnowflake) -> GuildStore {
-		print("Requesting guild store for \(id)")
 		defer {
 			if !subscribedGuilds.contains(id) {
+				print("Subscribing for guild store to \(id)")
 				subscribedGuilds.insert(id)
 				Task {
 					await gateway?.updateGuildSubscriptions(
@@ -159,7 +159,8 @@ final class GatewayStore {
 		if let store = guilds[id] {
 			return store
 		} else {
-			let store = GuildStore(id: id, from: currentUser.guilds[id])
+			let guild = currentUser.guilds[id]
+			let store = GuildStore(id: id, from: guild)
 			store.setGateway(self.gateway)
 			guilds[id] = store
 			return store

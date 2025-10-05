@@ -828,7 +828,7 @@ extension UserGatewayManager {
 					data = try DiscordGlobalConfiguration.encoder.encode(message.payload)
 				} catch {
 					self.logger.error(
-						"Could not encode payload",
+						"Could not encode payload, \(error)",
 						metadata: [
 							"payload": .string("\(message.payload)"),
 							"opcode": .stringConvertible(opcode),

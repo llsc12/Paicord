@@ -7,21 +7,35 @@
 //
 
 import Combine
-@_spi(Advanced) import SwiftUIIntrospect
 import PaicordLib
+@_spi(Advanced) import SwiftUIIntrospect
 import SwiftUIX
+import SDWebImageSwiftUI
 
 struct ChatView: View {
 	var vm: ChannelStore
 	@State private var isNearBottom = true
 	@State private var isScrolling = false
-	
-	@State private var showChannelInfo = false
 
-	init(vm: ChannelStore) {
-		self.vm = vm
-	}
+	@State private var showChannelInfo = false
 	
+	@Environment(GatewayStore.self) var gw
+
+	init(vm: ChannelStore) { self.vm = vm }
+	
+	@State private var text: String = ""
+
+	var channelName: String {
+		if let name = vm.channel?.name {
+			return name
+		} else if let ppl = vm.channel?.recipients {
+			return ppl.map({
+				$0.global_name ?? $0.username
+			}).joined(separator: ", ")
+		}
+		return "Unknown Channel"
+	}
+
 	var body: some View {
 
 		ScrollViewReader { proxy in
@@ -51,8 +65,21 @@ struct ChatView: View {
 				isNearBottom: $isNearBottom,
 				isScrolling: $isScrolling
 			)
+			.safeAreaInset(edge: .bottom) {
+				TextField(
+					"Message #\(channelName)",
+					text: $text
+				)
+				.textFieldStyle(.roundedBorder)
+				.onSubmit {
+					let text = self.text
+					self.text = ""
+					Task {
+						try await gw.client.createMessage(channelId: vm.channelId, payload: .init(content: text))
+					}
+				}
+			}
 		}
-
 		.scrollContentBackground(.hidden)
 		.scrollDismissesKeyboard(.interactively)
 		.toolbar {
@@ -60,9 +87,11 @@ struct ChatView: View {
 				if let name = vm.channel?.name {
 					Text(name)
 				} else if let ppl = vm.channel?.recipients {
-					Text(ppl.map({
+					Text(
+						ppl.map({
 							$0.global_name ?? $0.username
-						}).joined(separator: ", "))
+						}).joined(separator: ", ")
+					)
 				}
 				if let topic = vm.channel?.topic, !topic.isEmpty {
 					Text(vm.channel?.topic ?? "")
@@ -80,19 +109,24 @@ struct ChatView: View {
 	struct MessageCell: View {
 		var message: DiscordChannel.Message
 		@State var profileOpen = false
-
+		@State var avatarAnimated = false
+		
 		init(for message: DiscordChannel.Message) {
 			self.message = message
 		}
 
 		var body: some View {
-			HStack {
+			HStack(alignment: .top) {
 				Button {
 					profileOpen = true
 				} label: {
-					Circle()
-						.scaledToFit()
-						.frame(maxWidth: 35)
+					AnimatedImage(
+						url: avatarURL(animated: avatarAnimated)
+					)
+					.resizable()
+					.scaledToFill()
+					.frame(width: 35, height: 35)
+					.clipShape(.circle)
 				}
 				.buttonStyle(.borderless)
 				.popover(isPresented: $profileOpen) {
@@ -115,6 +149,24 @@ struct ChatView: View {
 						.foregroundStyle(.primary)
 						.frame(maxWidth: .infinity, alignment: .leading)
 				}
+			}
+			.onHover { self.avatarAnimated = $0 }
+		}
+		
+		func avatarURL(animated: Bool) -> URL? {
+			if let id = message.author?.id,
+			   let avatar = message.author?.avatar
+			{
+				return URL(
+					string: CDNEndpoint.userAvatar(userId: id, avatar: avatar).url
+						+ "?size=128&animated=\(animated.description)"
+				)
+			} else {
+				let discrim = message.author?.discriminator ?? "0"
+				return URL(
+					string: CDNEndpoint.defaultUserAvatar(discriminator: discrim).url
+						+ "?size=128"
+				)
 			}
 		}
 	}

@@ -769,6 +769,8 @@ public struct Gateway: Sendable, Codable {
 				try container.encode(payload, forKey: .data)
 			case let .requestVoiceStateUpdate(payload):
 				try container.encode(payload, forKey: .data)
+			case let .updateGuildSubscriptions(payload):
+				try container.encode(payload, forKey: .data)
 			default:
 				throw EncodingError.notSupposedToBeSent(
 					message: "'\(self)' data is supposed to never be sent."
