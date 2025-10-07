@@ -14,98 +14,97 @@ import SwiftUIX
 
 struct ChatView: View {
 	var vm: ChannelStore
-	@State private var isNearBottom = true
-	@State private var isScrolling = false
-
-	@State private var showChannelInfo = false
-
 	@Environment(GatewayStore.self) var gw
 	@Environment(PaicordAppState.self) var appState
+	@Environment(\.accessibilityReduceMotion) var accessibilityReduceMotion
+
+	@State private var text = ""
+
+	@State private var showChannelInfo = false  // topic description popover
+	@State private var isNearBottom = true  // used to track if we are near the bottom, if so scroll.
 
 	init(vm: ChannelStore) { self.vm = vm }
 
-	@State private var text: String = ""
-
-	var channelName: String {
-		if let name = vm.channel?.name {
-			return name
-		} else if let ppl = vm.channel?.recipients {
-			return ppl.map({
-				$0.global_name ?? $0.username
-			}).joined(separator: ", ")
-		}
-		return "Unknown Channel"
-	}
-
 	var body: some View {
-		ScrollViewReader { proxy in
-			List {
-				ForEach(vm.messages.values) { msg in
-					// check if prior message is from same author and within 5 minutes, and ensure there are no replies
-					let priorMessage = vm.getMessage(before: msg)
-					let isInline =
-						priorMessage?.author?.id == msg.author?.id
-						&& msg.timestamp.date.timeIntervalSince(
-							priorMessage?.timestamp.date ?? Date.distantPast
-						) < 300 && msg.referenced_message == nil
-					MessageCell(for: msg, inline: isInline)
+		VStack(spacing: 0) {
+			ScrollViewReader { proxy in
+				ScrollView {
+					LazyVStack(alignment: .leading, spacing: 0) {
+						ForEach(Array(vm.messages.values)) { msg in
+							let prior = vm.getMessage(before: msg)
+							let isInline =
+								prior?.author?.id == msg.author?.id
+								&& msg.timestamp.date.timeIntervalSince(
+									prior?.timestamp.date ?? .distantPast
+								) < 300 && msg.referenced_message == nil
+
+							MessageCell(for: msg, inline: isInline)
+								.onAppear {
+									guard msg == vm.messages.values.last else { return }
+									self.isNearBottom = true
+								}
+								.onDisappear {
+									guard msg == vm.messages.values.last else { return }
+									self.isNearBottom = false
+								}
+						}
+					}
+					.scrollTargetLayout()
+					#if os(macOS)
+						.padding(5)  // macos doesnt seem to have padding around chat
+					#elseif os(iOS)
+						.padding(.bottom, 10)  // add padding at the bottom for ios
+					#endif
 				}
-				.listRowInsets(.init())  // remove padding
-				.listRowSeparator(.hidden)  // hide divider
-				.listRowBackground(Color.clear)  // make background clear
-			}
-			.listStyle(.plain)
-			.environment(\.defaultMinListRowHeight, 10)
-			.defaultScrollAnchor(.bottom)
-			.onAppear {
-				DispatchQueue.main.async {
-					let id = vm.messages.values.last?.id
-					proxy.scrollTo(id, anchor: .bottom)
-				}
-			}
-			.onChange(of: vm.messages) {
-				if isNearBottom && !isScrolling {
+				.defaultScrollAnchor(.bottom)
+				.scrollDismissesKeyboard(.interactively)
+				.onAppear {
+					guard let lastID = vm.messages.values.last?.id else { return }
 					DispatchQueue.main.async {
-						let id = vm.messages.values.last?.id
-						proxy.scrollTo(id, anchor: .bottom)
+						withAnimation(accessibilityReduceMotion ? .none : .default) {
+							proxy.scrollTo(lastID, anchor: .top)
+						}
+					}
+				}
+				.onChange(of: vm.messages.count) {
+					if isNearBottom, let lastID = vm.messages.values.last?.id {
+						DispatchQueue.main.async {
+							withAnimation(accessibilityReduceMotion ? .none : .default) {
+								proxy.scrollTo(lastID, anchor: .top)
+							}
+						}
 					}
 				}
 			}
-			.background(.tableBackground)
-			.detectScrollStates(
-				isNearBottom: $isNearBottom,
-				isScrolling: $isScrolling
-			)
-			.safeAreaInset(edge: .bottom) {
-				TextField(
-					"Message #\(channelName)",
-					text: $text
-				)
-				.textFieldStyle(.roundedBorder)
-				.onSubmit {
-					let text = self.text
-					self.text = ""
-					Task {
-						try await gw.client.createMessage(
-							channelId: vm.channelId,
-							payload: .init(content: text)
-						)
-					}
-				}
+
+			Divider()
+
+			HStack {
+				TextField("Message", text: $text)
+					.textFieldStyle(.roundedBorder)
+				#if os(iOS)
+					.disabled(appState.chatOpen == false)
+				#endif
+					.onSubmit(sendMessage)
+				#if os(iOS)
+					Button("Send", action: sendMessage)
+						.buttonStyle(.borderedProminent)
+				#endif
 			}
+			.padding(5)
+			.background(.regularMaterial)
 		}
-		.scrollContentBackground(.hidden)
-		.scrollDismissesKeyboard(.interactively)
+		.background(.tableBackground)
 		#if os(iOS)
-		.toolbar {
-			ToolbarItem(placement: .topBarLeading) {
-				Button {
-					appState.chatOpen.toggle()
-				} label: {
-					Image(systemName: "arrow.left")
+			.toolbar {
+				ToolbarItem(placement: .topBarLeading) {
+					Button {
+						appState.chatOpen.toggle()
+					} label: {
+						Image(systemName: "arrow.left")
+					}
 				}
 			}
-		}
 		#endif
 		.toolbar {
 			ToolbarItem(placement: .navigation) {
@@ -130,127 +129,72 @@ struct ChatView: View {
 			}
 		}
 	}
-}
 
-extension View {
-	func detectScrollStates(
-		isNearBottom: Binding<Bool>,
-		isScrolling: Binding<Bool>
-	) -> some View {
-		self.modifier(
-			ScrollStateDetector(
-				isNearBottom: isNearBottom,
-				isScrolling: isScrolling
+	private func sendMessage() {
+		let msg = text.trimmingCharacters(in: .whitespacesAndNewlines)
+		guard !msg.isEmpty else { return }
+		text = ""
+		Task.detached {
+			try await gw.client.createMessage(
+				channelId: vm.channelId,
+				payload: .init(content: msg)
 			)
-		)
+		}
 	}
 }
 
-struct ScrollStateDetector: ViewModifier {
+// it doesnt seem to want to let us push new messages and have the view scroll by itself.
+struct TrackableScrollView<Content: View>: View {
 	@Binding var isNearBottom: Bool
-	@Binding var isScrolling: Bool
-	@State private var cancellables = Set<AnyCancellable>()
-	let threshold: CGFloat = 125
+	@ViewBuilder var content: Content
 
-	func body(content: Content) -> some View {
-		content
-			#if os(iOS)
-				.introspect(.scrollView, on: .iOS(.v17...)) {
-					(scrollView: UIScrollView) -> Void in
-					// im really sorry
-					DispatchQueue.main.async {
-						cancellables.forEach { $0.cancel() }
-						cancellables.removeAll()
+	@State private var contentHeight: CGFloat = 0
+	@State private var scrollViewHeight: CGFloat = 0
+	@State private var scrollOffset: CGFloat = 0
 
-						scrollView.publisher(for: \.contentOffset)
-						.sink { offset in
-							let bottomEdge = offset.y + scrollView.frame.size.height
-							let distanceFromBottom =
-								scrollView.contentSize.height - bottomEdge
-							// also rember to change threshold based on safe area insets
-							DispatchQueue.main.async {
-								self.isNearBottom = distanceFromBottom < (threshold - scrollView.safeAreaInsets.bottom)
+	var body: some View {
+		ScrollView {
+			content
+				.background(
+					GeometryReader { proxy in
+						Color.clear
+							.onAppear { contentHeight = proxy.size.height }
+							.onChange(of: proxy.size.height) {
+								contentHeight = proxy.size.height
 							}
-						}
-						.store(in: &cancellables)
-
-						let dragging = scrollView.publisher(for: \.isDragging)
-						let decelerating = scrollView.publisher(for: \.isDecelerating)
-
-						dragging.combineLatest(decelerating)
-						.map { $0 || $1 }
-						.removeDuplicates()
-						.sink { scrolling in
-							DispatchQueue.main.async {
-								self.isScrolling = scrolling
-							}
-						}
-						.store(in: &cancellables)
 					}
-
-				}
-			#elseif os(macOS)
-				.introspect(.scrollView, on: .macOS(.v14...)) {
-					(scrollView: NSScrollView) -> Void in
-					// im really sorry again
-					DispatchQueue.main.async {
-						cancellables.forEach { $0.cancel() }
-						cancellables.removeAll()
-
-						let clipView = scrollView.contentView
-						NotificationCenter.default.publisher(
-							for: NSView.boundsDidChangeNotification,
-							object: clipView
-						)
-						.compactMap { (notification: Notification) -> CGPoint? in
-							guard let clipView = notification.object as? NSClipView else {
-								return nil
-							}
-							return clipView.bounds.origin
-						}
-						.sink { bounds in
-							let contentHeight = scrollView.documentView?.frame.height ?? 0
-							let visibleHeight = clipView.bounds.height
-							let scrollOffset = bounds.y
-
-							let bottomEdge = scrollOffset + visibleHeight
-							let distanceFromBottom = contentHeight - bottomEdge
-
-							// also rember to change threshold based on safe area insets
-							DispatchQueue.main.async {
-								self.isNearBottom = distanceFromBottom < (threshold - scrollView.safeAreaInsets.bottom)
-							}
-						}
-						.store(in: &cancellables)
-
-						NotificationCenter.default.publisher(
-							for: NSScrollView.willStartLiveScrollNotification,
-							object: scrollView
-						)
-						.sink { _ in
-							DispatchQueue.main.async {
-								self.isScrolling = true
-							}
-						}
-						.store(in: &cancellables)
-
-						NotificationCenter.default.publisher(
-							for: NSScrollView.didEndLiveScrollNotification,
-							object: scrollView
-						)
-						.sink { _ in
-							DispatchQueue.main.async {
-								self.isScrolling = false
-							}
-						}
-						.store(in: &cancellables)
+				)
+		}
+		.background(
+			GeometryReader { proxy in
+				Color.clear
+					.onAppear { scrollViewHeight = proxy.size.height }
+					.onChange(of: proxy.size.height) {
+						scrollViewHeight = proxy.size.height
 					}
-				}
-			#endif
-			.onDisappear {
-				cancellables.forEach { $0.cancel() }
-				cancellables.removeAll()
 			}
+		)
+		.overlay(
+			GeometryReader { proxy in
+				Color.clear
+					.preference(
+						key: ScrollOffsetKey.self,
+						value: proxy.frame(in: .named("scroll")).minY
+					)
+			}
+		)
+		.coordinateSpace(name: "scroll")
+		.onPreferenceChange(ScrollOffsetKey.self) { value in
+			scrollOffset = -value
+			let distanceFromBottom = contentHeight - scrollOffset - scrollViewHeight
+			isNearBottom = distanceFromBottom < 150  // threshold
+		}
+	}
+}
+struct ScrollOffsetKey: PreferenceKey {
+	static var defaultValue: CGFloat = 0
+	static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+		value = nextValue()
 	}
 }
 
