@@ -1,6 +1,6 @@
 /// Inline parser for converting tokens into inline AST nodes
 ///
-/// This parser handles inline elements like emphasis, strong emphasis,
+/// This parser handles inline elements like italic, strong italic,
 /// links, images, code spans, and other inline formatting.
 import Foundation
 import DiscordModels
@@ -131,9 +131,9 @@ public final class InlineParser {
 			
 			return [AST.TextNode(content: content, sourceLocation: startLocation)]
 		case .asterisk:
-			// Handle emphasis and strong emphasis with *
-			if let emphasisNode = try parseEmphasisOrStrong(delimiter: "*") {
-				return [emphasisNode]
+			// Handle italic and strong italic with *
+			if let italicNode = try parseItalicOrBold(delimiter: "*") {
+				return [italicNode]
 			} else {
 				return [AST.TextNode(content: tokenStream.consume().content)]
 			}
@@ -146,8 +146,8 @@ public final class InlineParser {
 					return [AST.TextNode(content: tokenStream.consume().content)]
 				}
 			} else if tokenStream.current.content == "_" {
-				if let emphasisNode = try parseEmphasisOrStrong(delimiter: "_") {
-					return [emphasisNode]
+				if let italicNode = try parseItalicOrBold(delimiter: "_") {
+					return [italicNode]
 				} else {
 					return [AST.TextNode(content: tokenStream.consume().content)]
 				}
@@ -155,7 +155,7 @@ public final class InlineParser {
 				// Discord: triple underscore is underline+italics
 				// Parse underline, then parse italics inside
 				if let underlineNode = try? parseUnderline() {
-					if let italicNode = try? parseEmphasisOrStrong(delimiter: "_") {
+					if let italicNode = try? parseItalicOrBold(delimiter: "_") {
 						return [AST.UnderlineNode(children: [italicNode], sourceLocation: tokenStream.current.location)]
 					} else {
 						return [underlineNode].compactMap { $0 }
@@ -274,9 +274,9 @@ public final class InlineParser {
 		return AST.TextNode(content: token.content, sourceLocation: token.location)
 	}
 	
-	// MARK: - Emphasis and Strong Emphasis
+	// MARK: - Italic and Bold
 	
-	private func parseEmphasisOrStrong(delimiter: String) throws -> ASTNode? {
+	private func parseItalicOrBold(delimiter: String) throws -> ASTNode? {
 		let startLocation = tokenStream.current.location
 		let delimiterChar = Character(delimiter)
 		
@@ -355,7 +355,7 @@ public final class InlineParser {
 					)
 				}
 				
-				// Emphasis (1 delimiter)
+				// italic (1 delimiter)
 				if delimiterCount >= 1 && closingCount >= 1 {
 					let extraDelimiters = closingCount - 1
 					if extraDelimiters > 0 {
@@ -927,7 +927,7 @@ public final class InlineParser {
 		guard tokenStream.check(.underscore) else { return nil }
 		let openingUnderscore = tokenStream.current
 		guard openingUnderscore.content == "__" else {
-			// Single underscore, not underline - handle as emphasis
+			// Single underscore, not underline - handle as italic
 			return nil
 		}
 		

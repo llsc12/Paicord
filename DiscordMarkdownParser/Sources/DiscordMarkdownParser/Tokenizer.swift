@@ -39,7 +39,7 @@ public enum TokenType: String, CaseIterable, Sendable, Equatable {
 	case atxHeaderStart  // # ## ### etc.
 	case setextHeaderUnderline  // === or ---
 
-	// Emphasis and strong
+	// italic and strong
 	case asterisk  // *
 	case underscore  // _
 

@@ -40,6 +40,9 @@ struct MessageCell: View {
 					.buttonStyle(.borderless)
 					.height(1)
 					.disabled(true)  // btn used for spacing only
+					#if os(macOS)
+						.padding(.trailing, 4)  // balancing
+					#endif
 
 					content
 				}
@@ -48,9 +51,9 @@ struct MessageCell: View {
 					reply
 					HStack(alignment: .bottom) {
 						avatar
-						#if os(macOS)
-							.padding(.trailing, 4) // balancing
-						#endif
+							#if os(macOS)
+								.padding(.trailing, 4)  // balancing
+							#endif
 
 						userAndMessage
 					}
@@ -59,8 +62,8 @@ struct MessageCell: View {
 				.onHover { self.avatarAnimated = $0 }
 			}
 		}
-		.padding(5)
-		.padding(.horizontal, 5)  // ios needs horizontal padding
+		.padding(.horizontal, 10)
+		.padding(.vertical, 2)
 		#if os(macOS)
 			.onHover { self.cellHighlighted = $0 }
 			.background(
@@ -173,23 +176,23 @@ struct MessageCell: View {
 #Preview {
 	let llsc12 = DiscordUser(
 		id: .init("381538809180848128"),
-			username: "llsc12",
-			discriminator: "0",
-			global_name: nil,
-			avatar: "df71b3f223666fd8331c9940c6f7cbd9",
-			bot: false,
-			system: false,
-			mfa_enabled: true,
-			banner: nil,
-			accent_color: nil,
-			locale: .englishUS,
-			verified: true,
-			email: nil,
-			flags: .init(rawValue: 4_194_352),
-			premium_type: nil,
-			public_flags: .init(rawValue: 4_194_304),
-			avatar_decoration_data: nil,
-		)
+		username: "llsc12",
+		discriminator: "0",
+		global_name: nil,
+		avatar: "df71b3f223666fd8331c9940c6f7cbd9",
+		bot: false,
+		system: false,
+		mfa_enabled: true,
+		banner: nil,
+		accent_color: nil,
+		locale: .englishUS,
+		verified: true,
+		email: nil,
+		flags: .init(rawValue: 4_194_352),
+		premium_type: nil,
+		public_flags: .init(rawValue: 4_194_304),
+		avatar_decoration_data: nil,
+	)
 	MessageCell(
 		for: .init(
 			id: try! .makeFake(),

@@ -20,18 +20,18 @@ public enum CommonMarkUtils {
 			|| "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~".contains(char)
 	}
 
-	/// Check if a character can start emphasis
-	public static func canStartEmphasis(_ char: Character, leftFlanking: Bool)
+	/// Check if a character can start italic
+	public static func canStartitalic(_ char: Character, leftFlanking: Bool)
 		-> Bool
 	{
-		return leftFlanking && (char == "*" || char == "_")
+		return leftFlanking && (char == "*")
 	}
 
-	/// Check if a character can end emphasis
-	public static func canEndEmphasis(_ char: Character, rightFlanking: Bool)
+	/// Check if a character can end italic
+	public static func canEnditalic(_ char: Character, rightFlanking: Bool)
 		-> Bool
 	{
-		return rightFlanking && (char == "*" || char == "_")
+		return rightFlanking && (char == "*")
 	}
 
 	/// Normalize line endings to \n

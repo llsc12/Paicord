@@ -629,7 +629,7 @@ public final class BlockParser {
 	private func parseParagraph() throws -> AST.ParagraphNode {
 		let startLocation = tokenStream.current.location
 
-		// Use inline parser to properly handle inline elements like code spans, emphasis, etc.
+		// Use inline parser to properly handle inline elements like code spans, italic, etc.
 		let inlineParser = InlineParser(
 			tokenStream: tokenStream,
 			configuration: configuration

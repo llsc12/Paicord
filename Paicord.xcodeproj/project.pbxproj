@@ -20,7 +20,6 @@
 		57A4E7112E6B411A00470131 /* SDWebImageSVGCoder in Frameworks */ = {isa = PBXBuildFile; productRef = 57A4E7102E6B411A00470131 /* SDWebImageSVGCoder */; };
 		57A4E7152E6B44C900470131 /* CGSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A4E7142E6B44C200470131 /* CGSize.swift */; };
 		57A55C572E7560CF005C8226 /* Markdown.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A55C562E7560CC005C8226 /* Markdown.swift */; };
-		57A55C622E7563D6005C8226 /* Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A55C612E7563D4005C8226 /* Test.swift */; };
 		57AA8A032E7875D100B4CA9C /* Sidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57AA8A022E7875CD00B4CA9C /* Sidebar.swift */; };
 		57CDD87F2E71CB6000022203 /* HCaptcha in Frameworks */ = {isa = PBXBuildFile; productRef = 57CDD87E2E71CB6000022203 /* HCaptcha */; };
 		57CDD8812E71FF7600022203 /* CaptchaSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57CDD8802E71FF7600022203 /* CaptchaSheet.swift */; };
@@ -47,6 +46,8 @@
 		AA10971B2E64C181005BC3D2 /* PaicordApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1097122E64C181005BC3D2 /* PaicordApp.swift */; };
 		AA10971D2E64C18C005BC3D2 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA10971C2E64C189005BC3D2 /* ChatView.swift */; };
 		AA1378062E967A4A00100969 /* ProcessInfo+previews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1378042E96798000100969 /* ProcessInfo+previews.swift */; };
+		AA1378092E969A9000100969 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = AA1378082E969A9000100969 /* Lottie */; };
+		AA13780B2E969D6100100969 /* DiscordMarkdownParser in Frameworks */ = {isa = PBXBuildFile; productRef = AA13780A2E969D6100100969 /* DiscordMarkdownParser */; };
 		AA1878F32E81A30C009C7E40 /* GuildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1878F22E81A305009C7E40 /* GuildView.swift */; };
 		AA1878F92E81FC1A009C7E40 /* FLEX in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = AA1878F82E81FC1A009C7E40 /* FLEX */; };
 		AA5DC55A2E9482ED00D81EB5 /* MessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5DC5592E9482ED00D81EB5 /* MessageCell.swift */; };
@@ -78,7 +79,6 @@
 		57A4E70A2E6B315C00470131 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		57A4E7142E6B44C200470131 /* CGSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGSize.swift; sourceTree = "<group>"; };
 		57A55C562E7560CC005C8226 /* Markdown.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Markdown.swift; sourceTree = "<group>"; };
-		57A55C612E7563D4005C8226 /* Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Test.swift; sourceTree = "<group>"; };
 		57AA8A022E7875CD00B4CA9C /* Sidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sidebar.swift; sourceTree = "<group>"; };
 		57CDD8802E71FF7600022203 /* CaptchaSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptchaSheet.swift; sourceTree = "<group>"; };
 		57DA04292E79894500DB4C7C /* ConnectionStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionStateView.swift; sourceTree = "<group>"; };
@@ -140,9 +140,11 @@
 				572B694C2E7079FB00BCED00 /* PaicordLib in Frameworks */,
 				AA9C818C2E6702930086B1DA /* SwiftUIIntrospect in Frameworks */,
 				57CDD87F2E71CB6000022203 /* HCaptcha in Frameworks */,
+				AA13780B2E969D6100100969 /* DiscordMarkdownParser in Frameworks */,
 				AAEEC7222E6515C400EB5FC9 /* KeychainAccess in Frameworks */,
 				5783AA922E6B8F6500F73F6D /* MeshGradientCHeaders in Frameworks */,
 				57A4E7112E6B411A00470131 /* SDWebImageSVGCoder in Frameworks */,
+				AA1378092E969A9000100969 /* Lottie in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -180,7 +182,6 @@
 			isa = PBXGroup;
 			children = (
 				AABED5A72E7FF970005BDD63 /* PaicordLib++ */,
-				57A55C612E7563D4005C8226 /* Test.swift */,
 				57A4E7132E6B44BC00470131 /* Extensions */,
 			);
 			path = Utilities;
@@ -287,7 +288,7 @@
 		AA1097082E64C181005BC3D2 /* Chat */ = {
 			isa = PBXGroup;
 			children = (
-				57A55C562E7560CC005C8226 /* Markdown.swift */,
+				AA5DC5582E9482E800D81EB5 /* Messages */,
 				AA10971C2E64C189005BC3D2 /* ChatView.swift */,
 			);
 			path = Chat;
@@ -347,6 +348,7 @@
 			isa = PBXGroup;
 			children = (
 				AA5DC5592E9482ED00D81EB5 /* MessageCell.swift */,
+				57A55C562E7560CC005C8226 /* Markdown.swift */,
 			);
 			path = Messages;
 			sourceTree = "<group>";
@@ -362,7 +364,6 @@
 		AA9C81802E665E190086B1DA /* Common */ = {
 			isa = PBXGroup;
 			children = (
-				AA5DC5582E9482E800D81EB5 /* Messages */,
 				57DA042D2E79DC4400DB4C7C /* Settings */,
 				57A4E7092E6B315700470131 /* Login */,
 				AA9C81842E6667050086B1DA /* Utilities */,
@@ -444,6 +445,8 @@
 				57CDD87E2E71CB6000022203 /* HCaptcha */,
 				574D24DB2E76C78000CAB95E /* HighlightSwift */,
 				AA1878F82E81FC1A009C7E40 /* FLEX */,
+				AA1378082E969A9000100969 /* Lottie */,
+				AA13780A2E969D6100100969 /* DiscordMarkdownParser */,
 			);
 			productName = PaiCord;
 			productReference = AA1096DB2E63BE84005BC3D2 /* Paicord.app */;
@@ -484,6 +487,7 @@
 				57CDD87D2E71CB6000022203 /* XCRemoteSwiftPackageReference "hcaptcha" */,
 				574D24DA2E76C78000CAB95E /* XCRemoteSwiftPackageReference "HighlightSwift" */,
 				AA1878F72E81FC1A009C7E40 /* XCRemoteSwiftPackageReference "FLEX" */,
+				AA1378072E969A9000100969 /* XCRemoteSwiftPackageReference "lottie-spm" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = AA1096DC2E63BE84005BC3D2 /* Products */;
@@ -538,7 +542,6 @@
 				57E05C5D2E6CBCDC00B81AA7 /* GatewayStore.swift in Sources */,
 				57F5AF552E7CBDF400AD5674 /* MFAView.swift in Sources */,
 				5783AA942E6B8FD100F73F6D /* MeshGradient.swift in Sources */,
-				57A55C622E7563D6005C8226 /* Test.swift in Sources */,
 				57DA042A2E79894500DB4C7C /* ConnectionStateView.swift in Sources */,
 				57F5AF512E7CBC7700AD5674 /* LoginViewModel.swift in Sources */,
 				AABED5A92E7FF982005BDD63 /* Merging.swift in Sources */,
@@ -842,6 +845,14 @@
 				kind = branch;
 			};
 		};
+		AA1378072E969A9000100969 /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-spm";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.5.2;
+			};
+		};
 		AA1878F72E81FC1A009C7E40 /* XCRemoteSwiftPackageReference "FLEX" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/FLEXTool/FLEX";
@@ -907,6 +918,15 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 57CDD87D2E71CB6000022203 /* XCRemoteSwiftPackageReference "hcaptcha" */;
 			productName = HCaptcha;
+		};
+		AA1378082E969A9000100969 /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AA1378072E969A9000100969 /* XCRemoteSwiftPackageReference "lottie-spm" */;
+			productName = Lottie;
+		};
+		AA13780A2E969D6100100969 /* DiscordMarkdownParser */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DiscordMarkdownParser;
 		};
 		AA1878F82E81FC1A009C7E40 /* FLEX */ = {
 			isa = XCSwiftPackageProductDependency;

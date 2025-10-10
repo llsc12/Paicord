@@ -260,7 +260,7 @@ final class DiscordMarkdownParserTests: XCTestCase {
 		}
 		// Should contain a bold node with a user mention inside
 		let boldNode = paragraphNode.children.first {
-			$0.nodeType == .strongEmphasis
+			$0.nodeType == .bold
 		}
 		XCTAssertNotNil(boldNode)
 		if let boldNode = boldNode {
@@ -273,7 +273,7 @@ final class DiscordMarkdownParserTests: XCTestCase {
 		}
 		XCTAssertNotNil(underlineNode)
 		if let underlineNode = underlineNode {
-			let italicNode = underlineNode.children.first { $0.nodeType == .emphasis }
+			let italicNode = underlineNode.children.first { $0.nodeType == .italic }
 			XCTAssertNotNil(italicNode)
 		}
 	}
@@ -305,7 +305,7 @@ final class DiscordMarkdownParserTests: XCTestCase {
 			XCTFail("No link node found")
 			return
 		}
-		let boldNode = linkNode.children.first { $0.nodeType == .strongEmphasis }
+		let boldNode = linkNode.children.first { $0.nodeType == .bold }
 		let emojiNode = linkNode.children.first { $0.nodeType == .customEmoji }
 		XCTAssertNotNil(boldNode)
 		XCTAssertNotNil(emojiNode)
@@ -384,7 +384,7 @@ final class DiscordMarkdownParserTests: XCTestCase {
 		}
 		XCTAssertNotNil(underlineNode)
 		if let underlineNode = underlineNode as? AST.UnderlineNode {
-			let italicNode = underlineNode.children.first { $0.nodeType == .emphasis }
+			let italicNode = underlineNode.children.first { $0.nodeType == .italic }
 			XCTAssertNotNil(italicNode)
 			if let italicNode = italicNode as? AST.ItalicNode {
 				let textNode =
@@ -397,8 +397,8 @@ final class DiscordMarkdownParserTests: XCTestCase {
 
 	func testInlineStylingInHeaders() async throws {
 		let markdowns: [(String, Int?, ASTNodeType, String?, Any.Type?)] = [
-			("# **bold**", 1, .strongEmphasis, "bold", AST.HeadingNode.self),
-			("## *italic*", 2, .emphasis, "italic", AST.HeadingNode.self),
+			("# **bold**", 1, .bold, "bold", AST.HeadingNode.self),
+			("## *italic*", 2, .italic, "italic", AST.HeadingNode.self),
 			("### __underline__", 3, .underline, "underline", AST.HeadingNode.self),
 			("# ~~strike~~", 1, .strikethrough, "strike", AST.HeadingNode.self),
 			("## <:smile:123456>", 2, .customEmoji, nil, AST.HeadingNode.self),
@@ -670,7 +670,7 @@ final class DiscordMarkdownParserTests: XCTestCase {
 		let hasBold = blockQuoteNode.children
 			.compactMap { $0 as? AST.ParagraphNode }
 			.flatMap { $0.children }
-			.contains { $0.nodeType == .strongEmphasis }
+			.contains { $0.nodeType == .bold }
 
 		let hasCodeSpan = blockQuoteNode.children
 			.compactMap { $0 as? AST.ParagraphNode }
@@ -705,7 +705,7 @@ final class DiscordMarkdownParserTests: XCTestCase {
 			.flatMap { $0.children }
 			.compactMap { $0 as? AST.ParagraphNode }
 			.flatMap { $0.children }
-			.contains { $0.nodeType == .strongEmphasis }
+			.contains { $0.nodeType == .bold }
 
 		let hasEmoji = listNode.children
 			.compactMap { $0 as? AST.ListItemNode }
@@ -733,11 +733,11 @@ final class DiscordMarkdownParserTests: XCTestCase {
 		XCTAssertNotNil(underlineNode)
 		if let underlineNode = underlineNode {
 			let boldNode = underlineNode.children.first {
-				$0.nodeType == .strongEmphasis
+				$0.nodeType == .bold
 			}
 			XCTAssertNotNil(boldNode)
 			if let boldNode = boldNode {
-				let italicNode = boldNode.children.first { $0.nodeType == .emphasis }
+				let italicNode = boldNode.children.first { $0.nodeType == .italic }
 				XCTAssertNotNil(italicNode)
 				if let italicNode = italicNode {
 					let textContent = italicNode.children
@@ -765,7 +765,7 @@ final class DiscordMarkdownParserTests: XCTestCase {
 		let hasMention =
 			spoilerNode?.children.contains { $0.nodeType == .userMention } ?? false
 		let hasBold =
-			spoilerNode?.children.contains { $0.nodeType == .strongEmphasis } ?? false
+			spoilerNode?.children.contains { $0.nodeType == .bold } ?? false
 		XCTAssertTrue(hasMention)
 		XCTAssertTrue(hasBold)
 	}

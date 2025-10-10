@@ -486,19 +486,19 @@ public final class DiscordMarkdownParser: Sendable {
 				)
 			}
 
-		case .emphasis:
-			if let emphasisNode = originalNode as? AST.ItalicNode {
+		case .italic:
+			if let italicNode = originalNode as? AST.ItalicNode {
 				return AST.ItalicNode(
 					children: children,
-					sourceLocation: emphasisNode.sourceLocation
+					sourceLocation: italicNode.sourceLocation
 				)
 			}
 
-		case .strongEmphasis:
-			if let strongEmphasisNode = originalNode as? AST.BoldNode {
+		case .bold:
+			if let boldNode = originalNode as? AST.BoldNode {
 				return AST.BoldNode(
 					children: children,
-					sourceLocation: strongEmphasisNode.sourceLocation
+					sourceLocation: boldNode.sourceLocation
 				)
 			}
 
