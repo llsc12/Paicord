@@ -108,8 +108,24 @@ struct ChatView: View {
 		.toolbar {
 			#warning("make channel headers nicer")
 			ToolbarItem(placement: .navigation) {
-				HStack {
-					
+				if let name = vm.channel?.name {
+					Text(name)
+				} else if let ppl = vm.channel?.recipients {
+					Text(
+						ppl.map({
+							$0.global_name ?? $0.username
+						}).joined(separator: ", ")
+					)
+				}
+				if let topic = vm.channel?.topic, !topic.isEmpty {
+					Text(vm.channel?.topic ?? "")
+						.font(.caption)
+						.foregroundStyle(.secondary)
+						.sheet(isPresented: $showChannelInfo) {
+							Text(topic)
+								.padding()
+						}
+				}
 			}
 		}
 	}
