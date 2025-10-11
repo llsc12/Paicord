@@ -83,11 +83,11 @@ public struct Interaction: Sendable, Codable {
 	public struct ApplicationCommand: Sendable, Codable {
 
 		/// https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure
-		public struct ResolvedData: Sendable, Codable, Equatable {
+		public struct ResolvedData: Sendable, Codable, Equatable, Hashable {
 
 			/// https://discord.com/developers/docs/resources/channel#channel-object-channel-structure
 			/// https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure
-			public struct PartialChannel: Sendable, Codable, Equatable {
+			public struct PartialChannel: Sendable, Codable, Equatable, Hashable {
 				public var id: ChannelSnowflake
 				public var type: DiscordChannel.Kind
 				public var name: String?
@@ -465,7 +465,7 @@ extension [Interaction.ApplicationCommand.Option] {
 }
 
 /// https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object-message-interaction-structure
-public struct MessageInteraction: Sendable, Codable, Equatable {
+public struct MessageInteraction: Sendable, Codable, Equatable, Hashable {
 	public var id: InteractionSnowflake
 	public var type: Interaction.Kind
 	public var name: String
@@ -479,7 +479,7 @@ extension Interaction {
 	/// Anything inside `ActionRow` must not be used on its own for decoding/encoding purposes.
 	/// For example you always need to use `[ActionRow]` instead of `[ActionRow.Component]`.
 	public struct ActionRow: Sendable, Codable, ExpressibleByArrayLiteral,
-		Equatable, ValidatablePayload
+		Equatable, Hashable, ValidatablePayload
 	{
 
 		/// https://discord.com/developers/docs/interactions/message-components#component-object-component-types
@@ -497,7 +497,7 @@ extension Interaction {
 		}
 
 		/// https://discord.com/developers/docs/interactions/message-components#button-object-button-structure
-		public struct Button: Sendable, Codable, Equatable, ValidatablePayload {
+		public struct Button: Sendable, Codable, Equatable, Hashable, ValidatablePayload {
 
 			/// https://discord.com/developers/docs/interactions/message-components#button-object-button-styles
 			@UnstableEnum<Int>
@@ -647,12 +647,12 @@ extension Interaction {
 		}
 
 		/// https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure
-		public struct StringSelectMenu: Sendable, Codable, Equatable,
+		public struct StringSelectMenu: Sendable, Codable, Equatable, Hashable,
 			ValidatablePayload
 		{
 
 			/// https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure
-			public struct Option: Sendable, Codable, Equatable, ValidatablePayload {
+			public struct Option: Sendable, Codable, Equatable, Hashable, ValidatablePayload {
 				public var label: String
 				public var value: String
 				public var description: String?
@@ -736,7 +736,7 @@ extension Interaction {
 		}
 
 		/// https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-default-value-structure
-		public struct DefaultValue: Sendable, Codable, Equatable {
+		public struct DefaultValue: Sendable, Codable, Equatable, Hashable {
 
 			/// https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-default-value-structure
 			public enum Kind: String, Sendable, Codable {
@@ -765,7 +765,7 @@ extension Interaction {
 		}
 
 		/// https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure
-		public struct ChannelSelectMenu: Sendable, Codable, Equatable, ValidatablePayload {
+		public struct ChannelSelectMenu: Sendable, Codable, Equatable, Hashable, ValidatablePayload {
 			public var custom_id: String
 			public var channel_types: [DiscordChannel.Kind]?
 			public var placeholder: String?
@@ -819,7 +819,7 @@ extension Interaction {
 		}
 
 		/// https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure
-		public struct SelectMenu: Sendable, Codable, Equatable, ValidatablePayload {
+		public struct SelectMenu: Sendable, Codable, Equatable, Hashable, ValidatablePayload {
 			public var custom_id: String
 			public var placeholder: String?
 			public var default_values: [DefaultValue]?
@@ -876,7 +876,7 @@ extension Interaction {
 		}
 
 		/// https://discord.com/developers/docs/interactions/message-components#text-inputs
-		public struct TextInput: Sendable, Codable, Equatable, ValidatablePayload {
+		public struct TextInput: Sendable, Codable, Equatable, Hashable, ValidatablePayload {
 
 			/// https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-styles
 			@UnstableEnum<Int>
@@ -943,7 +943,7 @@ extension Interaction {
 			}
 		}
 
-		public enum Component: Sendable, Codable, Equatable, ValidatablePayload {
+		public enum Component: Sendable, Codable, Equatable, Hashable, ValidatablePayload {
 			case button(Button)
 			case stringSelect(StringSelectMenu)
 			case textInput(TextInput)

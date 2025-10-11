@@ -7,11 +7,15 @@
 //
 
 import Collections
+import Algorithms
 import Foundation
 import PaicordLib
 
 @Observable
 class ChannelStore: DiscordDataStore {
+	@ObservationIgnored
+	let guildStore: GuildStore?
+
 	// MARK: - Protocol Properties
 	var gateway: GatewayStore?
 	var eventTask: Task<Void, Never>?
@@ -28,9 +32,10 @@ class ChannelStore: DiscordDataStore {
 	var hasMoreHistory = true
 	var lastReadMessageId: MessageSnowflake?
 
-	init(id: ChannelSnowflake, from channel: DiscordChannel? = nil) {
+	init(id: ChannelSnowflake, from channel: DiscordChannel? = nil, guildStore: GuildStore? = nil) {
 		self.channelId = id
 		self.channel = channel
+		self.guildStore = guildStore
 	}
 
 	// MARK: - Protocol Methods
@@ -46,19 +51,7 @@ class ChannelStore: DiscordDataStore {
 		guard let gateway = gateway?.gateway else { return }
 		Task { @MainActor in
 			// ig also fetch latest messages too
-			let res = try await gateway.client.listMessages(channelId: channelId)
-			do {
-				// ensure request was successful
-				try res.guardSuccess()
-				let messages = try res.decode()
-				for message in messages.reversed() {
-					self.messages[message.id] = message
-				}
-
-				// lastly request members if member data for any author is missing
-			} catch {
-				PaicordAppState.shared.error = res.asError()
-			}
+			try await self.fetchMessages()
 		}
 		eventTask = Task { @MainActor in
 			for await event in await gateway.events {
@@ -152,6 +145,18 @@ class ChannelStore: DiscordDataStore {
 		guard var currentChannel = channel else { return }
 		currentChannel.last_message_id = message.id
 		channel = currentChannel
+
+		// Update guild member info if we have a guild store
+		if let guildStore, let authorId = message.author?.id,
+			let msgMember = message.member
+		{
+			if var member = guildStore.members[authorId] {
+				member.update(with: msgMember)
+				guildStore.members[authorId] = member
+			} else {
+				guildStore.members[authorId] = msgMember
+			}
+		}
 	}
 
 	private func handleMessageUpdate(
@@ -193,10 +198,41 @@ class ChannelStore: DiscordDataStore {
 		currentChannel.last_pin_timestamp = pinsUpdate.last_pin_timestamp
 		channel = currentChannel
 	}
-}
 
-// MARK: - Helpers
-extension ChannelStore {
+	// MARK: - Helpers
+
+	// NOTE: `around`, `before` and `after` are mutually exclusive.
+	func fetchMessages(
+		around: MessageSnowflake? = nil,
+		before: MessageSnowflake? = nil,
+		after: MessageSnowflake? = nil,
+		limit: Int? = nil
+	) async throws {
+		#warning("make this handle pagination etc maybe?")
+		guard let gateway = gateway?.gateway else { return }
+		let res = try await gateway.client.listMessages(channelId: channelId)
+		do {
+			// ensure request was successful
+			try res.guardSuccess()
+			let messages = try res.decode()
+			for message in messages.reversed() {
+				self.messages[message.id] = message
+			}
+			// lastly request members if member data for any author is missing
+			if let guildStore {
+				let unknownMembers = Array(messages.compactMap(\.author?.id).filter({
+					guildStore.members[$0] == nil
+				}).uniqued())
+				if !unknownMembers.isEmpty {
+					print("Requesting \(unknownMembers.count) unknown members in guild \(guildStore.guildId)")
+					await guildStore.requestMembers(for: unknownMembers)
+				}
+			}
+		} catch {
+			PaicordAppState.shared.error = res.asError()
+		}
+	}
+
 	func getMessage(
 		before message: DiscordChannel.Message
 	) -> DiscordChannel.Message? {

@@ -12,56 +12,73 @@ import SwiftUIX
 
 struct MessageCell: View {
 	var message: DiscordChannel.Message
-	var inline: Bool
+	var priorMessage: DiscordChannel.Message?
+	let guild: GuildStore?
 	@State var cellHighlighted = false
-	@State var profileOpen = false
-	@State var avatarAnimated = false
 
-	init(for message: DiscordChannel.Message, inline: Bool) {
+	init(
+		for message: DiscordChannel.Message,
+		prior: DiscordChannel.Message? = nil,
+		guild: GuildStore? = nil
+	) {
 		self.message = message
-		self.inline = inline
+		self.priorMessage = prior
+		self.guild = guild
 	}
 
 	#if os(iOS)
-		let avatarSize: CGFloat = 42
+		static let avatarSize: CGFloat = 42
 	#elseif os(macOS)
-		let avatarSize: CGFloat = 35
+		static let avatarSize: CGFloat = 35
 	#endif
 
 	var body: some View {
-		Group {
-			if inline {
-				HStack(alignment: .top) {
-					Button {
-					} label: {
-						Text("")
-							.frame(width: avatarSize)
-					}
-					.buttonStyle(.borderless)
-					.height(1)
-					.disabled(true)  // btn used for spacing only
-					#if os(macOS)
-						.padding(.trailing, 4)  // balancing
-					#endif
+		let inline =
+			priorMessage?.author?.id == message.author?.id
+			&& message.timestamp.date.timeIntervalSince(
+				priorMessage?.timestamp.date ?? .distantPast
+			) < 300 && message.referenced_message == nil && message.type == .default
 
-					content
-				}
-			} else {
-				VStack {
-					reply
-					HStack(alignment: .bottom) {
-						avatar
-							#if os(macOS)
-								.padding(.trailing, 4)  // balancing
-							#endif
-
-						userAndMessage
-					}
-					.fixedSize(horizontal: false, vertical: true)
-				}
-				.onHover { self.avatarAnimated = $0 }
+		// adding them together can cause arithmetic overflow, so hash instead
+		let cellHash: Int = {
+			var hasher = Hasher()
+			hasher.combine(message)
+			if let priorMessage = priorMessage {
+				hasher.combine(priorMessage)
 			}
+			return hasher.finalize()
+		}()
+
+		Group {
+			// Content
+			switch message.type {
+			case .default, .reply:
+				DefaultMessage(
+					message: message,
+					priorMessage: priorMessage,
+					guildStore: guild,
+					inline: inline,
+				)
+			default:
+				(Text(Image(systemName: "xmark.circle.fill"))
+					+ Text(" Unsupported message type \(message.type)"))
+					.foregroundStyle(.red)
+					.frame(maxWidth: .infinity, alignment: .leading)
+			}
+
+			// Embeds
+
+			// Attachments
+			if let attachments = message.attachments, !attachments.isEmpty {
+				AttachmentsView(attachments: attachments)
+			}
+
+			// Reactions
 		}
+		.equatable(by: cellHash)
+		/// stop updates to messages unless messages change.
+		/// prevent updates to messages unless they change
+		/// avoid re-render on message cell highlight
 		.padding(.horizontal, 10)
 		.padding(.vertical, 2)
 		#if os(macOS)
@@ -71,93 +88,7 @@ struct MessageCell: View {
 					? Color(NSColor.secondaryLabelColor).opacity(0.1) : .clear
 			)
 		#endif
-	}
-
-	@ViewBuilder
-	var reply: some View {
-		if let ref = message.referenced_message {
-			HStack {
-				ReplyLine()
-					.padding(.leading, avatarSize / 2)  // align with pfp
-
-				Text("\(ref.author?.username ?? "Unknown") • \(ref.content)")
-					.font(.caption)
-					.foregroundStyle(.secondary)
-					.lineLimit(1)
-					.frame(maxWidth: .infinity, alignment: .leading)
-			}
-		}
-	}
-
-	@ViewBuilder
-	var avatar: some View {
-		Button {
-			profileOpen = true
-		} label: {
-			AnimatedImage(
-				url: avatarURL(animated: avatarAnimated)
-			)
-			.resizable()
-			.scaledToFill()
-			.frame(width: avatarSize, height: avatarSize)
-			.clipShape(.circle)
-		}
-		.buttonStyle(.borderless)
-		.popover(isPresented: $profileOpen) {
-			Text("Profile for \(message.author?.username ?? "Unknown")")
-				.padding()
-		}
-		.frame(maxHeight: .infinity, alignment: .top)  // align pfp to top of cell
-	}
-
-	@ViewBuilder
-	var userAndMessage: some View {
-		VStack {
-			HStack {
-				Text(message.author?.username ?? "Unknown")
-					.font(.headline)
-				Text(message.timestamp.date, style: .time)
-					.font(.caption)
-					.foregroundStyle(.secondary)
-			}
-			.frame(maxWidth: .infinity, alignment: .leading)
-
-			content
-		}
-		.frame(maxHeight: .infinity, alignment: .bottom)  // align text to bottom of cell
-	}
-
-	@ViewBuilder
-	var content: some View {
-		#warning("make this show markdown")
-		Text(markdown: message.content)
-			.font(.body)
-			.foregroundStyle(.primary)
-			.frame(maxWidth: .infinity, alignment: .leading)
-	}
-
-	func avatarURL(animated: Bool) -> URL? {
-		if let id = message.author?.id,
-			let avatar = message.author?.avatar
-		{
-			if avatar.starts(with: "a_"), animated {
-				return URL(
-					string: CDNEndpoint.userAvatar(userId: id, avatar: avatar).url
-						+ ".gif?size=128&animated=true"
-				)
-			} else {
-				return URL(
-					string: CDNEndpoint.userAvatar(userId: id, avatar: avatar).url
-						+ ".png?size=128&animated=false"
-				)
-			}
-		} else {
-			let discrim = message.author?.discriminator ?? "0"
-			return URL(
-				string: CDNEndpoint.defaultUserAvatar(discriminator: discrim).url
-					+ "?size=128"
-			)
-		}
+		.padding(.top, inline ? 0 : 10)  // adds space between message groups
 	}
 
 	struct ReplyLine: View {
@@ -232,6 +163,6 @@ struct MessageCell: View {
 			guild_id: nil,
 			member: nil
 		),
-		inline: false
+		prior: nil
 	)
 }

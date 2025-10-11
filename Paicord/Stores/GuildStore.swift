@@ -19,7 +19,7 @@ class GuildStore: DiscordDataStore {
 	let guildId: GuildSnowflake
 	var guild: Guild?
 	var channels: [ChannelSnowflake: DiscordChannel] = [:]
-	var members: [UserSnowflake: Guild.Member] = [:]
+	var members: [UserSnowflake: Guild.PartialMember] = [:]
 	var roles: [RoleSnowflake: Role] = [:]
 	var emojis: [EmojiSnowflake: Emoji] = [:]
 	var stickers: [StickerSnowflake: Sticker] = [:]
@@ -29,36 +29,36 @@ class GuildStore: DiscordDataStore {
 	init(id: GuildSnowflake, from guild: Guild?) {
 		self.guildId = id
 		self.guild = guild
-		
+
 		// populate properties based on initial guild data
 		guard let guild else { return }
-		
+
 		// channels
 		guild.channels.forEach { channel in
 			channels[channel.id] = channel
 		}
-		
+
 		// roles
 		guild.roles.forEach { role in
 			roles[role.id] = role
 		}
-		
+
 		// emojis
 		guild.emojis.forEach { emoji in
 			if let id = emoji.id {
 				emojis[id] = emoji
 			}
 		}
-		
+
 		// stickers
 		guild.stickers?.forEach { sticker in
 			stickers[sticker.id] = sticker
 		}
-		
+
 		// members (usually the connected user only)
 		guild.members?.forEach { member in
 			if let user = member.user {
-				members[user.id] = member
+				members[user.id] = member.toPartialMember()
 			}
 		}
 	}
@@ -216,11 +216,11 @@ class GuildStore: DiscordDataStore {
 	}
 
 	private func handleGuildMemberAdd(_ memberAdd: Gateway.GuildMemberAdd) {
-		members[memberAdd.user.id] = memberAdd.toMember()
+		members[memberAdd.user.id] = memberAdd.toMember().toPartialMember()
 	}
 
 	private func handleGuildMemberUpdate(_ memberUpdate: Gateway.GuildMemberAdd) {
-		members[memberUpdate.user.id] = memberUpdate.toMember()
+		members[memberUpdate.user.id] = memberUpdate.toMember().toPartialMember()
 	}
 
 	private func handleGuildMemberRemove(
@@ -232,7 +232,13 @@ class GuildStore: DiscordDataStore {
 	private func handleGuildMembersChunk(
 		_ membersChunk: Gateway.GuildMembersChunk
 	) {
-		// TODO: Handle this
+		print("Received members chunk with \(membersChunk.members.count) members for guild \(membersChunk.guild_id)")
+		guard membersChunk.guild_id == guildId else { return }
+		for member in membersChunk.members {
+			if let user = member.user {
+				members[user.id] = member.toPartialMember()
+			}
+		}
 	}
 
 	private func handleGuildRoleCreate(_ roleCreate: Gateway.GuildRole) {
@@ -303,4 +309,16 @@ class GuildStore: DiscordDataStore {
 	//	func getVoiceState(for userId: UserSnowflake) -> Gateway.VoiceState? {
 	//		return voiceStates[userId]
 	//	}
+
+	// MARK: - Helpers
+
+	func requestMembers(for ids: [UserSnowflake]) async {
+		await gateway?.gateway?.requestGuildMembersChunk(
+			payload: .init(
+				guild_id: guildId,
+				presences: false,
+				user_ids: ids
+			)
+		)
+	}
 }

@@ -97,7 +97,7 @@ final class GatewayStore {
 		}
 
 		// Set up stores with gateway
-		currentUser.setGateway(self)
+		user.setGateway(self)
 		settings.setGateway(self)
 
 		// Update existing channel stores
@@ -112,7 +112,7 @@ final class GatewayStore {
 	}
 
 	func resetStores() {
-		currentUser = CurrentUserStore()
+		user = CurrentUserStore()
 		settings = SettingsStore()
 		channels = [:]
 		guilds = [:]
@@ -121,7 +121,7 @@ final class GatewayStore {
 	// MARK: - Data Stores
 
 	let accounts = TokenStore()
-	var currentUser = CurrentUserStore()
+	var user = CurrentUserStore()
 	var settings = SettingsStore()
 
 	private var channels: [ChannelSnowflake: ChannelStore] = [:]
@@ -131,8 +131,8 @@ final class GatewayStore {
 		if let store = channels[id] {
 			return store
 		} else {
-			let channel = guild?.channels[id] ?? currentUser.privateChannels[id]
-			let store = ChannelStore(id: id, from: channel)
+			let channel = guild?.channels[id] ?? user.privateChannels[id]
+			let store = ChannelStore(id: id, from: channel, guildStore: guild)
 			store.setGateway(self)
 			channels[id] = store
 			return store
@@ -165,7 +165,7 @@ final class GatewayStore {
 		if let store = guilds[id] {
 			return store
 		} else {
-			let guild = currentUser.guilds[id]
+			let guild = user.guilds[id]
 			let store = GuildStore(id: id, from: guild)
 			store.setGateway(self)
 			guilds[id] = store

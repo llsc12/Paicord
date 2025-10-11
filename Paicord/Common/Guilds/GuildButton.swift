@@ -138,7 +138,7 @@ struct GuildButton: View {
 				if isExpanded {
 					let guilds: [Guild] = folder.guildIds.compactMap { guildID in
 						let guildID = GuildSnowflake(guildID.description)
-						return gw.currentUser.guilds[guildID]
+						return gw.user.guilds[guildID]
 					}
 					ForEach(guilds) { guild in
 						GuildButton(guild: guild)  // imagine recursion lol (i joke)
@@ -226,13 +226,14 @@ struct GuildButton: View {
 					}
 				} else {
 					Rectangle()
-						.fill(.primaryButtonBackground.opacity(0.5))
+						.fill(.black.opacity(0.25))
 						.aspectRatio(1, contentMode: .fit)
 						.overlay {
 							Image(systemName: "bubble.left.and.bubble.right.fill")
 								.font(.title2)
 								.foregroundStyle(.tertiaryButton)
 						}
+						.background(.black.opacity(0.001)) // makes it easier to click
 				}
 			}
 			.clipShape(.rect(cornerRadius: isSelected ? 10 : 32, style: .continuous))

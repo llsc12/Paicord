@@ -31,14 +31,7 @@ struct ChatView: View {
 					LazyVStack(alignment: .leading, spacing: 0) {
 						ForEach(Array(vm.messages.values)) { msg in
 							let prior = vm.getMessage(before: msg)
-							let isInline =
-								prior?.author?.id == msg.author?.id
-								&& msg.timestamp.date.timeIntervalSince(
-									prior?.timestamp.date ?? .distantPast
-								) < 300 && msg.referenced_message == nil
-
-							MessageCell(for: msg, inline: isInline)
-								.padding(.top, isInline ? 0 : 5)
+							MessageCell(for: msg, prior: prior, guild: vm.guildStore)
 								.onAppear {
 									guard msg == vm.messages.values.last else { return }
 									self.isNearBottom = true

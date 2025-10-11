@@ -53,10 +53,10 @@ public enum Permission: Sendable, Codable {
 }
 
 /// https://discord.com/developers/docs/topics/permissions#role-object
-public struct Role: Sendable, Codable, Equatable {
+public struct Role: Sendable, Codable, Equatable, Hashable {
 
     /// https://discord.com/developers/docs/topics/permissions#role-object-role-tags-structure
-    public struct Tags: Sendable, Codable, Equatable {
+    public struct Tags: Sendable, Codable, Equatable, Hashable {
         public var bot_id: UserSnowflake?
         public var integration_id: IntegrationSnowflake?
         public var premium_subscriber: Bool?

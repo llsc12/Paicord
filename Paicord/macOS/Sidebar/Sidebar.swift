@@ -22,14 +22,10 @@ struct SidebarView: View {
 				.frame(width: 65)
 			if let guild = currentGuildStore {
 				GuildView(guild: guild)
-			} else if appState.selectedGuild == nil {
-				DMsView()
 			} else {
-				Spacer()
+				DMsView()
 			}
-
 		}
-		.navigationSplitViewColumnWidth(min: 280, ideal: 300, max: 360)
 	}
 
 	@ViewBuilder

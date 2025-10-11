@@ -3,7 +3,7 @@ import Foundation
 /// https://discord.com/developers/docs/resources/channel#channel-object-channel-structure
 /// The same as what the Discord API docs call "partial channel".
 /// Also the same as a "thread object".
-public struct DiscordChannel: Sendable, Codable, Equatable {
+public struct DiscordChannel: Sendable, Codable, Equatable, Hashable {
 
 	/// https://discord.com/developers/docs/resources/channel#channel-object-channel-types
 	/// https://docs.discord.food/resources/channel#channel-type
@@ -27,7 +27,7 @@ public struct DiscordChannel: Sendable, Codable, Equatable {
 	}
 
 	/// https://discord.com/developers/docs/resources/channel#overwrite-object
-	public struct Overwrite: Sendable, Codable, Equatable {
+	public struct Overwrite: Sendable, Codable, Equatable, Hashable {
 
 		/// https://discord.com/developers/docs/resources/channel#overwrite-object
 		@UnstableEnum<Int>
@@ -70,15 +70,15 @@ public struct DiscordChannel: Sendable, Codable, Equatable {
 		case requireTag  // 4
 		case spam  // 5
 		case isGuildResourceChannel  // 7
-		case clydeAI // 8
+		case clydeAI  // 8
 		case scheduledForDeletion  // 9
 		case summariesDisabled  // 11
 		case isRoleSubscriptionTemplatePreviewChannel  // 13
 		case isBroadcasting  // 14
 		case hideMediaDownloadOptions  // 15
-		case isJoinRequestInterviewChannel // 16
-		case obfuscated // 17
-		case isModeratorReportChannel // 19
+		case isJoinRequestInterviewChannel  // 16
+		case obfuscated  // 17
+		case isModeratorReportChannel  // 19
 		case __undocumented(UInt)
 	}
 
@@ -103,7 +103,7 @@ public struct DiscordChannel: Sendable, Codable, Equatable {
 	}
 
 	/// https://discord.com/developers/docs/resources/channel#default-reaction-object-default-reaction-structure
-	public struct DefaultReaction: Sendable, Codable, Equatable {
+	public struct DefaultReaction: Sendable, Codable, Equatable, Hashable {
 		public var emoji_id: EmojiSnowflake?
 		public var emoji_name: String?
 
@@ -119,7 +119,7 @@ public struct DiscordChannel: Sendable, Codable, Equatable {
 	}
 
 	/// https://discord.com/developers/docs/resources/channel#forum-tag-object-forum-tag-structure
-	public struct ForumTag: Sendable, Codable, Equatable {
+	public struct ForumTag: Sendable, Codable, Equatable, Hashable {
 		public var id: ForumTagSnowflake
 		public var name: String
 		public var moderated: Bool
@@ -174,7 +174,7 @@ public struct DiscordChannel: Sendable, Codable, Equatable {
 
 extension DiscordChannel {
 	/// https://discord.com/developers/docs/resources/channel#message-object``
-	public struct Message: Sendable, Codable, Equatable {
+	public struct Message: Sendable, Codable, Equatable, Hashable {
 
 		public init(
 			id: MessageSnowflake,
@@ -254,7 +254,7 @@ extension DiscordChannel {
 		}
 
 		/// https://discord.com/developers/docs/resources/channel#message-reference-object-message-reference-structure
-		public struct MessageReference: Sendable, Codable, Equatable {
+		public struct MessageReference: Sendable, Codable, Equatable, Hashable {
 			public var message_id: MessageSnowflake?
 			public var channel_id: ChannelSnowflake?
 			public var guild_id: GuildSnowflake?
@@ -274,6 +274,7 @@ extension DiscordChannel {
 		}
 
 		/// https://discord.com/developers/docs/resources/channel#message-object-message-types
+		/// https://docs.discord.food/resources/message#message-type
 		@UnstableEnum<Int>
 		public enum Kind: Sendable, Codable {
 			case `default`  // 0
@@ -305,8 +306,34 @@ extension DiscordChannel {
 			case stageStart  // 27
 			case stageEnd  // 28
 			case stageSpeaker  // 29
+			case stageRaiseHand  // 30
 			case stageTopic  // 31
 			case guildApplicationPremiumSubscription  // 32
+			case premiumReferral  // 35
+			case guildIncidentAlertModeEnabled  // 36
+			case guildIncidentAlertModeDisabled  // 37
+			case guildIncidentReportRaid  // 38
+			case guildIncidentReportFalseAlarm  // 39
+			case guildDeadchatRevivePrompt  // 40
+			case customGift  // 41
+			case guildGamingStatsPrompt  // 42
+			case purchaseNotification  // 44
+			case pollResult  // 46
+			case changelog  // 47
+			case nitroNotification  // 48
+			case channelLinkedToLobby  // 49
+			case giftingPrompt  // 50
+			case inGameMessageNux  // 51
+			case guildJoinRequestAcceptNotification  // 52
+			case guildJoinRequestRejectNotification  // 53
+			case guildJoinRequestWithdrawnNotification  // 54
+			case hdStreamingUpgraded  // 55
+			case reportToModDeletedMessage  // 58
+			case reportToModTimeoutUser  // 59
+			case reportToModKickUser  // 60
+			case reportToModBanUser  // 61
+			case reportToModClosedReport  // 62
+			case emojiAdded  // 63
 			case __undocumented(Int)
 		}
 
@@ -328,7 +355,7 @@ extension DiscordChannel {
 		}
 
 		/// https://discord.com/developers/docs/resources/channel#channel-mention-object
-		public struct ChannelMention: Sendable, Codable, Equatable {
+		public struct ChannelMention: Sendable, Codable, Equatable, Hashable {
 			public var id: ChannelSnowflake
 			public var guild_id: GuildSnowflake
 			public var type: DiscordChannel.Kind
@@ -336,7 +363,7 @@ extension DiscordChannel {
 		}
 
 		/// https://discord.com/developers/docs/resources/channel#attachment-object
-		public struct Attachment: Sendable, Codable, Equatable {
+		public struct Attachment: Sendable, Codable, Equatable, Hashable {
 
 			/// https://discord.com/developers/docs/resources/channel#attachment-object-attachment-flags
 			@UnstableEnum<UInt>
@@ -361,10 +388,10 @@ extension DiscordChannel {
 		}
 
 		/// https://discord.com/developers/docs/resources/channel#reaction-object
-		public struct Reaction: Sendable, Codable, Equatable {
+		public struct Reaction: Sendable, Codable, Equatable, Hashable {
 
 			/// https://discord.com/developers/docs/resources/channel#reaction-object-reaction-count-details-structure
-			public struct CountDetails: Sendable, Codable, Equatable {
+			public struct CountDetails: Sendable, Codable, Equatable, Hashable {
 				public var burst: Int
 				public var normal: Int
 
@@ -453,7 +480,7 @@ extension DiscordChannel {
 		}
 
 		/// https://discord.com/developers/docs/resources/channel#message-object-message-activity-structure
-		public struct Activity: Sendable, Codable, Equatable {
+		public struct Activity: Sendable, Codable, Equatable, Hashable {
 
 			/// https://discord.com/developers/docs/resources/channel#message-object-message-activity-types
 			@UnstableEnum<Int>
@@ -484,7 +511,7 @@ extension DiscordChannel {
 		//				DereferenceBox<InteractionMetadata>?
 		//		}
 
-		public struct Call: Sendable, Codable, Equatable {
+		public struct Call: Sendable, Codable, Equatable, Hashable {
 			public var participants: [UserSnowflake]
 			public var ended_timestamp: DiscordTimestamp?
 		}
@@ -533,7 +560,7 @@ extension DiscordChannel {
 
 extension DiscordChannel {
 	/// Partial ``DiscordChannel.Message`` object.
-	public struct PartialMessage: Sendable, Codable, Equatable {
+	public struct PartialMessage: Sendable, Codable, Equatable, Hashable {
 		public var id: MessageSnowflake
 		public var channel_id: ChannelSnowflake
 		public var author: DiscordUser?
@@ -577,7 +604,7 @@ extension DiscordChannel {
 }
 
 /// https://discord.com/developers/docs/resources/channel#thread-metadata-object-thread-metadata-structure
-public struct ThreadMetadata: Sendable, Codable, Equatable {
+public struct ThreadMetadata: Sendable, Codable, Equatable, Hashable {
 	public var archived: Bool
 	public var auto_archive_duration: DiscordChannel.AutoArchiveDuration
 	public var archive_timestamp: DiscordTimestamp
@@ -587,7 +614,7 @@ public struct ThreadMetadata: Sendable, Codable, Equatable {
 }
 
 /// https://discord.com/developers/docs/resources/channel#thread-member-object-thread-member-structure
-public struct ThreadMember: Sendable, Codable, Equatable {
+public struct ThreadMember: Sendable, Codable, Equatable, Hashable {
 	public var id: ChannelSnowflake?
 	public var user_id: UserSnowflake?
 	public var join_timestamp: DiscordTimestamp
@@ -652,7 +679,7 @@ extension DiscordChannel {
 }
 
 /// https://discord.com/developers/docs/resources/channel#embed-object
-public struct Embed: Sendable, Codable, Equatable, ValidatablePayload {
+public struct Embed: Sendable, Codable, Equatable, Hashable, ValidatablePayload {
 
 	/// https://discord.com/developers/docs/resources/channel#embed-object-embed-types
 	@UnstableEnum<String>
@@ -668,7 +695,7 @@ public struct Embed: Sendable, Codable, Equatable, ValidatablePayload {
 	}
 
 	public enum DynamicURL: Sendable, Codable, ExpressibleByStringLiteral,
-		Equatable
+		Equatable, Hashable
 	{
 		public typealias StringLiteralType = String
 
@@ -713,7 +740,7 @@ public struct Embed: Sendable, Codable, Equatable, ValidatablePayload {
 	}
 
 	/// https://discord.com/developers/docs/resources/channel#embed-object-embed-footer-structure
-	public struct Footer: Sendable, Codable, Equatable {
+	public struct Footer: Sendable, Codable, Equatable, Hashable {
 		public var text: String
 		public var icon_url: DynamicURL?
 		public var proxy_icon_url: String?
@@ -730,7 +757,7 @@ public struct Embed: Sendable, Codable, Equatable, ValidatablePayload {
 	}
 
 	/// https://discord.com/developers/docs/resources/channel#embed-object-embed-image-structure
-	public struct Media: Sendable, Codable, Equatable {
+	public struct Media: Sendable, Codable, Equatable, Hashable {
 		public var url: DynamicURL
 		public var proxy_url: String?
 		public var height: Int?
@@ -750,7 +777,7 @@ public struct Embed: Sendable, Codable, Equatable, ValidatablePayload {
 	}
 
 	/// https://discord.com/developers/docs/resources/channel#embed-object-embed-provider-structure
-	public struct Provider: Sendable, Codable, Equatable {
+	public struct Provider: Sendable, Codable, Equatable, Hashable {
 		public var name: String?
 		public var url: String?
 
@@ -761,7 +788,7 @@ public struct Embed: Sendable, Codable, Equatable, ValidatablePayload {
 	}
 
 	/// https://discord.com/developers/docs/resources/channel#embed-object-embed-author-structure
-	public struct Author: Sendable, Codable, Equatable {
+	public struct Author: Sendable, Codable, Equatable, Hashable {
 		public var name: String
 		public var url: String?
 		public var icon_url: DynamicURL?
@@ -781,7 +808,7 @@ public struct Embed: Sendable, Codable, Equatable, ValidatablePayload {
 	}
 
 	/// https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure
-	public struct Field: Sendable, Codable, Equatable {
+	public struct Field: Sendable, Codable, Equatable, Hashable {
 		public var name: String
 		public var value: String
 		public var inline: Bool?
@@ -883,7 +910,7 @@ public struct Embed: Sendable, Codable, Equatable, ValidatablePayload {
 }
 
 /// https://discord.com/developers/docs/resources/channel#role-subscription-data-object-role-subscription-data-object-structure
-public struct RoleSubscriptionData: Sendable, Codable, Equatable {
+public struct RoleSubscriptionData: Sendable, Codable, Equatable, Hashable {
 	// FIXME: use `Snowflake<Type>` instead
 	public var role_subscription_listing_id: AnySnowflake
 	public var tier_name: String
@@ -893,6 +920,7 @@ public struct RoleSubscriptionData: Sendable, Codable, Equatable {
 
 // MARK: + DiscordChannel.Message.Kind
 extension DiscordChannel.Message.Kind {
+	/// https://docs.discord.food/resources/message#message-type
 	public var isDeletable: Bool {
 		switch self {
 		case .`default`, .channelPinnedMessage, .guildMemberJoin,
@@ -903,13 +931,21 @@ extension DiscordChannel.Message.Kind {
 			.guildInviteReminder, .contextMenuCommand,
 			.autoModerationAction, .roleSubscriptionPurchase,
 			.interactionPremiumUpsell, .stageStart, .stageEnd,
-			.stageSpeaker, .stageTopic:
+			.stageSpeaker, .stageTopic, .guildDiscoveryDisqualified,
+			.guildDiscoveryRequalified, .guildDiscoveryGracePeriodInitialWarning,
+			.guildDiscoveryGracePeriodFinalWarning, .stageRaiseHand, .premiumReferral,
+			.guildIncidentAlertModeEnabled, .guildIncidentAlertModeDisabled,
+			.guildIncidentReportRaid, .guildIncidentReportFalseAlarm,
+			.guildDeadchatRevivePrompt, .customGift, .guildGamingStatsPrompt,
+			.purchaseNotification, .pollResult, .changelog, .nitroNotification,
+			.channelLinkedToLobby, .giftingPrompt, .inGameMessageNux,
+			.guildJoinRequestAcceptNotification, .guildJoinRequestRejectNotification,
+			.guildJoinRequestWithdrawnNotification, .hdStreamingUpgraded,
+			.reportToModDeletedMessage, .reportToModTimeoutUser, .reportToModKickUser,
+			.reportToModBanUser, .reportToModClosedReport, .emojiAdded:
 			return true
 		case .recipientAdd, .recipientRemove, .call, .channelNameChange,
-			.channelIconChange,
-			.guildDiscoveryDisqualified, .guildDiscoveryRequalified,
-			.guildDiscoveryGracePeriodInitialWarning,
-			.guildDiscoveryGracePeriodFinalWarning, .threadStarterMessage,
+			.channelIconChange, .threadStarterMessage,
 			.guildApplicationPremiumSubscription:
 			return false
 		case .__undocumented:

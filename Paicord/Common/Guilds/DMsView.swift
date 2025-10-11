@@ -21,36 +21,9 @@ struct DMsView: View {
 	@Environment(GatewayStore.self) var gw
 	@Environment(PaicordAppState.self) var appState
 	var body: some View {
-		ZStack(alignment: .top) {
-			ScrollView {
-				// acts as a spacer for title
-				HStack {
-					Text("Direct Messages")
-						.font(.title3)
-						.bold()
-				}
-				.padding(10)
-				.frame(maxWidth: .infinity, alignment: .leading)
-				.hidden()
-
-				ForEach(Array(gw.currentUser.privateChannels.values)) { channel in
-					GuildView.ChannelButton(channels: [:], channel: channel)
-				}
-			}
-
-			// header text
-			HStack {
-				Text("Direct Messages")
-					.font(.title3)
-					.bold()
-			}
-			.padding(10)
-			.frame(maxWidth: .infinity, alignment: .leading)
-			.background {
-				Color.black
-					.opacity(0.5)
-					.scaleEffect(1.2)
-					.blur(radius: 5)
+		ScrollView {
+			ForEach(Array(gw.user.privateChannels.values)) { channel in
+				GuildView.ChannelButton(channels: [:], channel: channel)
 			}
 		}
 		.frame(maxWidth: .infinity)

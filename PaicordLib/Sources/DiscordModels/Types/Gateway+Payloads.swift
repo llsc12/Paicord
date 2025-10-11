@@ -309,11 +309,11 @@ extension Gateway {
 		/// A ``ThreadMember`` with some extra fields.
 		/// https://discord.com/developers/docs/resources/channel#thread-member-object-thread-member-structure
 		/// https://discord.com/developers/docs/topics/gateway-events#thread-members-update-thread-members-update-event-fields
-		public struct ThreadMember: Sendable, Codable, Equatable {
+		public struct ThreadMember: Sendable, Codable, Equatable, Hashable {
 
 			/// A ``PresenceUpdate`` with nullable `guild_id`.
 			/// https://discord.com/developers/docs/topics/gateway-events#presence-update-presence-update-event-fields
-			public struct ThreadMemberPresenceUpdate: Sendable, Codable, Equatable {
+			public struct ThreadMemberPresenceUpdate: Sendable, Codable, Equatable, Hashable {
 				public var user: PartialUser
 				public var guild_id: GuildSnowflake?
 				public var status: Status
@@ -571,7 +571,7 @@ extension Gateway {
 	/// https://discord.com/developers/docs/topics/gateway-events#request-guild-members
 	public struct RequestGuildMembers: Sendable, Codable {
 		public var guild_id: GuildSnowflake
-		public var query: String = ""
+		public var query: String?
 		public var limit: Int = 0
 		public var presences: Bool?
 		public var user_ids: [UserSnowflake]?
@@ -579,7 +579,7 @@ extension Gateway {
 
 		public init(
 			guild_id: GuildSnowflake,
-			query: String = "",
+			query: String? = nil,
 			limit: Int = 0,
 			presences: Bool? = nil,
 			user_ids: [UserSnowflake]? = nil,
@@ -948,7 +948,7 @@ extension Gateway {
 	}
 
 	/// https://discord.com/developers/docs/topics/gateway-events#client-status-object
-	public struct ClientStatus: Sendable, Codable, Equatable {
+	public struct ClientStatus: Sendable, Codable, Equatable, Hashable {
 		public var desktop: Status?
 		public var mobile: Status?
 		public var web: Status?
@@ -990,7 +990,7 @@ extension Gateway {
 	}
 
 	/// https://discord.com/developers/docs/topics/gateway-events#activity-object
-	public struct Activity: Sendable, Codable, Equatable {
+	public struct Activity: Sendable, Codable, Equatable, Hashable {
 
 		/// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-types
 		@UnstableEnum<Int>
@@ -1005,7 +1005,7 @@ extension Gateway {
 		}
 
 		/// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-timestamps
-		public struct Timestamps: Sendable, Codable, Equatable {
+		public struct Timestamps: Sendable, Codable, Equatable, Hashable {
 			public var start: Int?
 			public var end: Int?
 
@@ -1016,7 +1016,7 @@ extension Gateway {
 		}
 
 		/// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-emoji
-		public struct ActivityEmoji: Sendable, Codable, Equatable {
+		public struct ActivityEmoji: Sendable, Codable, Equatable, Hashable {
 			public var name: String
 			public var id: EmojiSnowflake?
 			public var animated: Bool?
@@ -1033,7 +1033,7 @@ extension Gateway {
 		}
 
 		/// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-party
-		public struct Party: Sendable, Codable, Equatable {
+		public struct Party: Sendable, Codable, Equatable, Hashable {
 			public var id: String?
 			public var size: IntPair?
 
@@ -1044,7 +1044,7 @@ extension Gateway {
 		}
 
 		/// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-assets
-		public struct Assets: Sendable, Codable, Equatable {
+		public struct Assets: Sendable, Codable, Equatable, Hashable {
 			public var large_image: String?
 			public var large_text: String?
 			public var small_image: String?
@@ -1064,7 +1064,7 @@ extension Gateway {
 		}
 
 		/// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-secrets
-		public struct Secrets: Sendable, Codable, Equatable {
+		public struct Secrets: Sendable, Codable, Equatable, Hashable {
 			public var join: String?
 			public var spectate: String?
 			public var match: String?
@@ -1096,7 +1096,7 @@ extension Gateway {
 		}
 
 		/// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-buttons
-		public struct Button: Sendable, Codable, Equatable {
+		public struct Button: Sendable, Codable, Equatable, Hashable {
 			public var label: String
 			public var url: String
 

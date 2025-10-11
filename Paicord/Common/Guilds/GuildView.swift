@@ -14,49 +14,22 @@ struct GuildView: View {
 	var guild: GuildStore
 
 	var body: some View {
-		ZStack(alignment: .top) {
-			ScrollView {
-				if let bannerURL = bannerURL(animated: true) {  // maybe add animation control?
-					AnimatedImage(url: bannerURL)
-						.resizable()
-						.aspectRatio(16 / 9, contentMode: .fill)
-				} else {
-					// acts as a spacer for title
-					HStack {
-						Text(guild.guild?.name ?? "Unknown Guild")
-							.font(.title3)
-							.bold()
-					}
-					.padding(10)
+		ScrollView {
+			if let bannerURL = bannerURL(animated: true) {  // maybe add animation control?
+				AnimatedImage(url: bannerURL)
+					.resizable()
+					.aspectRatio(16 / 9, contentMode: .fill)
+			}
+
+			let uncategorizedChannels = guild.channels.values
+				.filter { $0.parent_id == nil }
+				.sorted { ($0.position ?? 0) < ($1.position ?? 0) }
+
+			ForEach(uncategorizedChannels) { channel in
+				ChannelButton(channels: guild.channels, channel: channel)
+					.padding(.horizontal, 10)
+					.padding(.vertical, 5)
 					.frame(maxWidth: .infinity, alignment: .leading)
-					.hidden()
-				}
-
-				let uncategorizedChannels = guild.channels.values
-					.filter { $0.parent_id == nil }
-					.sorted { ($0.position ?? 0) < ($1.position ?? 0) }
-				
-				ForEach(uncategorizedChannels) { channel in
-					ChannelButton(channels: guild.channels, channel: channel)
-						.padding(.horizontal, 10)
-						.padding(.vertical, 5)
-						.frame(maxWidth: .infinity, alignment: .leading)
-				}
-			}
-
-			// header text
-			HStack {
-				Text(guild.guild?.name ?? "Unknown Guild")
-					.font(.title3)
-					.bold()
-			}
-			.padding(10)
-			.frame(maxWidth: .infinity, alignment: .leading)
-			.background {
-				Color.black
-					.opacity(0.5)
-					.scaleEffect(1.2)
-					.blur(radius: 5)
 			}
 		}
 		.frame(maxWidth: .infinity)
@@ -106,11 +79,12 @@ struct GuildView: View {
 					.filter { $0.parent_id ?? (try! .makeFake()) == expectedParentID }
 					.sorted { ($0.position ?? 0) < ($1.position ?? 0) }
 					.map { $0.id }
-				
+
 				category(channelIDs: childChannels)
 			case .guildVoice:
 				textChannelButton {
-					Text(Image(systemName: "speaker.wave.2.fill")) + Text(" \(channel.name ?? "unknown")")
+					Text(Image(systemName: "speaker.wave.2.fill"))
+						+ Text(" \(channel.name ?? "unknown")")
 				}
 				.disabled(true)
 			default:
@@ -123,10 +97,12 @@ struct GuildView: View {
 				.disabled(true)
 			}
 		}
-		
+
 		/// Button that switches the chat to the given channel when clicked
 		@ViewBuilder
-		func textChannelButton<Content: View>(@ViewBuilder label: () -> Content) -> some View {
+		func textChannelButton<Content: View>(@ViewBuilder label: () -> Content)
+			-> some View
+		{
 			Button {
 				appState.selectedChannel = channel.id
 				#if os(iOS)
@@ -138,7 +114,7 @@ struct GuildView: View {
 				label()
 			}
 		}
-		
+
 		/// A disclosure group for a category, showing its child channels when expanded
 		@ViewBuilder
 		func category(channelIDs: [ChannelSnowflake]) -> some View {

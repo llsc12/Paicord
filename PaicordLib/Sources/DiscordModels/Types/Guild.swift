@@ -55,7 +55,7 @@ public struct Guild: Sendable, Codable {
 	}
 	
 	/// https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-structure
-	public struct Member: Sendable, Codable, Equatable {
+	public struct Member: Sendable, Codable, Equatable, Hashable {
 		/// https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-flags
 		@UnstableEnum<UInt>
 		public enum Flag: Sendable {
@@ -243,10 +243,10 @@ public struct Guild: Sendable, Codable {
 	}
 
 	/// https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-structure
-	public struct WelcomeScreen: Sendable, Codable, Equatable {
+	public struct WelcomeScreen: Sendable, Codable, Equatable, Hashable {
 
 		/// https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-channel-structure
-		public struct Channel: Sendable, Codable, Equatable {
+		public struct Channel: Sendable, Codable, Equatable, Hashable {
 			public var channel_id: ChannelSnowflake
 			public var description: String
 			public var emoji_id: EmojiSnowflake?
@@ -344,7 +344,7 @@ public struct Guild: Sendable, Codable {
 }
 
 /// https://discord.com/developers/docs/resources/guild#guild-object-guild-structure
-public struct PartialGuild: Sendable, Codable, Equatable {
+public struct PartialGuild: Sendable, Codable, Equatable, Hashable {
 	public var id: GuildSnowflake
 	public var name: String?
 	public var icon: String?
@@ -401,7 +401,23 @@ public struct PartialGuild: Sendable, Codable, Equatable {
 extension Guild {
 	/// A partial ``Guild.Member`` object.
 	/// https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-structure
-	public struct PartialMember: Sendable, Codable, Equatable {
+	public struct PartialMember: Sendable, Codable, Equatable, Hashable {
+		public init(user: DiscordUser? = nil, nick: String? = nil, avatar: String? = nil, roles: [RoleSnowflake]? = nil, joined_at: DiscordTimestamp? = nil, premium_since: DiscordTimestamp? = nil, deaf: Bool? = nil, mute: Bool? = nil, pending: Bool? = nil, flags: IntBitField<Member.Flag>? = nil, permissions: StringBitField<Permission>? = nil, communication_disabled_until: DiscordTimestamp? = nil, avatar_decoration_data: DiscordUser.AvatarDecoration? = nil) {
+			self.user = user
+			self.nick = nick
+			self.avatar = avatar
+			self.roles = roles
+			self.joined_at = joined_at
+			self.premium_since = premium_since
+			self.deaf = deaf
+			self.mute = mute
+			self.pending = pending
+			self.flags = flags
+			self.permissions = permissions
+			self.communication_disabled_until = communication_disabled_until
+			self.avatar_decoration_data = avatar_decoration_data
+		}
+		
 		public var user: DiscordUser?
 		public var nick: String?
 		public var avatar: String?

@@ -18,7 +18,7 @@ public struct DiscordApplication: Sendable, Codable {
 	}
 
 	/// https://discord.com/developers/docs/resources/application#install-params-object
-	public struct InstallParams: Sendable, Codable, Equatable {
+	public struct InstallParams: Sendable, Codable, Equatable, Hashable {
 		public var scopes: [OAuth2Scope]
 		public var permissions: StringBitField<Permission>
 
@@ -42,7 +42,7 @@ public struct DiscordApplication: Sendable, Codable {
 
 	/// https://discord.com/developers/docs/resources/application#application-object-application-integration-type-configuration-object
 	@_spi(UserInstallableApps)
-	public struct IntegrationKindConfiguration: Sendable, Codable, Equatable {
+	public struct IntegrationKindConfiguration: Sendable, Codable, Equatable, Hashable {
 		public var oauth2_install_params: InstallParams?
 
 		public init(oauth2_install_params: InstallParams? = nil) {
@@ -84,7 +84,7 @@ public struct DiscordApplication: Sendable, Codable {
 }
 
 /// https://discord.com/developers/docs/resources/application#application-object-application-structure
-public struct PartialApplication: Sendable, Codable, Equatable {
+public struct PartialApplication: Sendable, Codable, Equatable, Hashable {
 	public var id: ApplicationSnowflake
 	public var name: String?
 	public var icon: String?

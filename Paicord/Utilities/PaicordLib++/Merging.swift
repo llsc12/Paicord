@@ -52,7 +52,7 @@ extension Guild {
 		self.stickers = new.stickers
 		self.premium_progress_bar_enabled = new.premium_progress_bar_enabled
 		self.`lazy` = new.`lazy`
-//		self.hub_type = new.hub_type
+		//		self.hub_type = new.hub_type
 		self.nsfw = new.nsfw
 		self.application_command_counts = new.application_command_counts
 		self.embedded_activities = new.embedded_activities
@@ -107,7 +107,7 @@ extension Gateway.GuildCreate {
 			nsfw_level: nsfw_level,
 			stickers: stickers,
 			premium_progress_bar_enabled: premium_progress_bar_enabled,
-//			hub_type: hub_type,
+			//			hub_type: hub_type,
 			nsfw: nsfw,
 			application_command_counts: application_command_counts,
 			embedded_activities: embedded_activities,
@@ -175,7 +175,7 @@ extension Gateway.MessageCreate {
 		let refMsg = self.referenced_message?.value.toMessage()
 		let box: DereferenceBox<DiscordChannel.Message>? =
 			refMsg == nil ? nil : .init(value: refMsg!)
-		
+
 		return .init(
 			id: self.id,
 			channel_id: self.channel_id,
@@ -214,5 +214,63 @@ extension Gateway.MessageCreate {
 			guild_id: self.guild_id,
 			member: self.member
 		)
+	}
+}
+
+extension Guild.Member {
+	func toPartialMember() -> Guild.PartialMember {
+		.init(
+			user: self.user,
+			nick: self.nick,
+			avatar: self.avatar,
+			roles: self.roles,
+			joined_at: self.joined_at,
+			premium_since: self.premium_since,
+			deaf: self.deaf,
+			mute: self.mute,
+			pending: self.pending,
+			flags: self.flags,
+			permissions: self.permissions,
+			communication_disabled_until: self.communication_disabled_until,
+			avatar_decoration_data: self.avatar_decoration_data
+		)
+	}
+	
+	mutating func update(with new: Guild.PartialMember) {
+		self.user = new.user ?? self.user
+		self.nick = new.nick ?? self.nick
+		self.avatar = new.avatar ?? self.avatar
+		self.roles = new.roles ?? self.roles
+		self.joined_at = new.joined_at ?? self.joined_at
+		self.premium_since = new.premium_since ?? self.premium_since
+		self.deaf = new.deaf ?? self.deaf
+		self.mute = new.mute ?? self.mute
+		self.pending = new.pending ?? self.pending
+		self.flags = new.flags ?? self.flags
+		self.permissions = new.permissions ?? self.permissions
+		self.communication_disabled_until =
+			new.communication_disabled_until ?? self.communication_disabled_until
+		self.avatar_decoration_data =
+			new.avatar_decoration_data ?? self.avatar_decoration_data
+	}
+}
+
+extension Guild.PartialMember {
+	mutating func update(with new: Guild.PartialMember) {
+		self.user = new.user ?? self.user
+		self.nick = new.nick ?? self.nick
+		self.avatar = new.avatar ?? self.avatar
+		self.roles = new.roles ?? self.roles
+		self.joined_at = new.joined_at ?? self.joined_at
+		self.premium_since = new.premium_since ?? self.premium_since
+		self.deaf = new.deaf ?? self.deaf
+		self.mute = new.mute ?? self.mute
+		self.pending = new.pending ?? self.pending
+		self.flags = new.flags ?? self.flags
+		self.permissions = new.permissions ?? self.permissions
+		self.communication_disabled_until =
+			new.communication_disabled_until ?? self.communication_disabled_until
+		self.avatar_decoration_data =
+			new.avatar_decoration_data ?? self.avatar_decoration_data
 	}
 }

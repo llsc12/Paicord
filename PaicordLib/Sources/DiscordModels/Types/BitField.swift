@@ -1,4 +1,4 @@
-public protocol BitField: OptionSet, CustomStringConvertible where RawValue == UInt {
+public protocol BitField: OptionSet, Hashable, CustomStringConvertible where RawValue == UInt {
     associatedtype R: RawRepresentable & LosslessRawRepresentable
     where R: Hashable, R.RawValue == UInt
     var rawValue: UInt { get set }
