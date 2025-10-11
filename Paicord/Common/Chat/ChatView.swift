@@ -108,24 +108,8 @@ struct ChatView: View {
 		.toolbar {
 			#warning("make channel headers nicer")
 			ToolbarItem(placement: .navigation) {
-				if let name = vm.channel?.name {
-					Text(name)
-				} else if let ppl = vm.channel?.recipients {
-					Text(
-						ppl.map({
-							$0.global_name ?? $0.username
-						}).joined(separator: ", ")
-					)
-				}
-				if let topic = vm.channel?.topic, !topic.isEmpty {
-					Text(vm.channel?.topic ?? "")
-						.font(.caption)
-						.foregroundStyle(.secondary)
-						.sheet(isPresented: $showChannelInfo) {
-							Text(topic)
-								.padding()
-						}
-				}
+				HStack {
+					
 			}
 		}
 	}
@@ -140,61 +124,6 @@ struct ChatView: View {
 				payload: .init(content: msg)
 			)
 		}
-	}
-}
-
-// it doesnt seem to want to let us push new messages and have the view scroll by itself.
-struct TrackableScrollView<Content: View>: View {
-	@Binding var isNearBottom: Bool
-	@ViewBuilder var content: Content
-
-	@State private var contentHeight: CGFloat = 0
-	@State private var scrollViewHeight: CGFloat = 0
-	@State private var scrollOffset: CGFloat = 0
-
-	var body: some View {
-		ScrollView {
-			content
-				.background(
-					GeometryReader { proxy in
-						Color.clear
-							.onAppear { contentHeight = proxy.size.height }
-							.onChange(of: proxy.size.height) {
-								contentHeight = proxy.size.height
-							}
-					}
-				)
-		}
-		.background(
-			GeometryReader { proxy in
-				Color.clear
-					.onAppear { scrollViewHeight = proxy.size.height }
-					.onChange(of: proxy.size.height) {
-						scrollViewHeight = proxy.size.height
-					}
-			}
-		)
-		.overlay(
-			GeometryReader { proxy in
-				Color.clear
-					.preference(
-						key: ScrollOffsetKey.self,
-						value: proxy.frame(in: .named("scroll")).minY
-					)
-			}
-		)
-		.coordinateSpace(name: "scroll")
-		.onPreferenceChange(ScrollOffsetKey.self) { value in
-			scrollOffset = -value
-			let distanceFromBottom = contentHeight - scrollOffset - scrollViewHeight
-			isNearBottom = distanceFromBottom < 150  // threshold
-		}
-	}
-}
-struct ScrollOffsetKey: PreferenceKey {
-	static var defaultValue: CGFloat = 0
-	static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-		value = nextValue()
 	}
 }
 

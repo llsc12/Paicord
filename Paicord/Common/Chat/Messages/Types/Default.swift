@@ -120,6 +120,7 @@ extension MessageCell {
 						}
 					}
 					.buttonStyle(.plain)
+					.fontWeight(.semibold)
 					Text(message.timestamp.date, style: .time)
 						.font(.caption)
 						.foregroundStyle(.secondary)

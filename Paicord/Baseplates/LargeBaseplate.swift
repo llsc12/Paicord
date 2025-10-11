@@ -18,7 +18,9 @@ struct LargeBaseplate: View {
 	@State var currentGuildStore: GuildStore? = nil
 	@State var currentChannelStore: ChannelStore? = nil
 
-	@Weak var splitViewController: NSSplitViewController?
+	#if os(macOS)
+		@Weak var splitViewController: NSSplitViewController?
+	#endif
 
 	var body: some View {
 		NavigationSplitView {
@@ -26,14 +28,16 @@ struct LargeBaseplate: View {
 				.safeAreaInset(edge: .bottom, spacing: 0) {
 					ProfileBar()
 				}
-				.introspect(
-					.navigationSplitView,
-					on: .macOS(.v14...),
-					scope: .ancestor
-				) { (splitView: NSSplitView) -> Void in
-					self.splitViewController =
-						(splitView.delegate as? NSSplitViewController)
-				}
+				#if os(macOS)
+					.introspect(
+						.navigationSplitView,
+						on: .macOS(.v14...),
+						scope: .ancestor
+					) { (splitView: NSSplitView) -> Void in
+						self.splitViewController =
+							(splitView.delegate as? NSSplitViewController)
+					}
+				#endif
 				.toolbar(removing: .sidebarToggle)
 				.toolbar {
 					if let currentGuildStore {
@@ -61,6 +65,7 @@ struct LargeBaseplate: View {
 						.foregroundStyle(.secondary)
 				}
 			}
+			#if os(macOS)
 			.toolbar {
 				ToolbarItem(placement: .navigation) {
 					Button {
@@ -70,6 +75,7 @@ struct LargeBaseplate: View {
 					}
 				}
 			}
+			#endif
 		}
 		.inspector(isPresented: $showingInspector) {
 			Text("gm")

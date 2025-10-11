@@ -69,8 +69,8 @@ struct MessageCell: View {
 			// Embeds
 
 			// Attachments
-			if let attachments = message.attachments, !attachments.isEmpty {
-				AttachmentsView(attachments: attachments)
+			if !message.attachments.isEmpty {
+				AttachmentsView(attachments: message.attachments)
 			}
 
 			// Reactions
