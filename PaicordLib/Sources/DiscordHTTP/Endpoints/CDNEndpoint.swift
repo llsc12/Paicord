@@ -12,7 +12,11 @@ public enum CDNEndpoint: Endpoint {
 	case userBanner(userId: UserSnowflake, banner: String)
 	case defaultUserAvatar(discriminator: String)
 	case userAvatar(userId: UserSnowflake, avatar: String)
-	case guildMemberAvatar(guildId: GuildSnowflake, userId: UserSnowflake, avatar: String)
+	case guildMemberAvatar(
+		guildId: GuildSnowflake,
+		userId: UserSnowflake,
+		avatar: String
+	)
 	case userAvatarDecoration(userId: UserSnowflake, avatarDecoration: String)
 	case avatarDecoration(asset: String)
 	case collectibleNameplate(asset: String, file: CollectibleFile)
@@ -35,24 +39,27 @@ public enum CDNEndpoint: Endpoint {
 	)
 	case stickerPackBanner(assetId: AssetsSnowflake)
 	case teamIcon(teamId: TeamSnowflake, icon: String)
-	case sticker(stickerId: StickerSnowflake)
+	case sticker(stickerId: StickerSnowflake, format: Sticker.FormatKind)
 	case roleIcon(roleId: RoleSnowflake, icon: String)
-	case guildScheduledEventCover(eventId: GuildScheduledEventSnowflake, cover: String)
+	case guildScheduledEventCover(
+		eventId: GuildScheduledEventSnowflake,
+		cover: String
+	)
 	case guildMemberBanner(
 		guildId: GuildSnowflake,
 		userId: UserSnowflake,
 		banner: String
 	)
-	
+
 	/// This case serves as a way of discouraging exhaustive switch statements
 	case __DO_NOT_USE_THIS_CASE
-	
+
 	/// To select the asset file for the collectible nameplate endpoint.
 	public enum CollectibleFile: String, Sendable {
 		case webm = "asset.webm"
 		case `static` = "static.png"
 	}
-	
+
 	var urlSuffix: String {
 		let suffix: String
 		switch self {
@@ -70,11 +77,12 @@ public enum CDNEndpoint: Endpoint {
 			suffix = "banners/\(userId.rawValue)/\(banner)"
 		case let .defaultUserAvatar(discriminator):
 			suffix = "embed/avatars/\(discriminator).png"
-			/// Needs `.png`
+		/// Needs `.png`
 		case let .userAvatar(userId, avatar):
 			suffix = "avatars/\(userId.rawValue)/\(avatar)"
 		case let .guildMemberAvatar(guildId, userId, avatar):
-			suffix = "guilds/\(guildId.rawValue)/users/\(userId.rawValue)/avatars/\(avatar)"
+			suffix =
+				"guilds/\(guildId.rawValue)/users/\(userId.rawValue)/avatars/\(avatar)"
 		case let .userAvatarDecoration(userId, avatarDecoration):
 			suffix = "avatar-decorations/\(userId.rawValue)/\(avatarDecoration)"
 		case let .avatarDecoration(asset):
@@ -88,57 +96,76 @@ public enum CDNEndpoint: Endpoint {
 		case let .applicationAsset(appId, assetId):
 			suffix = "app-assets/\(appId.rawValue)/\(assetId.rawValue)"
 		case let .achievementIcon(appId, achievementId, icon):
-			suffix = "app-assets/\(appId.rawValue)/achievements/\(achievementId.rawValue)/icons/\(icon)"
+			suffix =
+				"app-assets/\(appId.rawValue)/achievements/\(achievementId.rawValue)/icons/\(icon)"
 		case let .storePageAsset(appId, assetId):
 			suffix = "app-assets/\(appId.rawValue)/store/\(assetId.rawValue)"
 		case let .stickerPackBanner(assetId):
 			suffix = "app-assets/710982414301790216/store/\(assetId.rawValue)"
 		case let .teamIcon(teamId, icon):
 			suffix = "team-icons/\(teamId.rawValue)/\(icon)"
-		case let .sticker(stickerId):
-			suffix = "stickers/\(stickerId.rawValue).png"
-			/// Needs `.png`
+		case let .sticker(stickerId, format):
+			switch format {
+			case .gif:
+				suffix = "stickers/\(stickerId.rawValue).gif"
+			case .lottie:
+				suffix = "stickers/\(stickerId.rawValue).json"
+			default:
+				suffix = "stickers/\(stickerId.rawValue).png"
+			}
 		case let .roleIcon(roleId, icon):
 			suffix = "role-icons/\(roleId.rawValue)/\(icon)"
 		case let .guildScheduledEventCover(eventId, cover):
 			suffix = "guild-events/\(eventId.rawValue)/\(cover)"
 		case let .guildMemberBanner(guildId, userId, banner):
-			suffix = "guilds/\(guildId.rawValue)/users/\(userId.rawValue)/banners/\(banner)"
+			suffix =
+				"guilds/\(guildId.rawValue)/users/\(userId.rawValue)/banners/\(banner)"
 		case .__DO_NOT_USE_THIS_CASE:
-			fatalError("If the case name wasn't already clear enough: '__DO_NOT_USE_THIS_CASE' MUST NOT be used")
+			fatalError(
+				"If the case name wasn't already clear enough: '__DO_NOT_USE_THIS_CASE' MUST NOT be used"
+			)
 		}
-		return suffix.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? suffix
+		return suffix.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)
+			?? suffix
 	}
-	
+
 	private var urlSuffixDescription: String {
 		urlSuffix
 	}
-	
+
 	public var url: String {
-		"https://cdn.discordapp.com/" + urlSuffix
+		switch self {
+		case .sticker(let stickerId, let format):
+			switch format {
+			case .lottie: "https://discord.com/"
+			default: "https://media.discordapp.net/" + urlSuffix
+			}
+		default:
+			"https://cdn.discordapp.com/" + urlSuffix
+		}
 	}
-	
+
 	/// Doesn't expose secret url path parameters.
 	public var urlDescription: String {
 		url
 	}
-	
+
 	public var httpMethod: HTTPMethod {
 		.GET
 	}
-	
+
 	/// Interaction endpoints don't count against the global rate limit.
 	/// Even if the global rate-limit is exceeded, you can still respond to interactions.
 	public var countsAgainstGlobalRateLimit: Bool {
 		true
 	}
-	
+
 	/// Some endpoints like don't require an authorization header because the endpoint itself
 	/// contains some kind of authorization token. Like half of the webhook endpoints.
 	public var requiresAuthorizationHeader: Bool {
 		false
 	}
-	
+
 	/// URL-path parameters.
 	public var parameters: [String] {
 		switch self {
@@ -180,7 +207,7 @@ public enum CDNEndpoint: Endpoint {
 			return [assetId.rawValue]
 		case .teamIcon(let teamId, let icon):
 			return [teamId.rawValue, icon]
-		case .sticker(let stickerId):
+		case .sticker(let stickerId, _):
 			return [stickerId.rawValue]
 		case .roleIcon(let roleId, let icon):
 			return [roleId.rawValue, icon]
@@ -189,10 +216,12 @@ public enum CDNEndpoint: Endpoint {
 		case .guildMemberBanner(let guildId, let userId, let banner):
 			return [guildId.rawValue, userId.rawValue, banner]
 		case .__DO_NOT_USE_THIS_CASE:
-			fatalError("If the case name wasn't already clear enough: '__DO_NOT_USE_THIS_CASE' MUST NOT be used")
+			fatalError(
+				"If the case name wasn't already clear enough: '__DO_NOT_USE_THIS_CASE' MUST NOT be used"
+			)
 		}
 	}
-	
+
 	public var id: Int {
 		switch self {
 		case .customEmoji: return 1
@@ -219,10 +248,12 @@ public enum CDNEndpoint: Endpoint {
 		case .guildMemberBanner: return 22
 		case .collectibleNameplate: return 23
 		case .__DO_NOT_USE_THIS_CASE:
-			fatalError("If the case name wasn't already clear enough: '__DO_NOT_USE_THIS_CASE' MUST NOT be used")
+			fatalError(
+				"If the case name wasn't already clear enough: '__DO_NOT_USE_THIS_CASE' MUST NOT be used"
+			)
 		}
 	}
-	
+
 	public var description: String {
 		switch self {
 		case let .customEmoji(emojiId):
@@ -242,9 +273,11 @@ public enum CDNEndpoint: Endpoint {
 		case let .userAvatar(userId, avatar):
 			return "userAvatar(userId: \(userId), avatar: \(avatar))"
 		case let .guildMemberAvatar(guildId, userId, avatar):
-			return "guildMemberAvatar(guildId: \(guildId), userId: \(userId), avatar: \(avatar))"
+			return
+				"guildMemberAvatar(guildId: \(guildId), userId: \(userId), avatar: \(avatar))"
 		case let .userAvatarDecoration(userId, avatarDecoration):
-			return "userAvatarDecoration(userId: \(userId), avatarDecoration: \(avatarDecoration))"
+			return
+				"userAvatarDecoration(userId: \(userId), avatarDecoration: \(avatarDecoration))"
 		case let .avatarDecoration(asset):
 			return "avatarDecoration(asset: \(asset))"
 		case let .collectibleNameplate(asset, file):
@@ -256,28 +289,34 @@ public enum CDNEndpoint: Endpoint {
 		case let .applicationAsset(appId, assetId):
 			return "applicationAsset(appId: \(appId), assetId: \(assetId))"
 		case let .achievementIcon(appId, achievementId, icon):
-			return "achievementIcon(appId: \(appId), achievementId: \(achievementId), icon: \(icon))"
+			return
+				"achievementIcon(appId: \(appId), achievementId: \(achievementId), icon: \(icon))"
 		case let .storePageAsset(appId, assetId):
 			return "storePageAsset(appId: \(appId), assetId: \(assetId))"
 		case let .stickerPackBanner(assetId):
 			return "stickerPackBanner(assetId: \(assetId))"
 		case let .teamIcon(teamId, icon):
 			return "teamIcon(teamId: \(teamId), icon: \(icon))"
-		case let .sticker(stickerId):
+		case let .sticker(stickerId, _):
 			return "sticker(stickerId: \(stickerId))"
 		case let .roleIcon(roleId, icon):
 			return "roleIcon(roleId: \(roleId), icon: \(icon))"
 		case let .guildScheduledEventCover(eventId, cover):
 			return "guildScheduledEventCover(eventId: \(eventId), cover: \(cover))"
 		case let .guildMemberBanner(guildId, userId, banner):
-			return "guildMemberBanner(guildId: \(guildId), userId: \(userId), banner: \(banner))"
+			return
+				"guildMemberBanner(guildId: \(guildId), userId: \(userId), banner: \(banner))"
 		case .__DO_NOT_USE_THIS_CASE:
-			fatalError("If the case name wasn't already clear enough: '__DO_NOT_USE_THIS_CASE' MUST NOT be used")
+			fatalError(
+				"If the case name wasn't already clear enough: '__DO_NOT_USE_THIS_CASE' MUST NOT be used"
+			)
 		}
 	}
 }
 
-public enum CDNEndpointIdentity: Int, Sendable, Hashable, CustomStringConvertible {
+public enum CDNEndpointIdentity: Int, Sendable, Hashable,
+	CustomStringConvertible
+{
 	case customEmoji
 	case guildIcon
 	case guildSplash
@@ -301,10 +340,10 @@ public enum CDNEndpointIdentity: Int, Sendable, Hashable, CustomStringConvertibl
 	case roleIcon
 	case guildScheduledEventCover
 	case guildMemberBanner
-	
+
 	/// This case serves as a way of discouraging exhaustive switch statements
 	case __DO_NOT_USE_THIS_CASE
-	
+
 	public var description: String {
 		switch self {
 		case .customEmoji: return "customEmoji"
@@ -331,10 +370,12 @@ public enum CDNEndpointIdentity: Int, Sendable, Hashable, CustomStringConvertibl
 		case .guildScheduledEventCover: return "guildScheduledEventCover"
 		case .guildMemberBanner: return "guildMemberBanner"
 		case .__DO_NOT_USE_THIS_CASE:
-			fatalError("If the case name wasn't already clear enough: '__DO_NOT_USE_THIS_CASE' MUST NOT be used")
+			fatalError(
+				"If the case name wasn't already clear enough: '__DO_NOT_USE_THIS_CASE' MUST NOT be used"
+			)
 		}
 	}
-	
+
 	init(endpoint: CDNEndpoint) {
 		switch endpoint {
 		case .customEmoji: self = .customEmoji
@@ -361,7 +402,9 @@ public enum CDNEndpointIdentity: Int, Sendable, Hashable, CustomStringConvertibl
 		case .guildScheduledEventCover: self = .guildScheduledEventCover
 		case .guildMemberBanner: self = .guildMemberBanner
 		case .__DO_NOT_USE_THIS_CASE:
-			fatalError("If the case name wasn't already clear enough: '__DO_NOT_USE_THIS_CASE' MUST NOT be used")
+			fatalError(
+				"If the case name wasn't already clear enough: '__DO_NOT_USE_THIS_CASE' MUST NOT be used"
+			)
 		}
 	}
 }

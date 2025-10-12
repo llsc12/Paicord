@@ -1,8 +1,8 @@
 //
-//  Default.swift
+//  ChatInputCommand.swift
 //  Paicord
 //
-//  Created by Lakhan Lothiyi on 10/10/2025.
+//  Created by Lakhan Lothiyi on 11/10/2025.
 //  Copyright © 2025 Lakhan Lothiyi.
 //
 
@@ -11,37 +11,28 @@ import SDWebImageSwiftUI
 import SwiftUIX
 
 extension MessageCell {
-	struct DefaultMessage: View {
+	struct ChatInputCommandMessage: View {
 		let message: DiscordChannel.Message
-		let priorMessage: DiscordChannel.Message?
 		let guildStore: GuildStore?
-		let inline: Bool
 
 		@State var profileOpen = false
 		@State var editedPopover = false
 		@State var avatarAnimated = false
 
 		var body: some View {
-			if inline {
-				HStack(alignment: .top) {
-					AvatarBalancing()
+			VStack {
+				reply
+				HStack(alignment: .bottom) {
+					avatar
+						#if os(macOS)
+							.padding(.trailing, 4)  // balancing
+						#endif
+					userAndMessage
 
-					MessageBody(message: message)
 				}
-			} else {
-				VStack {
-					reply
-					HStack(alignment: .bottom) {
-						avatar
-							#if os(macOS)
-								.padding(.trailing, 4)  // balancing
-							#endif
-						userAndMessage
-					}
-					.fixedSize(horizontal: false, vertical: true)
-				}
-				.onHover { self.avatarAnimated = $0 }
+				.fixedSize(horizontal: false, vertical: true)
 			}
+			.onHover { self.avatarAnimated = $0 }
 		}
 
 		@ViewBuilder

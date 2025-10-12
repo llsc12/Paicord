@@ -7,7 +7,6 @@
 //
 
 import PaicordLib
-import SDWebImageSwiftUI
 import SwiftUIX
 
 struct MessageCell: View {
@@ -59,21 +58,17 @@ struct MessageCell: View {
 					guildStore: guild,
 					inline: inline,
 				)
+			case .chatInputCommand:
+				ChatInputCommandMessage(message: message, guildStore: guild)
 			default:
-				(Text(Image(systemName: "xmark.circle.fill"))
-					+ Text(" Unsupported message type \(message.type)"))
-					.foregroundStyle(.red)
-					.frame(maxWidth: .infinity, alignment: .leading)
+				HStack {
+					AvatarBalancing()
+					(Text(Image(systemName: "xmark.circle.fill"))
+						+ Text(" Unsupported message type \(message.type)"))
+						.foregroundStyle(.red)
+						.frame(maxWidth: .infinity, alignment: .leading)
+				}
 			}
-
-			// Embeds
-
-			// Attachments
-			if !message.attachments.isEmpty {
-				AttachmentsView(attachments: message.attachments)
-			}
-
-			// Reactions
 		}
 		.equatable(by: cellHash)
 		/// stop updates to messages unless messages change.
@@ -89,18 +84,6 @@ struct MessageCell: View {
 			)
 		#endif
 		.padding(.top, inline ? 0 : 10)  // adds space between message groups
-	}
-
-	struct ReplyLine: View {
-		var body: some View {
-			RoundedRectangle(cornerRadius: 5)
-				.trim(from: 0.5, to: 0.75)
-				.stroke(.gray.opacity(0.4), lineWidth: 2)
-				.frame(width: 60, height: 20)
-				.padding(.top, 8)
-				.padding(.bottom, -12)
-				.padding(.trailing, -30)
-		}
 	}
 }
 

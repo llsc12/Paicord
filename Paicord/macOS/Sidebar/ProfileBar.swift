@@ -69,6 +69,7 @@ struct ProfileBar: View {
 					.brightness(-0.2)
 			}
 		}
+		.clipped()
 	}
 
 	func profileURL(animated: Bool) -> URL? {
@@ -99,6 +100,8 @@ struct NameplateView: View {
 			nameplate.palette.color.light.asColor()
 		case .dark:
 			nameplate.palette.color.dark.asColor()
+		@unknown default:
+			fatalError()
 		}
 	}
 

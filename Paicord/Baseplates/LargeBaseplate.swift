@@ -71,7 +71,7 @@ struct LargeBaseplate: View {
 					Button {
 						splitViewController?.toggleSidebar(nil)
 					} label: {
-						Image(systemName: "sidebar.leading")
+						Label("Toggle Sidebar", systemImage: "sidebar.left")
 					}
 				}
 			}
@@ -85,7 +85,7 @@ struct LargeBaseplate: View {
 			Button {
 				showingInspector.toggle()
 			} label: {
-				Label("Toggle Sidebar", systemImage: "sidebar.right")
+				Label("Toggle Member List", systemImage: "sidebar.right")
 			}
 		}
 		.task(id: appState.selectedGuild) {

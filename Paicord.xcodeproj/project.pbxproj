@@ -54,6 +54,13 @@
 		AA9C81832E6660BE0086B1DA /* GuildButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9C81822E6660BE0086B1DA /* GuildButton.swift */; };
 		AA9C81862E66670E0086B1DA /* CornerRadius.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9C81852E66670E0086B1DA /* CornerRadius.swift */; };
 		AA9C818C2E6702930086B1DA /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = AA9C818B2E6702930086B1DA /* SwiftUIIntrospect */; };
+		AAB50A502E9AA6800048E8B0 /* ChatInputCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB50A4F2E9AA67C0048E8B0 /* ChatInputCommand.swift */; };
+		AAB50A522E9AC9CB0048E8B0 /* ChannelHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB50A512E9AC9CB0048E8B0 /* ChannelHeader.swift */; };
+		AAB50A542E9AD4470048E8B0 /* MessageBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB50A532E9AD4470048E8B0 /* MessageBody.swift */; };
+		AAB50A562E9AD4680048E8B0 /* StickersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB50A552E9AD4680048E8B0 /* StickersView.swift */; };
+		AAB50A582E9AD4BB0048E8B0 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB50A572E9AD4B80048E8B0 /* Utilities.swift */; };
+		AAB50A5A2E9AD5790048E8B0 /* Username.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB50A592E9AD5750048E8B0 /* Username.swift */; };
+		AAB50A5E2E9B21B30048E8B0 /* Thumbhash.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB50A5D2E9B21AE0048E8B0 /* Thumbhash.swift */; };
 		AAB905302E82FD9200EA171B /* Conformances.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB9052F2E82FD8E00EA171B /* Conformances.swift */; };
 		AAB905322E83047D00EA171B /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB905312E83047900EA171B /* Extensions.swift */; };
 		AAB905342E8334AC00EA171B /* SlideoverDoubleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB905332E8334AC00EA171B /* SlideoverDoubleView.swift */; };
@@ -112,6 +119,13 @@
 		AA5DC5592E9482ED00D81EB5 /* MessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageCell.swift; sourceTree = "<group>"; };
 		AA9C81822E6660BE0086B1DA /* GuildButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuildButton.swift; sourceTree = "<group>"; };
 		AA9C81852E66670E0086B1DA /* CornerRadius.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CornerRadius.swift; sourceTree = "<group>"; };
+		AAB50A4F2E9AA67C0048E8B0 /* ChatInputCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatInputCommand.swift; sourceTree = "<group>"; };
+		AAB50A512E9AC9CB0048E8B0 /* ChannelHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelHeader.swift; sourceTree = "<group>"; };
+		AAB50A532E9AD4470048E8B0 /* MessageBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageBody.swift; sourceTree = "<group>"; };
+		AAB50A552E9AD4680048E8B0 /* StickersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StickersView.swift; sourceTree = "<group>"; };
+		AAB50A572E9AD4B80048E8B0 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
+		AAB50A592E9AD5750048E8B0 /* Username.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Username.swift; sourceTree = "<group>"; };
+		AAB50A5D2E9B21AE0048E8B0 /* Thumbhash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Thumbhash.swift; sourceTree = "<group>"; };
 		AAB9052F2E82FD8E00EA171B /* Conformances.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Conformances.swift; sourceTree = "<group>"; };
 		AAB905312E83047900EA171B /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		AAB905332E8334AC00EA171B /* SlideoverDoubleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideoverDoubleView.swift; sourceTree = "<group>"; };
@@ -185,6 +199,7 @@
 		57A4E7122E6B44B500470131 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				AAB50A5D2E9B21AE0048E8B0 /* Thumbhash.swift */,
 				AABED5A72E7FF970005BDD63 /* PaicordLib++ */,
 				57A4E7132E6B44BC00470131 /* Extensions */,
 			);
@@ -292,8 +307,9 @@
 		AA1097082E64C181005BC3D2 /* Chat */ = {
 			isa = PBXGroup;
 			children = (
-				AA5DC5582E9482E800D81EB5 /* Messages */,
 				AA10971C2E64C189005BC3D2 /* ChatView.swift */,
+				AAB50A512E9AC9CB0048E8B0 /* ChannelHeader.swift */,
+				AA5DC5582E9482E800D81EB5 /* Messages */,
 			);
 			path = Chat;
 			sourceTree = "<group>";
@@ -353,8 +369,12 @@
 			children = (
 				AAEEF4FF2E9900E00034FA04 /* Types */,
 				AA5DC5592E9482ED00D81EB5 /* MessageCell.swift */,
+				AAB50A532E9AD4470048E8B0 /* MessageBody.swift */,
+				AAB50A552E9AD4680048E8B0 /* StickersView.swift */,
 				AADD7F8C2E99EB060025B644 /* Attachments.swift */,
+				AAB50A592E9AD5750048E8B0 /* Username.swift */,
 				57A55C562E7560CC005C8226 /* Markdown.swift */,
+				AAB50A572E9AD4B80048E8B0 /* Utilities.swift */,
 			);
 			path = Messages;
 			sourceTree = "<group>";
@@ -370,13 +390,13 @@
 		AA9C81802E665E190086B1DA /* Common */ = {
 			isa = PBXGroup;
 			children = (
-				57DA042D2E79DC4400DB4C7C /* Settings */,
 				57A4E7092E6B315700470131 /* Login */,
-				AA9C81842E6667050086B1DA /* Utilities */,
-				AA1097082E64C181005BC3D2 /* Chat */,
 				57DA04282E79893B00DB4C7C /* Launch */,
-				57A55C542E7560B3005C8226 /* Sheets */,
 				57A55C552E7560BB005C8226 /* Guilds */,
+				AA1097082E64C181005BC3D2 /* Chat */,
+				57DA042D2E79DC4400DB4C7C /* Settings */,
+				57A55C542E7560B3005C8226 /* Sheets */,
+				AA9C81842E6667050086B1DA /* Utilities */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -427,6 +447,7 @@
 			isa = PBXGroup;
 			children = (
 				AAEEF5002E9900E50034FA04 /* Default.swift */,
+				AAB50A4F2E9AA67C0048E8B0 /* ChatInputCommand.swift */,
 			);
 			path = Types;
 			sourceTree = "<group>";
@@ -531,7 +552,9 @@
 			files = (
 				AA1378062E967A4A00100969 /* ProcessInfo+previews.swift in Sources */,
 				AA1097152E64C181005BC3D2 /* LargeBaseplate.swift in Sources */,
+				AAB50A562E9AD4680048E8B0 /* StickersView.swift in Sources */,
 				AA1097172E64C181005BC3D2 /* SmallBaseplate.swift in Sources */,
+				AAB50A5E2E9B21B30048E8B0 /* Thumbhash.swift in Sources */,
 				AAEEC71F2E65120000EB5FC9 /* TokenStore.swift in Sources */,
 				AA1097182E64C181005BC3D2 /* HomeView.swift in Sources */,
 				AA10971D2E64C18C005BC3D2 /* ChatView.swift in Sources */,
@@ -541,6 +564,7 @@
 				57E05C5B2E6C745900B81AA7 /* String+LocalizedError.swift in Sources */,
 				AABED5A42E7F4DAE005BDD63 /* GuildStore.swift in Sources */,
 				AAB905322E83047D00EA171B /* Extensions.swift in Sources */,
+				AAB50A522E9AC9CB0048E8B0 /* ChannelHeader.swift in Sources */,
 				AADD58652E82A95B00CBC8B6 /* GuildScrollBar.swift in Sources */,
 				AAB905302E82FD9200EA171B /* Conformances.swift in Sources */,
 				AA9C81832E6660BE0086B1DA /* GuildButton.swift in Sources */,
@@ -549,12 +573,15 @@
 				57F5AF492E7CB13100AD5674 /* PaicordAppState.swift in Sources */,
 				AAB905382E845A7300EA171B /* ChannelButton.swift in Sources */,
 				5724CD6F2E733D0E00931FEF /* MFASheet.swift in Sources */,
+				AAB50A542E9AD4470048E8B0 /* MessageBody.swift in Sources */,
 				57E05C592E6C6AE400B81AA7 /* Design Constants.swift in Sources */,
 				AABED5A62E7F514B005BDD63 /* SettingsStore.swift in Sources */,
 				AABED5A02E7F48FD005BDD63 /* CurrentUserStore.swift in Sources */,
 				57F5AF4D2E7CB14A00AD5674 /* PaicordSheetsAlerts.swift in Sources */,
+				AAB50A502E9AA6800048E8B0 /* ChatInputCommand.swift in Sources */,
 				57E05C5D2E6CBCDC00B81AA7 /* GatewayStore.swift in Sources */,
 				57F5AF552E7CBDF400AD5674 /* MFAView.swift in Sources */,
+				AAB50A582E9AD4BB0048E8B0 /* Utilities.swift in Sources */,
 				5783AA942E6B8FD100F73F6D /* MeshGradient.swift in Sources */,
 				57DA042A2E79894500DB4C7C /* ConnectionStateView.swift in Sources */,
 				57F5AF512E7CBC7700AD5674 /* LoginViewModel.swift in Sources */,
@@ -573,6 +600,7 @@
 				AABED59E2E7F463A005BDD63 /* ChannelStore.swift in Sources */,
 				AA5DC55A2E9482ED00D81EB5 /* MessageCell.swift in Sources */,
 				57F5AF532E7CBDD000AD5674 /* AccountPicker.swift in Sources */,
+				AAB50A5A2E9AD5790048E8B0 /* Username.swift in Sources */,
 				AAB905342E8334AC00EA171B /* SlideoverDoubleView.swift in Sources */,
 				57F5AF4B2E7CB13F00AD5674 /* AccountCommands.swift in Sources */,
 				AADD7F8D2E99EB0B0025B644 /* Attachments.swift in Sources */,

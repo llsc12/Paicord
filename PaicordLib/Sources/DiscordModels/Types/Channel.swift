@@ -363,7 +363,24 @@ extension DiscordChannel {
 		}
 
 		/// https://discord.com/developers/docs/resources/channel#attachment-object
-		public struct Attachment: Sendable, Codable, Equatable, Hashable {
+		public struct Attachment: Sendable, Codable, Identifiable, Equatable, Hashable {
+			
+			public init(id: AttachmentSnowflake, filename: String, description: String? = nil, content_type: String? = nil, size: Int, url: String, proxy_url: String, placeholder: String? = nil, height: Int? = nil, width: Int? = nil, ephemeral: Bool? = nil, duration_secs: Double? = nil, waveform: String? = nil, flags: IntBitField<Flag>? = nil) {
+				self.id = id
+				self.filename = filename
+				self.description = description
+				self.content_type = content_type
+				self.size = size
+				self.url = url
+				self.proxy_url = proxy_url
+				self.placeholder = placeholder
+				self.height = height
+				self.width = width
+				self.ephemeral = ephemeral
+				self.duration_secs = duration_secs
+				self.waveform = waveform
+				self.flags = flags
+			}
 
 			/// https://discord.com/developers/docs/resources/channel#attachment-object-attachment-flags
 			@UnstableEnum<UInt>
@@ -379,6 +396,7 @@ extension DiscordChannel {
 			public var size: Int
 			public var url: String
 			public var proxy_url: String
+			public var placeholder: String?
 			public var height: Int?
 			public var width: Int?
 			public var ephemeral: Bool?

@@ -51,7 +51,11 @@ class ChannelStore: DiscordDataStore {
 		guard let gateway = gateway?.gateway else { return }
 		Task { @MainActor in
 			// ig also fetch latest messages too
-			try await self.fetchMessages()
+			do {
+				try await self.fetchMessages()
+			} catch {
+				PaicordAppState.shared.error = error
+			}
 		}
 		eventTask = Task { @MainActor in
 			for await event in await gateway.events {

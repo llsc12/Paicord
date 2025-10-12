@@ -19,17 +19,18 @@ struct ChatView: View {
 
 	@State private var text = ""
 
-	@State private var showChannelInfo = false  // topic description popover
 	@ViewStorage private var isNearBottom = true  // used to track if we are near the bottom, if so scroll.
+	@ViewStorage private var pendingScrollWorkItem: DispatchWorkItem?
 
 	init(vm: ChannelStore) { self.vm = vm }
 
 	var body: some View {
+		let orderedMessages = Array(vm.messages.values)
 		VStack(spacing: 0) {
 			ScrollViewReader { proxy in
 				ScrollView {
 					LazyVStack(alignment: .leading, spacing: 0) {
-						ForEach(Array(vm.messages.values)) { msg in
+						ForEach(orderedMessages) { msg in
 							let prior = vm.getMessage(before: msg)
 							MessageCell(for: msg, prior: prior, guild: vm.guildStore)
 								.onAppear {
@@ -47,21 +48,24 @@ struct ChatView: View {
 				.defaultScrollAnchor(.bottom)
 				.scrollDismissesKeyboard(.interactively)
 				.onAppear {
-					guard let lastID = vm.messages.values.last?.id else { return }
-					DispatchQueue.main.async {
-						withAnimation(accessibilityReduceMotion ? .none : .default) {
-							proxy.scrollTo(lastID, anchor: .top)
-						}
-					}
+					scheduleScrollToBottom(
+						proxy: proxy,
+						messages: orderedMessages
+					)
 				}
 				.onChange(of: vm.messages.count) {
-					if isNearBottom, let lastID = vm.messages.values.last?.id {
-						DispatchQueue.main.async {
-							withAnimation(accessibilityReduceMotion ? .none : .default) {
-								proxy.scrollTo(lastID, anchor: .top)
-							}
-						}
+					if isNearBottom {
+						scheduleScrollToBottom(
+							proxy: proxy,
+							messages: orderedMessages
+						)
 					}
+				}
+				.onChange(of: vm.channelId) {
+					scheduleScrollToBottom(
+						proxy: proxy,
+						messages: orderedMessages
+					)
 				}
 			}
 		}
@@ -108,26 +112,35 @@ struct ChatView: View {
 		.toolbar {
 			#warning("make channel headers nicer")
 			ToolbarItem(placement: .navigation) {
-				if let name = vm.channel?.name {
-					Text(name)
-				} else if let ppl = vm.channel?.recipients {
-					Text(
-						ppl.map({
-							$0.global_name ?? $0.username
-						}).joined(separator: ", ")
-					)
-				}
-				if let topic = vm.channel?.topic, !topic.isEmpty {
-					Text(vm.channel?.topic ?? "")
-						.font(.caption)
-						.foregroundStyle(.secondary)
-						.sheet(isPresented: $showChannelInfo) {
-							Text(topic)
-								.padding()
-						}
+				ChannelHeader(vm: vm)
+			}
+//			if let topic = vm.channel?.topic, !topic.isEmpty {
+//				ToolbarItem(placement: .navigation) {
+//					HStack {
+//						ChannelTopic(topic: topic)
+//					}
+//				}
+//			}
+		}
+	}
+
+	private func scheduleScrollToBottom(
+		proxy: ScrollViewProxy,
+		messages: [DiscordChannel.Message]?
+	) {
+		pendingScrollWorkItem?.cancel()
+		guard let lastID = messages?.last?.id else { return }
+
+		let workItem = DispatchWorkItem { [proxy] in
+			// Use main queue to ensure layout is ready; small delay coalesces bursts
+			DispatchQueue.main.async {
+				withAnimation(accessibilityReduceMotion ? .none : .default) {
+					proxy.scrollTo(lastID, anchor: .top)
 				}
 			}
 		}
+		pendingScrollWorkItem = workItem
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.06, execute: workItem)
 	}
 
 	private func sendMessage() {
