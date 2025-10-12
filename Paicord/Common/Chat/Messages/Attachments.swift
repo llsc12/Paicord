@@ -51,11 +51,20 @@ extension MessageCell {
 				// previews
 				switch previewableAttachments.count {
 				case 1:
+					let attachment = previewableAttachments[0]
 					AttachmentGridItemPreview(
-						attachment: previewableAttachments[0]
+						attachment: attachment
 					)
 					.scaledToFit()
 					.clipShape(.rounded)
+					.frame(
+						minWidth: 1,
+						maxWidth: min(attachment.width?.toCGFloat, 350),
+						minHeight: 1,
+						maxHeight: min(attachment.height?.toCGFloat, 400),
+						alignment: .leading
+					)
+				//					case
 				default: EmptyView()
 				}
 				// files
@@ -63,7 +72,13 @@ extension MessageCell {
 					FileAttachmentView(attachment: file)
 				}
 			}
-			.frame(minWidth: 1, maxWidth: 350, minHeight: 1, maxHeight: 400, alignment: .leading)
+			.frame(
+				minWidth: 1,
+				maxWidth: (350),
+				minHeight: 1,
+				maxHeight: 400,
+				alignment: .leading
+			)
 		}
 
 		// MARK: - Layouts
@@ -111,9 +126,15 @@ extension MessageCell {
 								let data = Data(base64Encoded: placeholder)
 							{
 								let img = thumbHashToImage(hash: data)
-								Image(nsImage: img)
-									.resizable()
-									.scaledToFill()
+								#if os(macOS)
+									Image(nsImage: img)
+										.resizable()
+										.scaledToFill()
+								#else
+									Image(uiImage: img)
+										.resizable()
+										.scaledToFill()
+								#endif
 							} else {
 								Color.gray.opacity(0.2)
 							}

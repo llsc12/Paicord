@@ -50,6 +50,7 @@
 		AA13780B2E969D6100100969 /* DiscordMarkdownParser in Frameworks */ = {isa = PBXBuildFile; productRef = AA13780A2E969D6100100969 /* DiscordMarkdownParser */; };
 		AA1878F32E81A30C009C7E40 /* GuildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1878F22E81A305009C7E40 /* GuildView.swift */; };
 		AA1878F92E81FC1A009C7E40 /* FLEX in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = AA1878F82E81FC1A009C7E40 /* FLEX */; };
+		AA5CA6522E9BCCFF00C7C82A /* Maths.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5CA6512E9BCCFC00C7C82A /* Maths.swift */; };
 		AA5DC55A2E9482ED00D81EB5 /* MessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5DC5592E9482ED00D81EB5 /* MessageCell.swift */; };
 		AA9C81832E6660BE0086B1DA /* GuildButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9C81822E6660BE0086B1DA /* GuildButton.swift */; };
 		AA9C81862E66670E0086B1DA /* CornerRadius.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9C81852E66670E0086B1DA /* CornerRadius.swift */; };
@@ -116,6 +117,7 @@
 		AA10971C2E64C189005BC3D2 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
 		AA1378042E96798000100969 /* ProcessInfo+previews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProcessInfo+previews.swift"; sourceTree = "<group>"; };
 		AA1878F22E81A305009C7E40 /* GuildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuildView.swift; sourceTree = "<group>"; };
+		AA5CA6512E9BCCFC00C7C82A /* Maths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Maths.swift; sourceTree = "<group>"; };
 		AA5DC5592E9482ED00D81EB5 /* MessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageCell.swift; sourceTree = "<group>"; };
 		AA9C81822E6660BE0086B1DA /* GuildButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuildButton.swift; sourceTree = "<group>"; };
 		AA9C81852E66670E0086B1DA /* CornerRadius.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CornerRadius.swift; sourceTree = "<group>"; };
@@ -209,6 +211,7 @@
 		57A4E7132E6B44BC00470131 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				AA5CA6512E9BCCFC00C7C82A /* Maths.swift */,
 				AA1378042E96798000100969 /* ProcessInfo+previews.swift */,
 				AAFD41372E92FA42002BC9BE /* Array+safe.swift */,
 				57E05C5A2E6C745300B81AA7 /* String+LocalizedError.swift */,
@@ -595,6 +598,7 @@
 				57A4E7152E6B44C900470131 /* CGSize.swift in Sources */,
 				AAFD41382E92FA43002BC9BE /* Array+safe.swift in Sources */,
 				57F5AF4F2E7CB14F00AD5674 /* RootView.swift in Sources */,
+				AA5CA6522E9BCCFF00C7C82A /* Maths.swift in Sources */,
 				57A4E70B2E6B315F00470131 /* LoginView.swift in Sources */,
 				AAD73EB62E93E29E00470158 /* DMsView.swift in Sources */,
 				AABED59E2E7F463A005BDD63 /* ChannelStore.swift in Sources */,

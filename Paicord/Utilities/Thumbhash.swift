@@ -304,57 +304,6 @@ func thumbHashToApproximateAspectRatio(hash: Data) -> Float32 {
 #if os(iOS)
 	import UIKit
 
-	func imageToThumbHash(image: UIImage) -> Data {
-		let size = image.size
-		let w = Int(round(100 * size.width / max(size.width, size.height)))
-		let h = Int(round(100 * size.height / max(size.width, size.height)))
-		var rgba = Data(count: w * h * 4)
-		rgba.withUnsafeMutableBytes { rgba in
-			if let space = image.cgImage?.colorSpace,
-				let context = CGContext(
-					data: rgba.baseAddress,
-					width: w,
-					height: h,
-					bitsPerComponent: 8,
-					bytesPerRow: w * 4,
-					space: space,
-					bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
-				)
-			{
-				// EXIF orientation only works if you draw the UIImage, not the CGImage
-				context.concatenate(CGAffineTransform(1, 0, 0, -1, 0, CGFloat(h)))
-				UIGraphicsPushContext(context)
-				image.draw(in: CGRect(x: 0, y: 0, width: w, height: h))
-				UIGraphicsPopContext()
-
-				// Convert from premultiplied alpha to unpremultiplied alpha
-				var rgba = rgba.baseAddress!.bindMemory(
-					to: UInt8.self,
-					capacity: rgba.count
-				)
-				let n = w * h
-				var i = 0
-				while i < n {
-					let a = UInt16(rgba[3])
-					if a > 0 && a < 255 {
-						var r = UInt16(rgba[0])
-						var g = UInt16(rgba[1])
-						var b = UInt16(rgba[2])
-						r = min(255, r * 255 / a)
-						g = min(255, g * 255 / a)
-						b = min(255, b * 255 / a)
-						rgba[0] = UInt8(r)
-						rgba[1] = UInt8(g)
-						rgba[2] = UInt8(b)
-					}
-					rgba = rgba.advanced(by: 4)
-					i += 1
-				}
-			}
-		}
-		return rgbaToThumbHash(w: w, h: h, rgba: rgba)
-	}
-
 	func thumbHashToImage(hash: Data) -> UIImage {
 		var (w, h, rgba) = thumbHashToRGBA(hash: hash)
 		rgba.withUnsafeMutableBytes { rgba in

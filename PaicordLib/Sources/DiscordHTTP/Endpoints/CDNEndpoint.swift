@@ -135,7 +135,7 @@ public enum CDNEndpoint: Endpoint {
 
 	public var url: String {
 		switch self {
-		case .sticker(let stickerId, let format):
+		case .sticker(_, let format):
 			switch format {
 			case .lottie: "https://discord.com/"
 			default: "https://media.discordapp.net/" + urlSuffix
