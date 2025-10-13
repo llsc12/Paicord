@@ -7,7 +7,6 @@
 //  
 
 import SwiftUIX
-import SDWebImageSwiftUI
 import PaicordLib
 
 struct ChannelButton: View {

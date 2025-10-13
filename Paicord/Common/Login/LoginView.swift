@@ -7,7 +7,6 @@
 //
 
 import PaicordLib
-import SDWebImageSwiftUI
 import SwiftUI
 
 struct LoginView: View {

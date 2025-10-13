@@ -147,7 +147,8 @@ public final class MarkdownTokenizer {
 				type: .eof,
 				content: "",
 				location: currentLocation
-			))
+			)
+		)
 
 		return tokens
 	}
@@ -161,23 +162,104 @@ public final class MarkdownTokenizer {
 
 		let char = currentChar
 
-		// Handle newlines first
-		if char == "\n" {
-			advance()
-			return Token(type: .newline, content: "\n", location: startLocation)
-		}
-
-		if char == "\r" {
-			advance()
-			if currentChar == "\n" {
-				advance()
-			}
-			return Token(type: .newline, content: "\r\n", location: startLocation)
-		}
-
-		// Check for fenced code block state first
+		// Check for fenced code block state BEFORE handling newlines
 		if inFencedCodeBlock {
-			// Attempt to detect a closing fence (allowing up to 3 leading spaces)
+			// If we're at a newline, check if it's immediately followed by a closing fence
+			if char == "\n" || char == "\r" {
+				// Look ahead to see if this newline is directly before a closing fence
+				let savedPosition = position
+				let savedLine = line
+				let savedColumn = column
+
+				// Temporarily consume the newline
+				if char == "\n" {
+					advance()
+				} else if char == "\r" {
+					advance()
+					if !isAtEnd && currentChar == "\n" {
+						advance()
+					}
+				}
+
+				// Skip up to 3 spaces of indentation
+				var spacesSkipped = 0
+				while spacesSkipped < 3 && !isAtEnd
+					&& (currentChar == " " || currentChar == "\t")
+				{
+					advance()
+					spacesSkipped += 1
+				}
+
+				// Check if we have a closing fence
+				if !isAtEnd && currentChar == fenceCharacter {
+					var fenceCount = 0
+					let fenceStart = position
+
+					// Count fence characters
+					while !isAtEnd && currentChar == fenceCharacter {
+						fenceCount += 1
+						advance()
+					}
+
+					// Check if this is a valid closing fence (same length or longer)
+					if fenceCount >= fenceLength {
+						// Verify it's followed by end of line or whitespace only
+						var isValidClosingFence = true
+						while !isAtEnd && currentChar != "\n" && currentChar != "\r" {
+							if !currentChar.isWhitespace {
+								isValidClosingFence = false
+								break
+							}
+							advance()
+						}
+
+						if isValidClosingFence {
+							// This newline is directly before a valid closing fence
+							// Don't include the newline, just process the closing fence
+							position = fenceStart
+							line = savedLine
+							column = savedColumn
+
+							// Recalculate position to fence start
+							for i in savedPosition..<fenceStart {
+								if characters[i] == "\n" {
+									line += 1
+									column = 1
+								} else {
+									column += 1
+								}
+							}
+
+							// Process the closing fence
+							let closingFence = checkClosingFenceAllowingIndentation()
+							if closingFence != nil {
+								inFencedCodeBlock = false
+								fenceCharacter = nil
+								fenceLength = 0
+								fenceStartColumn = 0
+							}
+							return closingFence
+						}
+					}
+				}
+
+				// Not followed by a closing fence, restore position and process newline normally
+				position = savedPosition
+				line = savedLine
+				column = savedColumn
+
+				advance()
+				if char == "\r" && !isAtEnd && currentChar == "\n" {
+					advance()
+				}
+				return Token(
+					type: .newline,
+					content: char == "\r" ? "\r\n" : "\n",
+					location: startLocation
+				)
+			}
+
+			// Check for closing fence at current position
 			if let closingFence = checkClosingFenceAllowingIndentation() {
 				inFencedCodeBlock = false
 				fenceCharacter = nil
@@ -190,6 +272,19 @@ public final class MarkdownTokenizer {
 			return tokenizeTextInCodeBlock()
 		}
 
+		// Handle newlines (only when not in fenced code block)
+		if char == "\n" {
+			advance()
+			return Token(type: .newline, content: "\n", location: startLocation)
+		}
+
+		if char == "\r" {
+			advance()
+			if currentChar == "\n" {
+				advance()
+			}
+			return Token(type: .newline, content: "\r\n", location: startLocation)
+		}
 		// Check for line-start patterns (headers, lists, block quotes, etc.)
 		if column == 1 || isAfterWhitespace() {
 			if let lineStartToken = checkLineStartPatterns() {
@@ -587,15 +682,19 @@ public final class MarkdownTokenizer {
 
 	private func tokenizeBlockQuote() -> Token {
 		let startLocation = currentLocation
-		
+
 		// Check if this is a multiline block quote (>>>)
 		if peek() == ">" && peek(2) == ">" {
 			advance()  // First >
 			advance()  // Second >
 			advance()  // Third >
-			return Token(type: .multilineBlockQuoteMarker, content: ">>>", location: startLocation)
+			return Token(
+				type: .multilineBlockQuoteMarker,
+				content: ">>>",
+				location: startLocation
+			)
 		}
-		
+
 		// Single block quote
 		advance()
 		return Token(type: .blockQuoteMarker, content: ">", location: startLocation)

@@ -2,22 +2,15 @@
 //  Attachments.swift
 //  Paicord
 //
-//  Updated to use SwiftUI's quickLookPreview(_:in:) modifier so the Quick Look UI
-//  is driven by a selection binding and works cross-platform (macOS/iOS) without a
-//  custom UIViewControllerRepresentable.
-//
 //  Created by Lakhan Lothiyi on 11/10/2025.
-//  Modified by Copilot on 2025-10-11.
 //  Copyright © 2025 Lakhan Lothiyi.
 //
 
 import PaicordLib
-import QuickLook
 import SDWebImageSwiftUI
 import SwiftUIX
 
 extension MessageCell {
-	/// Flexible attachments grid with Quick Look integration via quickLookPreview(_:in:).
 	struct AttachmentsView: View {
 
 		var fileAttachments: [DiscordChannel.Message.Attachment]

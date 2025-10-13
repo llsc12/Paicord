@@ -8,7 +8,6 @@
 
 import Logging
 import PaicordLib
-import SDWebImageSVGCoder
 @_spi(Advanced) import SwiftUIIntrospect
 import SwiftUIX
 
@@ -25,18 +24,14 @@ struct PaicordApp: App {
 	@Environment(\.userInterfaceIdiom) var idiom
 
 	init() {
-		// Set up svg support
-		let SVGCoder = SDImageSVGCoder.shared
-		SDImageCodersManager.shared.addCoder(SVGCoder)
-
 		// i foubnd out this rly cool thing if u avoid logging 40mb of data to console the client isnt slow !!!!
-//		#if DEBUG
-//			DiscordGlobalConfiguration.makeLogger = { loggerLabel in
-//				var logger = Logger(label: loggerLabel)
-//				logger.logLevel = .trace
-//				return logger
-//			}
-//		#endif
+		#if DEBUG
+			DiscordGlobalConfiguration.makeLogger = { loggerLabel in
+				var logger = Logger(label: loggerLabel)
+				logger.logLevel = .trace
+				return logger
+			}
+		#endif
 	}
 
 	var body: some Scene {
@@ -45,9 +40,6 @@ struct PaicordApp: App {
 				gatewayStore: gatewayStore,
 				appState: appState
 			)
-			.environment(challenges)
-			.environment(appState)
-			.environment(gatewayStore)
 			.onAppear {
 				#if canImport(FLEX)
 					FLEXManager.shared.showExplorer()
@@ -57,9 +49,10 @@ struct PaicordApp: App {
 		#if os(macOS)
 			.windowToolbarStyle(.unified)
 		#endif
-		.commands {
-			AccountCommands(gatewayStore: gatewayStore)
-		}
+		.commands { AccountCommands(gatewayStore: gatewayStore) }
+		.environment(challenges)
+		.environment(appState)
+		.environment(gatewayStore)
 		#if os(macOS)
 			Settings {
 				SettingsView()

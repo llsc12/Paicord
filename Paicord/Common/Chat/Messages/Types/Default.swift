@@ -7,7 +7,6 @@
 //
 
 import PaicordLib
-import SDWebImageSwiftUI
 import SwiftUIX
 
 extension MessageCell {
@@ -17,9 +16,9 @@ extension MessageCell {
 		let guildStore: GuildStore?
 		let inline: Bool
 
-		@State var profileOpen = false
 		@State var editedPopover = false
 		@State var avatarAnimated = false
+		@State var profileOpen = false
 
 		var body: some View {
 			if inline {
@@ -32,10 +31,14 @@ extension MessageCell {
 				VStack {
 					reply
 					HStack(alignment: .bottom) {
-						avatar
-							#if os(macOS)
-								.padding(.trailing, 4)  // balancing
-							#endif
+						MessageAuthor.Avatar(
+							message: message,
+							profileOpen: $profileOpen,
+							animated: avatarAnimated
+						)
+						#if os(macOS)
+							.padding(.trailing, 4)  // balancing
+						#endif
 						userAndMessage
 					}
 					.fixedSize(horizontal: false, vertical: true)
@@ -52,7 +55,7 @@ extension MessageCell {
 						.padding(.leading, avatarSize / 2)  // align with pfp
 
 					Text("\(ref.author?.username ?? "Unknown") • \(ref.content)")
-						.font(.caption)
+						.font(.caption2)
 						.foregroundStyle(.secondary)
 						.lineLimit(1)
 						.frame(maxWidth: .infinity, alignment: .leading)
@@ -61,99 +64,55 @@ extension MessageCell {
 		}
 
 		@ViewBuilder
-		var avatar: some View {
-			Button {
-				profileOpen = true
-			} label: {
-				AnimatedImage(
-					url: avatarURL(animated: avatarAnimated)
-				)
-				.resizable()
-				.scaledToFill()
-				.frame(width: avatarSize, height: avatarSize)
-				.clipShape(.circle)
-			}
-			.buttonStyle(.borderless)
-			.popover(isPresented: $profileOpen) {
-				Text("Profile for \(message.author?.username ?? "Unknown")")
-					.padding()
-			}
-			.frame(maxHeight: .infinity, alignment: .top)  // align pfp to top of cell
-		}
-
-		@ViewBuilder
 		var userAndMessage: some View {
 			VStack {
 				HStack(alignment: .bottom) {
-					Button {
-						profileOpen = true
-					} label: {
-						if let guildStore, let userID = message.author?.id {
-							let member = guildStore.members[userID] ?? message.member
-							let color = member?.roles?.compactMap { guildStore.roles[$0] }
-								.sorted(by: { $0.position > $1.position })
-								.compactMap { $0.color.value != 0 ? $0.color : nil }
-								.first?.asColor()
-
-							Text(
-								member?.nick ?? message.author?.global_name ?? message.author?
-									.username
-									?? "Unknown"
-							)
-							.foregroundStyle(color != nil ? color! : .primary)
-						} else {
-							Text(
-								message.author?.global_name ?? message.author?.username
-									?? "Unknown"
-							)
-						}
-					}
-					.buttonStyle(.plain)
-					.fontWeight(.semibold)
-					Text(message.timestamp.date, style: .time)
-						.font(.caption)
-						.foregroundStyle(.secondary)
-					if let edit = message.edited_timestamp {
-						Text("(edited)")
-							.font(.caption)
-							.foregroundStyle(.secondary)
-							.popover(isPresented: $editedPopover) {
-								Text(
-									"Edited at \(edit.date.formatted(date: .abbreviated, time: .standard))"
-								)
-								.padding()
-							}
-							.onHover { self.editedPopover = $0 }
+					MessageAuthor.Username( // username line
+						message: message,
+						guildStore: guildStore,
+						profileOpen: $profileOpen
+					)
+					Date(for: message.timestamp.date) // message date
+					if let edit = message.edited_timestamp { // edited notice
+						EditStamp(edited: edit)
 					}
 				}
 				.frame(maxWidth: .infinity, alignment: .leading)
 
-				MessageBody(message: message)
+				MessageBody(message: message) // content
 			}
 			.frame(maxHeight: .infinity, alignment: .bottom)  // align text to bottom of cell
 		}
 
-		func avatarURL(animated: Bool) -> URL? {
-			if let id = message.author?.id,
-				let avatar = message.author?.avatar
-			{
-				if avatar.starts(with: "a_"), animated {
-					return URL(
-						string: CDNEndpoint.userAvatar(userId: id, avatar: avatar).url
-							+ ".gif?size=128&animated=true"
-					)
+		@ViewBuilder
+		func Date(for date: Date) -> some View {
+			Group {
+				if Calendar.current.isDateInToday(date) {
+					Text(message.timestamp.date, style: .time)
+				} else if Calendar.current.isDateInYesterday(date) {
+					Text("Yesterday at ") + Text(message.timestamp.date, style: .time)
 				} else {
-					return URL(
-						string: CDNEndpoint.userAvatar(userId: id, avatar: avatar).url
-							+ ".png?size=128&animated=false"
-					)
+					Text(date, format: .dateTime.month().day().year())
 				}
-			} else {
-				let discrim = message.author?.discriminator ?? "0"
-				return URL(
-					string: CDNEndpoint.defaultUserAvatar(discriminator: discrim).url
-						+ "?size=128"
-				)
+			}
+			.font(.caption2)
+			.foregroundStyle(.secondary)
+		}
+
+		struct EditStamp: View {
+			var edited: DiscordTimestamp
+			@State private var editedPopover = false
+			var body: some View {
+				Text("(edited)")
+					.font(.caption)
+					.foregroundStyle(.secondary)
+					.popover(isPresented: $editedPopover) {
+						Text(
+							"Edited at \(edited.date.formatted(date: .abbreviated, time: .standard))"
+						)
+						.padding()
+					}
+					.onHover { self.editedPopover = $0 }
 			}
 		}
 	}

@@ -10,6 +10,14 @@ import PaicordLib
 import SwiftUIX
 
 struct MessageCell: View {
+	
+	/// Controls the size of the avatar in the message cell.
+	#if os(iOS)
+		static let avatarSize: CGFloat = 40
+	#elseif os(macOS)
+	static let avatarSize: CGFloat = 35
+	#endif
+
 	var message: DiscordChannel.Message
 	var priorMessage: DiscordChannel.Message?
 	let guild: GuildStore?
@@ -24,12 +32,6 @@ struct MessageCell: View {
 		self.priorMessage = prior
 		self.guild = guild
 	}
-
-	#if os(iOS)
-		static let avatarSize: CGFloat = 42
-	#elseif os(macOS)
-		static let avatarSize: CGFloat = 35
-	#endif
 
 	var body: some View {
 		let inline =

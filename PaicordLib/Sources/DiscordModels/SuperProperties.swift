@@ -9,6 +9,10 @@
 import DiscordCore
 import Foundation
 
+#if canImport(UIKit)
+	import UIKit
+#endif
+
 // Discord clients send a horrific header containing your host machine information,
 // this is used for anti-abuse systems. It is sent at IDENTIFY in gateway and with all API requests as
 // the `X-Super-Properties` header. This extension adds the extra data. The definition only has initializer
@@ -148,7 +152,8 @@ public enum SuperProperties {
 			uname(&systemInfo)
 			let machineMirror = Mirror(reflecting: systemInfo.machine)
 			let identifier = machineMirror.children.reduce("") {
-				identifier, element in
+				identifier,
+				element in
 				guard let value = element.value as? Int8, value != 0 else {
 					return identifier
 				}
@@ -256,7 +261,8 @@ public enum SuperProperties {
 		uname(&systemInfo)
 		let versionMirror = Mirror(reflecting: systemInfo.release)
 		let version = versionMirror.children.reduce("") {
-			version, element in
+			version,
+			element in
 			guard let value = element.value as? Int8, value != 0 else {
 				return version
 			}
@@ -274,7 +280,7 @@ public enum SuperProperties {
 			return nil
 		#endif
 	}
-	
+
 	public static func client_app_state() -> String {
 		#if os(iOS)
 			return "active"
@@ -284,27 +290,29 @@ public enum SuperProperties {
 			return "unknown"
 		#endif
 	}
-	
+
 	public static func device_vendor_id() -> String? {
 		#if os(iOS)
+		DispatchQueue.main.sync {
 			if let uuid = UIDevice.current.identifierForVendor {
 				return uuid.uuidString.uppercased()
 			}
 			return UUID().uuidString.uppercased()  // fallback
+		}
 		#elseif os(macOS)
-		return nil
+			return nil
 		#else
-		return nil
+			return nil
 		#endif
 	}
-	
+
 	public static func design_id() -> Int? {
 		#if os(iOS)
 			return 2
 		#elseif os(macOS)
-		return nil
+			return nil
 		#else
-		return nil
+			return nil
 		#endif
 	}
 }

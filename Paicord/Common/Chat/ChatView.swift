@@ -7,7 +7,6 @@
 //
 
 import PaicordLib
-import SDWebImageSwiftUI
 @_spi(Advanced) import SwiftUIIntrospect
 import SwiftUIX
 
@@ -116,27 +115,27 @@ struct ChatView: View {
 			ToolbarItem(placement: .navigation) {
 				ChannelHeader(vm: vm)
 			}
-//			if let topic = vm.channel?.topic, !topic.isEmpty {
-//				ToolbarItem(placement: .navigation) {
-//					HStack {
-//						ChannelTopic(topic: topic)
-//					}
-//				}
-//			}
+			//			if let topic = vm.channel?.topic, !topic.isEmpty {
+			//				ToolbarItem(placement: .navigation) {
+			//					HStack {
+			//						ChannelTopic(topic: topic)
+			//					}
+			//				}
+			//			}
 		}
 	}
-	
+
 	func messageAllowed(_ msg: DiscordChannel.Message) -> Bool {
 		// Currently only filters out messages from blocked users
 		guard let authorId = msg.author?.id else { return true }
-		
+
 		// check relationship
 		if let relationship = gw.user.relationships[authorId] {
 			if relationship.type == .blocked || relationship.user_ignored {
 				return false
 			}
 		}
-		
+
 		return true
 	}
 
@@ -162,31 +161,16 @@ struct ChatView: View {
 	private func sendMessage() {
 		let msg = text.trimmingCharacters(in: .whitespacesAndNewlines)
 		guard !msg.isEmpty else { return }
-		text = ""
+		text = "" // clear input field
 		Task.detached {
-			try await gw.client.createMessage(
+			let nonce: MessageSnowflake? = try? .makeFake(date: .now)
+			return try await gw.client.createMessage(
 				channelId: vm.channelId,
-				payload: .init(content: msg)
+				payload: .init(
+					content: msg,
+					nonce: nonce != nil ? .string(nonce!.rawValue) : nil
+				)
 			)
 		}
-	}
-}
-
-// TODO: Remove asap
-extension Text {
-	init(
-		markdown: String,
-		fallback: AttributedString = "",
-		syntax: AttributedString.MarkdownParsingOptions.InterpretedSyntax =
-			.inlineOnlyPreservingWhitespace
-	) {
-		self.init(
-			(try? AttributedString(
-				markdown: markdown,
-				options: AttributedString.MarkdownParsingOptions(
-					interpretedSyntax: syntax
-				)
-			)) ?? fallback
-		)
 	}
 }

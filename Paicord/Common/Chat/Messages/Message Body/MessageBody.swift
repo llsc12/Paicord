@@ -18,9 +18,7 @@ extension MessageCell {
 				if message.flags?.contains(.isComponentsV2) == true {
 					ComponentsV2View(/*components: message.components*/)
 				} else if !message.content.isEmpty {
-					Text(markdown: message.content)
-						.font(.body)
-						.foregroundStyle(.primary)
+					MarkdownText(content: message.content)
 				}
 
 				// Attachments

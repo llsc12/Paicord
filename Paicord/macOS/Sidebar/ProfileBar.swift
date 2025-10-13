@@ -35,7 +35,7 @@ struct ProfileBar: View {
 				.bold()
 				if showingUsername {
 					Text("@\(gw.user.currentUser?.username ?? "Unknown User")")
-						.transition(.flipFromTop.combined(with: .opacity))
+						.transition(.opacity)
 				} else {
 					// show status
 				}

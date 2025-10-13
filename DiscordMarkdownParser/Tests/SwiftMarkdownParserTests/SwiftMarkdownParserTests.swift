@@ -803,98 +803,74 @@ final class DiscordMarkdownParserTests: XCTestCase {
 		XCTAssertEqual(textNode?.content, "subtext or footnote or whatever")
 	}
 
-	func testTeto() async throws {
-		let markdown =
-			"""
-			# Headers
+	func testItalics() async throws {
+		let markdown = "***italics***"
+		let document = try await parser.parseToAST(markdown)
+		// get first paragraph
+		let paragraph = document.children.first as! AST.ParagraphNode
+		// top level is bold for *** (bold + italics)
+		let bold = paragraph.children.first as! AST.BoldNode
+		let _ = bold.children.first as! AST.ItalicNode
+		XCTAssertTrue(true)
+	}
 
-			# big header
-			## smaller header
-			### small header
-			-# subtext or footnote or whatever!
-
-			# Text Formatting
-			*italics* _italics_
-			__underline__ __*underlining my italics*__
-			***bold italics*** and __***bold underlined italics***__!
-			~~strikethrough~~
-
-			# Masked Links
-			[wagwan](https://llsc12.me)
-
-			# Lists
-			* unordered list with asterisk
-			* unordered list with asterisk 2
-			- unordered list with hyphen
-			- unordered list with hyphen 2
-			 - unordered list hyphen indented
-			 - unordered list hyphen indented 2
-				- unordered list hyphen double indent
-				 - unordered list hyphen triple indent
-			- unordered list with hyphen 3
-
-			1. Step 1
-			2. Step 2
-				1. Substep 1
-				2. Substep 2
-			3. Step 3?
-
-			# Code Blocks
-			`inline code`
-			```
-			code block
-			1
-			2
-			3
-			```
+	func testCodeblock() async throws {
+		let markdown = """
 			```swift
-			// code block with a language specified
-			@main
-			struct Tool {
-			 static func main() async throws {
-				print("hi mom")
-				try? await Task.sleep(for: .seconds(1))
-				print("process ending")
-				exit(0)
-			 }
-			}
+			wsg
 			```
-			> Block quote
-			> It can contain buncha inline things too
-			> ```swift
-			> // like code
-			> ```
-			> # and headers
-			> ||and spoilers! boo!||
-			<https://google.com> is a link with no embed. just remove the angle brackets, embed wont appear at all.
+			"""
+		let document = try await parser.parseToAST(markdown)
+		XCTAssertEqual(
+			(document.children.first! as! AST.CodeBlockNode).content,
+			"wsg"
+		)  // no newline for terminator like discord.
+	}
 
-			[tooltip link](https://example.org "tooltips?")
-			[no embed tooltip link](<https://example.org> "tooltip and no embed")
-
-			<email@email.com>
-			<mailto:email@email.com>
-			<+999123456789>
-			<tel:+999123456789>
-			<sms:+999123456789>
-
-			user mentions <@snowflake>
-			channel mentions <#snowflake>
-			role mentions <&snowflake>
-			custom emojis <emojiname:snowflake> or <a:emojiname:snowflake>
-
-			all date stamp formats
-			Relative <t:1757847540:R>
-			Short time <t:1757847540:t>
-			Long time <t:1757847540:T>
-			Short date <t:1757847540:d>
-			Long date <t:1757847540:D>
-			Long date short time <t:1757847540:f>
-			Long date with day of week short time <t:1757847540:F>
-
-			multiline block quotes >>> that follow through to the end of the document
+	func testNestedBlockquotes() async throws {
+		let markdown = """
+			> This is a blockquote
+			> > This should not be a nested blockquote
+			> > but rather text with > characters
 			"""
 		let document = try await parser.parseToAST(markdown)
 
-		print(document)
+		// Should have only one blockquote node, not nested ones
+		XCTAssertEqual(document.children.count, 1)
+
+		guard let blockQuoteNode = document.children.first as? AST.BlockQuoteNode
+		else {
+			XCTFail("No block quote node found")
+			return
+		}
+
+		// The blockquote should contain paragraphs with the > characters as literal text
+		let paragraphs = blockQuoteNode.children.compactMap {
+			$0 as? AST.ParagraphNode
+		}
+		XCTAssertGreaterThan(paragraphs.count, 0)
+
+		// Check that the content includes the literal > characters
+		let allTextContent = paragraphs.flatMap { $0.children }
+			.compactMap { $0 as? AST.TextNode }
+			.map { $0.content }
+			.joined(separator: " ")
+
+		XCTAssertTrue( // XCTAssertTrue failed
+			allTextContent.contains("> This should not be a nested blockquote")
+		)
+		XCTAssertTrue( // XCTAssertTrue failed
+			allTextContent.contains("> but rather text with > characters")
+		)
+
+		// Ensure we don't have nested blockquote nodes
+		let hasNestedBlockquote = blockQuoteNode.children.contains { child in
+			if child.nodeType == .blockQuote {
+				return true
+			}
+			// Check recursively in case it's nested deeper
+			return child.children.contains { $0.nodeType == .blockQuote }
+		}
+		XCTAssertFalse(hasNestedBlockquote, "Blockquotes should not be nested") // XCTAssertFalse failed - Blockquotes should not be nested
 	}
 }
