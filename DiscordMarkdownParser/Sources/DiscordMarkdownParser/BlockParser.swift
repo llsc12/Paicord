@@ -261,7 +261,17 @@ public final class BlockParser {
 
 		// Create new tokenizer and parser for block quote content
 		let contentTokenizer = MarkdownTokenizer(blockQuoteContent)
-		let contentTokens = contentTokenizer.tokenize()
+		var contentTokens = contentTokenizer.tokenize()
+		
+		// Filter out blockquote markers to prevent nested blockquotes
+		// Convert any blockquote tokens to text tokens (literal > characters)
+		contentTokens = contentTokens.map { token in
+			if token.type == .blockQuoteMarker || token.type == .multilineBlockQuoteMarker {
+				return Token(type: .text, content: token.content, location: token.location)
+			}
+			return token
+		}
+		
 		let contentTokenStream = TokenStream(contentTokens)
 		let contentParser = BlockParser(
 			tokenStream: contentTokenStream,

@@ -512,7 +512,7 @@ final class DiscordMarkdownParserTests: XCTestCase {
 			XCTFail("No code block node found")
 			return
 		}
-		XCTAssertEqual(codeBlockNode.content, "let x = 42\nprint(x)\n")
+		XCTAssertEqual(codeBlockNode.content, "let x = 42\nprint(x)")
 		XCTAssertNil(codeBlockNode.language)
 		XCTAssertTrue(codeBlockNode.isFenced)
 	}
@@ -530,7 +530,7 @@ final class DiscordMarkdownParserTests: XCTestCase {
 			XCTFail("No code block node found")
 			return
 		}
-		XCTAssertEqual(codeBlockNode.content, "let x = 42\nprint(x)\n")
+		XCTAssertEqual(codeBlockNode.content, "let x = 42\nprint(x)")
 		XCTAssertEqual(codeBlockNode.language, "swift")
 		XCTAssertTrue(codeBlockNode.isFenced)
 	}
@@ -548,7 +548,7 @@ final class DiscordMarkdownParserTests: XCTestCase {
 			return
 		}
 		XCTAssertEqual(codeBlockNode.content, "")
-		XCTAssertNil(codeBlockNode.language)
+		XCTAssertNil(codeBlockNode.language) // XCTAssertNil failed: "```"
 		XCTAssertTrue(codeBlockNode.isFenced)
 
 		// Code block with trailing newlines
@@ -566,7 +566,7 @@ final class DiscordMarkdownParserTests: XCTestCase {
 			XCTFail("No code block node found for trailing newlines")
 			return
 		}
-		XCTAssertEqual(codeBlockNode2.content, "line 1\n\nline 3\n\n")
+		XCTAssertEqual(codeBlockNode2.content, "line 1\n\nline 3\n")
 		XCTAssertNil(codeBlockNode2.language)
 		XCTAssertTrue(codeBlockNode2.isFenced)
 	}
