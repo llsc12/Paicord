@@ -304,22 +304,23 @@ public final class BlockParser {
 
     let blockQuoteContent = blockQuoteLines.joined(separator: "\n")
 
-    // For Discord behavior: prevent nested blockquotes by escaping > at start of lines
-    // Process line by line to preserve > characters as literal text
+    // pprevent nested blockquotes by escaping > at start of lines
+    // process line by line to preserve > characters as literal text
     let lines = blockQuoteContent.components(separatedBy: "\n")
     let processedLines = lines.map { line in
       let trimmedLine = line.trimmingCharacters(in: .whitespaces)
-      // If a line starts with >, add a zero-width space to break blockquote detection
+      // If a line starts with >, insert a zero-width non-whitespace character before it
+      // to prevent the tokenizer from recognizing a nested blockquote.
       if trimmedLine.hasPrefix(">") {
-        // Replace leading > with > plus zero-width space to prevent tokenizer recognition
         return line.replacingOccurrences(
           of: "^(\\s*)>",
-          with: "$1>\u{200B}",
+          with: "$1\u{2060}>",
           options: .regularExpression
         )
       }
       return line
     }
+    
     let processedContent = processedLines.joined(separator: "\n")
 
     // Create new tokenizer and parser for block quote content
@@ -348,10 +349,10 @@ public final class BlockParser {
   // Helper function to recursively clean zero-width spaces from AST nodes
   private func cleanContent(_ node: ASTNode) -> ASTNode {
     if let textNode = node as? AST.TextNode {
-      let cleanedContent = textNode.content.replacingOccurrences(
-        of: "\u{200B}",
-        with: ""
-      )
+      let cleanedContent = textNode.content
+        .replacingOccurrences(of: "\u{200B}", with: "")
+        .replacingOccurrences(of: "\u{200C}", with: "")
+        .replacingOccurrences(of: "\u{2060}", with: "")
       return AST.TextNode(
         content: cleanedContent,
         sourceLocation: textNode.sourceLocation
@@ -403,8 +404,7 @@ public final class BlockParser {
       let cleanedChildren = linkNode.children.map { cleanContent($0) }
       return AST.LinkNode(
         url: linkNode.url,
-        title: linkNode.title,
-        children: cleanedChildren,
+        title: linkNode.title, children: cleanedChildren,
         sourceLocation: linkNode.sourceLocation
       )
     }
