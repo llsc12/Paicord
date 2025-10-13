@@ -9,14 +9,14 @@
 import SwiftUI
 
 struct ProfileView: View {
-	@Environment(GatewayStore.self) var gs
-	var body: some View {
-		VStack {
-			Text("Profile View")
+  @Environment(GatewayStore.self) var gs
+  var body: some View {
+    VStack {
+      Text("Profile View")
 
-			NavigationLink("Settings") {
-				SettingsView()
-			}
-		}
-	}
+      NavigationLink("Settings") {
+        SettingsView()
+      }
+    }
+  }
 }

@@ -10,45 +10,45 @@
 import SwiftUIX
 
 struct SidebarView: View {
-	@Environment(GatewayStore.self) var gw
-	@Environment(PaicordAppState.self) var appState
+  @Environment(GatewayStore.self) var gw
+  @Environment(PaicordAppState.self) var appState
 
-	@Binding var currentGuildStore: GuildStore?
+  @Binding var currentGuildStore: GuildStore?
 
-	var body: some View {
-		HStack(spacing: 0) {
-			guildScroller
-				.frame(width: 65)
-			if let guild = currentGuildStore {
-				GuildView(guild: guild)
-			} else {
-				DMsView()
-			}
-		}
-	}
+  var body: some View {
+    HStack(spacing: 0) {
+      guildScroller
+        .frame(width: 65)
+      if let guild = currentGuildStore {
+        GuildView(guild: guild)
+      } else {
+        DMsView()
+      }
+    }
+  }
 
-	@ViewBuilder
-	var guildScroller: some View {
-		GuildScrollBar()
-			.scrollIndicators(.hidden)
-			.scrollviewForceDisableScrollBars()
-	}
+  @ViewBuilder
+  var guildScroller: some View {
+    GuildScrollBar()
+      .scrollIndicators(.hidden)
+      .scrollviewForceDisableScrollBars()
+  }
 }
 
 extension View {
-	fileprivate func scrollviewForceDisableScrollBars() -> some View {
-		#if os(macOS)
-			self
-				.introspect(.scrollView, on: .macOS(.v14...)) { scrollView in
-					scrollView.hasVerticalScroller = false
-					scrollView.hasHorizontalScroller = false
-					scrollView.scrollerStyle = .overlay
-					scrollView.autohidesScrollers = true
-					scrollView.verticalScroller?.alphaValue = 0
-					scrollView.horizontalScroller?.alphaValue = 0
-				}
-		#else
-			self
-		#endif
-	}
+  fileprivate func scrollviewForceDisableScrollBars() -> some View {
+    #if os(macOS)
+      self
+        .introspect(.scrollView, on: .macOS(.v14...)) { scrollView in
+          scrollView.hasVerticalScroller = false
+          scrollView.hasHorizontalScroller = false
+          scrollView.scrollerStyle = .overlay
+          scrollView.autohidesScrollers = true
+          scrollView.verticalScroller?.alphaValue = 0
+          scrollView.horizontalScroller?.alphaValue = 0
+        }
+    #else
+      self
+    #endif
+  }
 }

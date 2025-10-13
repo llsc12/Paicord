@@ -9,10 +9,10 @@
 import PaicordLib
 
 protocol DiscordDataStore: AnyObject {
-	var gateway: GatewayStore? { get set }
-	var eventTask: Task<Void, Never>? { get set }
-	
-	func setGateway(_ gateway: GatewayStore?)
-	func setupEventHandling()
-	func cancelEventHandling()
+  var gateway: GatewayStore? { get set }
+  var eventTask: Task<Void, Never>? { get set }
+
+  func setGateway(_ gateway: GatewayStore?)
+  func setupEventHandling()
+  func cancelEventHandling()
 }

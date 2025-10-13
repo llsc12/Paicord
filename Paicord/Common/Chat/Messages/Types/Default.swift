@@ -10,110 +10,110 @@ import PaicordLib
 import SwiftUIX
 
 extension MessageCell {
-	struct DefaultMessage: View {
-		let message: DiscordChannel.Message
-		let priorMessage: DiscordChannel.Message?
-		let guildStore: GuildStore?
-		let inline: Bool
+  struct DefaultMessage: View {
+    let message: DiscordChannel.Message
+    let priorMessage: DiscordChannel.Message?
+    let guildStore: GuildStore?
+    let inline: Bool
 
-		@State var editedPopover = false
-		@State var avatarAnimated = false
-		@State var profileOpen = false
+    @State var editedPopover = false
+    @State var avatarAnimated = false
+    @State var profileOpen = false
 
-		var body: some View {
-			if inline {
-				HStack(alignment: .top) {
-					AvatarBalancing()
+    var body: some View {
+      if inline {
+        HStack(alignment: .top) {
+          AvatarBalancing()
 
-					MessageBody(message: message)
-				}
-			} else {
-				VStack {
-					reply
-					HStack(alignment: .bottom) {
-						MessageAuthor.Avatar(
-							message: message,
-							profileOpen: $profileOpen,
-							animated: avatarAnimated
-						)
-						#if os(macOS)
-							.padding(.trailing, 4)  // balancing
-						#endif
-						userAndMessage
-					}
-					.fixedSize(horizontal: false, vertical: true)
-				}
-				.onHover { self.avatarAnimated = $0 }
-			}
-		}
+          MessageBody(message: message)
+        }
+      } else {
+        VStack {
+          reply
+          HStack(alignment: .bottom) {
+            MessageAuthor.Avatar(
+              message: message,
+              profileOpen: $profileOpen,
+              animated: avatarAnimated
+            )
+            #if os(macOS)
+              .padding(.trailing, 4)  // balancing
+            #endif
+            userAndMessage
+          }
+          .fixedSize(horizontal: false, vertical: true)
+        }
+        .onHover { self.avatarAnimated = $0 }
+      }
+    }
 
-		@ViewBuilder
-		var reply: some View {
-			if let ref = message.referenced_message {
-				HStack {
-					ReplyLine()
-						.padding(.leading, avatarSize / 2)  // align with pfp
+    @ViewBuilder
+    var reply: some View {
+      if let ref = message.referenced_message {
+        HStack {
+          ReplyLine()
+            .padding(.leading, avatarSize / 2)  // align with pfp
 
-					Text("\(ref.author?.username ?? "Unknown") • \(ref.content)")
-						.font(.caption2)
-						.foregroundStyle(.secondary)
-						.lineLimit(1)
-						.frame(maxWidth: .infinity, alignment: .leading)
-				}
-			}
-		}
+          Text("\(ref.author?.username ?? "Unknown") • \(ref.content)")
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+      }
+    }
 
-		@ViewBuilder
-		var userAndMessage: some View {
-			VStack {
-				HStack(alignment: .bottom) {
-					MessageAuthor.Username( // username line
-						message: message,
-						guildStore: guildStore,
-						profileOpen: $profileOpen
-					)
-					Date(for: message.timestamp.date) // message date
-					if let edit = message.edited_timestamp { // edited notice
-						EditStamp(edited: edit)
-					}
-				}
-				.frame(maxWidth: .infinity, alignment: .leading)
+    @ViewBuilder
+    var userAndMessage: some View {
+      VStack {
+        HStack(alignment: .bottom) {
+          MessageAuthor.Username(  // username line
+            message: message,
+            guildStore: guildStore,
+            profileOpen: $profileOpen
+          )
+          Date(for: message.timestamp.date)  // message date
+          if let edit = message.edited_timestamp {  // edited notice
+            EditStamp(edited: edit)
+          }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
 
-				MessageBody(message: message) // content
-			}
-			.frame(maxHeight: .infinity, alignment: .bottom)  // align text to bottom of cell
-		}
+        MessageBody(message: message)  // content
+      }
+      .frame(maxHeight: .infinity, alignment: .bottom)  // align text to bottom of cell
+    }
 
-		@ViewBuilder
-		func Date(for date: Date) -> some View {
-			Group {
-				if Calendar.current.isDateInToday(date) {
-					Text(message.timestamp.date, style: .time)
-				} else if Calendar.current.isDateInYesterday(date) {
-					Text("Yesterday at ") + Text(message.timestamp.date, style: .time)
-				} else {
-					Text(date, format: .dateTime.month().day().year())
-				}
-			}
-			.font(.caption2)
-			.foregroundStyle(.secondary)
-		}
+    @ViewBuilder
+    func Date(for date: Date) -> some View {
+      Group {
+        if Calendar.current.isDateInToday(date) {
+          Text(message.timestamp.date, style: .time)
+        } else if Calendar.current.isDateInYesterday(date) {
+          Text("Yesterday at ") + Text(message.timestamp.date, style: .time)
+        } else {
+          Text(date, format: .dateTime.month().day().year())
+        }
+      }
+      .font(.caption2)
+      .foregroundStyle(.secondary)
+    }
 
-		struct EditStamp: View {
-			var edited: DiscordTimestamp
-			@State private var editedPopover = false
-			var body: some View {
-				Text("(edited)")
-					.font(.caption)
-					.foregroundStyle(.secondary)
-					.popover(isPresented: $editedPopover) {
-						Text(
-							"Edited at \(edited.date.formatted(date: .abbreviated, time: .standard))"
-						)
-						.padding()
-					}
-					.onHover { self.editedPopover = $0 }
-			}
-		}
-	}
+    struct EditStamp: View {
+      var edited: DiscordTimestamp
+      @State private var editedPopover = false
+      var body: some View {
+        Text("(edited)")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+          .popover(isPresented: $editedPopover) {
+            Text(
+              "Edited at \(edited.date.formatted(date: .abbreviated, time: .standard))"
+            )
+            .padding()
+          }
+          .onHover { self.editedPopover = $0 }
+      }
+    }
+  }
 }
