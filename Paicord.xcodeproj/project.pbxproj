@@ -51,6 +51,7 @@
 		AA1878F32E81A30C009C7E40 /* GuildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1878F22E81A305009C7E40 /* GuildView.swift */; };
 		AA1878F92E81FC1A009C7E40 /* FLEX in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = AA1878F82E81FC1A009C7E40 /* FLEX */; };
 		AA5CA6522E9BCCFF00C7C82A /* Maths.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5CA6512E9BCCFC00C7C82A /* Maths.swift */; };
+		AA5CA6542E9BD37D00C7C82A /* ComponentsV2.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5CA6532E9BD37500C7C82A /* ComponentsV2.swift */; };
 		AA5DC55A2E9482ED00D81EB5 /* MessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5DC5592E9482ED00D81EB5 /* MessageCell.swift */; };
 		AA9C81832E6660BE0086B1DA /* GuildButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9C81822E6660BE0086B1DA /* GuildButton.swift */; };
 		AA9C81862E66670E0086B1DA /* CornerRadius.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9C81852E66670E0086B1DA /* CornerRadius.swift */; };
@@ -118,6 +119,7 @@
 		AA1378042E96798000100969 /* ProcessInfo+previews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProcessInfo+previews.swift"; sourceTree = "<group>"; };
 		AA1878F22E81A305009C7E40 /* GuildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuildView.swift; sourceTree = "<group>"; };
 		AA5CA6512E9BCCFC00C7C82A /* Maths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Maths.swift; sourceTree = "<group>"; };
+		AA5CA6532E9BD37500C7C82A /* ComponentsV2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentsV2.swift; sourceTree = "<group>"; };
 		AA5DC5592E9482ED00D81EB5 /* MessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageCell.swift; sourceTree = "<group>"; };
 		AA9C81822E6660BE0086B1DA /* GuildButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuildButton.swift; sourceTree = "<group>"; };
 		AA9C81852E66670E0086B1DA /* CornerRadius.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CornerRadius.swift; sourceTree = "<group>"; };
@@ -377,6 +379,7 @@
 				AADD7F8C2E99EB060025B644 /* Attachments.swift */,
 				AAB50A592E9AD5750048E8B0 /* Username.swift */,
 				57A55C562E7560CC005C8226 /* Markdown.swift */,
+				AA5CA6532E9BD37500C7C82A /* ComponentsV2.swift */,
 				AAB50A572E9AD4B80048E8B0 /* Utilities.swift */,
 			);
 			path = Messages;
@@ -588,6 +591,7 @@
 				5783AA942E6B8FD100F73F6D /* MeshGradient.swift in Sources */,
 				57DA042A2E79894500DB4C7C /* ConnectionStateView.swift in Sources */,
 				57F5AF512E7CBC7700AD5674 /* LoginViewModel.swift in Sources */,
+				AA5CA6542E9BD37D00C7C82A /* ComponentsV2.swift in Sources */,
 				AABED5A92E7FF982005BDD63 /* Merging.swift in Sources */,
 				578E1CE12E67781700C6DEA3 /* GradientText.swift in Sources */,
 				AA1097192E64C181005BC3D2 /* NotificationsView.swift in Sources */,

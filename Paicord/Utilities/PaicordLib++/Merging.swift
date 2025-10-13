@@ -274,3 +274,14 @@ extension Guild.PartialMember {
 			new.avatar_decoration_data ?? self.avatar_decoration_data
 	}
 }
+
+extension DiscordRelationship {
+	mutating func update(with new: Gateway.PartialRelationship) {
+		self.id = new.id
+		self.type = new.type
+		self.nickname = new.nickname ?? self.nickname
+		self.stranger_request = new.stranger_request ?? self.stranger_request
+		self.user_ignored = new.user_ignored ?? self.user_ignored
+		self.since = new.since ?? self.since
+	}
+}

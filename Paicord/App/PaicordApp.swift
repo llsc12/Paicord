@@ -30,13 +30,13 @@ struct PaicordApp: App {
 		SDImageCodersManager.shared.addCoder(SVGCoder)
 
 		// i foubnd out this rly cool thing if u avoid logging 40mb of data to console the client isnt slow !!!!
-		//		#if DEBUG
-		//			DiscordGlobalConfiguration.makeLogger = { loggerLabel in
-		//				var logger = Logger(label: loggerLabel)
-		//				logger.logLevel = .trace
-		//				return logger
-		//			}
-		//		#endif
+//		#if DEBUG
+//			DiscordGlobalConfiguration.makeLogger = { loggerLabel in
+//				var logger = Logger(label: loggerLabel)
+//				logger.logLevel = .trace
+//				return logger
+//			}
+//		#endif
 	}
 
 	var body: some Scene {

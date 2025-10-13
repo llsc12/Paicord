@@ -231,7 +231,7 @@ public enum Payloads {
       public var embeds: [Embed]?
       public var allowedMentions: AllowedMentions?
       public var flags: IntBitField<DiscordChannel.Message.Flag>?
-      public var components: [Interaction.ActionRow]?
+      public var components: Interaction.ComponentSwitch?
       public var attachments: [Attachment]?
       public var files: [RawFile]?
       public var poll: CreatePollRequest?
@@ -253,7 +253,7 @@ public enum Payloads {
         embeds: [Embed]? = nil,
         allowedMentions: AllowedMentions? = nil,
         flags: IntBitField<DiscordChannel.Message.Flag>? = nil,
-        components: [Interaction.ActionRow]? = nil,
+        components: Interaction.ComponentSwitch? = nil,
         attachments: [Attachment]? = nil,
         files: [RawFile]? = nil,
         poll: CreatePollRequest? = nil
@@ -278,9 +278,11 @@ public enum Payloads {
           reason: "Can only contain 'suppressEmbeds' and 'ephemeral'",
           allowed: [.suppressEmbeds, .ephemeral]
         )
-        validateElementCountDoesNotExceed(
-          components, max: 5, name: "components")
-        components?.validate()
+				if let components = components?.legacy {
+					validateElementCountDoesNotExceed(
+						components, max: 5, name: "components")
+					components.validate()
+				}
         attachments?.validate()
         embeds?.validate()
         poll?.validate()
@@ -304,7 +306,7 @@ public enum Payloads {
     public struct Modal: Sendable, Encodable, ValidatablePayload {
       public var custom_id: String
       public var title: String
-      public var components: [Interaction.ActionRow]
+      public var components: Interaction.ComponentSwitch
 
       /// Discord docs says currently you can only send text-inputs.
       /// To send other types of components, use a normal message's `components`:
@@ -316,12 +318,14 @@ public enum Payloads {
       ) {
         self.custom_id = custom_id
         self.title = title
-        self.components = textInputs.map { [.textInput($0)] }
+				self.components = .legacy(textInputs.map { [.textInput($0)] })
       }
 
-      public func validate() -> [ValidationFailure] {
-        validateElementCountInRange(
-          components, min: 1, max: 5, name: "components")
+			public func validate() -> [ValidationFailure] {
+				if let components = components.legacy {
+					validateElementCountInRange(
+						components, min: 1, max: 5, name: "components")
+				}
       }
     }
 
@@ -539,7 +543,7 @@ public enum Payloads {
     public var embeds: [Embed]?
     public var allowed_mentions: AllowedMentions?
     public var message_reference: DiscordChannel.Message.MessageReference?
-    public var components: [Interaction.ActionRow]?
+    public var components: Interaction.ComponentSwitch?
     public var sticker_ids: [String]?
     public var files: [RawFile]?
     public var attachments: [Attachment]?
@@ -569,7 +573,7 @@ public enum Payloads {
       embeds: [Embed]? = nil,
       allowed_mentions: AllowedMentions? = nil,
       message_reference: DiscordChannel.Message.MessageReference? = nil,
-      components: [Interaction.ActionRow]? = nil,
+      components: Interaction.ComponentSwitch? = nil,
       sticker_ids: [String]? = nil,
       files: [RawFile]? = nil,
       attachments: [Attachment]? = nil,
@@ -604,7 +608,7 @@ public enum Payloads {
         content?.isEmpty,
         embeds?.isEmpty,
         sticker_ids?.isEmpty,
-        components?.isEmpty,
+				components?.legacy?.isEmpty,
         files?.isEmpty,
         poll?.answers.isEmpty,
         names: "content",
@@ -637,7 +641,7 @@ public enum Payloads {
     public var embeds: [Embed]?
     public var flags: IntBitField<DiscordChannel.Message.Flag>?
     public var allowed_mentions: AllowedMentions?
-    public var components: [Interaction.ActionRow]?
+    public var components: Interaction.ComponentSwitch?
     public var files: [RawFile]?
     public var attachments: [Attachment]?
 
@@ -655,7 +659,7 @@ public enum Payloads {
       embeds: [Embed]? = nil,
       flags: IntBitField<DiscordChannel.Message.Flag>? = nil,
       allowed_mentions: AllowedMentions? = nil,
-      components: [Interaction.ActionRow]? = nil,
+      components: Interaction.ComponentSwitch? = nil,
       files: [RawFile]? = nil,
       attachments: [Attachment]? = nil
     ) {
@@ -697,7 +701,7 @@ public enum Payloads {
     public var tts: Bool?
     public var embeds: [Embed]?
     public var allowed_mentions: AllowedMentions?
-    public var components: [Interaction.ActionRow]?
+    public var components: Interaction.ComponentSwitch?
     public var files: [RawFile]?
     public var attachments: [Attachment]?
     public var flags: IntBitField<DiscordChannel.Message.Flag>?
@@ -727,7 +731,7 @@ public enum Payloads {
       tts: Bool? = nil,
       embeds: [Embed]? = nil,
       allowed_mentions: AllowedMentions? = nil,
-      components: [Interaction.ActionRow]? = nil,
+      components: Interaction.ComponentSwitch? = nil,
       files: [RawFile]? = nil,
       attachments: [Attachment]? = nil,
       flags: IntBitField<DiscordChannel.Message.Flag>? = nil,
@@ -755,7 +759,7 @@ public enum Payloads {
       validateCharacterCountDoesNotExceed(content, max: 2_000, name: "content")
       validateAtLeastOneIsNotEmpty(
         content?.isEmpty,
-        components?.isEmpty,
+				components?.legacy?.isEmpty,
         files?.isEmpty,
         embeds?.isEmpty,
         poll?.answers.isEmpty,
@@ -842,7 +846,7 @@ public enum Payloads {
     public var content: String?
     public var embeds: [Embed]?
     public var allowed_mentions: AllowedMentions?
-    public var components: [Interaction.ActionRow]?
+    public var components: Interaction.ComponentSwitch?
     public var files: [RawFile]?
     public var attachments: [Attachment]?
 
@@ -858,7 +862,7 @@ public enum Payloads {
       content: String? = nil,
       embeds: [Embed]? = nil,
       allowed_mentions: AllowedMentions? = nil,
-      components: [Interaction.ActionRow]? = nil,
+      components: Interaction.ComponentSwitch? = nil,
       files: [RawFile]? = nil,
       attachments: [Attachment]? = nil
     ) {
@@ -955,7 +959,7 @@ public enum Payloads {
       public var content: String?
       public var embeds: [Embed]?
       public var allowed_mentions: AllowedMentions?
-      public var components: [Interaction.ActionRow]?
+      public var components: Interaction.ComponentSwitch?
       public var sticker_ids: [String]?
       public var files: [RawFile]?
       public var attachments: [Attachment]?
@@ -977,7 +981,7 @@ public enum Payloads {
         content: String? = nil,
         embeds: [Embed]? = nil,
         allowed_mentions: AllowedMentions? = nil,
-        components: [Interaction.ActionRow]? = nil,
+        components: Interaction.ComponentSwitch? = nil,
         sticker_ids: [String]? = nil,
         files: [RawFile]? = nil,
         attachments: [Attachment]? = nil,
@@ -1006,7 +1010,7 @@ public enum Payloads {
           content?.isEmpty,
           embeds?.isEmpty,
           sticker_ids?.isEmpty,
-          components?.isEmpty,
+					components?.legacy?.isEmpty,
           files?.isEmpty,
           poll?.answers.isEmpty,
           names: "content",

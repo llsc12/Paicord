@@ -20,7 +20,7 @@ class CurrentUserStore: DiscordDataStore {
 	var currentUser: DiscordUser?
 	var guilds: [GuildSnowflake: Guild] = [:]
 	var privateChannels: OrderedDictionary<ChannelSnowflake, DiscordChannel> = [:]
-	var relationships: [DiscordRelationship] = []
+	var relationships: [UserSnowflake: DiscordRelationship] = [:]
 
 	// MARK: - Protocol Methods
 	func setGateway(_ gateway: GatewayStore?) {
@@ -95,7 +95,7 @@ class CurrentUserStore: DiscordDataStore {
 			})
 			.reduce(into: [:]) { $0[$1.id] = $1 }
 
-		relationships = readyData.relationships
+		relationships = readyData.relationships.reduce(into: [:], { $0[$1.id] = $1 })
 	}
 
 	private func handleUserUpdate(_ user: DiscordUser) {
@@ -112,31 +112,30 @@ class CurrentUserStore: DiscordDataStore {
 	}
 
 	private func handleRelationshipAdd(_ relationship: DiscordRelationship) {
-		if let index = relationships.firstIndex(where: { $0.id == relationship.id })
-		{
-			relationships[index] = relationship
-		} else {
-			relationships.append(relationship)
-		}
+		relationships[relationship.id] = relationship
 	}
 
 	private func handleRelationshipUpdate(
 		_ partialRelationship: Gateway.PartialRelationship
 	) {
-		if let index = relationships.firstIndex(where: {
-			$0.id == partialRelationship.id
-		}) {
-			// Update the existing relationship with new data
-			var updatedRelationship = relationships[index]
-			updatedRelationship.type = partialRelationship.type
-			relationships[index] = updatedRelationship
+//		if let index = relationships.firstIndex(where: {
+//			$0.id == partialRelationship.id
+//		}) {
+//			// Update the existing relationship with new data
+//			var updatedRelationship = relationships[index]
+//			updatedRelationship.type = partialRelationship.type
+//			relationships[index] = updatedRelationship
+//		}
+		if var existingRelationship = relationships[partialRelationship.id] {
+			existingRelationship.update(with: partialRelationship)
+			relationships[existingRelationship.id] = existingRelationship
 		}
 	}
 
 	private func handleRelationshipRemove(
 		_ partialRelationship: Gateway.PartialRelationship
 	) {
-		relationships.removeAll { $0.id == partialRelationship.id }
+		relationships.removeValue(forKey: partialRelationship.id)
 	}
 
 	private func handlePrivateChannelCreate(_ channel: DiscordChannel) {

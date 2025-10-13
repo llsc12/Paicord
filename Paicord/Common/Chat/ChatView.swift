@@ -32,15 +32,17 @@ struct ChatView: View {
 					LazyVStack(alignment: .leading, spacing: 0) {
 						ForEach(orderedMessages) { msg in
 							let prior = vm.getMessage(before: msg)
-							MessageCell(for: msg, prior: prior, guild: vm.guildStore)
-								.onAppear {
-									guard msg == vm.messages.values.last else { return }
-									self.isNearBottom = true
-								}
-								.onDisappear {
-									guard msg == vm.messages.values.last else { return }
-									self.isNearBottom = false
-								}
+							if messageAllowed(msg) {
+								MessageCell(for: msg, prior: prior, guild: vm.guildStore)
+									.onAppear {
+										guard msg == vm.messages.values.last else { return }
+										self.isNearBottom = true
+									}
+									.onDisappear {
+										guard msg == vm.messages.values.last else { return }
+										self.isNearBottom = false
+									}
+							}
 						}
 					}
 					.scrollTargetLayout()
@@ -123,6 +125,20 @@ struct ChatView: View {
 //			}
 		}
 	}
+	
+	func messageAllowed(_ msg: DiscordChannel.Message) -> Bool {
+		// Currently only filters out messages from blocked users
+		guard let authorId = msg.author?.id else { return true }
+		
+		// check relationship
+		if let relationship = gw.user.relationships[authorId] {
+			if relationship.type == .blocked || relationship.user_ignored {
+				return false
+			}
+		}
+		
+		return true
+	}
 
 	private func scheduleScrollToBottom(
 		proxy: ScrollViewProxy,
@@ -156,6 +172,7 @@ struct ChatView: View {
 	}
 }
 
+// TODO: Remove asap
 extension Text {
 	init(
 		markdown: String,

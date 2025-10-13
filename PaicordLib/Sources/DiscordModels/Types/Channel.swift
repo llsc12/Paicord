@@ -203,7 +203,7 @@ extension DiscordChannel {
 			referenced_message: DereferenceBox<Message>? = nil,
 			interaction: MessageInteraction? = nil,
 			thread: DiscordChannel? = nil,
-			components: [Interaction.ActionRow]? = nil,
+			components: Interaction.ComponentSwitch? = nil,
 			sticker_items: [StickerItem]? = nil,
 			stickers: [Sticker]? = nil,
 			position: Int? = nil,
@@ -351,6 +351,8 @@ extension DiscordChannel {
 			case failedToMentionSomeRolesInThread  // 8
 			case suppressNotifications  // 12
 			case isVoiceMessage  // 13
+			case hasSnapshot  // 14
+			case isComponentsV2  // 15
 			case __undocumented(UInt)
 		}
 
@@ -363,9 +365,26 @@ extension DiscordChannel {
 		}
 
 		/// https://discord.com/developers/docs/resources/channel#attachment-object
-		public struct Attachment: Sendable, Codable, Identifiable, Equatable, Hashable {
-			
-			public init(id: AttachmentSnowflake, filename: String, description: String? = nil, content_type: String? = nil, size: Int, url: String, proxy_url: String, placeholder: String? = nil, height: Int? = nil, width: Int? = nil, ephemeral: Bool? = nil, duration_secs: Double? = nil, waveform: String? = nil, flags: IntBitField<Flag>? = nil) {
+		public struct Attachment: Sendable, Codable, Identifiable, Equatable,
+			Hashable
+		{
+
+			public init(
+				id: AttachmentSnowflake,
+				filename: String,
+				description: String? = nil,
+				content_type: String? = nil,
+				size: Int,
+				url: String,
+				proxy_url: String,
+				placeholder: String? = nil,
+				height: Int? = nil,
+				width: Int? = nil,
+				ephemeral: Bool? = nil,
+				duration_secs: Double? = nil,
+				waveform: String? = nil,
+				flags: IntBitField<Flag>? = nil
+			) {
 				self.id = id
 				self.filename = filename
 				self.description = description
@@ -562,7 +581,7 @@ extension DiscordChannel {
 		//		public var interaction_metadata: InteractionMetadata?
 		public var interaction: MessageInteraction?
 		public var thread: DiscordChannel?
-		public var components: [Interaction.ActionRow]?
+		public var components: Interaction.ComponentSwitch?
 		public var sticker_items: [StickerItem]?
 		public var stickers: [Sticker]?
 		public var position: Int?
@@ -607,7 +626,7 @@ extension DiscordChannel {
 		//		public var interaction_metadata: DiscordChannel.Message.InteractionMetadata?
 		public var interaction: MessageInteraction?
 		public var thread: DiscordChannel?
-		public var components: [Interaction.ActionRow]?
+		public var components: Interaction.ComponentSwitch?
 		public var sticker_items: [StickerItem]?
 		public var stickers: [Sticker]?
 		public var position: Int?
@@ -697,7 +716,8 @@ extension DiscordChannel {
 }
 
 /// https://discord.com/developers/docs/resources/channel#embed-object
-public struct Embed: Sendable, Codable, Equatable, Hashable, ValidatablePayload {
+public struct Embed: Sendable, Codable, Equatable, Hashable, ValidatablePayload
+{
 
 	/// https://discord.com/developers/docs/resources/channel#embed-object-embed-types
 	@UnstableEnum<String>

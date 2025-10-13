@@ -233,7 +233,11 @@ class ChannelStore: DiscordDataStore {
 				}
 			}
 		} catch {
-			PaicordAppState.shared.error = res.asError()
+			if let error = res.asError() {
+				PaicordAppState.shared.error = error
+			} else {
+				PaicordAppState.shared.error = error
+			}
 		}
 	}
 

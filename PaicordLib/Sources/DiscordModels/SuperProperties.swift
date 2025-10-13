@@ -13,32 +13,36 @@ import Foundation
 // this is used for anti-abuse systems. It is sent at IDENTIFY in gateway and with all API requests as
 // the `X-Super-Properties` header. This extension adds the extra data. The definition only has initializer
 // for bot clients. This expands on it.
-
+// TODO: add custom encode decodes so nil fields are included.
 extension Gateway.Identify.ConnectionProperties {
 	// ios useragent: Discord/83647 CFNetwork/3860.100.1 Darwin/25.0.0
-	// ios super-properties: eyJvcyI6ImlPUyIsImJyb3dzZXIiOiJEaXNjb3JkIGlPUyIsImRldmljZSI6ImlQaG9uZTEzLDMiLCJzeXN0ZW1fbG9jYWxlIjoiZW4tR0IiLCJoYXNfY2xpZW50X21vZHMiOmZhbHNlLCJjbGllbnRfdmVyc2lvbiI6IjI5NS4wIiwicmVsZWFzZV9jaGFubmVsIjoicHRiIiwiZGV2aWNlX3ZlbmRvcl9pZCI6IjI1Qjc2RDUxLTE1NDAtNDgyNC05MjZBLTlBRDBEMUNCOTMwMiIsImRlc2lnbl9pZCI6MiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiIiwiYnJvd3Nlcl92ZXJzaW9uIjoiIiwib3NfdmVyc2lvbiI6IjI2LjAiLCJjbGllbnRfYnVpbGRfbnVtYmVyIjo4MzY0NywiY2xpZW50X2V2ZW50X3NvdXJjZSI6bnVsbCwiY2xpZW50X2xhdW5jaF9pZCI6ImNmNzRjYTQ0LWZiMjEtNDk5Yi05OTNmLTNiMjcwZTdkOTQwOCIsImxhdW5jaF9zaWduYXR1cmUiOiIxNzU2NzIzOTIwMjcyODcwMDAwIiwiY2xpZW50X2FwcF9zdGF0ZSI6ImFjdGl2ZSIsImNsaWVudF9oZWFydGJlYXRfc2Vzc2lvbl9pZCI6ImNhYjVmOGQ2LWRiMDItNGQ0ZS1hMjUzLTdjNTExZjFmYjYxYSJ9
+	// ios super-properties: eyJvcyI6ImlPUyIsImJyb3dzZXIiOiJEaXNjb3JkIGlPUyIsImRldmljZSI6ImlQaG9uZTEzLDMiLCJzeXN0ZW1fbG9jYWxlIjoiZW4tR0IiLCJoYXNfY2xpZW50X21vZHMiOmZhbHNlLCJjbGllbnRfdmVyc2lvbiI6IjMwMC4wIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiZGV2aWNlX3ZlbmRvcl9pZCI6IjlGQTA0RUVCLTUyREYtNEZGNy05NzdFLTQ5NzU5RkI4MjExRSIsImRlc2lnbl9pZCI6MiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiIiwiYnJvd3Nlcl92ZXJzaW9uIjoiIiwib3NfdmVyc2lvbiI6IjI2LjAiLCJjbGllbnRfYnVpbGRfbnVtYmVyIjo4NjI1MSwiY2xpZW50X2V2ZW50X3NvdXJjZSI6bnVsbCwiY2xpZW50X2xhdW5jaF9pZCI6IjIwY2M0OTczLTYwYWYtNDZmMy1hZTFmLTBmMTk5N2I1MmU1YiIsImxhdW5jaF9zaWduYXR1cmUiOiIxNzYwMzEyNTg1MjIyMjA2MDAwIiwiY2xpZW50X2hlYXJ0YmVhdF9zZXNzaW9uX2lkIjoiOWVmNzk3MmMtYTJiMS00MjdmLWEzODAtMzA1ODFlNTFiNjQwIiwiY2xpZW50X2FwcF9zdGF0ZSI6ImFjdGl2ZSJ9
 
 	// macos useragent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) discord/0.0.358 Chrome/134.0.6998.205 Electron/35.3.0 Safari/537.36
-	// macos super-properties: eyJvcyI6Ik1hYyBPUyBYIiwiYnJvd3NlciI6IkRpc2NvcmQgQ2xpZW50IiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X3ZlcnNpb24iOiIwLjAuMzU4Iiwib3NfdmVyc2lvbiI6IjI0LjUuMCIsIm9zX2FyY2giOiJ4NjQiLCJhcHBfYXJjaCI6Ing2NCIsInN5c3RlbV9sb2NhbGUiOiJlbi1VUyIsImhhc19jbGllbnRfbW9kcyI6ZmFsc2UsImNsaWVudF9sYXVuY2hfaWQiOiI1OWNiODdhYy03NmExLTQ3ZDAtODk2Zi03MWM3NmZiZWI2YzAiLCJicm93c2VyX3VzZXJfYWdlbnQiOiJNb3ppbGxhLzUuMCAoTWFjaW50b3NoOyBJbnRlbCBNYWMgT1MgWCAxMF8xNV83KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBkaXNjb3JkLzAuMC4zNTggQ2hyb21lLzEzNC4wLjY5OTguMjA1IEVsZWN0cm9uLzM1LjMuMCBTYWZhcmkvNTM3LjM2IiwiYnJvd3Nlcl92ZXJzaW9uIjoiMzUuMy4wIiwib3Nfc2RrX3ZlcnNpb24iOiIyNCIsImNsaWVudF9idWlsZF9udW1iZXIiOjQzODk3MSwibmF0aXZlX2J1aWxkX251bWJlciI6bnVsbCwiY2xpZW50X2V2ZW50X3NvdXJjZSI6bnVsbCwibGF1bmNoX3NpZ25hdHVyZSI6ImFhMTQ0MzAyLTE3MTItNDU3YS04NTMwLWU0MjM1YTZjZTYyNiIsImNsaWVudF9oZWFydGJlYXRfc2Vzc2lvbl9pZCI6ImI2YWJjZWExLTIxY2ItNDI2Mi04OTY2LTg1ZDdhM2RlYzJlYSIsImNsaWVudF9hcHBfc3RhdGUiOiJmb2N1c2VkIn0=
+	// macos super-properties: eyJvcyI6Ik1hYyBPUyBYIiwiYnJvd3NlciI6IkRpc2NvcmQgQ2xpZW50IiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X3ZlcnNpb24iOiIwLjAuMzYzIiwib3NfdmVyc2lvbiI6IjI0LjUuMCIsIm9zX2FyY2giOiJ4NjQiLCJhcHBfYXJjaCI6Ing2NCIsInN5c3RlbV9sb2NhbGUiOiJlbi1VUyIsImhhc19jbGllbnRfbW9kcyI6ZmFsc2UsImNsaWVudF9sYXVuY2hfaWQiOiI1ZWIxZGU0Zi05YzQ4LTRlMGItYTNhZC00ZmZhZjZkZDA2NzEiLCJicm93c2VyX3VzZXJfYWdlbnQiOiJNb3ppbGxhLzUuMCAoTWFjaW50b3NoOyBJbnRlbCBNYWMgT1MgWCAxMF8xNV83KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBkaXNjb3JkLzAuMC4zNjMgQ2hyb21lLzEzNC4wLjY5OTguMjA1IEVsZWN0cm9uLzM1LjMuMCBTYWZhcmkvNTM3LjM2IiwiYnJvd3Nlcl92ZXJzaW9uIjoiMzUuMy4wIiwib3Nfc2RrX3ZlcnNpb24iOiIyNCIsImNsaWVudF9idWlsZF9udW1iZXIiOjQ1NzE3NCwibmF0aXZlX2J1aWxkX251bWJlciI6bnVsbCwiY2xpZW50X2V2ZW50X3NvdXJjZSI6bnVsbCwibGF1bmNoX3NpZ25hdHVyZSI6IjhkNmE4ODhiLTIwYjctNDZiNi05ZTc0LTZiOTEyYzFkYzUxNSIsImNsaWVudF9oZWFydGJlYXRfc2Vzc2lvbl9pZCI6ImNkNGY4ZDI4LTU3MWItNGU4MS1iMTQ2LWM1NWU3MjA5YWU2NCIsImNsaWVudF9hcHBfc3RhdGUiOiJmb2N1c2VkIn0
 
 	// if this is in header, the user agent will be included, otherwise it will be nil
 	public init(ws: Bool = true) {
-		self.client_launch_id = SuperProperties.client_launch_id()
 		self.os = Self.__defaultOS
 		self.browser = SuperProperties.browser()
-		self.device = SuperProperties.device()
 		self.release_channel = "stable"
+		self.system_locale = SuperProperties.GenerateLocaleHeader()
+		self.has_client_mods = false
+		self.device = SuperProperties.device()
 		self.client_version = SuperProperties.client_version()
 		self.os_version = SuperProperties.os_version()
 		self.os_arch = SuperProperties.os_arch()
 		self.app_arch = SuperProperties.os_arch()
-		self.system_locale = SuperProperties.GenerateLocaleHeader()
-		self.has_client_mods = false
 		self.browser_user_agent = SuperProperties.useragent(ws: ws)
 		self.browser_version = SuperProperties.browser_version()
 		self.os_sdk_version = SuperProperties.os_sdk_version()
 		self.client_build_number = SuperProperties.client_build_number()
-		self.client_app_state = "focused"
+		self.native_build_number = nil
+		self.client_launch_id = SuperProperties.client_launch_id()
+		self.device_vendor_id = SuperProperties.device_vendor_id()
+		self.client_app_state = SuperProperties.client_app_state()
+		self.design_id = SuperProperties.design_id()
+		self.client_event_source = nil
 	}
 
 	public static var __defaultOS: String {
@@ -218,9 +222,9 @@ public enum SuperProperties {
 	public static func client_version() -> String {
 		switch Gateway.Identify.ConnectionProperties.__defaultOS {
 		case "iOS":
-			return "295.0"
+			return "300.0"
 		case "Mac OS X":
-			return "0.0.358"
+			return "0.0.363"
 		default:
 			return "18.5"
 		}
@@ -229,9 +233,9 @@ public enum SuperProperties {
 	public static func client_build_number() -> Int? {
 		switch Gateway.Identify.ConnectionProperties.__defaultOS {
 		case "iOS":
-			return 83647
+			return 86251
 		case "Mac OS X":
-			return 439729
+			return 457174
 		default:
 			return nil
 		}
@@ -268,6 +272,39 @@ public enum SuperProperties {
 			return ver?.components(separatedBy: ".").first ?? ""
 		#else
 			return nil
+		#endif
+	}
+	
+	public static func client_app_state() -> String {
+		#if os(iOS)
+			return "active"
+		#elseif os(macOS)
+			return "focused"
+		#else
+			return "unknown"
+		#endif
+	}
+	
+	public static func device_vendor_id() -> String? {
+		#if os(iOS)
+			if let uuid = UIDevice.current.identifierForVendor {
+				return uuid.uuidString.uppercased()
+			}
+			return UUID().uuidString.uppercased()  // fallback
+		#elseif os(macOS)
+		return nil
+		#else
+		return nil
+		#endif
+	}
+	
+	public static func design_id() -> Int? {
+		#if os(iOS)
+			return 2
+		#elseif os(macOS)
+		return nil
+		#else
+		return nil
 		#endif
 	}
 }

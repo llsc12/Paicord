@@ -209,7 +209,8 @@ var featureFlags: [SwiftSetting] {
 	[
 		/// https://github.com/apple/swift-evolution/blob/main/proposals/0335-existential-any.md
 		/// Require `any` for existential types.
-		.enableUpcomingFeature("ExistentialAny")
+		.enableUpcomingFeature("ExistentialAny"),
+//		.define("DISCORDBM_ENABLE_LOGGING_DURING_DECODE", .when(configuration: .debug)),
 	]
 }
 

@@ -86,15 +86,17 @@ final class GatewayStore {
 	}
 
 	func setupEventHandling() {
-		eventTask = Task { @MainActor in
-			guard let gateway else { return }
-			for await event in await gateway.events {
-				switch event.data {
-
-				default: break
-				}
-			}
-		}
+//		eventTask = Task { @MainActor in
+//			guard let gateway else { return }
+//			for await event in await gateway.events {
+//				switch event.data {
+//				default: break
+//				}
+//			}
+//			for await failure in await gateway.eventFailures {
+//				PaicordAppState.shared.error = failure.0
+//			}
+//		}
 
 		// Set up stores with gateway
 		user.setGateway(self)

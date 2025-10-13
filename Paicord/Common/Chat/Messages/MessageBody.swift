@@ -13,22 +13,19 @@ extension MessageCell {
 	struct MessageBody: View {
 		var message: DiscordChannel.Message
 		var body: some View {
-			VStack(spacing: 4) {
+			VStack(alignment: .leading, spacing: 4) {
 				// Content
-				if !message.content.isEmpty {
+				if message.flags?.contains(.isComponentsV2) == true {
+					ComponentsV2View(/*components: message.components*/)
+				} else if !message.content.isEmpty {
 					Text(markdown: message.content)
 						.font(.body)
 						.foregroundStyle(.primary)
-						.frame(maxWidth: .infinity, alignment: .leading)
 				}
 
 				// Attachments
 				if !message.attachments.isEmpty {
-					AttachmentsView(attachments: message.attachments).frame(
-						maxWidth: .infinity,
-						alignment: .leading
-					)
-
+					AttachmentsView(attachments: message.attachments)
 				}
 
 				// Embeds
@@ -37,12 +34,12 @@ extension MessageCell {
 				// Stickers
 				if let stickers = message.sticker_items, !stickers.isEmpty {
 					StickersView(stickers: stickers)
-						.frame(maxWidth: .infinity, alignment: .leading)
 				}
 
 				// Reactions
 				// TODO: Reactions
 			}
+			.frame(maxWidth: .infinity, alignment: .leading)
 		}
 	}
 }

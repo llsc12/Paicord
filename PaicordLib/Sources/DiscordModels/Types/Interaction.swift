@@ -474,6 +474,71 @@ public struct MessageInteraction: Sendable, Codable, Equatable, Hashable {
 }
 
 extension Interaction {
+	/// Due to Discord reusing the components field, this enum exists to allow you to send either legacy components or the new components v2.
+	/// This does not represent any actual Discord structure. It will try to parse legacy components first, and if that fails it will assume it's v2 components.
+	public enum ComponentSwitch: Sendable, Codable, Equatable, Hashable {
+		var legacy: [ActionRow]? {
+			if case .legacy(let actionRows) = self {
+				return actionRows
+			}
+			return nil
+		}
+		
+		var v2: Void? {
+			if case .v2 = self {
+				return ()
+			}
+			return nil
+		}
+		
+		public static func == (lhs: Interaction.ComponentSwitch, rhs: Interaction.ComponentSwitch) -> Bool {
+			switch (lhs, rhs) {
+			case let (.legacy(a), .legacy(b)):
+				return a == b
+			case (.v2, .v2):
+				return true // TODO: implement when v2 components are defined
+			default:
+				return false
+			}
+		}
+		
+		public func hash(into hasher: inout Hasher) {
+			switch self {
+			case .legacy(let actionRows):
+				hasher.combine("legacy")
+				hasher.combine(actionRows)
+			case .v2:
+				hasher.combine("v2")
+				// No properties to hash for v2 yet
+			}
+		}
+		
+		case legacy([ActionRow])
+		case v2(Void)  // Placeholder for future v2 components
+		
+		public init(from decoder: any Decoder) throws {
+			var container = try decoder.unkeyedContainer()
+			if let actionRows = try? container.decode([ActionRow].self) {
+				self = .legacy(actionRows)
+			} else {
+				self = .v2(())
+			}
+		}
+		
+		public func encode(to encoder: any Encoder) throws {
+			var container = encoder.unkeyedContainer()
+			switch self {
+			case .legacy(let actionRows):
+				try container.encode(actionRows)
+			case .v2:
+				// No encoding for v2 components yet
+				break
+			}
+		}
+		
+		
+	}
+	
 	/// https://discord.com/developers/docs/interactions/message-components#action-rows
 	/// `ActionRow` is an attempt to simplify/beautify Discord's messy components.
 	/// Anything inside `ActionRow` must not be used on its own for decoding/encoding purposes.
@@ -483,6 +548,7 @@ extension Interaction {
 	{
 
 		/// https://discord.com/developers/docs/interactions/message-components#component-object-component-types
+		/// https://docs.discord.food/resources/components#component-type
 		@UnstableEnum<Int>
 		public enum Kind: Sendable, Codable {
 			case actionRow  // 1
@@ -493,6 +559,18 @@ extension Interaction {
 			case roleSelect  // 6
 			case mentionableSelect  // 7
 			case channelSelect  // 8
+			case label  // 18
+			case fileUpload  // 19
+			
+			/* specifically components v2 below*/
+			case section  // 9
+			case textDisplay  // 10
+			case thumbnail  // 11
+			case mediaGallery  // 12
+			case file  // 13
+			case separator  // 14
+			case contentInventoryEntry  // 16
+			case container  // 17
 			case __undocumented(Int)
 		}
 
@@ -998,6 +1076,26 @@ extension Interaction {
 					self = try .channelSelect(.init(from: decoder))
 				case .textInput:
 					self = try .textInput(.init(from: decoder))
+				case .label:
+					self = .__undocumented
+				case .fileUpload:
+					self = .__undocumented
+				case .section:
+					self = .__undocumented
+				case .textDisplay:
+					self = .__undocumented
+				case .thumbnail:
+					self = .__undocumented
+				case .mediaGallery:
+					self = .__undocumented
+				case .file:
+					self = .__undocumented
+				case .separator:
+					self = .__undocumented
+				case .contentInventoryEntry:
+					self = .__undocumented
+				case .container:
+					self = .__undocumented
 				case .__undocumented:
 					self = .__undocumented
 				}
