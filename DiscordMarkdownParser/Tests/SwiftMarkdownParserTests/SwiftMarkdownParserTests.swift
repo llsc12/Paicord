@@ -569,6 +569,19 @@ final class DiscordMarkdownParserTests: XCTestCase {
     XCTAssertEqual(codeBlockNode2.content, "line 1\n\nline 3\n")
     XCTAssertNil(codeBlockNode2.language)
     XCTAssertTrue(codeBlockNode2.isFenced)
+    
+    let markdownSingleLine = """
+      ```codeblock```
+      """
+    let document3 = try await parser.parseToAST(markdownSingleLine)
+    guard let codeBlockNode3 = document3.children.first as? AST.CodeBlockNode
+    else {
+      XCTFail("No code block node found for single line")
+      return
+    }
+    XCTAssertEqual(codeBlockNode3.content, "codeblock") // XCTAssertEqual failed: ("") is not equal to ("codeblock")
+    XCTAssertNil(codeBlockNode3.language) // XCTAssertNil failed: "codeblock```"
+    XCTAssertTrue(codeBlockNode3.isFenced)
   }
 
   func testBlockQuoteWithNestedElements() async throws {
@@ -873,4 +886,33 @@ final class DiscordMarkdownParserTests: XCTestCase {
     }
     XCTAssertFalse(hasNestedBlockquote, "Blockquotes should not be nested")
   }
+
+  func testBlockSeparation() async throws {
+    let markdown =
+      """
+      # Codeblocks
+      ```codeblock```
+      ```javascript
+      codeblock with language highlights
+      function meow() {}
+      ```
+      ```
+      -# codeblocks make **all of the markdown** __disappear__
+      (||spoilers|| don't work also, see more in thread)
+      ```
+      -# codeblocks with less top/bottom padding
+      ```hello``````world```
+      -# with highlighting
+      ```rs
+      fn main() {}
+      // you can omit the next line break
+      ``````js
+      function main() {}```
+      """
+    
+    let document = try await parser.parseToAST(markdown)
+    print(document)
+  }
+  
+  
 }
