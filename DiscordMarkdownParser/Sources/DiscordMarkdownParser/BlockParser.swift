@@ -619,7 +619,7 @@ public final class BlockParser {
     let fenceChar = fenceToken.content.first!
     let fenceLength = fenceToken.content.count
 
-    // Parse language info
+    // Parse language info or single-line content
     var language: String?
     var infoString = ""
 
@@ -643,18 +643,30 @@ public final class BlockParser {
     }
 
     // Collect tokens until newline, but stop if we encounter a closing fence
+    var encounteredClosingFenceBeforeNewline = false
     while !tokenStream.isAtEnd && !tokenStream.check(.newline) {
       // Check if this token is a potential closing fence
       if tokenStream.check(.backtick) || tokenStream.check(.tildeCodeFence) {
         let token = tokenStream.current
-        if token.content.first == fenceChar
-          && token.content.count >= fenceLength
-        {
-          // This is a closing fence, don't include it in the language info
+        if token.content.first == fenceChar && token.content.count >= fenceLength {
+          // Closing fence found on the same line
+          encounteredClosingFenceBeforeNewline = true
           break
         }
       }
       infoString += tokenStream.consume().content
+    }
+
+    if encounteredClosingFenceBeforeNewline {
+      // Single-line fenced code block like ```code``` — treat infoString as content, no language
+      // Consume the closing fence token
+      _ = tokenStream.match(.backtick, .tildeCodeFence)
+      return AST.CodeBlockNode(
+        content: infoString,
+        language: nil,
+        isFenced: true,
+        sourceLocation: startLocation
+      )
     }
 
     // Only set language if we have non-empty info string after trimming
