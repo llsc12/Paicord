@@ -235,7 +235,7 @@ class ChannelStore: DiscordDataStore {
         )
         if !unknownMembers.isEmpty {
           print(
-            "Requesting \(unknownMembers.count) unknown members in guild \(guildStore.guildId)"
+            "[ChannelStore] Requesting \(unknownMembers.count) unknown members in guild \(guildStore.guildId.rawValue)"
           )
           await guildStore.requestMembers(for: unknownMembers)
         }

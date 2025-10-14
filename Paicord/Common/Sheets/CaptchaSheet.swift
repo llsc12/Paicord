@@ -123,7 +123,7 @@ struct CaptchaSheet: ViewControllerRepresentable {
           hostView.addSubview(webview)
         }
         hcaptcha?.onEvent { event, _ in
-          print("HCaptcha event: \(event.rawValue)")
+          print("[HCaptcha] event: \(event.rawValue)")
         }
         hcaptcha?.validate(on: hostView) { result in
           do {
@@ -153,7 +153,7 @@ struct CaptchaSheet: ViewControllerRepresentable {
           hostView.addSubview(webview)
         }
         hcaptcha?.onEvent { event, _ in
-          print("HCaptcha event: \(event.rawValue)")
+          print("[HCaptcha] event: \(event.rawValue)")
         }
         hcaptcha?.validate(on: hostView) { result in
           do {

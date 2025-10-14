@@ -233,7 +233,7 @@ class GuildStore: DiscordDataStore {
     _ membersChunk: Gateway.GuildMembersChunk
   ) {
     print(
-      "Received members chunk with \(membersChunk.members.count) members for guild \(membersChunk.guild_id)"
+      "[GuildStore] Received members chunk with \(membersChunk.members.count) members for guild \(membersChunk.guild_id.rawValue)"
     )
     guard membersChunk.guild_id == guildId else { return }
     for member in membersChunk.members {

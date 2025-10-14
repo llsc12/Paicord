@@ -17,7 +17,7 @@ struct SettingsView: View {
         await gs.logOut()
       }
     } catch: {
-      print("failed to logout: \(String(describing: $0))")
+      print("[SettingsView] Failed to logout: \(String(describing: $0))")
     }
   }
 }

@@ -33,7 +33,7 @@ final class GatewayStore {
 
   var state: GatewayState = .noConnection {
     didSet {
-      print("Gateway state changed to \(state)")
+      print("[GatewayStore] Gateway state changed to \(state)")
     }
   }
 
@@ -145,7 +145,7 @@ final class GatewayStore {
   func getGuildStore(for id: GuildSnowflake) -> GuildStore {
     defer {
       if !subscribedGuilds.contains(id) {
-        print("Subscribing for guild store to \(id)")
+        print("[GatewayStore] Subscribing for guild store to \(id)")
         subscribedGuilds.insert(id)
         Task {
           await gateway?.updateGuildSubscriptions(
@@ -160,7 +160,7 @@ final class GatewayStore {
                 )
               ])
           )
-          print("Subscribed to guild \(id)")
+          print("[GatewayStore] Subscribed to guild \(id)")
         }
       }
     }
