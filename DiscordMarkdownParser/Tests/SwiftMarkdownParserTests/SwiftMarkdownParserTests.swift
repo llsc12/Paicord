@@ -569,7 +569,7 @@ final class DiscordMarkdownParserTests: XCTestCase {
     XCTAssertEqual(codeBlockNode2.content, "line 1\n\nline 3\n")
     XCTAssertNil(codeBlockNode2.language)
     XCTAssertTrue(codeBlockNode2.isFenced)
-    
+
     let markdownSingleLine = """
       ```codeblock```
       """
@@ -579,8 +579,8 @@ final class DiscordMarkdownParserTests: XCTestCase {
       XCTFail("No code block node found for single line")
       return
     }
-    XCTAssertEqual(codeBlockNode3.content, "codeblock") // XCTAssertEqual failed: ("") is not equal to ("codeblock")
-    XCTAssertNil(codeBlockNode3.language) // XCTAssertNil failed: "codeblock```"
+    XCTAssertEqual(codeBlockNode3.content, "codeblock")  // XCTAssertEqual failed: ("") is not equal to ("codeblock")
+    XCTAssertNil(codeBlockNode3.language)  // XCTAssertNil failed: "codeblock```"
     XCTAssertTrue(codeBlockNode3.isFenced)
   }
 
@@ -618,54 +618,54 @@ final class DiscordMarkdownParserTests: XCTestCase {
   }
 
   // TODO: This fails.
-  //	func testMaskedLinksWithTooltipAndNoEmbed() async throws {
-  //		let markdown =
-  //			"[tooltip link](https://example.org \"tooltips?\")\n[no embed tooltip link](<https://example.org> \"tooltip and no embed\")"
-  //		let document = try await parser.parseToAST(markdown)
-  //		guard let paragraphNode = document.children.first as? AST.ParagraphNode
-  //		else {
-  //			XCTFail("No paragraph node found")
-  //			return
-  //		}
-  //		let linkNode1 =
-  //			paragraphNode.children.first(where: {
-  //				($0 as? AST.LinkNode)?.url == "https://example.org"
-  //			}) as? AST.LinkNode
-  //		let linkNode2 =
-  //			paragraphNode.children.first(where: {
-  //				($0 as? AST.LinkNode)?.url == "https://example.org"
-  //			}) as? AST.LinkNode
-  //		XCTAssertNotNil(linkNode1)
-  //		XCTAssertNotNil(linkNode2)
-  //		XCTAssertEqual(linkNode1?.title, "tooltips?")
-  //		XCTAssertEqual(linkNode2?.title, "tooltip and no embed")
-  //	}
+  //  func testMaskedLinksWithTooltipAndNoEmbed() async throws {
+  //    let markdown =
+  //      "[tooltip link](https://example.org \"tooltips?\")\n[no embed tooltip link](<https://example.org> \"tooltip and no embed\")"
+  //    let document = try await parser.parseToAST(markdown)
+  //    guard let paragraphNode = document.children.first as? AST.ParagraphNode
+  //    else {
+  //      XCTFail("No paragraph node found")
+  //      return
+  //    }
+  //    let linkNode1 =
+  //      paragraphNode.children.first(where: {
+  //        ($0 as? AST.LinkNode)?.url == "https://example.org"
+  //      }) as? AST.LinkNode
+  //    let linkNode2 =
+  //      paragraphNode.children.first(where: {
+  //        ($0 as? AST.LinkNode)?.url == "https://example.org"
+  //      }) as? AST.LinkNode
+  //    XCTAssertNotNil(linkNode1)
+  //    XCTAssertNotNil(linkNode2)
+  //    XCTAssertEqual(linkNode1?.title, "tooltips?")
+  //    XCTAssertEqual(linkNode2?.title, "tooltip and no embed")
+  //  }
 
   // TODO: This fails.
-  //	func testAutolinkedUrlsEmailsPhones() async throws {
-  //		let markdown = "<https://google.com> <email@email.com> <tel:+999123456789>"
-  //		let document = try await parser.parseToAST(markdown)
-  //		guard let paragraphNode = document.children.first as? AST.ParagraphNode
-  //		else {
-  //			XCTFail("No paragraph node found")
-  //			return
-  //		}
-  //		let urlNode =
-  //			paragraphNode.children.first(where: {
-  //				($0 as? AST.TextNode)?.content == "https://google.com"
-  //			}) as? AST.TextNode
-  //		let emailNode =
-  //			paragraphNode.children.first(where: {
-  //				($0 as? AST.TextNode)?.content == "email@email.com"
-  //			}) as? AST.TextNode
-  //		let phoneNode =
-  //			paragraphNode.children.first(where: {
-  //				($0 as? AST.TextNode)?.content == "tel:+999123456789"
-  //			}) as? AST.TextNode
-  //		XCTAssertNotNil(urlNode)
-  //		XCTAssertNotNil(emailNode)
-  //		XCTAssertNotNil(phoneNode)
-  //	}
+  //  func testAutolinkedUrlsEmailsPhones() async throws {
+  //    let markdown = "<https://google.com> <email@email.com> <tel:+999123456789>"
+  //    let document = try await parser.parseToAST(markdown)
+  //    guard let paragraphNode = document.children.first as? AST.ParagraphNode
+  //    else {
+  //      XCTFail("No paragraph node found")
+  //      return
+  //    }
+  //    let urlNode =
+  //      paragraphNode.children.first(where: {
+  //        ($0 as? AST.TextNode)?.content == "https://google.com"
+  //      }) as? AST.TextNode
+  //    let emailNode =
+  //      paragraphNode.children.first(where: {
+  //        ($0 as? AST.TextNode)?.content == "email@email.com"
+  //      }) as? AST.TextNode
+  //    let phoneNode =
+  //      paragraphNode.children.first(where: {
+  //        ($0 as? AST.TextNode)?.content == "tel:+999123456789"
+  //      }) as? AST.TextNode
+  //    XCTAssertNotNil(urlNode)
+  //    XCTAssertNotNil(emailNode)
+  //    XCTAssertNotNil(phoneNode)
+  //  }
 
   func testMultilineBlockQuote() async throws {
     let markdown = """
@@ -908,11 +908,124 @@ final class DiscordMarkdownParserTests: XCTestCase {
       // you can omit the next line break
       ``````js
       function main() {}```
+      ```hi``` ```mom```
       """
-    
+
     let document = try await parser.parseToAST(markdown)
+    //    XCTAssertEqual(document.children.count, 0) // set this in a sec
     print(document)
+    guard document.children[0] as? AST.HeadingNode != nil else {
+      XCTFail("No heading node found")
+      return
+    }
+    guard document.children[1] as? AST.CodeBlockNode != nil else {
+      XCTFail("No first codeblock node found")
+      return
+    }
+    // after a codeblock ends, you can immediately start a new one without a line break and the codeblocks will be very close together.
+    // but if there's a line break, it should be represented in the AST.
+    guard document.children[2] as? AST.LineBreakNode != nil else {
+      XCTFail("No line break after first codeblock")
+      return
+    }
+    guard document.children[3] as? AST.CodeBlockNode != nil else {
+      XCTFail("No second codeblock node found")
+      return
+    }
+    guard document.children[4] as? AST.LineBreakNode != nil else {
+      XCTFail("No line break after second codeblock")
+      return
+    }
+    guard let codeblockMD = document.children[5] as? AST.CodeBlockNode else {
+      XCTFail("No third codeblock node found")
+      return
+    }
+    // ensure markdown inside codeblock is in the content raw
+    XCTAssertEqual(
+      codeblockMD.content,
+      "-# codeblocks make **all of the markdown** __disappear__\n(||spoilers|| don\'t work also, see more in thread)"
+    )
+    guard document.children[6] as? AST.LineBreakNode != nil else {
+      XCTFail("No line break after third codeblock")
+      return
+    }
+    guard let footnote1 = document.children[7] as? AST.FootnoteNode else {
+      XCTFail("No footnote node found")
+      return
+    }
+    XCTAssertEqual(
+      (footnote1.children.first as? AST.TextNode)?.content,
+      "codeblocks with less top/bottom padding"
+    )
+    // if you make two codeblocks back to back without a line break, they should be right next to each other in the AST without separation.
+    // currently this test fails. any codeblock next to another codeblock with no separation fails.
+    guard let codeblock1 = document.children[8] as? AST.CodeBlockNode,
+      let codeblock2 = document.children[9] as? AST.CodeBlockNode
+    else {
+      XCTFail(
+        "No fourth or fifth codeblock node found, without a middle line break"
+      )
+      return
+    }
+    XCTAssertEqual(codeblock1.content, "hello")
+    XCTAssertEqual(codeblock2.content, "world")
+
+    // Accept an optional line break between the adjacent codeblocks line and the following footnote.
+    let maybeBreak = document.children[safe: 10]
+    let nextIndexAfterBreak = (maybeBreak is AST.LineBreakNode) ? 11 : 10
+
+    guard let footnote2 = document.children[safe: nextIndexAfterBreak] as? AST.FootnoteNode else {
+      XCTFail("No second footnote node found")
+      return
+    }
+    XCTAssertEqual(
+      (footnote2.children.first as? AST.TextNode)?.content,
+      "with highlighting"
+    )
+    guard let codeblock3 = document.children[safe: nextIndexAfterBreak + 1] as? AST.CodeBlockNode else {
+      XCTFail("No sixth codeblock node found")
+      return
+    }
+    XCTAssertEqual(codeblock3.language, "rs")
+    XCTAssertEqual(
+      codeblock3.content,
+      "fn main() {}\n// you can omit the next line break"
+    )
+    guard let codeblock4 = document.children[safe: nextIndexAfterBreak + 2] as? AST.CodeBlockNode else {
+      XCTFail("No seventh codeblock node found")
+      return
+    }
+    XCTAssertEqual(codeblock4.language, "js")
+    XCTAssertEqual(codeblock4.content, "function main() {}")
   }
-  
-  
+
+  func testLineBreaks() async throws {
+    let markdown = """
+      This is a line with a hard break.
+      This is the next line.
+
+      This is a new paragraph after a blank line.
+      """
+    let document = try await parser.parseToAST(markdown)
+    guard let paragraph1 = document.children[0] as? AST.ParagraphNode else {
+      XCTFail("No first paragraph node found")
+      return
+    }
+    XCTAssertEqual(paragraph1.children.count, 3)  // Text, LineBreak, Text
+    XCTAssertTrue(paragraph1.children[1] is AST.LineBreakNode)
+
+    guard let paragraph2 = document.children[1] as? AST.ParagraphNode else {
+      XCTFail("No second paragraph node found")
+      return
+    }
+    XCTAssertEqual(paragraph2.children.count, 1)  // Just text
+  }
+}
+
+// MARK: - Safe indexing helper used above
+private extension Array where Element == ASTNode {
+  subscript(safe index: Int) -> ASTNode? {
+    guard index >= 0 && index < count else { return nil }
+    return self[index]
+  }
 }

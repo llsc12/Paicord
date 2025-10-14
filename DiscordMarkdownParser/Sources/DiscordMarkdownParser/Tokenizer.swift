@@ -203,43 +203,31 @@ public final class MarkdownTokenizer {
 
           // Check if this is a valid closing fence (same length or longer)
           if fenceCount >= fenceLength {
-            // Verify it's followed by end of line or whitespace only
-            var isValidClosingFence = true
-            while !isAtEnd && currentChar != "\n" && currentChar != "\r" {
-              if !currentChar.isWhitespace {
-                isValidClosingFence = false
-                break
+            // This newline is directly before a valid closing fence (trailing chars allowed)
+            // Rewind to start of fence and emit it next
+            position = fenceStart
+            line = savedLine
+            column = savedColumn
+
+            // Recalculate position to fence start
+            for i in savedPosition..<fenceStart {
+              if characters[i] == "\n" {
+                line += 1
+                column = 1
+              } else {
+                column += 1
               }
-              advance()
             }
 
-            if isValidClosingFence {
-              // This newline is directly before a valid closing fence
-              // Don't include the newline, just process the closing fence
-              position = fenceStart
-              line = savedLine
-              column = savedColumn
-
-              // Recalculate position to fence start
-              for i in savedPosition..<fenceStart {
-                if characters[i] == "\n" {
-                  line += 1
-                  column = 1
-                } else {
-                  column += 1
-                }
-              }
-
-              // Process the closing fence
-              let closingFence = checkClosingFenceAllowingIndentation()
-              if closingFence != nil {
-                inFencedCodeBlock = false
-                fenceCharacter = nil
-                fenceLength = 0
-                fenceStartColumn = 0
-              }
-              return closingFence
+            // Process the closing fence
+            let closingFence = checkClosingFenceAllowingIndentation()
+            if closingFence != nil {
+              inFencedCodeBlock = false
+              fenceCharacter = nil
+              fenceLength = 0
+              fenceStartColumn = 0
             }
+            return closingFence
           }
         }
 
@@ -552,6 +540,17 @@ public final class MarkdownTokenizer {
     while !isAtEnd && currentChar == "`" {
       content.append(currentChar)
       advance()
+    }
+
+    // If this is a fence (>=3) and we're not already inside a fenced code block,
+    // treat this as starting a fenced code block so the tokenizer will handle
+    // closing fences and inner content appropriately.
+    if content.count >= 3 && !inFencedCodeBlock {
+      inFencedCodeBlock = true
+      fenceCharacter = "`"
+      fenceLength = content.count
+      // Approximate start column for the fence; we moved `content.count` chars forward
+      fenceStartColumn = startLocation.column
     }
 
     return Token(type: .backtick, content: content, location: startLocation)
@@ -1221,8 +1220,8 @@ public final class MarkdownTokenizer {
     var content = ""
     var count = 0
 
-    // Count fence characters
-    while !isAtEnd && currentChar == char {
+    // Count up to the opening fence length and emit exactly that many
+    while !isAtEnd && currentChar == char && count < fenceLength {
       content.append(currentChar)
       count += 1
       advance()
@@ -1237,23 +1236,7 @@ public final class MarkdownTokenizer {
       return nil
     }
 
-    // Check that this is followed by end of line or whitespace only
-    // This ensures we don't close on fence characters that are part of content
-    var tempPos = position
-
-    while tempPos < characters.count && characters[tempPos] != "\n"
-      && characters[tempPos] != "\r"
-    {
-      if !characters[tempPos].isWhitespace {
-        // There's non-whitespace content after the fence, so this is not a closing fence
-        position = startLocation.offset
-        line = startLocation.line
-        column = startLocation.column
-        return nil
-      }
-      tempPos += 1
-    }
-
+    // Do NOT enforce trailing-whitespace-only; allow adjacent fences/content
     let tokenType: TokenType = char == "`" ? .backtick : .tildeCodeFence
     return Token(type: tokenType, content: content, location: startLocation)
   }
@@ -1262,13 +1245,11 @@ public final class MarkdownTokenizer {
     let startLocation = currentLocation
     var content = ""
 
-    // Consume characters until newline, but stop if we are about to hit a valid
-    // closing fence on this line (to allow single-line fenced blocks like ```code```).
+    // The main `nextToken` loop has already checked for a valid closing fence.
+    // Consume characters until newline or before a potential closing fence sequence
     while !isAtEnd && currentChar != "\n" && currentChar != "\r" {
-      // If we see the fence character, check if from here to end-of-line is a valid
-      // closing fence (>= opening length and followed only by whitespace).
+      // Stop before a fence sequence of the opening length or longer
       if let fenceChar = fenceCharacter, currentChar == fenceChar {
-        // Look ahead without consuming to verify a valid closing fence sequence.
         var pos = position
         var count = 0
         while pos < characters.count && characters[pos] == fenceChar {
@@ -1276,20 +1257,7 @@ public final class MarkdownTokenizer {
           pos += 1
         }
         if count >= fenceLength {
-          // Ensure the remainder of the line is whitespace only.
-          var onlyWhitespaceToEOL = true
-          var scan = pos
-          while scan < characters.count && characters[scan] != "\n" && characters[scan] != "\r" {
-            if !characters[scan].isWhitespace {
-              onlyWhitespaceToEOL = false
-              break
-            }
-            scan += 1
-          }
-          if onlyWhitespaceToEOL {
-            // Stop before the fence so that the outer loop can emit the fence token.
-            break
-          }
+          break
         }
       }
 
@@ -1312,11 +1280,6 @@ public final class MarkdownTokenizer {
     let originalLine = line
     let originalColumn = column
 
-    // We allow closing fences to appear anywhere on the line (Discord-style),
-    // provided that from the fence start to end-of-line there is only the fence
-    // and optional trailing whitespace. We also allow up to 3 leading spaces/tabs
-    // before the fence (standard indentation allowance).
-
     // Skip up to three leading spaces or tabs.
     var spacesSkipped = 0
     while spacesSkipped < 3 && !isAtEnd {
@@ -1330,7 +1293,7 @@ public final class MarkdownTokenizer {
 
     // After skipping indentation, the next character must match the opening fence character.
     if currentChar == fenceChar {
-      // Defer to the standard closing-fence logic which validates count and trailing content.
+      // Emit a closing fence token of exactly the opening length
       if let fence = checkClosingFence() {
         return fence
       }

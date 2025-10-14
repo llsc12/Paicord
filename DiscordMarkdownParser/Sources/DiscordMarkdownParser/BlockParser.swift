@@ -12,6 +12,8 @@ public final class BlockParser {
   private let tokenStream: TokenStream
   private let configuration: DiscordMarkdownParser.Configuration
   private var linkReferences: [String: LinkReference] = [:]
+  // Track the last emitted top-level block type to decide newline handling
+  private var lastEmittedBlockType: ASTNodeType? = nil
 
   /// Initialize with token stream and configuration
   public init(
@@ -63,6 +65,7 @@ public final class BlockParser {
 
       if let block = try parseBlock() {
         children.append(block)
+        lastEmittedBlockType = block.nodeType
         consecutiveNilBlocks = 0  // Reset counter when we get a valid block
       } else {
         consecutiveNilBlocks += 1
@@ -119,9 +122,20 @@ public final class BlockParser {
       return try parseIndentedCodeBlock()
 
     case .newline:
-      // Empty line - skip
-      tokenStream.advance()
-      return nil
+      // Top-level newline handling: emit a visible line break node if
+      // there is exactly one newline and the previous emitted block was a code block.
+      var newlineCount = 0
+      while tokenStream.check(.newline) {
+        tokenStream.advance()
+        newlineCount += 1
+      }
+      if newlineCount == 1, lastEmittedBlockType == .codeBlock {
+        return AST.LineBreakNode(isHard: false, sourceLocation: token.location)
+      } else {
+        // 2+ newlines act as a blank line/paragraph separator with no explicit node
+        // or single newline after non-code blocks — skip
+        return nil
+      }
 
     default:
       // Check for setext heading
@@ -661,6 +675,7 @@ public final class BlockParser {
       // Single-line fenced code block like ```code``` — treat infoString as content, no language
       // Consume the closing fence token
       _ = tokenStream.match(.backtick, .tildeCodeFence)
+      // Do not consume a trailing newline here; let the top-level newline handler decide
       return AST.CodeBlockNode(
         content: infoString,
         language: nil,
@@ -771,33 +786,64 @@ public final class BlockParser {
 
   private func parseParagraph() throws -> AST.ParagraphNode {
     let startLocation = tokenStream.current.location
+    var children: [ASTNode] = []
 
-    // Use inline parser to properly handle inline elements like code spans, italic, etc.
-    let inlineParser = InlineParser(
-      tokenStream: tokenStream,
-      configuration: configuration
-    )
-    let inlineNodes = try inlineParser.parseInlines(until: [.newline, .eof])
+    while !tokenStream.isAtEnd {
+      // Parse a single line worth of inline content
+      let inlineParser = InlineParser(
+        tokenStream: tokenStream,
+        configuration: configuration
+      )
+      let inlineNodes = try inlineParser.parseInlines(until: [.newline, .eof])
+      children.append(contentsOf: inlineNodes)
+
+      // End if EOF
+      if tokenStream.isAtEnd { break }
+
+      // If the current token is a newline, decide whether to continue the paragraph
+      if tokenStream.check(.newline) {
+        // Consume a single newline
+        tokenStream.advance()
+
+        // If another newline follows, it's a blank line -> paragraph ends
+        if tokenStream.check(.newline) {
+          // Consume any additional newlines
+          while tokenStream.check(.newline) { tokenStream.advance() }
+          break
+        }
+
+        // If the next token would start a new block, end the paragraph here
+        if startsNewBlock(at: tokenStream.current) {
+          break
+        }
+
+        // Otherwise, this is a soft line break within the same paragraph
+        children.append(
+          AST.LineBreakNode(isHard: false, sourceLocation: startLocation)
+        )
+        // Continue to parse the next line as part of the same paragraph
+        continue
+      } else {
+        // No newline boundary; paragraph ends
+        break
+      }
+    }
 
     return AST.ParagraphNode(
-      children: inlineNodes,
+      children: children,
       sourceLocation: startLocation
     )
   }
 
-  private func isBlockBoundary() -> Bool {
-    let token = tokenStream.current
-
+  /// Determine if the given token begins a new block-level construct
+  private func startsNewBlock(at token: Token) -> Bool {
     switch token.type {
-    case .newline:
-      // Check if followed by another newline (blank line)
-      return tokenStream.peek().type == .newline
-    case .atxHeaderStart, .blockQuoteMarker, .listMarker:
+    case .atxHeaderStart, .blockQuoteMarker, .multilineBlockQuoteMarker,
+      .listMarker, .indentedCodeBlock, .footnoteHeaderMarker:
       return true
     case .backtick, .tildeCodeFence:
+      // Treat as a new block only if it's a fence of length >= 3
       return token.content.count >= 3
-    case .indentedCodeBlock:
-      return true
     case .eof:
       return true
     default:

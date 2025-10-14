@@ -113,11 +113,12 @@ struct MarkdownText: View {
               .highlightMode(.languageAlias(language))
           } else {
             CodeText(code)
+              
           }
         }
-        .padding(2)
+        .padding(8)
       }
-      .background(Color(hexadecimal: "#1f202f"))
+      .background(Color(hexadecimal: "#1f2126"))
       .cornerRadius(6)
     }
   }
