@@ -1020,6 +1020,41 @@ final class DiscordMarkdownParserTests: XCTestCase {
     }
     XCTAssertEqual(paragraph2.children.count, 1)  // Just text
   }
+  
+  func testNestedFormattingInsideStrikethrough() async throws {
+    let markdown = "~~***__hi__***~~"
+    let document = try await parser.parseToAST(markdown)
+    guard let paragraph = document.children.first as? AST.ParagraphNode else {
+      XCTFail("No paragraph node found")
+      return
+    }
+    XCTAssertEqual(paragraph.children.count, 1, "Paragraph should have exactly one child (strikethrough)")
+    guard let strike = paragraph.children.first as? AST.StrikethroughNode else {
+      XCTFail("Expected StrikethroughNode as first child")
+      return
+    }
+    XCTAssertEqual(strike.children.count, 1, "Strikethrough should contain one child (bold)")
+    guard let bold = strike.children.first as? AST.BoldNode else {
+      XCTFail("Expected BoldNode inside StrikethroughNode")
+      return
+    }
+    XCTAssertEqual(bold.children.count, 1, "Bold should contain one child (italic)")
+    guard let italic = bold.children.first as? AST.ItalicNode else {
+      XCTFail("Expected ItalicNode inside BoldNode")
+      return
+    }
+    XCTAssertEqual(italic.children.count, 1, "Italic should contain one child (underline)")
+    guard let underline = italic.children.first as? AST.UnderlineNode else {
+      XCTFail("Expected UnderlineNode inside ItalicNode")
+      return
+    }
+    XCTAssertEqual(underline.children.count, 1, "Underline should contain one child (text)")
+    guard let text = underline.children.first as? AST.TextNode else {
+      XCTFail("Expected TextNode inside UnderlineNode")
+      return
+    }
+    XCTAssertEqual(text.content, "hi", "Final text content should be 'hi'")
+  }
 }
 
 // MARK: - Safe indexing helper used above

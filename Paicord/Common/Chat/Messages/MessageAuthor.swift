@@ -91,7 +91,11 @@ extension MessageCell {
           }
         }
         .buttonStyle(.plain)
+        #if os(iOS)
         .font(.callout)
+        #elseif os(macOS)
+        .font(.body)
+        #endif
         .fontWeight(.semibold)
       }
     }

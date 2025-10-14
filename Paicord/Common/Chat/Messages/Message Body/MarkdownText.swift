@@ -3,7 +3,6 @@
 //  Paicord
 //
 //  Created by Lakhan Lothiyi on 13/09/2025.
-//  Copyright © 2025 Lakhan Lothiyi.
 //
 
 import DiscordMarkdownParser
@@ -52,6 +51,13 @@ struct MarkdownText: View {
         } else {
           Text("")
         }
+      case .footnote:
+        if let attr = block.attributedContent {
+          let converted = AttributedString(attr)
+          Text(converted)
+        } else {
+          Text("")
+        }
 
       case .codeBlock:
         if let code = block.codeContent {
@@ -87,6 +93,19 @@ struct MarkdownText: View {
             }
           }
         }
+      case .listItem:
+        if let attr = block.attributedContent {
+          let converted = AttributedString(attr)
+          Text(converted)
+        } else if let children = block.children {
+          VStack(alignment: .leading, spacing: 4) {
+            ForEach(children) { nested in
+              BlockView(block: nested)
+            }
+          }
+        } else {
+          Text("")
+        }
 
       default:
         // Fallback: attempt to render attributed content
@@ -104,28 +123,52 @@ struct MarkdownText: View {
   struct Codeblock: View {
     var code: String
     var language: String?
-
+    @State private var isHovered: Bool = false
     var body: some View {
-      ScrollView(.horizontal) {
-        Group {
-          if let language {
-            CodeText(code)
-              .highlightMode(.languageAlias(language))
-          } else {
-            CodeText(code)
-              
-          }
+      Group {
+        if let language {
+          CodeText(code)
+            .highlightMode(.languageAlias(language))
+        } else {
+          Text(code)  // no highlighting
+            .fontDesign(.monospaced)
         }
-        .padding(8)
       }
-      .background(Color(hexadecimal: "#1f2126"))
-      .cornerRadius(6)
+      .containerRelativeFrame(.horizontal, alignment: .leading) { length, _ in
+        max(length * 0.8, 250)
+      }
+      .padding(8)
+      .background(Color(hexadecimal: "#1f202f"))
+      .clipShape(.rounded)
+      .overlay(
+        RoundedRectangle(cornerSize: .init(10), style: .continuous)
+          .stroke(Color(hexadecimal: "#373745"), lineWidth: 1)
+      )
+      .overlay(alignment: .topTrailing) {
+        if isHovered {
+          Button {
+            #if os(macOS)
+              let pasteboard = NSPasteboard.general
+              pasteboard.clearContents()
+              pasteboard.setString(code, forType: .string)
+            #else
+              UIPasteboard.general.string = code
+            #endif
+          } label: {
+            Image(systemName: "doc.on.doc")
+              .padding(6)
+              .background(.ultraThinMaterial)
+              .clipShape(Circle())
+          }
+          .buttonStyle(.plain)
+          .padding(6)
+        }
+      }
+      .onHover { self.isHovered = $0 }
     }
   }
 }
 
-// A simple block model representing each top-level block parsed from the AST.
-// Inline content is provided as an NSAttributedString in `attributedContent` when applicable.
 struct BlockElement: Identifiable {
   let id = UUID()
   let nodeType: ASTNodeType
@@ -134,7 +177,7 @@ struct BlockElement: Identifiable {
   let codeContent: String?
   let language: String?
   let level: Int?  // heading level
-  let children: [BlockElement]?  // for nested blocks (blockquotes, lists)
+  let children: [BlockElement]?  // for nested blocks (lists, codeblocks etc, but not blockquotes.)
   let sourceLocation: SourceLocation?
 }
 
@@ -143,6 +186,8 @@ class MarkdownRendererVM {
   static var parser: DiscordMarkdownParser = {
     .init()
   }()
+
+  private enum BaseInlineStyle { case body, footnote }
 
   var blocks: [BlockElement] = []
 
@@ -178,7 +223,10 @@ class MarkdownRendererVM {
   private func makeBlock(from node: ASTNode) async -> BlockElement? {
     switch node.nodeType {
     case .paragraph:
-      let attributed = renderInlinesToNSAttributedString(nodes: node.children)
+      let attributed = renderInlinesToNSAttributedString(
+        nodes: node.children,
+        baseStyle: .body
+      )
       return BlockElement(
         nodeType: .paragraph,
         attributedContent: attributed,
@@ -193,7 +241,8 @@ class MarkdownRendererVM {
       if let heading = node as? AST.HeadingNode {
         let attributed = renderInlinesToNSAttributedString(
           nodes: heading.children,
-          headingLevel: heading.level
+          headingLevel: heading.level,
+          baseStyle: .body
         )
         return BlockElement(
           nodeType: .heading,
@@ -206,7 +255,20 @@ class MarkdownRendererVM {
         )
       }
       return nil
-
+    case .footnote:
+      let attributed = renderInlinesToNSAttributedString(
+        nodes: node.children,
+        baseStyle: .footnote
+      )
+      return BlockElement(
+        nodeType: .footnote,
+        attributedContent: attributed,
+        codeContent: nil,
+        language: nil,
+        level: nil,
+        children: nil,
+        sourceLocation: node.sourceLocation
+      )
     case .codeBlock:
       if let code = node as? AST.CodeBlockNode {
         return BlockElement(
@@ -262,7 +324,10 @@ class MarkdownRendererVM {
             items.append(itemBlock)
           } else {
             // fallback: try to convert inline children to a paragraph inside list item
-            let attr = renderInlinesToNSAttributedString(nodes: item.children)
+            let attr = renderInlinesToNSAttributedString(
+              nodes: item.children,
+              baseStyle: .body
+            )
             let itemBlock = BlockElement(
               nodeType: .listItem,
               attributedContent: attr,
@@ -302,7 +367,10 @@ class MarkdownRendererVM {
 
     default:
       // For other block-like nodes, attempt to render their inline children.
-      let attr = renderInlinesToNSAttributedString(nodes: node.children)
+      let attr = renderInlinesToNSAttributedString(
+        nodes: node.children,
+        baseStyle: .body
+      )
       return BlockElement(
         nodeType: node.nodeType,
         attributedContent: attr,
@@ -320,51 +388,37 @@ class MarkdownRendererVM {
   // typographic styles for bold/italic/underline/strikethrough/monospace & links.
   private func renderInlinesToNSAttributedString(
     nodes: [ASTNode],
-    headingLevel: Int? = nil
-  )
-    -> NSAttributedString
-  {
+    headingLevel: Int? = nil,
+    baseStyle: BaseInlineStyle = .body
+  ) -> NSAttributedString {
     let result = NSMutableAttributedString()
-
-    let baseFontSize: CGFloat = 14.0
+    let baseFont: Any
+    let baseColor: AppKitOrUIKitColor
+    switch baseStyle {
+    case .body:
+      baseFont = FontHelpers.preferredBodyFont()
+      baseColor = AppKitOrUIKitColor.labelCompatible
+    case .footnote:
+      baseFont = FontHelpers.preferredFootnoteFont()
+      baseColor = AppKitOrUIKitColor.secondaryLabelCompatible
+    }
     let baseAttributes: [NSAttributedString.Key: Any] = [
-      .foregroundColor: AppKitOrUIKitColor.labelCompatible,
-      .font: FontHelpers.systemFont(size: baseFontSize),
+      .foregroundColor: baseColor,
+      .font: baseFont,
     ]
-
     for node in nodes {
-      append(
-        node: node,
-        to: result,
-        baseAttributes: baseAttributes,
-        baseFontSize: baseFontSize
-      )
+      append(node: node, to: result, baseAttributes: baseAttributes)
     }
-
-    // If this is a heading, apply heading font to the whole attributed string.
     if let level = headingLevel, result.length > 0 {
-      var headingFont: Any = FontHelpers.boldFont(base: baseFontSize)
-      switch level {
-      case 1: headingFont = FontHelpers.systemFont(size: 24)
-      case 2: headingFont = FontHelpers.systemFont(size: 20)
-      case 3: headingFont = FontHelpers.systemFont(size: 18)
-      default: headingFont = FontHelpers.boldFont(base: baseFontSize)
-      }
-      result.addAttribute(
-        .font,
-        value: headingFont,
-        range: NSRange(location: 0, length: result.length)
-      )
+      FontHelpers.applyHeadingLevel(level, to: result)
     }
-
     return result
   }
 
   private func append(
     node: ASTNode,
     to container: NSMutableAttributedString,
-    baseAttributes: [NSAttributedString.Key: Any],
-    baseFontSize: CGFloat
+    baseAttributes: [NSAttributedString.Key: Any]
   ) {
     switch node.nodeType {
     case .text:
@@ -382,16 +436,10 @@ class MarkdownRendererVM {
         append(
           node: child,
           to: inner,
-          baseAttributes: baseAttributes,
-          baseFontSize: baseFontSize
+          baseAttributes: baseAttributes
         )
       }
-      var newAttrs = baseAttributes
-      newAttrs[.font] = FontHelpers.italicFont(base: baseFontSize)
-      inner.addAttributes(
-        newAttrs,
-        range: NSRange(location: 0, length: inner.length)
-      )
+      FontHelpers.applyTrait(.italic, to: inner)
       container.append(inner)
 
     case .bold:
@@ -400,16 +448,10 @@ class MarkdownRendererVM {
         append(
           node: child,
           to: inner,
-          baseAttributes: baseAttributes,
-          baseFontSize: baseFontSize
+          baseAttributes: baseAttributes
         )
       }
-      var newAttrs = baseAttributes
-      newAttrs[.font] = FontHelpers.boldFont(base: baseFontSize)
-      inner.addAttributes(
-        newAttrs,
-        range: NSRange(location: 0, length: inner.length)
-      )
+      FontHelpers.applyTrait(.bold, to: inner)
       container.append(inner)
 
     case .underline:
@@ -418,8 +460,7 @@ class MarkdownRendererVM {
         append(
           node: child,
           to: inner,
-          baseAttributes: baseAttributes,
-          baseFontSize: baseFontSize
+          baseAttributes: baseAttributes
         )
       }
       var newAttrs = baseAttributes
@@ -436,8 +477,7 @@ class MarkdownRendererVM {
         append(
           node: child,
           to: inner,
-          baseAttributes: baseAttributes,
-          baseFontSize: baseFontSize
+          baseAttributes: baseAttributes
         )
       }
       var newAttrs = baseAttributes
@@ -451,7 +491,7 @@ class MarkdownRendererVM {
     case .codeSpan:
       if let code = node as? AST.CodeSpanNode {
         let attrs: [NSAttributedString.Key: Any] = [
-          .font: FontHelpers.monospaceFont(base: baseFontSize),
+          .font: FontHelpers.preferredMonospaceFont(),
           .backgroundColor: AppKitOrUIKitColor
             .tertiarySystemBackgroundCompatible,
           .foregroundColor: AppKitOrUIKitColor.labelCompatible,
@@ -464,8 +504,7 @@ class MarkdownRendererVM {
           append(
             node: child,
             to: container,
-            baseAttributes: baseAttributes,
-            baseFontSize: baseFontSize
+            baseAttributes: baseAttributes
           )
         }
       }
@@ -477,8 +516,7 @@ class MarkdownRendererVM {
           append(
             node: child,
             to: inner,
-            baseAttributes: baseAttributes,
-            baseFontSize: baseFontSize
+            baseAttributes: baseAttributes
           )
         }
         var newAttrs = baseAttributes
@@ -498,7 +536,7 @@ class MarkdownRendererVM {
     case .autolink:
       if let a = node as? AST.AutolinkNode {
         let attrs: [NSAttributedString.Key: Any] = [
-          .font: FontHelpers.systemFont(size: baseFontSize),
+          .font: FontHelpers.preferredBodyFont(),
           .foregroundColor: AppKitOrUIKitColor.systemBlue,
           .link: URL(string: a.url) as Any,
         ]
@@ -523,8 +561,7 @@ class MarkdownRendererVM {
         append(
           node: child,
           to: inner,
-          baseAttributes: baseAttributes,
-          baseFontSize: baseFontSize
+          baseAttributes: baseAttributes
         )
       }
       var newAttrs = baseAttributes
@@ -599,8 +636,7 @@ class MarkdownRendererVM {
         append(
           node: child,
           to: container,
-          baseAttributes: baseAttributes,
-          baseFontSize: baseFontSize
+          baseAttributes: baseAttributes
         )
       }
     }
@@ -610,49 +646,146 @@ class MarkdownRendererVM {
 // MARK: - Helpers
 
 private enum FontHelpers {
-  static func systemFont(size: CGFloat) -> Any {
+  // Preferred body font for platform (Dynamic Type on iOS)
+  static func preferredBodyFont() -> Any {
     #if os(macOS)
-      return NSFont.systemFont(ofSize: size)
+      return NSFont.systemFont(ofSize: NSFont.systemFontSize)
     #else
-      return UIFont.systemFont(ofSize: size)
+      let font = UIFont.preferredFont(forTextStyle: .body)
+      return UIFontMetrics(forTextStyle: .body).scaledFont(for: font)
     #endif
   }
 
-  static func boldFont(base: CGFloat) -> Any {
+  // Monospace font that respects dynamic type on iOS
+  static func preferredMonospaceFont() -> Any {
     #if os(macOS)
-      return NSFont.boldSystemFont(ofSize: base)
+      return NSFont.monospacedSystemFont(
+        ofSize: NSFont.systemFontSize,
+        weight: .regular
+      )
     #else
-      return UIFont.boldSystemFont(ofSize: base)
+      let base = UIFont.preferredFont(forTextStyle: .body)
+      let mono = UIFont.monospacedSystemFont(
+        ofSize: base.pointSize,
+        weight: .regular
+      )
+      return UIFontMetrics(forTextStyle: .body).scaledFont(for: mono)
     #endif
   }
 
-  static func italicFont(base: CGFloat) -> Any {
+  static func preferredFootnoteFont() -> Any {
     #if os(macOS)
-      // try to get an italic variant; fallback to system font
-      if let italic = NSFontManager.shared.convert(
-        NSFont.systemFont(ofSize: base),
-        toHaveTrait: .italicFontMask
-      ) as NSFont? {
-        return italic
+      return NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
+    #else
+      let font = UIFont.preferredFont(forTextStyle: .footnote)
+      return UIFontMetrics(forTextStyle: .footnote).scaledFont(for: font)
+    #endif
+  }
+
+  enum Trait { case italic, bold }
+
+  // Apply a font trait in-place to an attributed string, preserving existing traits and sizes.
+  static func applyTrait(_ trait: Trait, to string: NSMutableAttributedString) {
+    let full = NSRange(location: 0, length: string.length)
+    string.enumerateAttribute(.font, in: full, options: []) { value, range, _ in
+      #if os(macOS)
+        let current: NSFont =
+          (value as? NSFont) ?? (preferredBodyFont() as! NSFont)
+        let updated = withTrait(trait, of: current)
+        string.addAttribute(.font, value: updated, range: range)
+      #else
+        let current: UIFont =
+          (value as? UIFont) ?? (preferredBodyFont() as! UIFont)
+        let updated = withTrait(trait, of: current)
+        string.addAttribute(.font, value: updated, range: range)
+      #endif
+    }
+  }
+
+  // Scale fonts for a heading level while preserving italic/bold traits in runs.
+  static func applyHeadingLevel(
+    _ level: Int,
+    to string: NSMutableAttributedString
+  ) {
+    let full = NSRange(location: 0, length: string.length)
+    string.enumerateAttribute(.font, in: full, options: []) { value, range, _ in
+      #if os(macOS)
+        let current: NSFont =
+          (value as? NSFont) ?? (preferredBodyFont() as! NSFont)
+        let updated = headingFont(from: current, level: level)
+        string.addAttribute(.font, value: updated, range: range)
+      #else
+        let current: UIFont =
+          (value as? UIFont) ?? (preferredBodyFont() as! UIFont)
+        let updated = headingFont(from: current, level: level)
+        string.addAttribute(.font, value: updated, range: range)
+      #endif
+    }
+  }
+
+  #if os(macOS)
+    private static func withTrait(_ trait: Trait, of font: NSFont) -> NSFont {
+      let manager = NSFontManager.shared
+      switch trait {
+      case .italic:
+        return manager.convert(font, toHaveTrait: .italicFontMask)
+      case .bold:
+        return manager.convert(font, toHaveTrait: .boldFontMask)
       }
-      return NSFont.systemFont(ofSize: base)
-    #else
-      if let descriptor = UIFont.systemFont(ofSize: base).fontDescriptor
-        .withSymbolicTraits(.traitItalic)
-      {
-        return UIFont(descriptor: descriptor, size: base)
-      }
-      return UIFont.systemFont(ofSize: base)
-    #endif
-  }
+    }
 
-  static func monospaceFont(base: CGFloat) -> Any {
-    #if os(macOS)
-      return NSFont.monospacedSystemFont(ofSize: base, weight: .regular)
-    #else
-      return UIFont.monospacedSystemFont(ofSize: base, weight: .regular)
-    #endif
-  }
+    private static func headingFont(from font: NSFont, level: Int) -> NSFont {
+      // Simple scaling factors for macOS
+      let factor: CGFloat
+      switch level {
+      case 1: factor = 1.6
+      case 2: factor = 1.4
+      case 3: factor = 1.2
+      default: factor = 1.1
+      }
+      let sized =
+        NSFont(descriptor: font.fontDescriptor, size: font.pointSize * factor)
+        ?? font
+      // Headings are bold by default; preserve existing traits (e.g. italic) by adding bold on top
+      return withTrait(.bold, of: sized)
+    }
+  #else
+    private static func withTrait(_ trait: Trait, of font: UIFont) -> UIFont {
+      var traits = font.fontDescriptor.symbolicTraits
+      switch trait {
+      case .italic:
+        traits.insert(.traitItalic)
+      case .bold:
+        traits.insert(.traitBold)
+      }
+      let descriptor =
+        font.fontDescriptor.withSymbolicTraits(traits) ?? font.fontDescriptor
+      // size 0 keeps the same size; then scale for Dynamic Type
+      let updated = UIFont(descriptor: descriptor, size: font.pointSize)
+      return UIFontMetrics.default.scaledFont(for: updated)
+    }
+
+    private static func textStyle(forHeading level: Int) -> UIFont.TextStyle {
+      switch level {
+      case 1: return .title1
+      case 2: return .title2
+      case 3: return .title3
+      default: return .headline
+      }
+    }
+
+    private static func headingFont(from font: UIFont, level: Int) -> UIFont {
+      let style = textStyle(forHeading: level)
+      var base = UIFont.preferredFont(forTextStyle: style)
+      // Preserve existing traits from the run and add .bold to make headings bold by default
+      var traits = font.fontDescriptor.symbolicTraits
+      traits.insert(.traitBold)
+      if let desc = base.fontDescriptor.withSymbolicTraits(traits) {
+        base = UIFont(descriptor: desc, size: base.pointSize)
+      }
+      return UIFontMetrics(forTextStyle: style).scaledFont(for: base)
+    }
+  #endif
 }
 
 // UIColor wrappers for cross-platform compatibility
@@ -703,9 +836,11 @@ extension Text {
 }
 
 #Preview {
-  @Previewable @State var input = "hello **world**"
-  @Previewable @State var content = "hello **world**"
-  VStack {
+  @Previewable @State var input =
+    "hello **world**\n*italics*\n***italics and bold***"
+  @Previewable @State var content =
+    "hello **world**\n*italics*\n***italics and bold***"
+  VStack(alignment: .leading) {
     TextEditor(text: $input)
       .containerRelativeFrame(.vertical) { length, _ in
         length / 2
@@ -720,7 +855,7 @@ extension Text {
       }
     }
   }
-  .frame(maxWidth: 550)
+  .frame(maxWidth: 260)
   .frame(maxHeight: 260)
   .background(.appBackground)
 }

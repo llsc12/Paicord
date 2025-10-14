@@ -750,21 +750,22 @@ public final class InlineParser {
 
     // Look for closing ~~
     while !tokenStream.isAtEnd {
-      if tokenStream.check(.tilde) {
-        let closingTilde = tokenStream.current
-        if closingTilde.content == "~~" {
-          // Found closing ~~
-          tokenStream.advance()
-          foundClosing = true
-          break
-        }
+      if tokenStream.check(.tilde) && tokenStream.current.content == "~~" {
+        // Found closing ~~
+        tokenStream.advance()
+        foundClosing = true
+        break
       }
 
-      // Add content inside strikethrough
-      let token = tokenStream.consume()
-      content.append(
-        AST.TextNode(content: token.content, sourceLocation: token.location)
-      )
+      // Parse nested inline formatting inside strikethrough instead of raw text
+      let inlineNodes = try parseInline()
+      for inline in inlineNodes {
+        if let fragment = inline as? AST.FragmentNode {
+          content.append(contentsOf: fragment.children)
+        } else {
+          content.append(inline)
+        }
+      }
     }
 
     if foundClosing {
