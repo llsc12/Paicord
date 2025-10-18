@@ -121,8 +121,7 @@ struct MFAView: View {
               do {
                 let req = try await loginClient.verifyMFALogin(
                   type: chosenMethod!,
-                  code: input,
-                  ticket: authentication.ticket!,
+                  payload: .init(code: input, ticket: authentication.ticket!),
                   fingerprint: fingerprint
                 )
                 if let error = req.asError() { throw error }

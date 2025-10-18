@@ -28,6 +28,7 @@ struct MarkdownText: View {
       }
     }
     .task(id: content) {
+      guard content != renderer.rawContent else { return }  // skip reparsing of same content.
       await renderer.update(content)
     }
   }
@@ -36,25 +37,9 @@ struct MarkdownText: View {
     var block: BlockElement
     var body: some View {
       switch block.nodeType {
-      case .paragraph:
+      case .paragraph, .heading, .footnote:
         if let attr = block.attributedContent {
-          let attrConverted = AttributedString(attr)
-          Text(attrConverted)
-        } else {
-          Text("")
-        }
-
-      case .heading:
-        if let attr = block.attributedContent {
-          let converted = AttributedString(attr)
-          Text(converted)
-        } else {
-          Text("")
-        }
-      case .footnote:
-        if let attr = block.attributedContent {
-          let converted = AttributedString(attr)
-          Text(converted)
+          AttributedText(attributedString: attr)
         } else {
           Text("")
         }
@@ -108,7 +93,6 @@ struct MarkdownText: View {
         }
 
       default:
-        // Fallback: attempt to render attributed content
         if let attr = block.attributedContent {
           let converted = AttributedString(attr)
           Text(converted)
@@ -196,23 +180,23 @@ class MarkdownRendererVM {
   func update(_ rawContent: String) async {
     self.rawContent = rawContent
     do {
-      let ast: AST.DocumentNode = try await Self.parser.parseToAST(
-        self.rawContent
-      )
-      self.blocks = await self.buildBlocks(from: ast)
+      let ast: AST.DocumentNode = try await Self.parser.parseToAST(rawContent)
+      await MainActor.run {
+        self.blocks = self.buildBlocks(from: ast)
+      }
     } catch {
       // parsing failed — keep previous content but log
       print("Markdown parse failed: \(error)")
     }
   }
 
-  private var rawContent: String = ""
+  var rawContent: String = ""
 
   // Walk top-level AST nodes and convert to BlockElement models.
-  func buildBlocks(from document: AST.DocumentNode) async -> [BlockElement] {
+  func buildBlocks(from document: AST.DocumentNode) -> [BlockElement] {
     var result: [BlockElement] = []
     for child in document.children {
-      if let block = await makeBlock(from: child) {
+      if let block = makeBlock(from: child) {
         result.append(block)
       }
     }
@@ -220,7 +204,7 @@ class MarkdownRendererVM {
   }
 
   // Create a BlockElement from an ASTNode if it is a block-level node.
-  private func makeBlock(from node: ASTNode) async -> BlockElement? {
+  private func makeBlock(from node: ASTNode) -> BlockElement? {
     switch node.nodeType {
     case .paragraph:
       let attributed = renderInlinesToNSAttributedString(
@@ -286,7 +270,7 @@ class MarkdownRendererVM {
     case .blockQuote:
       var nested: [BlockElement] = []
       for child in node.children {
-        if let b = await makeBlock(from: child) {
+        if let b = makeBlock(from: child) {
           nested.append(b)
         }
       }
@@ -308,7 +292,7 @@ class MarkdownRendererVM {
           if let listItem = item as? AST.ListItemNode {
             var listItemChildren: [BlockElement] = []
             for c in listItem.children {
-              if let blockChild = await makeBlock(from: c) {
+              if let blockChild = makeBlock(from: c) {
                 listItemChildren.append(blockChild)
               }
             }
@@ -574,10 +558,15 @@ class MarkdownRendererVM {
 
     case .customEmoji:
       if let ce = node as? AST.CustomEmojiNode {
-        let s = NSAttributedString(
-          string: ":\(ce.name):",
-          attributes: baseAttributes
-        )
+        let copyText =
+          "<\(ce.isAnimated ? "a" : ""):\(ce.name):\(ce.identifier)>"
+        guard
+          let url = URL(
+            string: CDNEndpoint.customEmoji(emojiId: ce.identifier).url
+              + (ce.isAnimated ? ".gif" : ".png") + "?size=44"
+          )
+        else { return }
+        let s = self.makeEmojiAttachment(url: url, copyText: copyText)
         container.append(s)
       }
 
@@ -836,26 +825,141 @@ extension Text {
 }
 
 #Preview {
-  @Previewable @State var input =
-    "hello **world**\n*italics*\n***italics and bold***"
-  @Previewable @State var content =
-    "hello **world**\n*italics*\n***italics and bold***"
-  VStack(alignment: .leading) {
-    TextEditor(text: $input)
-      .containerRelativeFrame(.vertical) { length, _ in
-        length / 2
+  @Previewable @State var profileOpen: Bool = false
+  @Previewable @State var avatarAnimated: Bool = false
+  
+  var message: DiscordChannel.Message = .init(
+    id: try! .makeFake(),
+    channel_id: try! .makeFake(),
+    author: DiscordUser(
+      id: .init("381538809180848128"),
+      username: "llsc12",
+      discriminator: "0",
+      global_name: nil,
+      avatar: "df71b3f223666fd8331c9940c6f7cbd9",
+      bot: false,
+      system: false,
+      mfa_enabled: true,
+      banner: nil,
+      accent_color: nil,
+      locale: nil,
+      verified: true,
+      email: nil,
+      flags: .init(rawValue: 4_194_352),
+      premium_type: DiscordUser.PremiumKind.none,
+      public_flags: .init(rawValue: 4_194_304),
+      collectibles: .init(
+        nameplate: .init(
+          asset: "nameplates/nameplates_v3/bonsai/",
+          sku_id: .init("1382845914225442886"),
+          label: "COLLECTIBLES_NAMEPLATES_VOL_3_BONSAI_A11Y",
+          palette: .bubble_gum,
+          expires_at: nil
+        ),
+      ),
+      avatar_decoration_data: nil
+    ),
+    content:
+      """
+gn
+# Regular markdown
+||spoiler||
+~~strikethrough~~
+__underline__
+*italics* or _italics_
+**bold**
+***bold & italics***
+***~~strikethrough, bold & italics~~*** (you can mix them)
+`codeline`
+**`bold codeline`**
+``codeline with ` in it``
+``codeline that ends with ` ``
+and `` ` starts with`` or `` ` has on both sides ` ``
+> single line quote
+
+> multiple line
+> quote
+
+>>> (if you type \">>>\" at the beginning of any line, it will 
+expand them to the lines remaining\nuntil the end of the message
+-# doesn't save the \">>>\" if sent from desktop
+""",
+    timestamp: .init(date: .now),
+    edited_timestamp: nil,
+    tts: false,
+    mention_everyone: false,
+    mentions: [],
+    mention_roles: [],
+    mention_channels: [],
+    attachments: [],
+    embeds: [],
+    reactions: [],
+    nonce: nil,
+    pinned: false,
+    webhook_id: nil,
+    type: .default,
+    activity: nil,
+    application: nil,
+    application_id: nil,
+    message_reference: nil,
+    flags: .init(rawValue: 0),
+    referenced_message: nil,
+    interaction: nil,
+    thread: nil,
+    components: nil,
+    sticker_items: nil,
+    stickers: nil,
+    position: nil,
+    role_subscription_data: nil,
+    resolved: nil,
+    poll: nil,
+    call: nil,
+    guild_id: nil,
+    member: nil
+  )
+  ScrollView {
+    //    LazyVStack {
+    VStack {
+      HStack(alignment: .bottom) {
+        MessageCell.MessageAuthor.Avatar(
+          message: message,
+          profileOpen: $profileOpen,
+          animated: false
+        )
+#if os(macOS)
+        .padding(.trailing, 4)  // balancing
+#endif
+        VStack(spacing: 0) {
+          HStack(alignment: .bottom) {
+            MessageCell.MessageAuthor.Username(  // username line
+              message: message,
+              guildStore: nil,
+              profileOpen: $profileOpen
+            )
+            //                        Date(for: message.timestamp.date)  // message date
+            //          if let edit = message.edited_timestamp {  // edited notice
+            //            MessageCell.DefaultMessage.EditStamp(edited: edit)
+            //          }
+          }
+          .border(.green)
+          .frame(
+            maxWidth: .infinity,
+            maxHeight: .infinity,
+            alignment: .bottomLeading
+          )
+          .fixedSize(horizontal: false, vertical: true)
+          .border(.red)
+          
+          MarkdownText(content: message.content)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .border(.blue)
+        }
+        .frame(maxHeight: .infinity, alignment: .bottom)  // align text to bottom of cell
       }
-      .onChange(of: input) {
-        content = input
-      }
-    Divider()
-    ScrollView {
-      VStack(alignment: .leading) {
-        MarkdownText(content: content)
-      }
+      .fixedSize(horizontal: false, vertical: true)
     }
+    .padding(.horizontal, 4)
+//    .onHover { avatarAnimated = $0 }
   }
-  .frame(maxWidth: 260)
-  .frame(maxHeight: 260)
-  .background(.appBackground)
+//}
 }

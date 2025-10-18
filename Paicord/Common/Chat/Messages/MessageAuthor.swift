@@ -14,10 +14,12 @@ extension MessageCell {
   enum MessageAuthor {
     struct Avatar: View {
       var message: DiscordChannel.Message
+      var guildStore: GuildStore?
       @Binding var profileOpen: Bool
       var animated: Bool
       var body: some View {
         Button {
+          guard message.author != nil else { return }
           profileOpen = true
         } label: {
           AnimatedImage(
@@ -30,8 +32,12 @@ extension MessageCell {
         }
         .buttonStyle(.borderless)
         .popover(isPresented: $profileOpen) {
-          Text("Profile for \(message.author?.username ?? "Unknown")")
-            .padding()
+          if let userId = message.author?.id, let user = message.author {
+            ProfilePopoutView(
+              member: guildStore?.members[userId] ?? message.member,
+              user: user
+            )
+          }
         }
         .frame(maxHeight: .infinity, alignment: .top)  // align pfp to top of cell
       }
@@ -92,9 +98,9 @@ extension MessageCell {
         }
         .buttonStyle(.plain)
         #if os(iOS)
-        .font(.callout)
+          .font(.callout)
         #elseif os(macOS)
-        .font(.body)
+          .font(.body)
         #endif
         .fontWeight(.semibold)
       }

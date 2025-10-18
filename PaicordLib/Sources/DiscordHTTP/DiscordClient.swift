@@ -3,7 +3,9 @@ import DiscordModels
 public protocol DiscordClient: Sendable {
 	/// Only needed for user accounts.
 	var captchaCallback: CaptchaChallengeHandler? { get set }
-
+  var mfaCallback: MFAVerificationHandler? { get set }
+  var authentication: AuthenticationHeader { get }
+  
 	/// Your app's id.
 	/// If you don't provide it here, DiscordBM will try to extract it from your token.
 	/// If there is no `appId` you will need to provide it at all call-sites of

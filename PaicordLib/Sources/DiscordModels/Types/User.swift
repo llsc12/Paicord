@@ -101,10 +101,22 @@ public struct DiscordUser: Sendable, Codable, Equatable, Hashable {
 
 	/// https://docs.discord.food/resources/user#collectibles-structure
 	public struct Collectibles: Sendable, Codable, Equatable, Hashable {
+    public init(nameplate: Nameplate? = nil) {
+      self.nameplate = nameplate
+    }
+    
 		public var nameplate: Nameplate?
 
 		/// https://docs.discord.food/resources/user#nameplate-data-structure
 		public struct Nameplate: Sendable, Codable, Equatable, Hashable {
+      public init(asset: String, sku_id: SKUSnowflake, label: String, palette: ColorPalette, expires_at: DiscordTimestamp? = nil) {
+        self.asset = asset
+        self.sku_id = sku_id
+        self.label = label
+        self.palette = palette
+        self.expires_at = expires_at
+      }
+      
 			public var asset: String
 			public var sku_id: SKUSnowflake
 			public var label: String

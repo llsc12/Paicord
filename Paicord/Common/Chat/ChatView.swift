@@ -157,6 +157,17 @@ struct ChatView: View {
     pendingScrollWorkItem = workItem
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.06, execute: workItem)
   }
+  
+  @State var ackTask: Task<Void, Error>? = nil
+  private func acknowledge() {
+    ackTask?.cancel()
+    ackTask = Task {
+      try? await Task.sleep(for: .seconds(1.5))
+      Task.detached {
+        try await gw.client.triggerTypingIndicator(channelId: .makeFake())
+      }
+    }
+  }
 
   private func sendMessage() {
     let msg = text.trimmingCharacters(in: .whitespacesAndNewlines)

@@ -66,8 +66,8 @@ final class LoginViewModel {
         throw "A tracking fingerprint couldn't be generated."
       }
       let res = try await loginClient.forgotPassword(
-        fingerprint: fingerprint,
-        login: login
+        payload: .init(login: login),
+        fingerprint: fingerprint
       )
       if let error = res.asError() { throw error }
       self.forgotPasswordSent.toggle()
@@ -83,8 +83,10 @@ final class LoginViewModel {
         throw "A tracking fingerprint couldn't be generated."
       }
       let request = try await loginClient.userLogin(
-        login: login,
-        password: password,
+        payload: .init(
+          login: login,
+          password: .init(password),
+        ),
         fingerprint: fingerprint
       )
       if let error = request.asError() { throw error }

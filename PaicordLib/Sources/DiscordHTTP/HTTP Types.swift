@@ -306,6 +306,10 @@ public enum DiscordHTTPError: Error, CustomStringConvertible {
   /// The query parameter '\(name)' with a value of '\(value ?? "nil")' is out of the Discord-acceptable bounds of \(lowerBound)...\(upperBound).
   case queryParameterOutOfBounds(
     name: String, value: String?, lowerBound: Int, upperBound: Int)
+  /// You are trying to use a bot-only endpoint '\(endpoint)' with user authentication.
+  case assertionFailureBotOnlyEndpoint(endpoint: any Endpoint)
+  /// You are trying to use a user-only endpoint '\(endpoint)' with bot authentication.
+  case assertionFailureUserOnlyEndpoint(endpoint: any Endpoint)
 
   public var description: String {
     switch self {
@@ -334,6 +338,12 @@ public enum DiscordHTTPError: Error, CustomStringConvertible {
     case let .queryParameterOutOfBounds(name, value, lowerBound, upperBound):
       return
         "DiscordHTTPError.queryParameterOutOfBounds(name: \(name), value: \(value ?? "nil"), lowerBound: \(lowerBound), upperBound: \(upperBound))"
+    case let .assertionFailureBotOnlyEndpoint(endpoint):
+      return
+        "DiscordHTTPError.assertionFailureBotOnlyEndpoint(endpoint: \(endpoint))"
+    case let .assertionFailureUserOnlyEndpoint(endpoint):
+      return
+        "DiscordHTTPError.assertionFailureUserOnlyEndpoint(endpoint: \(endpoint))"
     }
   }
 }

@@ -40,7 +40,7 @@ public enum APIEndpoint: Endpoint {
   case setChannelPermissionOverwrite(
     channelId: ChannelSnowflake, overwriteId: AnySnowflake)
   case createDm
-  case createGroupDm
+//  case createGroupDm
   case followAnnouncementChannel(channelId: ChannelSnowflake)
   case triggerTypingIndicator(channelId: ChannelSnowflake)
   case updateChannel(channelId: ChannelSnowflake)
@@ -430,8 +430,8 @@ public enum APIEndpoint: Endpoint {
       suffix = "channels/\(channelId)/permissions/\(overwriteId)"
     case .createDm:
       suffix = "users/@me/channels"
-    case .createGroupDm:
-      suffix = "users/@me/channels"
+//    case .createGroupDm:
+//      suffix = "users/@me/channels"
     case let .followAnnouncementChannel(channelId):
       let channelId = channelId.rawValue
       suffix = "channels/\(channelId)/followers"
@@ -1076,8 +1076,8 @@ public enum APIEndpoint: Endpoint {
       suffix = "channels/\(channelId)/permissions/\(overwriteId)"
     case .createDm:
       suffix = "users/@me/channels"
-    case .createGroupDm:
-      suffix = "users/@me/channels"
+//    case .createGroupDm:
+//      suffix = "users/@me/channels"
     case let .followAnnouncementChannel(channelId):
       let channelId = channelId.rawValue
       suffix = "channels/\(channelId)/followers"
@@ -1693,7 +1693,7 @@ public enum APIEndpoint: Endpoint {
     case .pinMessage: return .PUT
     case .setChannelPermissionOverwrite: return .PUT
     case .createDm: return .POST
-    case .createGroupDm: return .POST
+//    case .createGroupDm: return .POST
     case .followAnnouncementChannel: return .POST
     case .triggerTypingIndicator: return .POST
     case .updateChannel: return .PATCH
@@ -1886,7 +1886,7 @@ public enum APIEndpoint: Endpoint {
     case .pinMessage: return true
     case .setChannelPermissionOverwrite: return true
     case .createDm: return true
-    case .createGroupDm: return true
+//    case .createGroupDm: return true
     case .followAnnouncementChannel: return true
     case .triggerTypingIndicator: return true
     case .updateChannel: return true
@@ -2079,7 +2079,7 @@ public enum APIEndpoint: Endpoint {
     case .pinMessage: return true
     case .setChannelPermissionOverwrite: return true
     case .createDm: return true
-    case .createGroupDm: return true
+//    case .createGroupDm: return true
     case .followAnnouncementChannel: return true
     case .triggerTypingIndicator: return true
     case .updateChannel: return true
@@ -2286,8 +2286,8 @@ public enum APIEndpoint: Endpoint {
       return [channelId.rawValue, overwriteId.rawValue]
     case .createDm:
       return []
-    case .createGroupDm:
-      return []
+//    case .createGroupDm:
+//      return []
     case let .followAnnouncementChannel(channelId):
       return [channelId.rawValue]
     case let .triggerTypingIndicator(channelId):
@@ -2653,7 +2653,7 @@ public enum APIEndpoint: Endpoint {
     case .pinMessage: return 12
     case .setChannelPermissionOverwrite: return 13
     case .createDm: return 14
-    case .createGroupDm: return 15
+//    case .createGroupDm: return 15
     case .followAnnouncementChannel: return 16
     case .triggerTypingIndicator: return 17
     case .updateChannel: return 18
@@ -2868,8 +2868,8 @@ public enum APIEndpoint: Endpoint {
         "setChannelPermissionOverwrite(channelId.rawValue: \(channelId.rawValue), overwriteId.rawValue: \(overwriteId.rawValue))"
     case .createDm:
       return "createDm"
-    case .createGroupDm:
-      return "createGroupDm"
+//    case .createGroupDm:
+//      return "createGroupDm"
     case let .followAnnouncementChannel(channelId):
       return
         "followAnnouncementChannel(channelId.rawValue: \(channelId.rawValue))"
@@ -3301,6 +3301,13 @@ public enum APIEndpoint: Endpoint {
       fatalError(
         "If the case name wasn't already clear enough: '__DO_NOT_USE_THIS_CASE' MUST NOT be used"
       )
+    }
+  }
+  
+  public var specialisedRatelimit: (maxRequests: Int, for: Duration)? {
+    switch self {
+    case .createDm: return (maxRequests: 10, for: .minutes(10))
+    default: return nil
     }
   }
 }

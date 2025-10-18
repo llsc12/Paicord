@@ -27,9 +27,7 @@ extension DiscordClient {
 	/// https://docs.discord.food/authentication#login-account
 	@inlinable
 	public func userLogin(
-		login: String,
-		password: String,
-		undelete: Bool = false,
+    payload: Payloads.Authentication,
 		fingerprint: String
 	) async throws -> DiscordClientResponse<UserAuthentication> {
 		let endpoint = UserAPIEndpoint.userLogin
@@ -39,11 +37,7 @@ extension DiscordClient {
 				headers: [
 					"X-Fingerprint": fingerprint
 				]),
-			payload: Payloads.Authentication(
-				login: login,
-				password: .init(password),
-				undelete: undelete
-			)
+      payload: payload
 		)
 	}
 
@@ -51,8 +45,8 @@ extension DiscordClient {
 	/// https://docs.discord.food/authentication#send-mfa-sms
 	@inlinable
 	public func verifySendSMS(
-		fingerprint: String,
-		ticket: Secret
+		ticket: Secret,
+    fingerprint: String
 	) async throws -> DiscordClientResponse<UserAuthenticationMFASMS> {
 		let endpoint = UserAPIEndpoint.verifySendSMS
 		return try await self.send(
@@ -72,8 +66,7 @@ extension DiscordClient {
 	@inlinable
 	public func verifyMFALogin(
 		type: Payloads.MFASubmitData.MFAKind,
-		code: String,
-		ticket: Secret,
+    payload: Payloads.AuthenticationMFA,
 		fingerprint: String
 	) async throws -> DiscordClientResponse<UserAuthentication> {
 		let endpoint = UserAPIEndpoint.verifyMFALogin(type: type)
@@ -83,10 +76,7 @@ extension DiscordClient {
 				headers: [
 					"X-Fingerprint": fingerprint
 				]),
-			payload: Payloads.AuthenticationMFA(
-				code: code,
-				ticket: ticket
-			)
+			payload: payload
 		)
 	}
 
@@ -117,8 +107,8 @@ extension DiscordClient {
 	/// https://docs.discord.food/authentication#forgot-password
 	@inlinable
 	public func forgotPassword(
-		fingerprint: String,
-		login: String
+    payload: Payloads.ForgotPassword,
+    fingerprint: String
 	) async throws
 		-> DiscordHTTPResponse
 	{
@@ -129,25 +119,19 @@ extension DiscordClient {
 				headers: [
 					"X-Fingerprint": fingerprint
 				]),
-			payload: Payloads.ForgotPassword(login: login))
+      payload: payload)
 	}
 
 	/// Verifies a user's identity using multi-factor authentication. On success, returns a cookie that can be used to bypass MFA for the next 5 minutes.
 	/// https://docs.discord.food/authentication#verify-mfa
 	@inlinable
 	public func verifyMFA(
-		type: Payloads.MFASubmitData.MFAKind,
-		ticket: Secret,
-		code: String
-	) async throws -> DiscordClientResponse<MFAResponse> {
+    payload: Payloads.MFASubmitData,
+  ) async throws -> DiscordClientResponse<MFAResponse> {
 		let endpoint = UserAPIEndpoint.verifyMFA
 		return try await self.send(
 			request: .init(to: endpoint),
-			payload: Payloads.MFASubmitData(
-				ticket: ticket,
-				mfa_type: type,
-				data: code
-			)
+			payload: payload
 		)
 	}
 }

@@ -65,7 +65,7 @@ extension MessageCell {
 
     @ViewBuilder
     var userAndMessage: some View {
-      VStack {
+      VStack(spacing: 2) {
         HStack(alignment: .bottom) {
           MessageAuthor.Username(  // username line
             message: message,
@@ -77,7 +77,8 @@ extension MessageCell {
             EditStamp(edited: edit)
           }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
+        .fixedSize(horizontal: false, vertical: true)
 
         MessageBody(message: message)  // content
       }
