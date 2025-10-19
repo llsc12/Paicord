@@ -33,9 +33,9 @@ jobs:
           path: |
             build-mac
             build-ios
-          key: ${{ runner.os }}-deriveddata-${{ hashFiles('**/Podfile.lock', '**/Package.resolved', '.github/workflows/build.yml') }}
+          key: deriveddata-${{ hashFiles('.github/workflows/build.yml') }}
           restore-keys: |
-            ${{ runner.os }}-deriveddata-
+            deriveddata
 
       - name: Build macOS .app
         run: |
