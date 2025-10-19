@@ -559,7 +559,7 @@ class MarkdownRendererVM {
     case .customEmoji:
       if let ce = node as? AST.CustomEmojiNode {
         let copyText =
-          "<\(ce.isAnimated ? "a" : ""):\(ce.name):\(ce.identifier)>"
+        "<\(ce.isAnimated ? "a" : ""):\(ce.name):\(ce.identifier.rawValue)>"
         guard
           let url = URL(
             string: CDNEndpoint.customEmoji(emojiId: ce.identifier).url
