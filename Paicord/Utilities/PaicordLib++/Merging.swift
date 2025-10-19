@@ -281,7 +281,7 @@ extension DiscordRelationship {
     self.type = new.type
     self.nickname = new.nickname ?? self.nickname
     self.stranger_request = new.stranger_request ?? self.stranger_request
-    self.user_ignored = new.user_ignored
+    self.user_ignored = new.user_ignored ?? self.user_ignored
     self.since = new.since ?? self.since
   }
 }
