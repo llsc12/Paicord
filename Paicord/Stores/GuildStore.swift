@@ -11,296 +11,316 @@ import PaicordLib
 
 @Observable
 class GuildStore: DiscordDataStore {
-	// MARK: - Protocol Properties
-	var gateway: GatewayStore?
-	var eventTask: Task<Void, Never>?
+  // MARK: - Protocol Properties
+  var gateway: GatewayStore?
+  var eventTask: Task<Void, Never>?
 
-	// MARK: - Guild Properties
-	let guildId: GuildSnowflake
-	var guild: Guild?
-	var channels: [ChannelSnowflake: DiscordChannel] = [:]
-	var members: [UserSnowflake: Guild.Member] = [:]
-	var roles: [RoleSnowflake: Role] = [:]
-	var emojis: [EmojiSnowflake: Emoji] = [:]
-	var stickers: [StickerSnowflake: Sticker] = [:]
-	var presences: [UserSnowflake: Gateway.PresenceUpdate] = [:]
-	var voiceStates: [UserSnowflake: VoiceState] = [:]
+  // MARK: - Guild Properties
+  let guildId: GuildSnowflake
+  var guild: Guild?
+  var channels: [ChannelSnowflake: DiscordChannel] = [:]
+  var members: [UserSnowflake: Guild.PartialMember] = [:]
+  var roles: [RoleSnowflake: Role] = [:]
+  var emojis: [EmojiSnowflake: Emoji] = [:]
+  var stickers: [StickerSnowflake: Sticker] = [:]
+  var presences: [UserSnowflake: Gateway.PresenceUpdate] = [:]
+  var voiceStates: [UserSnowflake: VoiceState] = [:]
 
-	init(id: GuildSnowflake, from guild: Guild?) {
-		self.guildId = id
-		self.guild = guild
-		
-		// populate properties based on initial guild data
-		guard let guild else { return }
-		
-		// channels
-		guild.channels.forEach { channel in
-			channels[channel.id] = channel
-		}
-		
-		// roles
-		guild.roles.forEach { role in
-			roles[role.id] = role
-		}
-		
-		// emojis
-		guild.emojis.forEach { emoji in
-			if let id = emoji.id {
-				emojis[id] = emoji
-			}
-		}
-		
-		// stickers
-		guild.stickers?.forEach { sticker in
-			stickers[sticker.id] = sticker
-		}
-		
-		// members (usually the connected user only)
-		guild.members?.forEach { member in
-			if let user = member.user {
-				members[user.id] = member
-			}
-		}
-	}
+  init(id: GuildSnowflake, from guild: Guild?) {
+    self.guildId = id
+    self.guild = guild
 
-	// MARK: - Protocol Methods
-	func setGateway(_ gateway: GatewayStore?) {
-		cancelEventHandling()
-		self.gateway = gateway
-		if gateway != nil {
-			setupEventHandling()
-		}
-	}
+    // populate properties based on initial guild data
+    guard let guild else { return }
 
-	func setupEventHandling() {
-		guard let gateway = gateway?.gateway else { return }
+    // channels
+    guild.channels.forEach { channel in
+      channels[channel.id] = channel
+    }
 
-		eventTask = Task { @MainActor in
-			for await event in await gateway.events {
-				switch event.data {
-				case .guildUpdate(let updatedGuild):
-					if updatedGuild.id == guildId {
-						handleGuildUpdate(updatedGuild)
-					}
+    // roles
+    guild.roles.forEach { role in
+      roles[role.id] = role
+    }
 
-				case .guildDelete(let unavailableGuild):
-					if unavailableGuild.id == guildId {
-						handleGuildDelete(unavailableGuild)
-					}
+    // emojis
+    guild.emojis.forEach { emoji in
+      if let id = emoji.id {
+        emojis[id] = emoji
+      }
+    }
 
-				case .channelCreate(let channel):
-					if channel.guild_id == guildId {
-						handleChannelCreate(channel)
-					}
+    // stickers
+    guild.stickers?.forEach { sticker in
+      stickers[sticker.id] = sticker
+    }
 
-				case .channelUpdate(let channel):
-					if channel.guild_id == guildId {
-						handleChannelUpdate(channel)
-					}
+    // members (usually the connected user only)
+    guild.members?.forEach { member in
+      if let user = member.user {
+        members[user.id] = member.toPartialMember()
+      }
+    }
+  }
 
-				case .channelDelete(let channel):
-					if channel.guild_id == guildId {
-						handleChannelDelete(channel)
-					}
+  // MARK: - Protocol Methods
+  func setGateway(_ gateway: GatewayStore?) {
+    cancelEventHandling()
+    self.gateway = gateway
+    if gateway != nil {
+      setupEventHandling()
+    }
+  }
 
-				case .guildMemberAdd(let memberAdd):
-					if memberAdd.guild_id == guildId {
-						handleGuildMemberAdd(memberAdd)
-					}
+  func setupEventHandling() {
+    guard let gateway = gateway?.gateway else { return }
 
-				case .guildMemberUpdate(let memberUpdate):
-					if memberUpdate.guild_id == guildId {
-						handleGuildMemberUpdate(memberUpdate)
-					}
+    eventTask = Task { @MainActor in
+      for await event in await gateway.events {
+        switch event.data {
+        case .guildUpdate(let updatedGuild):
+          if updatedGuild.id == guildId {
+            handleGuildUpdate(updatedGuild)
+          }
 
-				case .guildMemberRemove(let memberRemove):
-					if memberRemove.guild_id == guildId {
-						handleGuildMemberRemove(memberRemove)
-					}
+        case .guildDelete(let unavailableGuild):
+          if unavailableGuild.id == guildId {
+            handleGuildDelete(unavailableGuild)
+          }
 
-				case .guildMembersChunk(let membersChunk):
-					if membersChunk.guild_id == guildId {
-						handleGuildMembersChunk(membersChunk)
-					}
+        case .channelCreate(let channel):
+          if channel.guild_id == guildId {
+            handleChannelCreate(channel)
+          }
 
-				case .guildRoleCreate(let roleCreate):
-					if roleCreate.guild_id == guildId {
-						handleGuildRoleCreate(roleCreate)
-					}
+        case .channelUpdate(let channel):
+          if channel.guild_id == guildId {
+            handleChannelUpdate(channel)
+          }
 
-				case .guildRoleUpdate(let roleUpdate):
-					if roleUpdate.guild_id == guildId {
-						handleGuildRoleUpdate(roleUpdate)
-					}
+        case .channelDelete(let channel):
+          if channel.guild_id == guildId {
+            handleChannelDelete(channel)
+          }
 
-				case .guildRoleDelete(let roleDelete):
-					if roleDelete.guild_id == guildId {
-						handleGuildRoleDelete(roleDelete)
-					}
+        case .guildMemberAdd(let memberAdd):
+          if memberAdd.guild_id == guildId {
+            handleGuildMemberAdd(memberAdd)
+          }
 
-				case .guildEmojisUpdate(let emojisUpdate):
-					if emojisUpdate.guild_id == guildId {
-						handleGuildEmojisUpdate(emojisUpdate)
-					}
+        case .guildMemberUpdate(let memberUpdate):
+          if memberUpdate.guild_id == guildId {
+            handleGuildMemberUpdate(memberUpdate)
+          }
 
-				case .guildStickersUpdate(let stickersUpdate):
-					if stickersUpdate.guild_id == guildId {
-						handleGuildStickersUpdate(stickersUpdate)
-					}
+        case .guildMemberRemove(let memberRemove):
+          if memberRemove.guild_id == guildId {
+            handleGuildMemberRemove(memberRemove)
+          }
 
-				case .presenceUpdate(let presence):
-					if presence.guild_id == guildId {
-						handlePresenceUpdate(presence)
-					}
+        case .guildMembersChunk(let membersChunk):
+          if membersChunk.guild_id == guildId {
+            handleGuildMembersChunk(membersChunk)
+          }
 
-				case .voiceStateUpdate(let voiceState):
-					if voiceState.guild_id == guildId {
-						handleVoiceStateUpdate(voiceState)
-					}
+        case .guildRoleCreate(let roleCreate):
+          if roleCreate.guild_id == guildId {
+            handleGuildRoleCreate(roleCreate)
+          }
 
-				default:
-					break
-				}
-			}
-		}
-	}
+        case .guildRoleUpdate(let roleUpdate):
+          if roleUpdate.guild_id == guildId {
+            handleGuildRoleUpdate(roleUpdate)
+          }
 
-	func cancelEventHandling() {
-		eventTask?.cancel()
-		eventTask = nil
-	}
+        case .guildRoleDelete(let roleDelete):
+          if roleDelete.guild_id == guildId {
+            handleGuildRoleDelete(roleDelete)
+          }
 
-	// MARK: - Event Handlers
-	private func handleGuildUpdate(_ updatedGuild: Guild) {
-		guild = updatedGuild
+        case .guildEmojisUpdate(let emojisUpdate):
+          if emojisUpdate.guild_id == guildId {
+            handleGuildEmojisUpdate(emojisUpdate)
+          }
 
-		// Update cached roles
-		let guildRoles = updatedGuild.roles
-		roles.removeAll()
-		for role in guildRoles {
-			roles[role.id] = role
-		}
+        case .guildStickersUpdate(let stickersUpdate):
+          if stickersUpdate.guild_id == guildId {
+            handleGuildStickersUpdate(stickersUpdate)
+          }
 
-		// Update cached emojis
-		let guildEmojis = updatedGuild.emojis
-		emojis.removeAll()
-		for emoji in guildEmojis {
-			if let id = emoji.id {
-				emojis[id] = emoji
-			}
-		}
-	}
+        case .presenceUpdate(let presence):
+          if presence.guild_id == guildId {
+            handlePresenceUpdate(presence)
+          }
 
-	private func handleGuildDelete(_ unavailableGuild: UnavailableGuild) {
-		// Guild was deleted or became unavailable, clear all data
-		guild = nil
-		channels.removeAll()
-		members.removeAll()
-		roles.removeAll()
-		emojis.removeAll()
-		stickers.removeAll()
-		presences.removeAll()
-		voiceStates.removeAll()
-	}
+        case .voiceStateUpdate(let voiceState):
+          if voiceState.guild_id == guildId {
+            handleVoiceStateUpdate(voiceState)
+          }
 
-	private func handleChannelCreate(_ channel: DiscordChannel) {
-		channels[channel.id] = channel
-	}
+        default:
+          break
+        }
+      }
+    }
+  }
 
-	private func handleChannelUpdate(_ channel: DiscordChannel) {
-		channels[channel.id] = channel
-	}
+  func cancelEventHandling() {
+    eventTask?.cancel()
+    eventTask = nil
+  }
 
-	private func handleChannelDelete(_ channel: DiscordChannel) {
-		channels.removeValue(forKey: channel.id)
-	}
+  // MARK: - Event Handlers
+  private func handleGuildUpdate(_ updatedGuild: Guild) {
+    guild = updatedGuild
 
-	private func handleGuildMemberAdd(_ memberAdd: Gateway.GuildMemberAdd) {
-		members[memberAdd.user.id] = memberAdd.toMember()
-	}
+    // Update cached roles
+    let guildRoles = updatedGuild.roles
+    roles.removeAll()
+    for role in guildRoles {
+      roles[role.id] = role
+    }
 
-	private func handleGuildMemberUpdate(_ memberUpdate: Gateway.GuildMemberAdd) {
-		members[memberUpdate.user.id] = memberUpdate.toMember()
-	}
+    // Update cached emojis
+    let guildEmojis = updatedGuild.emojis
+    emojis.removeAll()
+    for emoji in guildEmojis {
+      if let id = emoji.id {
+        emojis[id] = emoji
+      }
+    }
+  }
 
-	private func handleGuildMemberRemove(
-		_ memberRemove: Gateway.GuildMemberRemove
-	) {
-		members.removeValue(forKey: memberRemove.user.id)
-	}
+  private func handleGuildDelete(_ unavailableGuild: UnavailableGuild) {
+    // Guild was deleted or became unavailable, clear all data
+    guild = nil
+    channels.removeAll()
+    members.removeAll()
+    roles.removeAll()
+    emojis.removeAll()
+    stickers.removeAll()
+    presences.removeAll()
+    voiceStates.removeAll()
+  }
 
-	private func handleGuildMembersChunk(
-		_ membersChunk: Gateway.GuildMembersChunk
-	) {
-		// TODO: Handle this
-	}
+  private func handleChannelCreate(_ channel: DiscordChannel) {
+    channels[channel.id] = channel
+  }
 
-	private func handleGuildRoleCreate(_ roleCreate: Gateway.GuildRole) {
-		roles[roleCreate.role.id] = roleCreate.role
-	}
+  private func handleChannelUpdate(_ channel: DiscordChannel) {
+    channels[channel.id] = channel
+  }
 
-	private func handleGuildRoleUpdate(_ roleUpdate: Gateway.GuildRole) {
-		roles[roleUpdate.role.id] = roleUpdate.role
-	}
+  private func handleChannelDelete(_ channel: DiscordChannel) {
+    channels.removeValue(forKey: channel.id)
+  }
 
-	private func handleGuildRoleDelete(_ roleDelete: Gateway.GuildRoleDelete) {
-		roles.removeValue(forKey: roleDelete.role_id)
-	}
+  private func handleGuildMemberAdd(_ memberAdd: Gateway.GuildMemberAdd) {
+    members[memberAdd.user.id] = memberAdd.toMember().toPartialMember()
+  }
 
-	private func handleGuildEmojisUpdate(
-		_ emojisUpdate: Gateway.GuildEmojisUpdate
-	) {
-		emojis.removeAll()
-		for emoji in emojisUpdate.emojis {
-			guard let id = emoji.id else { continue }
-			emojis[id] = emoji
-		}
-	}
+  private func handleGuildMemberUpdate(_ memberUpdate: Gateway.GuildMemberAdd) {
+    members[memberUpdate.user.id] = memberUpdate.toMember().toPartialMember()
+  }
 
-	private func handleGuildStickersUpdate(
-		_ stickersUpdate: Gateway.GuildStickersUpdate
-	) {
-		stickers.removeAll()
-		for sticker in stickersUpdate.stickers {
-			stickers[sticker.id] = sticker
-		}
-	}
+  private func handleGuildMemberRemove(
+    _ memberRemove: Gateway.GuildMemberRemove
+  ) {
+    members.removeValue(forKey: memberRemove.user.id)
+  }
 
-	private func handlePresenceUpdate(_ presence: Gateway.PresenceUpdate) {
-		presences[presence.user.id] = presence
-	}
+  private func handleGuildMembersChunk(
+    _ membersChunk: Gateway.GuildMembersChunk
+  ) {
+    print(
+      "[GuildStore] Received members chunk with \(membersChunk.members.count) members for guild \(membersChunk.guild_id.rawValue)"
+    )
+    guard membersChunk.guild_id == guildId else { return }
+    for member in membersChunk.members {
+      if let user = member.user {
+        members[user.id] = member.toPartialMember()
+      }
+    }
+  }
 
-	private func handleVoiceStateUpdate(_ voiceState: VoiceState) {
-		if voiceState.channel_id != nil {
-			voiceStates[voiceState.user_id] = voiceState
-		} else {
-			// User left voice channel
-			voiceStates.removeValue(forKey: voiceState.user_id)
-		}
-	}
+  private func handleGuildRoleCreate(_ roleCreate: Gateway.GuildRole) {
+    roles[roleCreate.role.id] = roleCreate.role
+  }
 
-	//	/// Gets the member for a user ID
-	//	func getMember(for userId: UserSnowflake) -> DiscordGuild.Member? {
-	//		return members[userId]
-	//	}
-	//
-	//	/// Gets the role for a role ID
-	//	func getRole(for roleId: RoleSnowflake) -> DiscordRole? {
-	//		return roles[roleId]
-	//	}
-	//
-	//	/// Gets the channel for a channel ID
-	//	func getChannel(for channelId: ChannelSnowflake) -> DiscordChannel? {
-	//		return channels[channelId]
-	//	}
-	//
-	//	/// Gets the presence for a user ID
-	//	func getPresence(for userId: UserSnowflake) -> Gateway.PresenceUpdate? {
-	//		return presences[userId]
-	//	}
-	//
-	//	/// Gets the voice state for a user ID
-	//	func getVoiceState(for userId: UserSnowflake) -> Gateway.VoiceState? {
-	//		return voiceStates[userId]
-	//	}
+  private func handleGuildRoleUpdate(_ roleUpdate: Gateway.GuildRole) {
+    roles[roleUpdate.role.id] = roleUpdate.role
+  }
+
+  private func handleGuildRoleDelete(_ roleDelete: Gateway.GuildRoleDelete) {
+    roles.removeValue(forKey: roleDelete.role_id)
+  }
+
+  private func handleGuildEmojisUpdate(
+    _ emojisUpdate: Gateway.GuildEmojisUpdate
+  ) {
+    emojis.removeAll()
+    for emoji in emojisUpdate.emojis {
+      guard let id = emoji.id else { continue }
+      emojis[id] = emoji
+    }
+  }
+
+  private func handleGuildStickersUpdate(
+    _ stickersUpdate: Gateway.GuildStickersUpdate
+  ) {
+    stickers.removeAll()
+    for sticker in stickersUpdate.stickers {
+      stickers[sticker.id] = sticker
+    }
+  }
+
+  private func handlePresenceUpdate(_ presence: Gateway.PresenceUpdate) {
+    presences[presence.user.id] = presence
+  }
+
+  private func handleVoiceStateUpdate(_ voiceState: VoiceState) {
+    if voiceState.channel_id != nil {
+      voiceStates[voiceState.user_id] = voiceState
+    } else {
+      // User left voice channel
+      voiceStates.removeValue(forKey: voiceState.user_id)
+    }
+  }
+
+  //	/// Gets the member for a user ID
+  //	func getMember(for userId: UserSnowflake) -> DiscordGuild.Member? {
+  //		return members[userId]
+  //	}
+  //
+  //	/// Gets the role for a role ID
+  //	func getRole(for roleId: RoleSnowflake) -> DiscordRole? {
+  //		return roles[roleId]
+  //	}
+  //
+  //	/// Gets the channel for a channel ID
+  //	func getChannel(for channelId: ChannelSnowflake) -> DiscordChannel? {
+  //		return channels[channelId]
+  //	}
+  //
+  //	/// Gets the presence for a user ID
+  //	func getPresence(for userId: UserSnowflake) -> Gateway.PresenceUpdate? {
+  //		return presences[userId]
+  //	}
+  //
+  //	/// Gets the voice state for a user ID
+  //	func getVoiceState(for userId: UserSnowflake) -> Gateway.VoiceState? {
+  //		return voiceStates[userId]
+  //	}
+
+  // MARK: - Helpers
+
+  func requestMembers(for ids: [UserSnowflake]) async {
+    await gateway?.gateway?.requestGuildMembersChunk(
+      payload: .init(
+        guild_id: guildId,
+        presences: false,
+        user_ids: ids
+      )
+    )
+  }
 }

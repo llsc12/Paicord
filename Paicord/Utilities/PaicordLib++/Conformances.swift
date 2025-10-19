@@ -10,7 +10,7 @@ import PaicordLib
 import SwiftProtobuf
 
 extension DiscordProtos_DiscordUsers_V1_PreloadedUserSettings.GuildFolder:
-	@retroactive Identifiable
+  @retroactive Identifiable
 {}
 
 extension Guild: @retroactive Identifiable {}
@@ -18,7 +18,7 @@ extension Guild: @retroactive Identifiable {}
 extension DiscordChannel: @retroactive Identifiable {}
 
 extension Snowflake: @retroactive Identifiable {
-	public var id: String { self.rawValue }
+  public var id: String { self.rawValue }
 }
 
 extension DiscordChannel.Message: @retroactive Identifiable {}

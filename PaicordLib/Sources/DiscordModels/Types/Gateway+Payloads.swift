@@ -31,11 +31,14 @@ extension Gateway {
 			public var system_locale: String?
 			public var has_client_mods: Bool?
 			public var client_launch_id: String?
+			public var device_vendor_id: String?
 			public var browser_user_agent: String?
 			public var browser_version: String?
 			public var os_sdk_version: String?  // first segment of os_version
 			public var client_build_number: Int?
 			public var client_app_state: String?
+			public var native_build_number: Int?
+			public var design_id: Int? // ui on mobile
 
 			public var client_event_source: String? = nil
 
@@ -47,6 +50,127 @@ extension Gateway {
 				self.os = os
 				self.browser = browser
 				self.device = device
+			}
+
+			enum CodingKeys: String, CodingKey {
+				case os, browser, device, release_channel, client_version, os_version,
+					os_arch, app_arch, system_locale, has_client_mods, client_launch_id,
+					device_vendor_id,
+					browser_user_agent, browser_version, os_sdk_version,
+					client_build_number, client_app_state, native_build_number,
+					client_event_source, design_id
+			}
+
+			public init(from decoder: any Decoder) throws {
+				let container = try decoder.container(keyedBy: CodingKeys.self)
+				self.os = try container.decode(String.self, forKey: .os)
+				self.browser = try container.decode(String.self, forKey: .browser)
+				self.device = try container.decode(String.self, forKey: .device)
+				self.release_channel = try container.decodeIfPresent(
+					String.self,
+					forKey: .release_channel
+				)
+				self.client_version = try container.decodeIfPresent(
+					String.self,
+					forKey: .client_version
+				)
+				self.os_version = try container.decodeIfPresent(
+					String.self,
+					forKey: .os_version
+				)
+				self.os_arch = try container.decodeIfPresent(
+					String.self,
+					forKey: .os_arch
+				)
+				self.app_arch = try container.decodeIfPresent(
+					String.self,
+					forKey: .app_arch
+				)
+				self.system_locale = try container.decodeIfPresent(
+					String.self,
+					forKey: .system_locale
+				)
+				self.has_client_mods = try container.decodeIfPresent(
+					Bool.self,
+					forKey: .has_client_mods
+				)
+				self.client_launch_id = try container.decodeIfPresent(
+					String.self,
+					forKey: .client_launch_id
+				)
+				self.device_vendor_id = try container.decodeIfPresent(
+					String.self,
+					forKey: .device_vendor_id
+				)
+				self.browser_user_agent = try container.decodeIfPresent(
+					String.self,
+					forKey: .browser_user_agent
+				)
+				self.browser_version = try container.decodeIfPresent(
+					String.self,
+					forKey: .browser_version
+				)
+				self.os_sdk_version = try container.decodeIfPresent(
+					String.self,
+					forKey: .os_sdk_version
+				)
+				self.client_build_number = try container.decodeIfPresent(
+					Int.self,
+					forKey: .client_build_number
+				)
+				self.client_app_state = try container.decodeIfPresent(
+					String.self,
+					forKey: .client_app_state
+				)
+				self.native_build_number = try container.decodeIfPresent(
+					Int.self,
+					forKey: .client_build_number
+				)
+				self.client_event_source = try container.decodeIfPresent(
+					String.self,
+					forKey: .client_event_source
+				)
+				self.design_id = try container.decodeIfPresent(
+					Int.self,
+					forKey: .design_id
+				)
+			}
+
+			// encode manually to ensure null values are encoded as null
+			public func encode(to encoder: any Encoder) throws {
+				var container = encoder.container(keyedBy: CodingKeys.self)
+				try container.encode(self.os, forKey: .os)
+				try container.encode(self.browser, forKey: .browser)
+				try container.encode(self.device, forKey: .device)
+				try container.encode(self.release_channel, forKey: .release_channel)
+				try container.encode(self.client_version, forKey: .client_version)
+				try container.encode(self.os_version, forKey: .os_version)
+				try container.encode(self.os_arch, forKey: .os_arch)
+				try container.encode(self.app_arch, forKey: .app_arch)
+				try container.encode(self.system_locale, forKey: .system_locale)
+				try container.encode(self.has_client_mods, forKey: .has_client_mods)
+				try container.encode(self.client_launch_id, forKey: .client_launch_id)
+				try container.encodeIfPresent(self.device_vendor_id, forKey: .device_vendor_id)
+				try container.encodeIfPresent(self.design_id, forKey: .design_id)
+				try container.encode(
+					self.browser_user_agent,
+					forKey: .browser_user_agent
+				)
+				try container.encode(self.browser_version, forKey: .browser_version)
+				try container.encode(self.os_sdk_version, forKey: .os_sdk_version)
+				try container.encode(
+					self.client_build_number,
+					forKey: .client_build_number
+				)
+				try container.encode(self.client_app_state, forKey: .client_app_state)
+				try container.encode(
+					self.native_build_number,
+					forKey: .client_build_number
+				)
+				try container.encode(
+					self.client_event_source,
+					forKey: .client_event_source
+				)
 			}
 		}
 
@@ -245,8 +369,8 @@ extension Gateway {
 		public var shard: IntPair?
 
 		// bot only
-//		public var application: PartialApplication?
-//		public var guilds: [UnavailableGuild] 	
+		//		public var application: PartialApplication?
+		//		public var guilds: [UnavailableGuild]
 
 		// user only
 		public var sessions: [Session]
@@ -309,11 +433,13 @@ extension Gateway {
 		/// A ``ThreadMember`` with some extra fields.
 		/// https://discord.com/developers/docs/resources/channel#thread-member-object-thread-member-structure
 		/// https://discord.com/developers/docs/topics/gateway-events#thread-members-update-thread-members-update-event-fields
-		public struct ThreadMember: Sendable, Codable, Equatable {
+		public struct ThreadMember: Sendable, Codable, Equatable, Hashable {
 
 			/// A ``PresenceUpdate`` with nullable `guild_id`.
 			/// https://discord.com/developers/docs/topics/gateway-events#presence-update-presence-update-event-fields
-			public struct ThreadMemberPresenceUpdate: Sendable, Codable, Equatable {
+			public struct ThreadMemberPresenceUpdate: Sendable, Codable, Equatable,
+				Hashable
+			{
 				public var user: PartialUser
 				public var guild_id: GuildSnowflake?
 				public var status: Status
@@ -354,7 +480,8 @@ extension Gateway {
 		public var widget_enabled: Bool?
 		public var widget_channel_id: ChannelSnowflake?
 		public var verification_level: Guild.VerificationLevel
-		public var default_message_notifications: Guild.DefaultMessageNotificationLevel
+		public var default_message_notifications:
+			Guild.DefaultMessageNotificationLevel
 		public var explicit_content_filter: Guild.ExplicitContentFilterLevel
 		public var roles: [Role]
 		public var emojis: [Emoji]
@@ -383,7 +510,7 @@ extension Gateway {
 		public var stickers: [Sticker]?
 		public var premium_progress_bar_enabled: Bool
 		public var `lazy`: Bool?
-//		public var hub_type: String?
+		//		public var hub_type: String?
 		public var nsfw: Bool
 		public var application_command_counts: [String: Int]?
 		public var embedded_activities: [Gateway.Activity]?
@@ -445,7 +572,7 @@ extension Gateway {
 			self.stickers = new.stickers
 			self.premium_progress_bar_enabled = new.premium_progress_bar_enabled
 			self.`lazy` = new.`lazy`
-//			self.hub_type = new.hub_type
+			//			self.hub_type = new.hub_type
 			self.nsfw = new.nsfw
 			self.application_command_counts = new.application_command_counts
 			self.embedded_activities = new.embedded_activities
@@ -571,7 +698,7 @@ extension Gateway {
 	/// https://discord.com/developers/docs/topics/gateway-events#request-guild-members
 	public struct RequestGuildMembers: Sendable, Codable {
 		public var guild_id: GuildSnowflake
-		public var query: String = ""
+		public var query: String?
 		public var limit: Int = 0
 		public var presences: Bool?
 		public var user_ids: [UserSnowflake]?
@@ -579,7 +706,7 @@ extension Gateway {
 
 		public init(
 			guild_id: GuildSnowflake,
-			query: String = "",
+			query: String? = nil,
 			limit: Int = 0,
 			presences: Bool? = nil,
 			user_ids: [UserSnowflake]? = nil,
@@ -702,11 +829,11 @@ extension Gateway {
 		public var message_reference: DiscordChannel.Message.MessageReference?
 		public var flags: IntBitField<DiscordChannel.Message.Flag>?
 		public var referenced_message: DereferenceBox<MessageCreate>?
-//		@_spi(UserInstallableApps) @DecodeOrNil
-//		public var interaction_metadata: DiscordChannel.Message.InteractionMetadata?
+		//		@_spi(UserInstallableApps) @DecodeOrNil
+		//		public var interaction_metadata: DiscordChannel.Message.InteractionMetadata?
 		public var interaction: MessageInteraction?
 		public var thread: DiscordChannel?
-		public var components: [Interaction.ActionRow]?
+		public var components: Interaction.ComponentSwitch?
 		public var sticker_items: [StickerItem]?
 		public var stickers: [Sticker]?
 		public var position: Int?
@@ -940,7 +1067,7 @@ extension Gateway {
 		public var burst: Bool?
 		public var emoji: Emoji
 	}
-	
+
 	/// https://docs.discord.food/topics/gateway-events#request-last-messages-structure
 	public struct RequestLastMessages: Sendable, Codable {
 		public var guild_id: GuildSnowflake
@@ -948,7 +1075,7 @@ extension Gateway {
 	}
 
 	/// https://discord.com/developers/docs/topics/gateway-events#client-status-object
-	public struct ClientStatus: Sendable, Codable, Equatable {
+	public struct ClientStatus: Sendable, Codable, Equatable, Hashable {
 		public var desktop: Status?
 		public var mobile: Status?
 		public var web: Status?
@@ -990,7 +1117,7 @@ extension Gateway {
 	}
 
 	/// https://discord.com/developers/docs/topics/gateway-events#activity-object
-	public struct Activity: Sendable, Codable, Equatable {
+	public struct Activity: Sendable, Codable, Equatable, Hashable {
 
 		/// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-types
 		@UnstableEnum<Int>
@@ -1005,7 +1132,7 @@ extension Gateway {
 		}
 
 		/// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-timestamps
-		public struct Timestamps: Sendable, Codable, Equatable {
+		public struct Timestamps: Sendable, Codable, Equatable, Hashable {
 			public var start: Int?
 			public var end: Int?
 
@@ -1016,7 +1143,7 @@ extension Gateway {
 		}
 
 		/// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-emoji
-		public struct ActivityEmoji: Sendable, Codable, Equatable {
+		public struct ActivityEmoji: Sendable, Codable, Equatable, Hashable {
 			public var name: String
 			public var id: EmojiSnowflake?
 			public var animated: Bool?
@@ -1033,7 +1160,7 @@ extension Gateway {
 		}
 
 		/// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-party
-		public struct Party: Sendable, Codable, Equatable {
+		public struct Party: Sendable, Codable, Equatable, Hashable {
 			public var id: String?
 			public var size: IntPair?
 
@@ -1044,7 +1171,7 @@ extension Gateway {
 		}
 
 		/// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-assets
-		public struct Assets: Sendable, Codable, Equatable {
+		public struct Assets: Sendable, Codable, Equatable, Hashable {
 			public var large_image: String?
 			public var large_text: String?
 			public var small_image: String?
@@ -1064,7 +1191,7 @@ extension Gateway {
 		}
 
 		/// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-secrets
-		public struct Secrets: Sendable, Codable, Equatable {
+		public struct Secrets: Sendable, Codable, Equatable, Hashable {
 			public var join: String?
 			public var spectate: String?
 			public var match: String?
@@ -1096,7 +1223,7 @@ extension Gateway {
 		}
 
 		/// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-buttons
-		public struct Button: Sendable, Codable, Equatable {
+		public struct Button: Sendable, Codable, Equatable, Hashable {
 			public var label: String
 			public var url: String
 
@@ -1548,24 +1675,24 @@ extension Gateway {
 			public var client: ClientType
 			public var os: String
 			public var version: Int
-			
+
 			@UnstableEnum<String>
 			public enum ClientType: Sendable, Codable {
-				case desktop // desktop
-				case web // web
-				case mobile // mobile
+				case desktop  // desktop
+				case web  // web
+				case mobile  // mobile
 				case __undocumented(String)
 			}
-			
+
 			@UnstableEnum<String>
 			public enum OperatingSystemType: Sendable, Codable {
-				case windows // windows
-				case osx // osx
-				case linux // linux
-				case android // android
-				case ios // ios
-				case playstation // playstation
-				case xbox // xbox
+				case windows  // windows
+				case osx  // osx
+				case linux  // linux
+				case android  // android
+				case ios  // ios
+				case playstation  // playstation
+				case xbox  // xbox
 				case __undocumented(String)
 			}
 		}
@@ -1647,12 +1774,14 @@ extension Gateway {
 			case .preloaded:
 				let preloaded = try container.decode(
 					DiscordProtos_DiscordUsers_V1_PreloadedUserSettings.self,
-					forKey: .settings)
+					forKey: .settings
+				)
 				self = .preloaded(preloaded)
 			case .frecency:
 				let frecency = try container.decode(
 					DiscordProtos_DiscordUsers_V1_FrecencyUserSettings.self,
-					forKey: .settings)
+					forKey: .settings
+				)
 				self = .frecency(frecency)
 			default:
 				let str = try container.decode(String.self, forKey: .settings)
@@ -1692,17 +1821,17 @@ extension Gateway {
 			case __undocumented(UInt)
 		}
 	}
-	
+
 	/// https://docs.discord.food/topics/gateway-events#guild-soundboard-sound-create
 	/// https://docs.discord.food/topics/gateway-events#guild-soundboard-sound-update
 	public typealias SoundboardSounds = [SoundboardSound]
-	
+
 	/// https://docs.discord.food/topics/gateway-events#guild-soundboard-sound-delete
 	public struct SoundboardSoundDelete: Sendable, Codable {
 		public var guild_id: GuildSnowflake
 		public var soundboard_sounds: SoundboardSounds
 	}
-	
+
 	/// I cannot find any details on `CHANNEL_UNREAD_UPDATE`, so here's an example.
 	/// {
 	/// 	"guild_id": "1248793573",
@@ -1722,7 +1851,7 @@ extension Gateway {
 	public struct ChannelUnreadUpdate: Sendable, Codable {
 		public var guild_id: GuildSnowflake?
 		public var channel_unread_updates: [UnreadUpdate]
-		
+
 		public struct UnreadUpdate: Sendable, Codable {
 			public var last_pin_timestamp: DiscordTimestamp?
 			public var last_message_id: MessageSnowflake

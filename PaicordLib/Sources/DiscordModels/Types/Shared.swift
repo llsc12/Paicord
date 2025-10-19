@@ -99,7 +99,7 @@ public enum StringIntDoubleBool: Sendable, Codable {
 //MARK: - StringOrInt
 
 /// To dynamically decode/encode String or Int.
-public enum StringOrInt: Sendable, Codable, Equatable {
+public enum StringOrInt: Sendable, Codable, Equatable, Hashable {
 	case string(String)
 	case int(Int)
 
@@ -244,7 +244,7 @@ extension DiscordLocaleDict: Sendable where C: Sendable {}
 //MARK: - DiscordTimestamp
 
 /// A timestamp that decode/encodes itself how Discord expects.
-public struct DiscordTimestamp: Codable {
+public struct DiscordTimestamp: Codable, Hashable {
 
 	public enum DecodingError: Swift.Error, CustomStringConvertible {
 		/// The timestamp had an unexpected format. This is a library decoding issue, please report this at https://github.com/DiscordBM/DiscordBM/issues.
@@ -404,7 +404,7 @@ extension DiscordTimestamp: Comparable {
 //MARK: - IntPair
 
 /// An array consisting of two integers.
-public struct IntPair: Sendable, Codable, CustomStringConvertible, Equatable {
+public struct IntPair: Sendable, Codable, CustomStringConvertible, Equatable, Hashable {
 	public var first: Int
 	public var second: Int
 
@@ -440,10 +440,7 @@ public struct IntPair: Sendable, Codable, CustomStringConvertible, Equatable {
 //MARK: - DiscordColor
 
 /// A dynamic color type that decode/encodes itself as an integer which Discord expects.
-public struct DiscordColor: Sendable, Codable, Equatable,
-	ExpressibleByIntegerLiteral
-{
-
+public struct DiscordColor: Sendable, Codable, Equatable, Hashable, ExpressibleByIntegerLiteral {
 	public let value: Int
 
 	public func asRGB() -> (red: Int, green: Int, blue: Int) {
@@ -823,6 +820,11 @@ extension DereferenceBox: Sendable where C: Sendable {}
 extension DereferenceBox: Equatable where C: Equatable {
 	public static func == (lhs: DereferenceBox<C>, rhs: DereferenceBox<C>) -> Bool {
 		return lhs.value == rhs.value
+	}
+}
+extension DereferenceBox: Hashable where C: Hashable {
+	public func hash(into hasher: inout Hasher) {
+		self.value.hash(into: &hasher)
 	}
 }
 

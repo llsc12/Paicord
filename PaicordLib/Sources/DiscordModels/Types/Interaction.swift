@@ -83,11 +83,11 @@ public struct Interaction: Sendable, Codable {
 	public struct ApplicationCommand: Sendable, Codable {
 
 		/// https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure
-		public struct ResolvedData: Sendable, Codable, Equatable {
+		public struct ResolvedData: Sendable, Codable, Equatable, Hashable {
 
 			/// https://discord.com/developers/docs/resources/channel#channel-object-channel-structure
 			/// https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure
-			public struct PartialChannel: Sendable, Codable, Equatable {
+			public struct PartialChannel: Sendable, Codable, Equatable, Hashable {
 				public var id: ChannelSnowflake
 				public var type: DiscordChannel.Kind
 				public var name: String?
@@ -465,7 +465,7 @@ extension [Interaction.ApplicationCommand.Option] {
 }
 
 /// https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object-message-interaction-structure
-public struct MessageInteraction: Sendable, Codable, Equatable {
+public struct MessageInteraction: Sendable, Codable, Equatable, Hashable {
 	public var id: InteractionSnowflake
 	public var type: Interaction.Kind
 	public var name: String
@@ -474,15 +474,81 @@ public struct MessageInteraction: Sendable, Codable, Equatable {
 }
 
 extension Interaction {
+	/// Due to Discord reusing the components field, this enum exists to allow you to send either legacy components or the new components v2.
+	/// This does not represent any actual Discord structure. It will try to parse legacy components first, and if that fails it will assume it's v2 components.
+	public enum ComponentSwitch: Sendable, Codable, Equatable, Hashable {
+		var legacy: [ActionRow]? {
+			if case .legacy(let actionRows) = self {
+				return actionRows
+			}
+			return nil
+		}
+		
+		var v2: Void? {
+			if case .v2 = self {
+				return ()
+			}
+			return nil
+		}
+		
+		public static func == (lhs: Interaction.ComponentSwitch, rhs: Interaction.ComponentSwitch) -> Bool {
+			switch (lhs, rhs) {
+			case let (.legacy(a), .legacy(b)):
+				return a == b
+			case (.v2, .v2):
+				return true // TODO: implement when v2 components are defined
+			default:
+				return false
+			}
+		}
+		
+		public func hash(into hasher: inout Hasher) {
+			switch self {
+			case .legacy(let actionRows):
+				hasher.combine("legacy")
+				hasher.combine(actionRows)
+			case .v2:
+				hasher.combine("v2")
+				// No properties to hash for v2 yet
+			}
+		}
+		
+		case legacy([ActionRow])
+		case v2(Void)  // Placeholder for future v2 components
+		
+		public init(from decoder: any Decoder) throws {
+			var container = try decoder.unkeyedContainer()
+			if let actionRows = try? container.decode([ActionRow].self) {
+				self = .legacy(actionRows)
+			} else {
+				self = .v2(())
+			}
+		}
+		
+		public func encode(to encoder: any Encoder) throws {
+			var container = encoder.unkeyedContainer()
+			switch self {
+			case .legacy(let actionRows):
+				try container.encode(actionRows)
+			case .v2:
+				// No encoding for v2 components yet
+				break
+			}
+		}
+		
+		
+	}
+	
 	/// https://discord.com/developers/docs/interactions/message-components#action-rows
 	/// `ActionRow` is an attempt to simplify/beautify Discord's messy components.
 	/// Anything inside `ActionRow` must not be used on its own for decoding/encoding purposes.
 	/// For example you always need to use `[ActionRow]` instead of `[ActionRow.Component]`.
 	public struct ActionRow: Sendable, Codable, ExpressibleByArrayLiteral,
-		Equatable, ValidatablePayload
+		Equatable, Hashable, ValidatablePayload
 	{
 
 		/// https://discord.com/developers/docs/interactions/message-components#component-object-component-types
+		/// https://docs.discord.food/resources/components#component-type
 		@UnstableEnum<Int>
 		public enum Kind: Sendable, Codable {
 			case actionRow  // 1
@@ -493,11 +559,23 @@ extension Interaction {
 			case roleSelect  // 6
 			case mentionableSelect  // 7
 			case channelSelect  // 8
+			case label  // 18
+			case fileUpload  // 19
+			
+			/* specifically components v2 below*/
+			case section  // 9
+			case textDisplay  // 10
+			case thumbnail  // 11
+			case mediaGallery  // 12
+			case file  // 13
+			case separator  // 14
+			case contentInventoryEntry  // 16
+			case container  // 17
 			case __undocumented(Int)
 		}
 
 		/// https://discord.com/developers/docs/interactions/message-components#button-object-button-structure
-		public struct Button: Sendable, Codable, Equatable, ValidatablePayload {
+		public struct Button: Sendable, Codable, Equatable, Hashable, ValidatablePayload {
 
 			/// https://discord.com/developers/docs/interactions/message-components#button-object-button-styles
 			@UnstableEnum<Int>
@@ -647,12 +725,12 @@ extension Interaction {
 		}
 
 		/// https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure
-		public struct StringSelectMenu: Sendable, Codable, Equatable,
+		public struct StringSelectMenu: Sendable, Codable, Equatable, Hashable,
 			ValidatablePayload
 		{
 
 			/// https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure
-			public struct Option: Sendable, Codable, Equatable, ValidatablePayload {
+			public struct Option: Sendable, Codable, Equatable, Hashable, ValidatablePayload {
 				public var label: String
 				public var value: String
 				public var description: String?
@@ -736,7 +814,7 @@ extension Interaction {
 		}
 
 		/// https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-default-value-structure
-		public struct DefaultValue: Sendable, Codable, Equatable {
+		public struct DefaultValue: Sendable, Codable, Equatable, Hashable {
 
 			/// https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-default-value-structure
 			public enum Kind: String, Sendable, Codable {
@@ -765,7 +843,7 @@ extension Interaction {
 		}
 
 		/// https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure
-		public struct ChannelSelectMenu: Sendable, Codable, Equatable, ValidatablePayload {
+		public struct ChannelSelectMenu: Sendable, Codable, Equatable, Hashable, ValidatablePayload {
 			public var custom_id: String
 			public var channel_types: [DiscordChannel.Kind]?
 			public var placeholder: String?
@@ -819,7 +897,7 @@ extension Interaction {
 		}
 
 		/// https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure
-		public struct SelectMenu: Sendable, Codable, Equatable, ValidatablePayload {
+		public struct SelectMenu: Sendable, Codable, Equatable, Hashable, ValidatablePayload {
 			public var custom_id: String
 			public var placeholder: String?
 			public var default_values: [DefaultValue]?
@@ -876,7 +954,7 @@ extension Interaction {
 		}
 
 		/// https://discord.com/developers/docs/interactions/message-components#text-inputs
-		public struct TextInput: Sendable, Codable, Equatable, ValidatablePayload {
+		public struct TextInput: Sendable, Codable, Equatable, Hashable, ValidatablePayload {
 
 			/// https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-styles
 			@UnstableEnum<Int>
@@ -943,7 +1021,7 @@ extension Interaction {
 			}
 		}
 
-		public enum Component: Sendable, Codable, Equatable, ValidatablePayload {
+		public enum Component: Sendable, Codable, Equatable, Hashable, ValidatablePayload {
 			case button(Button)
 			case stringSelect(StringSelectMenu)
 			case textInput(TextInput)
@@ -998,6 +1076,26 @@ extension Interaction {
 					self = try .channelSelect(.init(from: decoder))
 				case .textInput:
 					self = try .textInput(.init(from: decoder))
+				case .label:
+					self = .__undocumented
+				case .fileUpload:
+					self = .__undocumented
+				case .section:
+					self = .__undocumented
+				case .textDisplay:
+					self = .__undocumented
+				case .thumbnail:
+					self = .__undocumented
+				case .mediaGallery:
+					self = .__undocumented
+				case .file:
+					self = .__undocumented
+				case .separator:
+					self = .__undocumented
+				case .contentInventoryEntry:
+					self = .__undocumented
+				case .container:
+					self = .__undocumented
 				case .__undocumented:
 					self = .__undocumented
 				}

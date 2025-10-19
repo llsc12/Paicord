@@ -27,6 +27,7 @@ public struct DiscordRelationship: Sendable, Codable {
 	public var nickname: String?
 	public var is_spam_request: Bool?
 	public var stranger_request: Bool?
+	public var user_ignored: Bool
 	public var origin_application_id: ApplicationSnowflake?
 	public var since: DiscordTimestamp?
 	

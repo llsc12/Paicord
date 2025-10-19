@@ -11,18 +11,18 @@ import SwiftUI
 // TODO: Make more account related commands etc
 
 struct AccountCommands: Commands {
-	let gatewayStore: GatewayStore
+  let gatewayStore: GatewayStore
 
-	var body: some Commands {
-		CommandMenu("Account") {
-			Button("Log Out") {
-				Task {
-					if let current = gatewayStore.accounts.currentAccount {
-						gatewayStore.accounts.removeAccount(current)
-						await gatewayStore.logOut()
-					}
-				}
-			}
-		}
-	}
+  var body: some Commands {
+    CommandMenu("Account") {
+      Button("Log Out") {
+        Task {
+          if let current = gatewayStore.accounts.currentAccount {
+            gatewayStore.accounts.removeAccount(current)
+            await gatewayStore.logOut()
+          }
+        }
+      }
+    }
+  }
 }

@@ -8,14 +8,14 @@ import NIOFoundationCompat
 public enum Payloads {
 
   /// Used to authenticate and retrieve credentials.
-	/// https://docs.discord.food/authentication#login-account
+  /// https://docs.discord.food/authentication#login-account
   public struct Authentication: Sendable, Encodable, ValidatablePayload {
-    var login: String
-    var password: Secret
-    var undelete: Bool = false
+    public var login: String
+    public var password: Secret
+    public var undelete: Bool = false
 
-    var login_source: LoginSource? = nil
-    var gift_code_sku_id: String? = nil
+    public var login_source: LoginSource? = nil
+    public var gift_code_sku_id: String? = nil
 
     public init(login: String, password: Secret, undelete: Bool = false) {
       self.login = login
@@ -25,11 +25,15 @@ public enum Payloads {
 
     public func validate() -> [ValidationFailure] {
       validateCharacterCountInRange(
-        password.value, min: 8, max: 72, name: "password")
+        password.value,
+        min: 8,
+        max: 72,
+        name: "password"
+      )
     }
 
     /// Where a login is initiated from outside of the normal login flow.
-    enum LoginSource: String, Sendable, Encodable {
+    public enum LoginSource: String, Sendable, Encodable {
       case
         gift,
         guild_template,
@@ -42,21 +46,21 @@ public enum Payloads {
   }
 
   /// Used to send an SMS to the user's phone for MFA.
-	/// https://docs.discord.food/authentication#send-mfa-sms
+  /// https://docs.discord.food/authentication#send-mfa-sms
   public struct AuthenticationMFASendSMS: Sendable, Encodable,
     ValidatablePayload
   {
     public var ticket: Secret
-	
-	public init(ticket: Secret) {
-	  self.ticket = ticket
-	}
 
-    public func validate() -> [ValidationFailure] { }
+    public init(ticket: Secret) {
+      self.ticket = ticket
+    }
+
+    public func validate() -> [ValidationFailure] {}
   }
 
   /// Used to complete MFA verify process when you've received a ticket rather than a token from the login endpoint.
-	/// https://docs.discord.food/authentication#verify-mfa-login
+  /// https://docs.discord.food/authentication#verify-mfa-login
   public struct AuthenticationMFA: Sendable, Encodable, ValidatablePayload {
     var code: String
     var ticket: Secret
@@ -73,51 +77,51 @@ public enum Payloads {
       validateCharacterCountInRange(code, min: 6, max: 6, name: "code")
     }
   }
-  
-	/// https://docs.discord.food/authentication#logout-auth-sessions
+
+  /// https://docs.discord.food/authentication#logout-auth-sessions
   public struct LogoutSessions: Sendable, Encodable, ValidatablePayload {
     public var session_id_hashes: [String]
-    
+
     public init(session_id_hashes: [String]) {
       self.session_id_hashes = session_id_hashes
     }
-    
-    public func validate() -> [ValidationFailure] { }
+
+    public func validate() -> [ValidationFailure] {}
   }
-  
-	/// https://docs.discord.food/authentication#forgot-password
+
+  /// https://docs.discord.food/authentication#forgot-password
   public struct ForgotPassword: Sendable, Encodable, ValidatablePayload {
     public var login: String
-    
+
     public init(login: String) {
       self.login = login
     }
-    
-    public func validate() -> [ValidationFailure] { }
+
+    public func validate() -> [ValidationFailure] {}
   }
-	
-	/// https://docs.discord.food/authentication#mfa-verification
-	public struct MFASubmitData: Sendable, Codable, ValidatablePayload {
-		public var ticket: Secret
-		public var mfa_type: MFAKind
-		public var data: String
-		
-		public init(ticket: Secret, mfa_type: MFAKind, data: String) {
-			self.ticket = ticket
-			self.mfa_type = mfa_type
-			self.data = data
-		}
-		
-		public enum MFAKind: String, Sendable, Codable {
-			case totp // totp
-			case sms // sms
-			case backup // backup
-			case webauthn // webauthn
-			case password // password
-		}
-		
-		public func validate() -> [ValidationFailure] { }
-	}
+
+  /// https://docs.discord.food/authentication#mfa-verification
+  public struct MFASubmitData: Sendable, Codable, ValidatablePayload {
+    public var ticket: Secret
+    public var mfa_type: MFAKind
+    public var data: String
+
+    public init(ticket: Secret, mfa_type: MFAKind, data: String) {
+      self.ticket = ticket
+      self.mfa_type = mfa_type
+      self.data = data
+    }
+
+    public enum MFAKind: String, Sendable, Codable {
+      case totp  // totp
+      case sms  // sms
+      case backup  // backup
+      case webauthn  // webauthn
+      case password  // password
+    }
+
+    public func validate() -> [ValidationFailure] {}
+  }
 
   /// An attachment object, but for sending.
   /// https://discord.com/developers/docs/resources/channel#attachment-object
@@ -161,7 +165,10 @@ public enum Payloads {
 
     public func validate() -> [ValidationFailure] {
       validateCharacterCountDoesNotExceed(
-        description, max: 1_024, name: "description")
+        description,
+        max: 1_024,
+        name: "description"
+      )
     }
   }
 
@@ -231,7 +238,7 @@ public enum Payloads {
       public var embeds: [Embed]?
       public var allowedMentions: AllowedMentions?
       public var flags: IntBitField<DiscordChannel.Message.Flag>?
-      public var components: [Interaction.ActionRow]?
+      public var components: Interaction.ComponentSwitch?
       public var attachments: [Attachment]?
       public var files: [RawFile]?
       public var poll: CreatePollRequest?
@@ -253,7 +260,7 @@ public enum Payloads {
         embeds: [Embed]? = nil,
         allowedMentions: AllowedMentions? = nil,
         flags: IntBitField<DiscordChannel.Message.Flag>? = nil,
-        components: [Interaction.ActionRow]? = nil,
+        components: Interaction.ComponentSwitch? = nil,
         attachments: [Attachment]? = nil,
         files: [RawFile]? = nil,
         poll: CreatePollRequest? = nil
@@ -278,9 +285,14 @@ public enum Payloads {
           reason: "Can only contain 'suppressEmbeds' and 'ephemeral'",
           allowed: [.suppressEmbeds, .ephemeral]
         )
-        validateElementCountDoesNotExceed(
-          components, max: 5, name: "components")
-        components?.validate()
+        if let components = components?.legacy {
+          validateElementCountDoesNotExceed(
+            components,
+            max: 5,
+            name: "components"
+          )
+          components.validate()
+        }
         attachments?.validate()
         embeds?.validate()
         poll?.validate()
@@ -304,24 +316,31 @@ public enum Payloads {
     public struct Modal: Sendable, Encodable, ValidatablePayload {
       public var custom_id: String
       public var title: String
-      public var components: [Interaction.ActionRow]
+      public var components: Interaction.ComponentSwitch
 
       /// Discord docs says currently you can only send text-inputs.
       /// To send other types of components, use a normal message's `components`:
       /// `Payloads.InteractionResponse.Message(components: [...])`
       /// Respectively, you can't send a text-input using a normal message's `components`.
       public init(
-        custom_id: String, title: String,
+        custom_id: String,
+        title: String,
         textInputs: [Interaction.ActionRow.TextInput]
       ) {
         self.custom_id = custom_id
         self.title = title
-        self.components = textInputs.map { [.textInput($0)] }
+        self.components = .legacy(textInputs.map { [.textInput($0)] })
       }
 
       public func validate() -> [ValidationFailure] {
-        validateElementCountInRange(
-          components, min: 1, max: 5, name: "components")
+        if let components = components.legacy {
+          validateElementCountInRange(
+            components,
+            min: 1,
+            max: 5,
+            name: "components"
+          )
+        }
       }
     }
 
@@ -445,7 +464,8 @@ public enum Payloads {
     /// Creates a response of type `Kind.applicationCommandAutoCompleteResult`.
     public static func autocompleteResult(_ result: Autocomplete) -> Self {
       .init(
-        type: .applicationCommandAutoCompleteResult, data: .autocomplete(result)
+        type: .applicationCommandAutoCompleteResult,
+        data: .autocomplete(result)
       )
     }
 
@@ -457,7 +477,9 @@ public enum Payloads {
     /// Creates a response of type `Kind.premiumRequired`.
     public static func premiumRequired(isEphemeral: Bool = false) -> Self {
       .init(
-        type: .premiumRequired, data: .flags(.init(isEphemeral: isEphemeral)))
+        type: .premiumRequired,
+        data: .flags(.init(isEphemeral: isEphemeral))
+      )
     }
   }
 
@@ -539,7 +561,7 @@ public enum Payloads {
     public var embeds: [Embed]?
     public var allowed_mentions: AllowedMentions?
     public var message_reference: DiscordChannel.Message.MessageReference?
-    public var components: [Interaction.ActionRow]?
+    public var components: Interaction.ComponentSwitch?
     public var sticker_ids: [String]?
     public var files: [RawFile]?
     public var attachments: [Attachment]?
@@ -569,7 +591,7 @@ public enum Payloads {
       embeds: [Embed]? = nil,
       allowed_mentions: AllowedMentions? = nil,
       message_reference: DiscordChannel.Message.MessageReference? = nil,
-      components: [Interaction.ActionRow]? = nil,
+      components: Interaction.ComponentSwitch? = nil,
       sticker_ids: [String]? = nil,
       files: [RawFile]? = nil,
       attachments: [Attachment]? = nil,
@@ -595,16 +617,22 @@ public enum Payloads {
     public func validate() -> [ValidationFailure] {
       validateElementCountDoesNotExceed(embeds, max: 10, name: "embeds")
       validateElementCountDoesNotExceed(
-        sticker_ids, max: 3, name: "sticker_ids")
+        sticker_ids,
+        max: 3,
+        name: "sticker_ids"
+      )
       validateCharacterCountDoesNotExceed(content, max: 2_000, name: "content")
       validateCharacterCountDoesNotExceed(
-        nonce?.asString, max: 25, name: "nonce")
+        nonce?.asString,
+        max: 25,
+        name: "nonce"
+      )
       allowed_mentions?.validate()
       validateAtLeastOneIsNotEmpty(
         content?.isEmpty,
         embeds?.isEmpty,
         sticker_ids?.isEmpty,
-        components?.isEmpty,
+        components?.legacy?.isEmpty,
         files?.isEmpty,
         poll?.answers.isEmpty,
         names: "content",
@@ -637,7 +665,7 @@ public enum Payloads {
     public var embeds: [Embed]?
     public var flags: IntBitField<DiscordChannel.Message.Flag>?
     public var allowed_mentions: AllowedMentions?
-    public var components: [Interaction.ActionRow]?
+    public var components: Interaction.ComponentSwitch?
     public var files: [RawFile]?
     public var attachments: [Attachment]?
 
@@ -655,7 +683,7 @@ public enum Payloads {
       embeds: [Embed]? = nil,
       flags: IntBitField<DiscordChannel.Message.Flag>? = nil,
       allowed_mentions: AllowedMentions? = nil,
-      components: [Interaction.ActionRow]? = nil,
+      components: Interaction.ComponentSwitch? = nil,
       files: [RawFile]? = nil,
       attachments: [Attachment]? = nil
     ) {
@@ -697,7 +725,7 @@ public enum Payloads {
     public var tts: Bool?
     public var embeds: [Embed]?
     public var allowed_mentions: AllowedMentions?
-    public var components: [Interaction.ActionRow]?
+    public var components: Interaction.ComponentSwitch?
     public var files: [RawFile]?
     public var attachments: [Attachment]?
     public var flags: IntBitField<DiscordChannel.Message.Flag>?
@@ -727,7 +755,7 @@ public enum Payloads {
       tts: Bool? = nil,
       embeds: [Embed]? = nil,
       allowed_mentions: AllowedMentions? = nil,
-      components: [Interaction.ActionRow]? = nil,
+      components: Interaction.ComponentSwitch? = nil,
       files: [RawFile]? = nil,
       attachments: [Attachment]? = nil,
       flags: IntBitField<DiscordChannel.Message.Flag>? = nil,
@@ -755,7 +783,7 @@ public enum Payloads {
       validateCharacterCountDoesNotExceed(content, max: 2_000, name: "content")
       validateAtLeastOneIsNotEmpty(
         content?.isEmpty,
-        components?.isEmpty,
+        components?.legacy?.isEmpty,
         files?.isEmpty,
         embeds?.isEmpty,
         poll?.answers.isEmpty,
@@ -824,7 +852,8 @@ public enum Payloads {
     public var channel_id: ChannelSnowflake?
 
     public init(
-      name: String, avatar: ImageData? = nil,
+      name: String,
+      avatar: ImageData? = nil,
       channel_id: ChannelSnowflake? = nil
     ) {
       self.name = name
@@ -842,7 +871,7 @@ public enum Payloads {
     public var content: String?
     public var embeds: [Embed]?
     public var allowed_mentions: AllowedMentions?
-    public var components: [Interaction.ActionRow]?
+    public var components: Interaction.ComponentSwitch?
     public var files: [RawFile]?
     public var attachments: [Attachment]?
 
@@ -858,7 +887,7 @@ public enum Payloads {
       content: String? = nil,
       embeds: [Embed]? = nil,
       allowed_mentions: AllowedMentions? = nil,
-      components: [Interaction.ActionRow]? = nil,
+      components: Interaction.ComponentSwitch? = nil,
       files: [RawFile]? = nil,
       attachments: [Attachment]? = nil
     ) {
@@ -955,7 +984,7 @@ public enum Payloads {
       public var content: String?
       public var embeds: [Embed]?
       public var allowed_mentions: AllowedMentions?
-      public var components: [Interaction.ActionRow]?
+      public var components: Interaction.ComponentSwitch?
       public var sticker_ids: [String]?
       public var files: [RawFile]?
       public var attachments: [Attachment]?
@@ -977,7 +1006,7 @@ public enum Payloads {
         content: String? = nil,
         embeds: [Embed]? = nil,
         allowed_mentions: AllowedMentions? = nil,
-        components: [Interaction.ActionRow]? = nil,
+        components: Interaction.ComponentSwitch? = nil,
         sticker_ids: [String]? = nil,
         files: [RawFile]? = nil,
         attachments: [Attachment]? = nil,
@@ -998,15 +1027,21 @@ public enum Payloads {
       public func validate() -> [ValidationFailure] {
         validateElementCountDoesNotExceed(embeds, max: 10, name: "embeds")
         validateElementCountDoesNotExceed(
-          sticker_ids, max: 3, name: "sticker_ids")
+          sticker_ids,
+          max: 3,
+          name: "sticker_ids"
+        )
         validateCharacterCountDoesNotExceed(
-          content, max: 2_000, name: "content")
+          content,
+          max: 2_000,
+          name: "content"
+        )
         allowed_mentions?.validate()
         validateAtLeastOneIsNotEmpty(
           content?.isEmpty,
           embeds?.isEmpty,
           sticker_ids?.isEmpty,
-          components?.isEmpty,
+          components?.legacy?.isEmpty,
           files?.isEmpty,
           poll?.answers.isEmpty,
           names: "content",
@@ -1135,14 +1170,25 @@ public enum Payloads {
       )
       validateCharacterCountInRange(name, min: 1, max: 32, name: "name")
       validateCharacterCountDoesNotExceed(
-        description, max: 100, name: "description")
+        description,
+        max: 100,
+        name: "description"
+      )
       for (_, value) in name_localizations?.values ?? [:] {
         validateCharacterCountInRange(
-          value, min: 1, max: 32, name: "name_localizations.name")
+          value,
+          min: 1,
+          max: 32,
+          name: "name_localizations.name"
+        )
       }
       for (_, value) in description_localizations?.values ?? [:] {
         validateCharacterCountInRange(
-          value, min: 1, max: 32, name: "description_localizations.name")
+          value,
+          min: 1,
+          max: 32,
+          name: "description_localizations.name"
+        )
       }
       validateElementCountDoesNotExceed(options, max: 25, name: "options")
       options?.validate()
@@ -1216,14 +1262,25 @@ public enum Payloads {
     public func validate() -> [ValidationFailure] {
       validateCharacterCountInRange(name, min: 1, max: 32, name: "name")
       validateCharacterCountDoesNotExceed(
-        description, max: 100, name: "description")
+        description,
+        max: 100,
+        name: "description"
+      )
       for (_, value) in name_localizations?.values ?? [:] {
         validateCharacterCountInRange(
-          value, min: 1, max: 32, name: "name_localizations.name")
+          value,
+          min: 1,
+          max: 32,
+          name: "name_localizations.name"
+        )
       }
       for (_, value) in description_localizations?.values ?? [:] {
         validateCharacterCountInRange(
-          value, min: 1, max: 32, name: "description_localizations.name")
+          value,
+          min: 1,
+          max: 32,
+          name: "description_localizations.name"
+        )
       }
       validateElementCountDoesNotExceed(options, max: 25, name: "options")
       options?.validate()
@@ -1286,7 +1343,9 @@ public enum Payloads {
     public var emoji_name: String?
 
     public init(
-      id: ForumTagSnowflake? = nil, name: String, moderated: Bool? = nil,
+      id: ForumTagSnowflake? = nil,
+      name: String,
+      moderated: Bool? = nil,
       emoji_id: EmojiSnowflake? = nil
     ) {
       self.id = id
@@ -1296,7 +1355,9 @@ public enum Payloads {
     }
 
     public init(
-      id: ForumTagSnowflake? = nil, name: String, moderated: Bool? = nil,
+      id: ForumTagSnowflake? = nil,
+      name: String,
+      moderated: Bool? = nil,
       emoji_name: String? = nil
     ) {
       self.id = id
@@ -1386,9 +1447,17 @@ public enum Payloads {
         name: "rate_limit_per_user"
       )
       validateNumberInRangeOrNil(
-        bitrate, min: 8_000, max: 384_000, name: "bitrate")
+        bitrate,
+        min: 8_000,
+        max: 384_000,
+        name: "bitrate"
+      )
       validateNumberInRangeOrNil(
-        user_limit, min: 0, max: 10_000, name: "user_limit")
+        user_limit,
+        min: 0,
+        max: 10_000,
+        name: "user_limit"
+      )
       validateOnlyContains(
         flags,
         name: "flags",
@@ -1396,7 +1465,10 @@ public enum Payloads {
         allowed: [.requireTag]
       )
       validateElementCountDoesNotExceed(
-        available_tags, max: 20, name: "available_tags")
+        available_tags,
+        max: 20,
+        name: "available_tags"
+      )
       available_tags?.validate()
     }
   }
@@ -1447,7 +1519,10 @@ public enum Payloads {
         allowed: [.pinned]
       )
       validateElementCountDoesNotExceed(
-        applied_tags, max: 5, name: "applied_tags")
+        applied_tags,
+        max: 5,
+        name: "applied_tags"
+      )
       applied_tags?.validate()
     }
   }
@@ -1525,11 +1600,22 @@ public enum Payloads {
         name: "rate_limit_per_user"
       )
       validateNumberInRangeOrNil(
-        bitrate, min: 8_000, max: 384_000, name: "bitrate")
+        bitrate,
+        min: 8_000,
+        max: 384_000,
+        name: "bitrate"
+      )
       validateNumberInRangeOrNil(
-        user_limit, min: 0, max: 10_000, name: "user_limit")
+        user_limit,
+        min: 0,
+        max: 10_000,
+        name: "user_limit"
+      )
       validateElementCountDoesNotExceed(
-        available_tags, max: 20, name: "available_tags")
+        available_tags,
+        max: 20,
+        name: "available_tags"
+      )
       available_tags?.validate()
     }
   }
@@ -1650,6 +1736,75 @@ public enum Payloads {
     }
   }
 
+  /// https://docs.discord.food/resources/auto-moderation#automod-trigger-metadata
+  public struct AutoModTriggerMetadata: Sendable, Codable, ValidatablePayload {
+    public var keyword_filter: [String]
+    public var regex_patterns: [String]
+    public var presets: [Int]
+    public var allow_list: [String]
+    public var mention_total_limit: Int
+    public var mention_raid_protection_enabled: Bool
+
+    public init(
+      keyword_filter: [String],
+      regex_patterns: [String],
+      presets: [Int],
+      allow_list: [String],
+      mention_total_limit: Int,
+      mention_raid_protection_enabled: Bool
+    ) {
+      self.keyword_filter = keyword_filter
+      self.regex_patterns = regex_patterns
+      self.presets = presets
+      self.allow_list = allow_list
+      self.mention_total_limit = mention_total_limit
+      self.mention_raid_protection_enabled = mention_raid_protection_enabled
+    }
+
+    public func validate() -> [ValidationFailure] {
+      validateElementCountDoesNotExceed(
+        keyword_filter,
+        max: 1000,
+        name: "keyword_filter"
+      )
+      validateElementCountDoesNotExceed(
+        regex_patterns,
+        max: 10,
+        name: "regex_patterns"
+      )
+      validateElementCountDoesNotExceed(
+        allow_list,
+        max: 1000,
+        name: "allow_list",
+      )
+      validateHasPrecondition(
+        condition: mention_total_limit <= 50,
+        allowedIf: !mention_raid_protection_enabled,
+        name: "mention_total_limit",
+        reason:
+          "'mention_total_limit' must be less than or equal to 50 when 'mention_raid_protection_enabled' is false"
+      )
+    }
+  }
+
+  /// https://docs.discord.food/resources/auto-moderation#execute-automod-alert-action
+  public struct ExecuteAutoModAlertAction: Sendable, Codable, ValidatablePayload
+  {
+    public var channel_id: ChannelSnowflake
+    public var message_id: MessageSnowflake
+    public var alert_action_type: AlertActionKind
+
+    public enum AlertActionKind: Int, Sendable, Codable {
+      case setCompleted = 1
+      case unsetCompleted = 2
+      case deleteUserMessage = 3
+      case submitFeedback = 4
+    }
+
+    public func validate() -> [ValidationFailure] {
+    }
+  }
+
   /// https://discord.com/developers/docs/resources/auto-moderation#create-auto-moderation-rule-json-params
   public struct CreateAutoModerationRule: Sendable, Codable, ValidatablePayload
   {
@@ -1684,9 +1839,15 @@ public enum Payloads {
 
     public func validate() -> [ValidationFailure] {
       validateElementCountDoesNotExceed(
-        exempt_roles, max: 50, name: "exempt_roles")
+        exempt_roles,
+        max: 50,
+        name: "exempt_roles"
+      )
       validateElementCountDoesNotExceed(
-        exempt_channels, max: 50, name: "exempt_channels")
+        exempt_channels,
+        max: 50,
+        name: "exempt_channels"
+      )
     }
   }
 
@@ -1724,9 +1885,15 @@ public enum Payloads {
 
     public func validate() -> [ValidationFailure] {
       validateElementCountDoesNotExceed(
-        exempt_roles, max: 50, name: "exempt_roles")
+        exempt_roles,
+        max: 50,
+        name: "exempt_roles"
+      )
       validateElementCountDoesNotExceed(
-        exempt_channels, max: 50, name: "exempt_channels")
+        exempt_channels,
+        max: 50,
+        name: "exempt_channels"
+      )
     }
   }
 
@@ -2010,8 +2177,11 @@ public enum Payloads {
 
     public func validate() -> [ValidationFailure] {
       validateNumberInRangeOrNil(
-        delete_message_seconds, min: 0, max: 604_800,
-        name: "delete_message_seconds")
+        delete_message_seconds,
+        min: 0,
+        max: 604_800,
+        name: "delete_message_seconds"
+      )
     }
   }
 
@@ -2028,8 +2198,11 @@ public enum Payloads {
     public func validate() -> [ValidationFailure] {
       validateElementCountInRange(user_ids, min: 1, max: 200, name: "user_ids")
       validateNumberInRangeOrNil(
-        delete_message_seconds, min: 0, max: 604_800,
-        name: "delete_message_seconds")
+        delete_message_seconds,
+        min: 0,
+        max: 604_800,
+        name: "delete_message_seconds"
+      )
     }
   }
 
@@ -2104,7 +2277,9 @@ public enum Payloads {
     public var include_roles: [RoleSnowflake]
 
     public init(
-      days: Int, compute_prune_count: Bool, include_roles: [RoleSnowflake]
+      days: Int,
+      compute_prune_count: Bool,
+      include_roles: [RoleSnowflake]
     ) {
       self.days = days
       self.compute_prune_count = compute_prune_count
@@ -2308,7 +2483,10 @@ public enum Payloads {
     public func validate() -> [ValidationFailure] {
       validateCharacterCountInRange(name, min: 1, max: 100, name: "name")
       validateCharacterCountDoesNotExceed(
-        description, max: 120, name: "description")
+        description,
+        max: 120,
+        name: "description"
+      )
     }
   }
 
@@ -2325,7 +2503,10 @@ public enum Payloads {
     public func validate() -> [ValidationFailure] {
       validateCharacterCountInRange(name, min: 1, max: 100, name: "name")
       validateCharacterCountDoesNotExceed(
-        description, max: 120, name: "description")
+        description,
+        max: 120,
+        name: "description"
+      )
     }
   }
 
@@ -2362,7 +2543,8 @@ public enum Payloads {
     public var privacy_level: StageInstance.PrivacyLevel?
 
     public init(
-      topic: String? = nil, privacy_level: StageInstance.PrivacyLevel? = nil
+      topic: String? = nil,
+      privacy_level: StageInstance.PrivacyLevel? = nil
     ) {
       self.topic = topic
       self.privacy_level = privacy_level
@@ -2398,7 +2580,11 @@ public enum Payloads {
     public func validate() -> [ValidationFailure] {
       validateCharacterCountInRange(name, min: 2, max: 30, name: "name")
       validateCharacterCountInRangeOrNil(
-        description, min: 2, max: 100, name: "description")
+        description,
+        min: 2,
+        max: 100,
+        name: "description"
+      )
       validateCharacterCountDoesNotExceed(tags, max: 200, name: "tags")
     }
   }
@@ -2410,7 +2596,9 @@ public enum Payloads {
     public var tags: String?
 
     public init(
-      name: String? = nil, description: String? = nil, tags: String? = nil
+      name: String? = nil,
+      description: String? = nil,
+      tags: String? = nil
     ) {
       self.name = name
       self.description = description
@@ -2420,7 +2608,11 @@ public enum Payloads {
     public func validate() -> [ValidationFailure] {
       validateCharacterCountInRange(name, min: 2, max: 30, name: "name")
       validateCharacterCountInRangeOrNil(
-        description, min: 2, max: 100, name: "description")
+        description,
+        min: 2,
+        max: 100,
+        name: "description"
+      )
       validateCharacterCountDoesNotExceed(tags, max: 200, name: "tags")
     }
   }
@@ -2432,7 +2624,8 @@ public enum Payloads {
     public var banner: ImageData?
 
     public init(
-      username: String? = nil, avatar: ImageData? = nil,
+      username: String? = nil,
+      avatar: ImageData? = nil,
       banner: ImageData? = nil
     ) {
       self.username = username
@@ -2444,33 +2637,43 @@ public enum Payloads {
   }
 
   /// https://discord.com/developers/docs/resources/user#create-dm-json-params
+  /// https://discord.com/developers/docs/resources/user#create-group-dm-json-params
+  /// https://docs.discord.food/resources/channel#json-params
   public struct CreateDM: Sendable, Encodable, ValidatablePayload {
-    public var recipient_id: UserSnowflake
+//    public var recipient_id: UserSnowflake? // deprecated
+    public var recipients: [UserSnowflake]?
 
     @inlinable
-    public init(recipient_id: UserSnowflake) {
-      self.recipient_id = recipient_id
+    public init(recipient: UserSnowflake) {
+      self.recipients = [recipient]
+    }
+    
+    @inlinable
+    public init(recipients: [UserSnowflake]) {
+      self.recipients = recipients
     }
 
-    public func validate() -> [ValidationFailure] {}
-  }
-
-  /// https://discord.com/developers/docs/resources/user#create-group-dm-json-params
-  public struct CreateGroupDM: Sendable, Encodable, ValidatablePayload {
-    public var access_tokens: [String]
-    public var nicks: [String: String]
-
-    public init(access_tokens: [String], nicks: [UserSnowflake: String]) {
-      self.access_tokens = access_tokens
-      self.nicks = .init(
-        uniqueKeysWithValues: nicks.map { key, value in
-          (key.rawValue, value)
-        }
-      )
+    public func validate() -> [ValidationFailure] {
+      if let recipients {
+        validateElementCountInRange(
+          recipients,
+          min: 1,
+          max: 10,
+          name: "recipients"
+        )
+      }
     }
-
-    public func validate() -> [ValidationFailure] {}
   }
+
+//  public struct CreateGroupDM: Sendable, Encodable, ValidatablePayload {
+//    public var recipients: [UserSnowflake]
+//
+//    public init(recipients: [UserSnowflake]) {
+//      self.recipients = recipients
+//    }
+//
+//    public func validate() -> [ValidationFailure] {}
+//  }
 
   /// https://discord.com/developers/docs/resources/user#update-user-application-role-connection-json-params
   public struct UpdateUserApplicationRoleConnection: Sendable, Encodable,
@@ -2497,9 +2700,15 @@ public enum Payloads {
 
     public func validate() -> [ValidationFailure] {
       validateCharacterCountDoesNotExceed(
-        platform_name, max: 50, name: "platform_name")
+        platform_name,
+        max: 50,
+        name: "platform_name"
+      )
       validateCharacterCountDoesNotExceed(
-        platform_username, max: 100, name: "platform_username")
+        platform_username,
+        max: 100,
+        name: "platform_username"
+      )
     }
   }
 

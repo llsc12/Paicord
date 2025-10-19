@@ -1,5 +1,5 @@
 //
-//  UserGateway.swift
+//  UsrGatewayTests.swift
 //  PaicordLib
 //
 // Created by Lakhan Lothiyi on 26/08/2025.
@@ -12,6 +12,7 @@ import XCTest
 
 class UserGatewayTests: XCTestCase {
 	func testGateway() async throws {
+		// insane logging pls dont use
 		DiscordGlobalConfiguration.makeLogger = { loggerLabel in
 			var logger = Logger(label: loggerLabel)
 			logger.logLevel = .trace
@@ -19,8 +20,7 @@ class UserGatewayTests: XCTestCase {
 		}
 
 		let gateway = await UserGatewayManager(
-			token:
-				"OTMzMTI0MzIzMDM4ODU5MzE1.GgHeou.k7b3Ar40tj4Qr4v0hSoBnV15yKoNRLnW3uDRqs"
+			token:"redacted"
 		)
 
 		await gateway.connect()
@@ -48,6 +48,13 @@ class UserGatewayTests: XCTestCase {
 
 		let error = try DiscordGlobalConfiguration.decoder.decode(JSONError.self, from: data)
 		print(error)
+	}
+	
+	func testSuperPropertiesGeneration() {
+		let properties = Gateway.Identify.ConnectionProperties.init(ws: false)
+		let data = try! DiscordGlobalConfiguration.encoder.encode(properties)
+		let json = String(data: data, encoding: .utf8)!
+		print(json)
 	}
 }
 

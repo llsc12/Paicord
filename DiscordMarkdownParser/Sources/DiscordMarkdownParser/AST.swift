@@ -43,8 +43,8 @@ public struct ASTNodeType: RawRepresentable, Hashable, Sendable {
 
 	// Inline elements
 	public static let text = ASTNodeType(rawValue: "text")
-	public static let emphasis = ASTNodeType(rawValue: "emphasis")
-	public static let strongEmphasis = ASTNodeType(rawValue: "strongEmphasis")
+	public static let italic = ASTNodeType(rawValue: "italic")
+	public static let bold = ASTNodeType(rawValue: "bold")
 	public static let link = ASTNodeType(rawValue: "link")
 	public static let codeSpan = ASTNodeType(rawValue: "codeSpan")
 	public static let lineBreak = ASTNodeType(rawValue: "lineBreak")
@@ -65,10 +65,26 @@ public struct ASTNodeType: RawRepresentable, Hashable, Sendable {
 	public static let autolink = ASTNodeType(rawValue: "autolink")
 }
 
+extension ASTNodeType {
+	public var isBlock: Bool {
+		switch self {
+		case .document, .paragraph, .heading, .blockQuote, .list, .listItem,
+			.codeBlock, .thematicBreak:
+			return true
+		default:
+			return false
+		}
+	}
+
+	public var isInline: Bool {
+		!isBlock
+	}
+}
+
 // MARK: - Source Location
 
 /// Represents a location in the source markdown text
-public struct SourceLocation: Sendable, Equatable {
+public struct SourceLocation: Sendable, Equatable, Hashable {
 	/// Line number (1-based)
 	public let line: Int
 
@@ -128,7 +144,9 @@ public enum AST {
 		public let level: Int
 
 		public init(
-			level: Int, children: [ASTNode], sourceLocation: SourceLocation? = nil
+			level: Int,
+			children: [ASTNode],
+			sourceLocation: SourceLocation? = nil
 		) {
 			self.level = level
 			self.children = children
@@ -164,7 +182,9 @@ public enum AST {
 		public let items: [ASTNode]
 
 		public init(
-			isOrdered: Bool, startNumber: Int? = nil, items: [ASTNode],
+			isOrdered: Bool,
+			startNumber: Int? = nil,
+			items: [ASTNode],
 			sourceLocation: SourceLocation? = nil
 		) {
 			self.isOrdered = isOrdered
@@ -206,8 +226,11 @@ public enum AST {
 		public let isFenced: Bool
 
 		public init(
-			content: String, language: String? = nil, info: String? = nil,
-			isFenced: Bool = false, sourceLocation: SourceLocation? = nil
+			content: String,
+			language: String? = nil,
+			info: String? = nil,
+			isFenced: Bool = false,
+			sourceLocation: SourceLocation? = nil
 		) {
 			self.content = content
 			self.language = language
@@ -234,9 +257,9 @@ public enum AST {
 		}
 	}
 
-	/// Emphasis node (italic)
+	/// italic node
 	public struct ItalicNode: ASTNode, Sendable {
-		public let nodeType: ASTNodeType = .emphasis
+		public let nodeType: ASTNodeType = .italic
 		public let children: [ASTNode]
 		public let sourceLocation: SourceLocation?
 
@@ -246,9 +269,9 @@ public enum AST {
 		}
 	}
 
-	/// Strong emphasis node (bold)
+	/// Bold node
 	public struct BoldNode: ASTNode, Sendable {
-		public let nodeType: ASTNodeType = .strongEmphasis
+		public let nodeType: ASTNodeType = .bold
 		public let children: [ASTNode]
 		public let sourceLocation: SourceLocation?
 
@@ -271,7 +294,9 @@ public enum AST {
 		public let title: String?
 
 		public init(
-			url: String, title: String? = nil, children: [ASTNode],
+			url: String,
+			title: String? = nil,
+			children: [ASTNode],
 			sourceLocation: SourceLocation? = nil
 		) {
 			self.url = url
@@ -366,7 +391,9 @@ public enum AST {
 		public let text: String
 
 		public init(
-			url: String, text: String, sourceLocation: SourceLocation? = nil
+			url: String,
+			text: String,
+			sourceLocation: SourceLocation? = nil
 		) {
 			self.url = url
 			self.text = text
@@ -414,7 +441,9 @@ public enum AST {
 		public let isAnimated: Bool
 
 		public init(
-			name: String, identifier: EmojiSnowflake, isAnimated: Bool = false,
+			name: String,
+			identifier: EmojiSnowflake,
+			isAnimated: Bool = false,
 			sourceLocation: SourceLocation? = nil
 		) {
 			self.name = name
@@ -503,7 +532,8 @@ public enum AST {
 		public let style: TimestampStyle?
 
 		public init(
-			date: Date, style: TimestampStyle? = nil,
+			date: Date,
+			style: TimestampStyle? = nil,
 			sourceLocation: SourceLocation? = nil
 		) {
 			self.date = date

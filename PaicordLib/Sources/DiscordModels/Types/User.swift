@@ -1,5 +1,5 @@
 /// https://discord.com/developers/docs/resources/user#user-object-user-structure
-public struct DiscordUser: Sendable, Codable, Equatable {
+public struct DiscordUser: Sendable, Codable, Equatable, Hashable {
 
 	public init(
 		id: UserSnowflake,
@@ -18,6 +18,7 @@ public struct DiscordUser: Sendable, Codable, Equatable {
 		flags: IntBitField<Flag>? = nil,
 		premium_type: PremiumKind? = nil,
 		public_flags: IntBitField<Flag>? = nil,
+		collectibles: Collectibles? = nil,
 		avatar_decoration_data: AvatarDecoration? = nil
 	) {
 		self.id = id
@@ -36,6 +37,7 @@ public struct DiscordUser: Sendable, Codable, Equatable {
 		self.flags = flags
 		self.premium_type = premium_type
 		self.public_flags = public_flags
+		self.collectibles = collectibles
 		self.avatar_decoration_data = avatar_decoration_data
 	}
 
@@ -71,7 +73,7 @@ public struct DiscordUser: Sendable, Codable, Equatable {
 	}
 
 	/// https://discord.com/developers/docs/resources/user#avatar-decoration-data-object
-	public struct AvatarDecoration: Sendable, Codable, Equatable {
+	public struct AvatarDecoration: Sendable, Codable, Equatable, Hashable {
 		public var asset: String
 		public var sku_id: SKUSnowflake
 	}
@@ -94,12 +96,143 @@ public struct DiscordUser: Sendable, Codable, Equatable {
 	public var public_flags: IntBitField<Flag>?
 	@available(*, deprecated, renamed: "avatar_decoration_data")
 	public var avatar_decoration: String?
+	public var collectibles: Collectibles?
 	public var avatar_decoration_data: AvatarDecoration?
+
+	/// https://docs.discord.food/resources/user#collectibles-structure
+	public struct Collectibles: Sendable, Codable, Equatable, Hashable {
+    public init(nameplate: Nameplate? = nil) {
+      self.nameplate = nameplate
+    }
+    
+		public var nameplate: Nameplate?
+
+		/// https://docs.discord.food/resources/user#nameplate-data-structure
+		public struct Nameplate: Sendable, Codable, Equatable, Hashable {
+      public init(asset: String, sku_id: SKUSnowflake, label: String, palette: ColorPalette, expires_at: DiscordTimestamp? = nil) {
+        self.asset = asset
+        self.sku_id = sku_id
+        self.label = label
+        self.palette = palette
+        self.expires_at = expires_at
+      }
+      
+			public var asset: String
+			public var sku_id: SKUSnowflake
+			public var label: String
+			public var palette: ColorPalette
+			public var expires_at: DiscordTimestamp?
+
+			@UnstableEnum<String>
+			public enum ColorPalette: Sendable, Codable {
+				case none
+				case crimson
+				case berry
+				case sky
+				case teal
+				case forest
+				case bubble_gum
+				case violet
+				case cobalt
+				case clover
+				case lemon
+				case white
+				case __undocumented(String)
+			}
+		}
+	}
+}
+
+extension DiscordUser.Collectibles.Nameplate.ColorPalette {
+	public var color: (light: DiscordColor, dark: DiscordColor) {
+		//		[r.P.Crimson]: {
+		//				darkBackground: "#900007",
+		//				lightBackground: "#E7040F",
+		//				name: r.P.Crimson
+		//		},
+		//		[r.P.Berry]: {
+		//				darkBackground: "#893A99",
+		//				lightBackground: "#B11FCF",
+		//				name: r.P.Berry
+		//		},
+		//		[r.P.Sky]: {
+		//				darkBackground: "#0080B7",
+		//				lightBackground: "#56CCFF",
+		//				name: r.P.Sky
+		//		},
+		//		[r.P.Teal]: {
+		//				darkBackground: "#086460",
+		//				lightBackground: "#7DEED7",
+		//				name: r.P.Teal
+		//		},
+		//		[r.P.Forest]: {
+		//				darkBackground: "#2D5401",
+		//				lightBackground: "#6AA624",
+		//				name: r.P.Forest
+		//		},
+		//		[r.P.BubbleGum]: {
+		//				darkBackground: "#DC3E97",
+		//				lightBackground: "#F957B3",
+		//				name: r.P.BubbleGum
+		//		},
+		//		[r.P.Violet]: {
+		//				darkBackground: "#730BC8",
+		//				lightBackground: "#972FED",
+		//				name: r.P.Violet
+		//		},
+		//		[r.P.Cobalt]: {
+		//				darkBackground: "#0131C2",
+		//				lightBackground: "#4278FF",
+		//				name: r.P.Cobalt
+		//		},
+		//		[r.P.Clover]: {
+		//				darkBackground: "#047B20",
+		//				lightBackground: "#63CD5A",
+		//				name: r.P.Clover
+		//		},
+		//		[r.P.Lemon]: {
+		//				darkBackground: "#F6CD12",
+		//				lightBackground: "#FED400",
+		//				name: r.P.Lemon
+		//		},
+		//		[r.P.White]: {
+		//				darkBackground: "#FFFFFF",
+		//				lightBackground: "#FFFFFF",
+		//				name: r.P.White
+		//		}
+
+		switch self {
+		case .crimson:
+			return (light: .init(hex: "#E7040F")!, dark: .init(hex: "#900007")!)
+		case .berry:
+			return (light: .init(hex: "#B11FCF")!, dark: .init(hex: "#893A99")!)
+		case .sky:
+			return (light: .init(hex: "#56CCFF")!, dark: .init(hex: "#0080B7")!)
+		case .teal:
+			return (light: .init(hex: "#7DEED7")!, dark: .init(hex: "#086460")!)
+		case .forest:
+			return (light: .init(hex: "#6AA624")!, dark: .init(hex: "#2D5401")!)
+		case .bubble_gum:
+			return (light: .init(hex: "#F957B3")!, dark: .init(hex: "#DC3E97")!)
+		case .violet:
+			return (light: .init(hex: "#972FED")!, dark: .init(hex: "#730BC8")!)
+		case .cobalt:
+			return (light: .init(hex: "#4278FF")!, dark: .init(hex: "#0131C2")!)
+		case .clover:
+			return (light: .init(hex: "#63CD5A")!, dark: .init(hex: "#047B20")!)
+		case .lemon:
+			return (light: .init(hex: "#FED400")!, dark: .init(hex: "#F6CD12")!)
+		case .white:
+			return (light: .init(hex: "#FFFFFF")!, dark: .init(hex: "#FFFFFF")!)
+		case .none, .__undocumented:
+			return (light: .init(hex: "#000000")!, dark: .init(hex: "#000000")!)
+		}
+	}
 }
 
 /// A partial ``DiscordUser`` object.
 /// https://discord.com/developers/docs/resources/user#user-object-user-structure
-public struct PartialUser: Sendable, Codable, Equatable {
+public struct PartialUser: Sendable, Codable, Equatable, Hashable {
 	public var id: UserSnowflake
 	public var username: String?
 	public var discriminator: String?
@@ -124,7 +257,7 @@ public struct PartialUser: Sendable, Codable, Equatable {
 /// A ``DiscordUser`` with an extra `member` field.
 /// https://discord.com/developers/docs/topics/gateway-events#message-create-message-create-extra-fields
 /// https://discord.com/developers/docs/resources/user#user-object-user-structure
-public struct MentionUser: Sendable, Codable, Equatable {
+public struct MentionUser: Sendable, Codable, Equatable, Hashable {
 	public var id: UserSnowflake
 	public var username: String
 	public var discriminator: String

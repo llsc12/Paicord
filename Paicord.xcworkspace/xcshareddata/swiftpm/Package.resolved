@@ -1,5 +1,5 @@
 {
-  "originHash" : "dc32f76771b50c87ad3f038b5c2593a4991dc95af3c0d15980fec613f8624275",
+  "originHash" : "c81a87d0d4d4bd74c6597837bf6bbf51b5d4b1af543d8630628ddf9a2622a2cd",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -40,10 +40,10 @@
     {
       "identity" : "highlightswift",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/appstefan/HighlightSwift",
+      "location" : "https://github.com/llsc12/HighlightSwift",
       "state" : {
-        "revision" : "784ca3ccfc8a2cf724fbb2f06cb6ec3329424da3",
-        "version" : "1.1.0"
+        "branch" : "main",
+        "revision" : "2661e939fd897a1f56d18f84fe99f020f3e64a63"
       }
     },
     {
@@ -53,6 +53,15 @@
       "state" : {
         "branch" : "master",
         "revision" : "e0c7eebc5a4465a3c4680764f26b7a61f567cdaf"
+      }
+    },
+    {
+      "identity" : "lottie-spm",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/airbnb/lottie-spm",
+      "state" : {
+        "revision" : "04f2fd18cc9404a0a0917265a449002674f24ec9",
+        "version" : "4.5.2"
       }
     },
     {
@@ -80,15 +89,6 @@
       "state" : {
         "revision" : "34cf2423a2c4088d06a3b08655603b5bc3eeeb3a",
         "version" : "5.21.2"
-      }
-    },
-    {
-      "identity" : "sdwebimagesvgcoder",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SDWebImage/SDWebImageSVGCoder/",
-      "state" : {
-        "revision" : "85b5d58ad02c207c496fa34426dc6560d6ae32f0",
-        "version" : "1.8.0"
       }
     },
     {

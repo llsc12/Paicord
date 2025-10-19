@@ -10,6 +10,6 @@ import CoreGraphics
 
 extension CGSize {
   init(_ value: CGFloat) {
-	self.init(width: value, height: value)
+    self.init(width: value, height: value)
   }
 }

@@ -8,11 +8,12 @@
 
 import MeshGradient
 import simd
-import protocol SwiftUI.View
+
 import struct SwiftUI.Environment
 import struct SwiftUI.EnvironmentValues
-import struct SwiftUI.State
 import struct SwiftUI.Group
+import struct SwiftUI.State
+import protocol SwiftUI.View
 
 extension LoginView {
   struct MeshGradientBackground: View {
@@ -43,7 +44,10 @@ extension LoginView {
     // This methods prepares the grid model that will be sent to metal for rendering
     func generatePlainGrid(size: Int = 6) -> Grid<ControlPoint> {
       let preparationGrid = Grid<MeshColor>(
-        repeating: .zero, width: size, height: size)
+        repeating: .zero,
+        width: size,
+        height: size
+      )
 
       // At first we create grid without randomisation. This is smooth mesh gradient without
       // any turbulency and overlaps
@@ -53,15 +57,35 @@ extension LoginView {
       for x in stride(from: 0, to: result.width, by: 1) {
         for y in stride(from: 0, to: result.height, by: 1) {
           meshRandomizer.locationRandomizer(
-            &result[x, y].location, x, y, result.width, result.height)
+            &result[x, y].location,
+            x,
+            y,
+            result.width,
+            result.height
+          )
           meshRandomizer.turbulencyRandomizer(
-            &result[x, y].uTangent, x, y, result.width, result.height)
+            &result[x, y].uTangent,
+            x,
+            y,
+            result.width,
+            result.height
+          )
           meshRandomizer.turbulencyRandomizer(
-            &result[x, y].vTangent, x, y, result.width, result.height)
+            &result[x, y].vTangent,
+            x,
+            y,
+            result.width,
+            result.height
+          )
 
           meshRandomizer.colorRandomizer(
-            &result[x, y].color, result[x, y].color, x, y, result.width,
-            result.height)
+            &result[x, y].color,
+            result[x, y].color,
+            x,
+            y,
+            result.width,
+            result.height
+          )
         }
       }
 
@@ -74,38 +98,48 @@ extension LoginView {
     init() {
       self.meshRandomizer = MeshRandomizer(
         colorRandomizer: MeshRandomizer.arrayBasedColorRandomizer(
-          availableColors: Self.meshColorsDark))
+          availableColors: Self.meshColorsDark
+        )
+      )
     }
 
     @Environment(\.colorScheme) var cs
 
     var body: some View {
-			Group {
-#if os(iOS)
-				LegacyMeshGradient(
-					initialGrid: generatePlainGrid(),
-					animatorConfiguration: .init(
-						animationSpeedRange: 2...4, meshRandomizer: meshRandomizer)
-				)
-#elseif os(macOS)
-				MeshGradient(
-					initialGrid: generatePlainGrid(),
-					animatorConfiguration: .init(
-						animationSpeedRange: 2...4, meshRandomizer: meshRandomizer)
-				)
-#endif
-			}
+      Group {
+        #if os(iOS)
+          LegacyMeshGradient(
+            initialGrid: generatePlainGrid(),
+            animatorConfiguration: .init(
+              animationSpeedRange: 2...4,
+              meshRandomizer: meshRandomizer
+            )
+          )
+        #elseif os(macOS)
+          MeshGradient(
+            initialGrid: generatePlainGrid(),
+            animatorConfiguration: .init(
+              animationSpeedRange: 2...4,
+              meshRandomizer: meshRandomizer
+            )
+          )
+        #endif
+      }
       .onAppear {
         let colors = cs == .light ? Self.meshColorsLight : Self.meshColorsDark
         self.meshRandomizer = MeshRandomizer(
           colorRandomizer: MeshRandomizer.arrayBasedColorRandomizer(
-            availableColors: colors))
+            availableColors: colors
+          )
+        )
       }
       .onChange(of: cs) {
         let colors = cs == .light ? Self.meshColorsLight : Self.meshColorsDark
         self.meshRandomizer = MeshRandomizer(
           colorRandomizer: MeshRandomizer.arrayBasedColorRandomizer(
-            availableColors: colors))
+            availableColors: colors
+          )
+        )
       }
     }
   }
