@@ -140,6 +140,7 @@ extension MessageCell {
         var attachment: DiscordChannel.Message.Attachment
         var body: some View {
           Text("Video preview not implemented yet.")
+            .foregroundStyle(.red)
         }
       }
     }

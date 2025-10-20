@@ -1055,6 +1055,19 @@ final class DiscordMarkdownParserTests: XCTestCase {
     }
     XCTAssertEqual(text.content, "hi", "Final text content should be 'hi'")
   }
+  
+  func testEmojisLargeVariant() async throws {
+    let markdown1 = "<:blobcatcozy:1026533070955872337> <:blobcatcozy:1026533070955872337> <:blobcatcozy:1026533070955872337>"
+    let markdown2 = "<:blobcatcozy:1026533070955872337> 🥺"
+    let markdown3 = "<:blobcatcozy:1026533070955872337> hii"
+    let document1 = try await parser.parseToAST(markdown1)
+    let document2 = try await parser.parseToAST(markdown2)
+    let document3 = try await parser.parseToAST(markdown3)
+    
+    XCTAssertTrue(document1.isEmojisOnly())
+    XCTAssertTrue(document2.isEmojisOnly())
+    XCTAssertFalse(document3.isEmojisOnly())
+  }
 }
 
 // MARK: - Safe indexing helper used above

@@ -168,10 +168,8 @@ struct BlockElement: Identifiable {
 @Observable
 class MarkdownRendererVM {
   static var parser: DiscordMarkdownParser = {
-    .init()
+    .init() 
   }()
-
-  private enum BaseInlineStyle { case body, footnote }
 
   var blocks: [BlockElement] = []
 
@@ -180,17 +178,29 @@ class MarkdownRendererVM {
   func update(_ rawContent: String) async {
     self.rawContent = rawContent
     do {
-      let ast: AST.DocumentNode = try await Self.parser.parseToAST(rawContent)
+      let ast: AST.DocumentNode = try await Task.detached {
+        try await Self.parser.parseToAST(rawContent)
+      }.value
+      let blocks = await Task.detached {
+//        let emojisOnly = ast.isEmojisOnly()
+//        await MainActor.run {
+//          self.isEmojisOnly = emojisOnly
+//        }
+        let blocks = self.buildBlocks(from: ast)
+        return blocks
+      }.value
       await MainActor.run {
-        self.blocks = self.buildBlocks(from: ast)
+        self.blocks = blocks
       }
     } catch {
-      // parsing failed — keep previous content but log
+      // parsing failed, keep previous content but log
       print("Markdown parse failed: \(error)")
     }
   }
 
   var rawContent: String = ""
+
+  private enum BaseInlineStyle { case body, footnote }
 
   // Walk top-level AST nodes and convert to BlockElement models.
   func buildBlocks(from document: AST.DocumentNode) -> [BlockElement] {
@@ -559,7 +569,7 @@ class MarkdownRendererVM {
     case .customEmoji:
       if let ce = node as? AST.CustomEmojiNode {
         let copyText =
-        "<\(ce.isAnimated ? "a" : ""):\(ce.name):\(ce.identifier.rawValue)>"
+          "<\(ce.isAnimated ? "a" : ""):\(ce.name):\(ce.identifier.rawValue)>"
         guard
           let url = URL(
             string: CDNEndpoint.customEmoji(emojiId: ce.identifier).url
@@ -861,29 +871,29 @@ extension Text {
     ),
     content:
       """
-gn
-# Regular markdown
-||spoiler||
-~~strikethrough~~
-__underline__
-*italics* or _italics_
-**bold**
-***bold & italics***
-***~~strikethrough, bold & italics~~*** (you can mix them)
-`codeline`
-**`bold codeline`**
-``codeline with ` in it``
-``codeline that ends with ` ``
-and `` ` starts with`` or `` ` has on both sides ` ``
-> single line quote
+      gn
+      # Regular markdown
+      ||spoiler||
+      ~~strikethrough~~
+      __underline__
+      *italics* or _italics_
+      **bold**
+      ***bold & italics***
+      ***~~strikethrough, bold & italics~~*** (you can mix them)
+      `codeline`
+      **`bold codeline`**
+      ``codeline with ` in it``
+      ``codeline that ends with ` ``
+      and `` ` starts with`` or `` ` has on both sides ` ``
+      > single line quote
 
-> multiple line
-> quote
+      > multiple line
+      > quote
 
->>> (if you type \">>>\" at the beginning of any line, it will 
-expand them to the lines remaining\nuntil the end of the message
--# doesn't save the \">>>\" if sent from desktop
-""",
+      >>> (if you type \">>>\" at the beginning of any line, it will 
+      expand them to the lines remaining\nuntil the end of the message
+      -# doesn't save the \">>>\" if sent from desktop
+      """,
     timestamp: .init(date: .now),
     edited_timestamp: nil,
     tts: false,
@@ -926,9 +936,9 @@ expand them to the lines remaining\nuntil the end of the message
           profileOpen: $profileOpen,
           animated: false
         )
-#if os(macOS)
-        .padding(.trailing, 4)  // balancing
-#endif
+        #if os(macOS)
+          .padding(.trailing, 4)  // balancing
+        #endif
         VStack(spacing: 0) {
           HStack(alignment: .bottom) {
             MessageCell.MessageAuthor.Username(  // username line
@@ -949,7 +959,7 @@ expand them to the lines remaining\nuntil the end of the message
           )
           .fixedSize(horizontal: false, vertical: true)
           .border(.red)
-          
+
           MarkdownText(content: message.content)
             .frame(maxWidth: .infinity, alignment: .leading)
             .border(.blue)
@@ -959,7 +969,7 @@ expand them to the lines remaining\nuntil the end of the message
       .fixedSize(horizontal: false, vertical: true)
     }
     .padding(.horizontal, 4)
-//    .onHover { avatarAnimated = $0 }
+    //    .onHover { avatarAnimated = $0 }
   }
-//}
+  //}
 }

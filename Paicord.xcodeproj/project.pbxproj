@@ -211,9 +211,9 @@
 		57A4E7122E6B44B500470131 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
-				AAB50A5D2E9B21AE0048E8B0 /* Thumbhash.swift */,
 				AABED5A72E7FF970005BDD63 /* PaicordLib++ */,
 				57A4E7132E6B44BC00470131 /* Extensions */,
+				AAB50A5D2E9B21AE0048E8B0 /* Thumbhash.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
