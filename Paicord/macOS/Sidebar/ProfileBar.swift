@@ -65,7 +65,7 @@ struct ProfileBar: View {
     .padding(10)
     .background {
       if let nameplate = gw.user.currentUser?.collectibles?.nameplate {
-        NameplateView(nameplate: nameplate)
+        Profile.NameplateView(nameplate: nameplate)
           .brightness(-0.2)
       }
     }
@@ -90,47 +90,3 @@ struct ProfileBar: View {
   }
 }
 
-struct NameplateView: View {
-  @Environment(\.colorScheme) var colorScheme
-  let nameplate: DiscordUser.Collectibles.Nameplate
-
-  var color: Color {
-    switch colorScheme {
-    case .light:
-      nameplate.palette.color.light.asColor()
-    case .dark:
-      nameplate.palette.color.dark.asColor()
-    @unknown default:
-      fatalError()
-    }
-  }
-
-  var staticURL: URL? {
-    URL(
-      string: CDNEndpoint.collectibleNameplate(
-        asset: nameplate.asset,
-        file: .static
-      ).url
-    )
-  }
-
-  var body: some View {
-    ZStack {
-      switch nameplate.palette {
-      case .none, .__undocumented: EmptyView()
-      default:
-        LinearGradient(
-          gradient: Gradient(stops: [
-            .init(color: color.opacity(0.1), location: 0.0),
-            .init(color: color.opacity(0.4), location: 1.0),
-          ]),
-          startPoint: .leading,
-          endPoint: .trailing
-        )
-      }
-      WebImage(url: staticURL)
-        .resizable()
-        .scaledToFill()
-    }
-  }
-}

@@ -3,12 +3,14 @@ import NIOHTTP1
 
 /// CDN Endpoints.
 /// https://discord.com/developers/docs/reference#image-formatting-cdn-endpoints
+/// https://docs.discord.food/reference#cdn-endpoints
 public enum CDNEndpoint: Endpoint {
   case customEmoji(emojiId: EmojiSnowflake)
   case guildIcon(guildId: GuildSnowflake, icon: String)
   case guildSplash(guildId: GuildSnowflake, splash: String)
   case guildDiscoverySplash(guildId: GuildSnowflake, splash: String)
   case guildBanner(guildId: GuildSnowflake, banner: String)
+  case guildTagBadge(guildId: GuildSnowflake, badge: String)
   case userBanner(userId: UserSnowflake, banner: String)
   case defaultUserAvatar(discriminator: String)
   case userAvatar(userId: UserSnowflake, avatar: String)
@@ -50,6 +52,7 @@ public enum CDNEndpoint: Endpoint {
     userId: UserSnowflake,
     banner: String
   )
+  case channelIcon(channelId: ChannelSnowflake, icon: String)
 
   /// This case serves as a way of discouraging exhaustive switch statements
   case __DO_NOT_USE_THIS_CASE
@@ -73,6 +76,8 @@ public enum CDNEndpoint: Endpoint {
       suffix = "discovery-splashes/\(guildId.rawValue)/\(splash)"
     case let .guildBanner(guildId, banner):
       suffix = "banners/\(guildId.rawValue)/\(banner)"
+    case let .guildTagBadge(guildId, badge):
+      suffix = "guild-tag-badges/\(guildId.rawValue)/\(badge)"
     case let .userBanner(userId, banner):
       suffix = "banners/\(userId.rawValue)/\(banner)"
     case let .defaultUserAvatar(discriminator):
@@ -120,6 +125,8 @@ public enum CDNEndpoint: Endpoint {
     case let .guildMemberBanner(guildId, userId, banner):
       suffix =
         "guilds/\(guildId.rawValue)/users/\(userId.rawValue)/banners/\(banner)"
+    case let .channelIcon(channelId, icon):
+      suffix = "channel-icons/\(channelId.rawValue)/\(icon)"
     case .__DO_NOT_USE_THIS_CASE:
       fatalError(
         "If the case name wasn't already clear enough: '__DO_NOT_USE_THIS_CASE' MUST NOT be used"
@@ -179,6 +186,8 @@ public enum CDNEndpoint: Endpoint {
       return [guildId.rawValue, splash]
     case .guildBanner(let guildId, let banner):
       return [guildId.rawValue, banner]
+    case .guildTagBadge(let guildId, let badge):
+      return [guildId.rawValue, badge]
     case .userBanner(let userId, let banner):
       return [userId.rawValue, banner]
     case .defaultUserAvatar(let discriminator):
@@ -215,6 +224,8 @@ public enum CDNEndpoint: Endpoint {
       return [eventId.rawValue, cover]
     case .guildMemberBanner(let guildId, let userId, let banner):
       return [guildId.rawValue, userId.rawValue, banner]
+    case .channelIcon(let channelId, let icon):
+      return [channelId.rawValue, icon]
     case .__DO_NOT_USE_THIS_CASE:
       fatalError(
         "If the case name wasn't already clear enough: '__DO_NOT_USE_THIS_CASE' MUST NOT be used"
@@ -247,6 +258,8 @@ public enum CDNEndpoint: Endpoint {
     case .guildScheduledEventCover: return 21
     case .guildMemberBanner: return 22
     case .collectibleNameplate: return 23
+    case .guildTagBadge: return 24
+    case .channelIcon: return 25
     case .__DO_NOT_USE_THIS_CASE:
       fatalError(
         "If the case name wasn't already clear enough: '__DO_NOT_USE_THIS_CASE' MUST NOT be used"
@@ -266,6 +279,8 @@ public enum CDNEndpoint: Endpoint {
       return "guildDiscoverySplash(guildId: \(guildId), splash: \(splash))"
     case let .guildBanner(guildId, banner):
       return "guildBanner(guildId: \(guildId), banner: \(banner))"
+    case let .guildTagBadge(guildId, badge):
+      return "guildTagBadge(guildId: \(guildId), badge: \(badge))"
     case let .userBanner(userId, banner):
       return "userBanner(userId: \(userId), banner: \(banner))"
     case let .defaultUserAvatar(discriminator):
@@ -306,13 +321,15 @@ public enum CDNEndpoint: Endpoint {
     case let .guildMemberBanner(guildId, userId, banner):
       return
         "guildMemberBanner(guildId: \(guildId), userId: \(userId), banner: \(banner))"
+    case let .channelIcon(channelId, icon):
+      return "channelIcon(channelId: \(channelId), icon: \(icon))"
     case .__DO_NOT_USE_THIS_CASE:
       fatalError(
         "If the case name wasn't already clear enough: '__DO_NOT_USE_THIS_CASE' MUST NOT be used"
       )
     }
   }
-  
+
   public var specialisedRatelimit: (maxRequests: Int, for: Duration)? {
     switch self {
     default: return nil
@@ -328,6 +345,7 @@ public enum CDNEndpointIdentity: Int, Sendable, Hashable,
   case guildSplash
   case guildDiscoverySplash
   case guildBanner
+  case guildTagBadge
   case userBanner
   case defaultUserAvatar
   case userAvatar
@@ -346,6 +364,7 @@ public enum CDNEndpointIdentity: Int, Sendable, Hashable,
   case roleIcon
   case guildScheduledEventCover
   case guildMemberBanner
+  case channelIcon
 
   /// This case serves as a way of discouraging exhaustive switch statements
   case __DO_NOT_USE_THIS_CASE
@@ -357,6 +376,7 @@ public enum CDNEndpointIdentity: Int, Sendable, Hashable,
     case .guildSplash: return "guildSplash"
     case .guildDiscoverySplash: return "guildDiscoverySplash"
     case .guildBanner: return "guildBanner"
+    case .guildTagBadge: return "guildTagBadge"
     case .userBanner: return "userBanner"
     case .defaultUserAvatar: return "defaultUserAvatar"
     case .userAvatar: return "userAvatar"
@@ -375,6 +395,7 @@ public enum CDNEndpointIdentity: Int, Sendable, Hashable,
     case .roleIcon: return "roleIcon"
     case .guildScheduledEventCover: return "guildScheduledEventCover"
     case .guildMemberBanner: return "guildMemberBanner"
+    case .channelIcon: return "channelIcon"
     case .__DO_NOT_USE_THIS_CASE:
       fatalError(
         "If the case name wasn't already clear enough: '__DO_NOT_USE_THIS_CASE' MUST NOT be used"
@@ -389,6 +410,7 @@ public enum CDNEndpointIdentity: Int, Sendable, Hashable,
     case .guildSplash: self = .guildSplash
     case .guildDiscoverySplash: self = .guildDiscoverySplash
     case .guildBanner: self = .guildBanner
+    case .guildTagBadge: self = .guildTagBadge
     case .userBanner: self = .userBanner
     case .defaultUserAvatar: self = .defaultUserAvatar
     case .userAvatar: self = .userAvatar
@@ -407,6 +429,7 @@ public enum CDNEndpointIdentity: Int, Sendable, Hashable,
     case .roleIcon: self = .roleIcon
     case .guildScheduledEventCover: self = .guildScheduledEventCover
     case .guildMemberBanner: self = .guildMemberBanner
+    case .channelIcon: self = .channelIcon
     case .__DO_NOT_USE_THIS_CASE:
       fatalError(
         "If the case name wasn't already clear enough: '__DO_NOT_USE_THIS_CASE' MUST NOT be used"

@@ -25,10 +25,12 @@ extension MarkdownRendererVM {
   func makeEmojiAttachment(url: URL, copyText: String) -> NSAttributedString {
     #if os(macOS)
       let attachment = NSTextAttachment()
-      attachment.attachmentCell = EmojiAttachmentCell(
-        url: url,
-        copyText: copyText
-      )  // textkit1
+      DispatchQueue.main.sync {
+        attachment.attachmentCell = EmojiAttachmentCell(
+          url: url,
+          copyText: copyText
+        )
+      }  // textkit1
     #elseif os(iOS)
       // textkit2? but somehow the view is made to use textkit1 compatibility mode?
       // ensure registration

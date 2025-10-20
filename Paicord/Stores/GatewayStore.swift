@@ -86,17 +86,19 @@ final class GatewayStore {
   }
 
   func setupEventHandling() {
-    //		eventTask = Task { @MainActor in
-    //			guard let gateway else { return }
-    //			for await event in await gateway.events {
-    //				switch event.data {
-    //				default: break
-    //				}
-    //			}
-    //			for await failure in await gateway.eventFailures {
-    //				PaicordAppState.shared.error = failure.0
-    //			}
-    //		}
+    eventTask = Task { @MainActor in
+      guard let gateway else { return }
+      for await event in await gateway.events {
+        switch event.data {
+        case .ready(let readyData):
+          if let token = readyData.auth_token, var acc = accounts.currentAccount {
+            acc.token = token
+            accounts.currentAccount = acc
+          }
+        default: break
+        }
+      }
+    }
 
     // Set up stores with gateway
     user.setGateway(self)
@@ -118,6 +120,7 @@ final class GatewayStore {
     settings = SettingsStore()
     channels = [:]
     guilds = [:]
+    subscribedGuilds = []
   }
 
   // MARK: - Data Stores

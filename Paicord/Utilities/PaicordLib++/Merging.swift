@@ -285,3 +285,23 @@ extension DiscordRelationship {
     self.since = new.since ?? self.since
   }
 }
+
+extension DiscordUser {
+  func toPartialUser() -> PartialUser {
+    .init(
+      id: self.id,
+      username: self.username,
+      discriminator: self.discriminator,
+      global_name: self.global_name,
+      avatar: self.avatar,
+      avatar_decoration_data: self.avatar_decoration_data,
+      collectibles: self.collectibles,
+      primary_guild: self.primary_guild,
+      bot: self.bot,
+      system: self.system,
+      banner: self.banner,
+      accent_color: self.accent_color,
+      public_flags: self.public_flags
+    )
+  }
+}

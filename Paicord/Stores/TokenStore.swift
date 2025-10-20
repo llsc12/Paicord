@@ -31,10 +31,24 @@ final class TokenStore {
 
   /// Returns the current account (if one is set)
   var currentAccount: AccountData? {
-    guard let id = currentAccountID else { return nil }
-    return account(for: id)
+    get {
+      access(keyPath: \.currentAccount)
+      guard let id = currentAccountID else { return nil }
+      return account(for: id)
+    }
+    set {
+      withMutation(keyPath: \.currentAccount) {
+        guard let id = newValue?.user.id else {
+          currentAccountID = nil
+          return
+        }
+        currentAccountID = id
+        self.updateAccount(for: id, newValue!)
+      }
+    }
   }
 
+  @ObservationIgnored
   private var _currentAccountID: UserSnowflake? {
     get {
       guard
@@ -55,7 +69,7 @@ final class TokenStore {
   }
 
   var accounts: [AccountData] {
-    didSet { Self.save(accounts) }
+    didSet { Self.save(accounts) }  // only works on set, not mutation i think
   }
 
   init() {
@@ -65,6 +79,7 @@ final class TokenStore {
   func addAccount(token: Secret, user: DiscordUser) {
     accounts.append(AccountData(user: user, token: token))
     currentAccountID = user.id
+    Self.save(accounts)
   }
 
   func removeAccount(_ account: AccountData) {
@@ -72,6 +87,7 @@ final class TokenStore {
     if currentAccountID == account.user.id {
       currentAccountID = nil  // push to login screen to choose an account or log in
     }
+    Self.save(accounts)
   }
 
   func updateProfile(for id: UserSnowflake, _ data: DiscordUser) {
@@ -79,6 +95,14 @@ final class TokenStore {
       return
     }
     accounts[index].user = data
+  }
+
+  func updateAccount(for id: UserSnowflake, _ account: AccountData) {
+    guard let index = accounts.firstIndex(where: { $0.user.id == id }) else {
+      return
+    }
+    accounts[index] = account
+    Self.save(accounts)
   }
 
   func account(for id: UserSnowflake) -> AccountData? {

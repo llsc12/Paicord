@@ -22,9 +22,19 @@ struct DMsView: View {
   @Environment(PaicordAppState.self) var appState
   var body: some View {
     ScrollView {
-      ForEach(Array(gw.user.privateChannels.values)) { channel in
-        GuildView.ChannelButton(channels: [:], channel: channel)
+      #if os(iOS)
+      HStack {
+        Text("Direct Messages")
+          .font(.title2)
       }
+      #endif
+      let channels = Array(gw.user.privateChannels.values)
+      LazyVStack {
+        ForEach(channels) { channel in
+          ChannelButton(channels: [:], channel: channel)
+        }
+      }
+      .padding(.vertical, 4)
     }
     .frame(maxWidth: .infinity)
     .background(.tableBackground.opacity(0.5))

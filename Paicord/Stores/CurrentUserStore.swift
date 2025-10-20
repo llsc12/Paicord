@@ -21,6 +21,8 @@ class CurrentUserStore: DiscordDataStore {
   var guilds: [GuildSnowflake: Guild] = [:]
   var privateChannels: OrderedDictionary<ChannelSnowflake, DiscordChannel> = [:]
   var relationships: [UserSnowflake: DiscordRelationship] = [:]
+  var presences: [UserSnowflake: Gateway.PresenceUpdate] = [:]
+  var users: [UserSnowflake: PartialUser] = [:]
 
   // MARK: - Protocol Methods
   func setGateway(_ gateway: GatewayStore?) {
@@ -39,22 +41,16 @@ class CurrentUserStore: DiscordDataStore {
         switch event.data {
         case .ready(let readyData):
           handleReady(readyData)
-
         case .userUpdate(let user):
           handleUserUpdate(user)
-
         case .guildCreate(let guildData):
           handleGuildCreate(guildData)
-
         case .guildDelete(let unavailableGuild):
           handleGuildDelete(unavailableGuild)
-
         case .relationshipAdd(let relationship):
           handleRelationshipAdd(relationship)
-
         case .relationshipUpdate(let partialRelationship):
           handleRelationshipUpdate(partialRelationship)
-
         case .relationshipRemove(let partialRelationship):
           handleRelationshipRemove(partialRelationship)
         case .channelCreate(let channel):
@@ -69,7 +65,8 @@ class CurrentUserStore: DiscordDataStore {
           if privateChannels[message.channel_id] != nil {
             handleMessageCreate(message)
           }
-
+        case .presenceUpdate(let presence):
+          handlePresenceUpdate(presence)
         default:
           break
         }
@@ -95,10 +92,13 @@ class CurrentUserStore: DiscordDataStore {
       })
       .reduce(into: [:]) { $0[$1.id] = $1 }
 
-    relationships = readyData.relationships.reduce(
-      into: [:],
-      { $0[$1.id] = $1 }
-    )
+    relationships = readyData.relationships.reduce(into: [:]) { $0[$1.id] = $1 }
+    users = readyData.relationships.reduce(into: [:]) { $0[$1.id] = $1.user }
+
+    presences = readyData.presences.reduce(into: [:]) { $0[$1.user.id] = $1 }
+
+    users[readyData.user.id] = readyData.user.toPartialUser()
+    users = readyData.presences.reduce(into: users) { $0[$1.user.id] = $1.user }
   }
 
   private func handleUserUpdate(_ user: DiscordUser) {
@@ -153,6 +153,11 @@ class CurrentUserStore: DiscordDataStore {
     guard var channel = privateChannels[message.channel_id] else { return }
     channel.last_message_id = message.id
     privateChannels.updateValueAndMoveToFront(channel, forKey: channel.id)
+  }
+  
+  private func handlePresenceUpdate(_ presence: Gateway.PresenceUpdate) {
+    presences[presence.user.id] = presence
+    users[presence.user.id] = presence.user
   }
 
   //	/// Updates the current user's presence
