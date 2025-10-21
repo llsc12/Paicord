@@ -54,8 +54,7 @@ final class GatewayStore {
     guard [.stopped, .noConnection].contains(state), eventTask == nil else {
       return
     }
-    if let accountID = accounts.currentAccountID {
-      let account = accounts.account(for: accountID)!
+    if let account = accounts.currentAccount {
       await logIn(as: account)
     }
   }
