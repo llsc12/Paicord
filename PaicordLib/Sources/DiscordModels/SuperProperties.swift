@@ -229,7 +229,7 @@ public enum SuperProperties {
 		case "iOS":
 			return "300.0"
 		case "Mac OS X":
-			return "0.0.363"
+			return "0.0.364"
 		default:
 			return "18.5"
 		}
@@ -240,7 +240,7 @@ public enum SuperProperties {
 		case "iOS":
 			return 86251
 		case "Mac OS X":
-			return 457174
+			return 459631
 		default:
 			return nil
 		}

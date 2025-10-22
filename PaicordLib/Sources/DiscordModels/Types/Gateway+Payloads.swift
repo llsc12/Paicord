@@ -124,7 +124,7 @@ extension Gateway {
         )
         self.native_build_number = try container.decodeIfPresent(
           Int.self,
-          forKey: .client_build_number
+          forKey: .native_build_number
         )
         self.client_event_source = try container.decodeIfPresent(
           String.self,
@@ -168,7 +168,7 @@ extension Gateway {
         try container.encode(self.client_app_state, forKey: .client_app_state)
         try container.encode(
           self.native_build_number,
-          forKey: .client_build_number
+          forKey: .native_build_number
         )
         try container.encode(
           self.client_event_source,
