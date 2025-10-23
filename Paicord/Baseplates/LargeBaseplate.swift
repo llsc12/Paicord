@@ -80,13 +80,12 @@ struct LargeBaseplate: View {
     }
     .inspector(isPresented: $showingInspector) {
       VStack(alignment: .leading) {
-        if let store = currentChannelStore,
-           let channel = store.channel,
-           let recipients: [DiscordUser] = channel.recipients {
+        if let recipients = currentChannelStore?.channel?.recipients {
             ForEach(recipients, id: \.id) { recipient in
               MemberRowView(user: recipient)
             }
-          if let currentUser = gw.accounts.currentAccount?.user {        MemberRowView(user: currentUser)
+          if let currentUser = gw.accounts.currentAccount?.user {
+            MemberRowView(user: currentUser)
           }
         } else {
           Text("gm")
