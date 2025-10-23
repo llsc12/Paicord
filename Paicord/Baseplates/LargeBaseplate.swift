@@ -8,6 +8,7 @@
 
 @_spi(Advanced) import SwiftUIIntrospect
 import SwiftUIX
+import DiscordModels
 
 // if on macos or ipad
 struct LargeBaseplate: View {
@@ -78,8 +79,23 @@ struct LargeBaseplate: View {
       #endif
     }
     .inspector(isPresented: $showingInspector) {
-      Text("gm")
-        .inspectorColumnWidth(min: 240, ideal: 260, max: 280)
+      VStack(alignment: .leading) {
+        if let store = currentChannelStore,
+           let channel = store.channel,
+           let recipients: [DiscordUser] = channel.recipients {
+            ForEach(recipients, id: \.id) { recipient in
+              MemberRowView(user: recipient)
+            }
+          if let currentUser = gw.accounts.currentAccount?.user {        MemberRowView(user: currentUser)
+          }
+        } else {
+          Text("gm")
+        }
+      }
+      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+      .inspectorColumnWidth(min: 240, ideal: 260, max: 280)
+      .padding([.top, .leading], 8)
+      .ignoresSafeArea()
     }
     .toolbar {
       Button {

@@ -34,6 +34,7 @@
 		57F5AF512E7CBC7700AD5674 /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57F5AF502E7CBC7700AD5674 /* LoginViewModel.swift */; };
 		57F5AF532E7CBDD000AD5674 /* AccountPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57F5AF522E7CBDD000AD5674 /* AccountPicker.swift */; };
 		57F5AF552E7CBDF400AD5674 /* MFAView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57F5AF542E7CBDF400AD5674 /* MFAView.swift */; };
+		8702A5382EAA6753008DD55A /* MemberRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8702A5372EAA6751008DD55A /* MemberRowView.swift */; };
 		AA0C43D72E9F190B000FA834 /* AttributedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0C43D62E9F18AD000FA834 /* AttributedText.swift */; };
 		AA0C43D92E9F1D41000FA834 /* EmojiAttachmentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0C43D82E9F1D41000FA834 /* EmojiAttachmentCell.swift */; };
 		AA1097142E64C181005BC3D2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA1097102E64C181005BC3D2 /* Assets.xcassets */; };
@@ -114,6 +115,8 @@
 		57F5AF502E7CBC7700AD5674 /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
 		57F5AF522E7CBDD000AD5674 /* AccountPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountPicker.swift; sourceTree = "<group>"; };
 		57F5AF542E7CBDF400AD5674 /* MFAView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MFAView.swift; sourceTree = "<group>"; };
+		8702A5372EAA6751008DD55A /* MemberRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberRowView.swift; sourceTree = "<group>"; };
+		8702A5392EAA6FC2008DD55A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		AA0C43D62E9F18AD000FA834 /* AttributedText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributedText.swift; sourceTree = "<group>"; };
 		AA0C43D82E9F1D41000FA834 /* EmojiAttachmentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiAttachmentCell.swift; sourceTree = "<group>"; };
 		AA1096DB2E63BE84005BC3D2 /* Paicord.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Paicord.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -251,6 +254,7 @@
 		57A55C552E7560BB005C8226 /* Guilds */ = {
 			isa = PBXGroup;
 			children = (
+				8702A5372EAA6751008DD55A /* MemberRowView.swift */,
 				AAD73EB52E93E29E00470158 /* DMsView.swift */,
 				AAB905372E845A7000EA171B /* ChannelButton.swift */,
 				AADD58642E82A95100CBC8B6 /* GuildScrollBar.swift */,
@@ -384,6 +388,7 @@
 		AA1097132E64C181005BC3D2 /* Paicord */ = {
 			isa = PBXGroup;
 			children = (
+				8702A5392EAA6FC2008DD55A /* Info.plist */,
 				57F5AF452E7CAD0F00AD5674 /* App */,
 				AA1097072E64C181005BC3D2 /* Baseplates */,
 				AA9C81802E665E190086B1DA /* Common */,
@@ -656,6 +661,7 @@
 				AAB50A542E9AD4470048E8B0 /* MessageBody.swift in Sources */,
 				57E05C592E6C6AE400B81AA7 /* Design Constants.swift in Sources */,
 				AABED5A62E7F514B005BDD63 /* SettingsStore.swift in Sources */,
+				8702A5382EAA6753008DD55A /* MemberRowView.swift in Sources */,
 				AABED5A02E7F48FD005BDD63 /* CurrentUserStore.swift in Sources */,
 				57F5AF4D2E7CB14A00AD5674 /* PaicordSheetsAlerts.swift in Sources */,
 				AAB50A502E9AA6800048E8B0 /* ChatInputCommand.swift in Sources */,
@@ -830,10 +836,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = 566RT33SA2;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Paicord/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -873,10 +880,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = 566RT33SA2;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Paicord/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
