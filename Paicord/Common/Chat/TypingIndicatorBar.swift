@@ -12,6 +12,7 @@ import PaicordLib
 extension ChatView {
   struct TypingIndicatorBar: View {
     @Environment(GatewayStore.self) var gw
+    @Environment(\.userInterfaceIdiom) var idiom
     var vm: ChannelStore
     var body: some View {
 
@@ -49,7 +50,9 @@ extension ChatView {
             }
             Spacer()
           }
-          .font(.subheadline)
+          .font(idiom == .phone ? .footnote : .subheadline)
+          .lineLimit(1)
+          .truncationMode(.head)
           .padding(.horizontal, 6)
           .padding(.vertical, 2)
           .background(.regularMaterial)

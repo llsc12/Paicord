@@ -170,6 +170,14 @@ class MarkdownRendererVM {
   static var parser: DiscordMarkdownParser = {
     .init() 
   }()
+  static let cache: NSCache<NSString, CachedDocument> =  .init()
+  
+  class CachedDocument: NSObject {
+    let document: AST.DocumentNode
+    init(document: AST.DocumentNode) {
+      self.document = document
+    }
+  }
 
   var blocks: [BlockElement] = []
 
@@ -179,7 +187,13 @@ class MarkdownRendererVM {
     self.rawContent = rawContent
     do {
       let ast: AST.DocumentNode = try await Task.detached {
-        try await Self.parser.parseToAST(rawContent)
+        if let cached = Self.cache.object(forKey: rawContent as NSString) {
+          return cached.document
+        }
+        let ast = try await Self.parser.parseToAST(rawContent)
+        let cached = CachedDocument(document: ast)
+        Self.cache.setObject(cached, forKey: rawContent as NSString)
+        return ast
       }.value
       let blocks = await Task.detached {
 //        let emojisOnly = ast.isEmojisOnly()

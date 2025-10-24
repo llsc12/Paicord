@@ -45,7 +45,7 @@ struct ChatView: View {
           }
           .scrollTargetLayout()
         }
-        .defaultScrollAnchor(.bottom)
+        .bottomAnchored()
         .scrollDismissesKeyboard(.interactively)
         .onAppear {
           scheduleScrollToBottom(
@@ -143,6 +143,20 @@ struct ChatView: View {
       Task.detached {
         try await gw.client.triggerTypingIndicator(channelId: .makeFake())
       }
+    }
+  }
+}
+
+fileprivate extension View {
+  func bottomAnchored() -> some View {
+    if #available(iOS 18.0, macOS 15.0, *) {
+      return self
+        .defaultScrollAnchor(.bottom, for: .initialOffset)
+        .defaultScrollAnchor(.bottom, for: .alignment)
+        .defaultScrollAnchor(.bottom, for: .sizeChanges)
+    } else {
+      return self
+        .defaultScrollAnchor(.bottom)
     }
   }
 }
