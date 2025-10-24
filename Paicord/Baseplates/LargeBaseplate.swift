@@ -6,9 +6,9 @@
 // Copyright © 2025 Lakhan Lothiyi.
 //
 
+import DiscordModels
 @_spi(Advanced) import SwiftUIIntrospect
 import SwiftUIX
-import DiscordModels
 
 // if on macos or ipad
 struct LargeBaseplate: View {
@@ -61,9 +61,15 @@ struct LargeBaseplate: View {
             .environment(currentChannelStore)
         } else {
           // placeholder
-          Text(":3")
-            .font(.largeTitle)
-            .foregroundStyle(.secondary)
+          VStack {
+            Text(":3")
+              .font(.largeTitle)
+              .foregroundStyle(.secondary)
+
+            Text("Select a channel to start chatting")
+              .foregroundStyle(.secondary)
+              .font(.title2)
+          }
         }
       }
       #if os(macOS)
@@ -79,22 +85,10 @@ struct LargeBaseplate: View {
       #endif
     }
     .inspector(isPresented: $showingInspector) {
-      VStack(alignment: .leading) {
-        if let recipients = currentChannelStore?.channel?.recipients {
-            ForEach(recipients, id: \.id) { recipient in
-              MemberRowView(user: recipient)
-            }
-          if let currentUser = gw.accounts.currentAccount?.user {
-            MemberRowView(user: currentUser)
-          }
-        } else {
-          Text("gm")
-        }
-      }
-      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-      .inspectorColumnWidth(min: 240, ideal: 260, max: 280)
-      .padding([.top, .leading], 8)
-      .ignoresSafeArea()
+      MemberSidebarView(
+        guildStore: currentGuildStore,
+        channelStore: currentChannelStore
+      )
     }
     .toolbar {
       Button {

@@ -80,7 +80,7 @@ public enum CDNEndpoint: Endpoint {
       suffix = "guild-tag-badges/\(guildId.rawValue)/\(badge)"
     case let .userBanner(userId, banner):
       suffix = "banners/\(userId.rawValue)/\(banner)"
-    case let .defaultUserAvatar(discriminator):
+    case .defaultUserAvatar(_):
       suffix = "assets/2ccd8ae8b2379360.png" // old default avatar path no longer functional. Using static asset.
     case let .userAvatar(userId, avatar):
       suffix = "avatars/\(userId.rawValue)/\(avatar)"

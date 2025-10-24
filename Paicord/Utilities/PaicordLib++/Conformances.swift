@@ -23,6 +23,9 @@ extension Snowflake: @retroactive Identifiable {
 
 extension DiscordChannel.Message: @retroactive Identifiable {}
 
+extension DiscordUser: @retroactive Identifiable {}
+extension PartialUser: @retroactive Identifiable {}
+
 protocol ActivityData {
   var status: Gateway.Status { get }
   var activities: [Gateway.Activity] { get }
