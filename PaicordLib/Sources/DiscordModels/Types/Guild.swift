@@ -640,6 +640,12 @@ extension Guild {
 			public var end_time: DiscordTimestamp?
 		}
 	}
+  
+  /// https://docs.discord.food/resources/emoji#get-guild-top-emojis
+  public struct TopEmoji: Sendable, Codable {
+    public var emoji_id: EmojiSnowflake
+    public var emoji_rank: Int
+  }
 }
 
 /// https://discord.com/developers/docs/resources/guild#unavailable-guild-object

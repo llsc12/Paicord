@@ -15,11 +15,19 @@ struct ConnectionStateView: View {
   var body: some View {
     ZStack(alignment: .bottom) {
       VStack {
-        Image(systemName: "questionmark.app.dashed")
-          .resizable()
-          .scaledToFit()
-          .maxWidth(80)
-          .maxHeight(80)
+        #if os(macOS)
+          Image(nsImage: NSImage(named: "AppIcon")!)
+            .resizable()
+            .scaledToFit()
+            .maxWidth(80)
+            .maxHeight(80)
+        #else
+          Image(uiImage: UIImage(named: "AppIcon")!)
+            .resizable()
+            .scaledToFit()
+            .maxWidth(80)
+            .maxHeight(80)
+        #endif
         Text("Paicord")
           .font(.title2)
           .fontWeight(.bold)
@@ -63,9 +71,21 @@ struct ConnectionStateView: View {
     "Constructing ViewModels...",
     "Locating closest Genius Bar...",
     "Theoretically supports Linux!",
+    "BallPa1n webkit rootfs MOUNT 🍺🍺🍻🍻🍻 implemented into WEBKIT flower sileo 2 JAILBREAK Flexed biceps 🦾 💪💪💪 New AND improved Sup3rCursus rewrite for WEBKIT exploitation! 🐟 🍻🍻🍻 fugu16 Code TRANSLATED into webkit access via explotation SoC Display Drivers, 🦾 NEW untethered WEBKIT 💪💪 GLITCHED powered by manticore pwnmy WITH new Sup3rCursus improved b00tstrap arm64_32-arm-os 💪💪💪💪",
+    "🪅",
+    "comes with cryptominer bundled",
+    "shaw",
+    "Dr. Pepper the best",
+    "wha",
+    "paiplosion",
+    "oh I wasn't suggesting that for a splash thing but sure",
+    "Also try Terraria!",
+    "where's the also try minecraft!",
+    "Δ",
   ].randomElement()!
 }
 
 #Preview {
   ConnectionStateView(state: .configured)
+    .environment(GatewayStore())
 }

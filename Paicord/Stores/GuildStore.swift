@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Collections
 import PaicordLib
 
 @Observable
@@ -20,7 +21,7 @@ class GuildStore: DiscordDataStore {
   var guild: Guild?
   var channels: [ChannelSnowflake: DiscordChannel] = [:]
   var members: [UserSnowflake: Guild.PartialMember] = [:]
-  var roles: [RoleSnowflake: Role] = [:]
+  var roles: OrderedDictionary<RoleSnowflake, Role> = [:]
   var presences: [UserSnowflake: Gateway.PresenceUpdate] = [:]
   var voiceStates: [UserSnowflake: VoiceState] = [:]
 
@@ -37,7 +38,15 @@ class GuildStore: DiscordDataStore {
     }
 
     // roles
-    guild.roles.forEach { role in
+    // https://docs.discord.food/topics/permissions#permission-hierarchy
+    let guildRoles = guild.roles.sorted {
+      if $0.position == $1.position {
+        return $0.id.rawValue < $1.id.rawValue
+      } else {
+        return $0.position > $1.position
+      }
+    }
+    for role in guildRoles {
       roles[role.id] = role
     }
 

@@ -13,7 +13,7 @@ struct GuildScrollBar: View {
   @Environment(GatewayStore.self) var gw
 
   var body: some View {
-    ScrollView {
+    ScrollFadeMask {
       LazyVStack {
         GuildButton(guild: nil)  // becomes dms "guild"
 

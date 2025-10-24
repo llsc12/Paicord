@@ -78,7 +78,7 @@ public struct DiscordUser: Sendable, Codable, Equatable, Hashable {
   public struct AvatarDecoration: Sendable, Codable, Equatable, Hashable {
     public var asset: String
     public var sku_id: SKUSnowflake
-    
+
     public init(asset: String, sku_id: SKUSnowflake) {
       self.asset = asset
       self.sku_id = sku_id
@@ -153,6 +153,63 @@ public struct DiscordUser: Sendable, Codable, Equatable, Hashable {
         case white
         case __undocumented(String)
       }
+    }
+  }
+
+  /// https://docs.discord.food/resources/user#get-user-profile
+  public struct Profile: Sendable, Codable, Equatable, Hashable {
+    public var application: ProfileApplication?
+    public var user: PartialUser
+    public var user_profile: Metadata?
+    public var badges: [Badge]?
+    public var guild_member: Guild.Member?
+    public var guild_member_profile: Metadata?
+    public var guild_badges: [Badge]?
+    public var legacy_username: String?
+    public var mutual_guilds: [MutualGuild]?
+    public var mutual_friends: [PartialUser]?
+    public var mutual_friends_count: Int?
+    public var connected_accounts: [PartialConnection]?
+    public var application_role_connections: [ApplicationRoleConnection]?
+    public var premium_type: PremiumKind?
+    public var premium_since: DiscordTimestamp?
+    public var premium_guild_since: DiscordTimestamp?
+
+    /// https://docs.discord.food/resources/user#profile-application-structure
+    public struct ProfileApplication: Sendable, Codable, Equatable, Hashable {
+    }
+
+    /// https://docs.discord.food/resources/user#profile-metadata-object
+    public struct Metadata: Sendable, Codable, Equatable, Hashable {
+      public var guild_id: GuildSnowflake?
+      public var pronouns: String?
+      public var bio: String?
+      public var banner: String?
+      public var accent_color: DiscordColor?  // Not respected on guild profiles
+      public var theme_colors: [DiscordColor]?  // 2 values if present, as two gradient stops
+      public var popout_animation_particle_type: AnySnowflake?
+      public var emoji: Emoji?
+      public var profile_effect: Effect?
+    }
+
+    /// https://docs.discord.food/resources/user#profile-effect-structure
+    public struct Effect: Sendable, Codable, Equatable, Hashable {
+      public var id: AnySnowflake
+      public var expires_at: DiscordTimestamp?
+    }
+
+    /// https://docs.discord.food/resources/user#profile-badge-structure
+    public struct Badge: Sendable, Codable, Equatable, Hashable {
+      public var id: AnySnowflake
+      public var description: String
+      public var icon: String
+      public var link: String?
+    }
+
+    /// https://docs.discord.food/resources/user#mutual-guild-structure
+    public struct MutualGuild: Sendable, Codable, Equatable, Hashable {
+      public var id: GuildSnowflake
+      public var nick: String?
     }
   }
 }
@@ -264,6 +321,7 @@ public struct MentionUser: Sendable, Codable, Equatable, Hashable {
 
 extension DiscordUser {
   /// https://discord.com/developers/docs/resources/user#connection-object-connection-structure
+  /// https://docs.discord.food/resources/connected-accounts#connection-structure
   public struct Connection: Sendable, Codable {
 
     /// https://discord.com/developers/docs/resources/user#connection-object-services
@@ -316,8 +374,17 @@ extension DiscordUser {
     public var visibility: VisibilityKind
   }
 
+  /// https://docs.discord.food/resources/connected-accounts#partial-connection-structure
+  public struct PartialConnection: Sendable, Codable, Equatable, Hashable {
+    public var id: String
+    public var name: String
+    public var type: Connection.Service
+    public var verified: Bool
+  }
+
   /// https://discord.com/developers/docs/resources/user#application-role-connection-object
-  public struct ApplicationRoleConnection: Sendable, Codable, ValidatablePayload
+  public struct ApplicationRoleConnection: Sendable, Codable, Equatable,
+    Hashable, ValidatablePayload
   {
     public var platform_name: String?
     public var platform_username: String?

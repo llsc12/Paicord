@@ -328,6 +328,9 @@ public typealias UserSnowflake = Snowflake<DiscordUser>
 /// Convenience type-alias for `Snowflake<DiscordApplication>`
 public typealias ApplicationSnowflake = Snowflake<DiscordApplication>
 
+/// Convenience type-alias for `Snowflake<DiscordApplication.Asset>`
+public typealias ApplicationAssetSnowflake = Snowflake<DiscordApplication.Asset>
+
 /// Convenience type-alias for `Snowflake<Emoji>`
 public typealias EmojiSnowflake = Snowflake<Emoji>
 

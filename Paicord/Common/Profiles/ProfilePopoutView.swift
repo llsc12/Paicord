@@ -19,15 +19,20 @@ struct ProfilePopoutView: View {
 
   var body: some View {
     ScrollView {
-      WebImage(
-        url: bannerURL(animated: true),
-        options: []
-      )
       VStack {
+        let _ = print(bannerURL(animated: true))
+          WebImage(
+            url: bannerURL(animated: true),
+            options: []
+          )
+          .resizable()
+          .scaledToFit()
         Profile.AvatarWithPresence(
           member: member,
           user: user
         )
+        .animated(true)
+        .showsAvatarDecoration()
         .frame(maxWidth: 80, maxHeight: 80)
       }
       .minWidth(idiom == .phone ? nil : 300)  // popover limits on larger devices
@@ -40,11 +45,20 @@ struct ProfilePopoutView: View {
   func bannerURL(animated: Bool) -> URL? {
     let userId = user.id
     if let guildId = guild?.guildId,
-      let banner = member?.banner ?? user.banner
+      let banner = member?.banner
     {
       return URL(
         string: CDNEndpoint.guildMemberBanner(
           guildId: guildId,
+          userId: userId,
+          banner: banner
+        ).url
+          + ((banner.hasPrefix("a_") && animated)
+            ? "gif" : "png") + "?size=600"
+      )
+    } else if let banner = user.banner {
+      return URL(
+        string: CDNEndpoint.userBanner(
           userId: userId,
           banner: banner
         ).url

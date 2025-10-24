@@ -2640,14 +2640,14 @@ public enum Payloads {
   /// https://discord.com/developers/docs/resources/user#create-group-dm-json-params
   /// https://docs.discord.food/resources/channel#json-params
   public struct CreateDM: Sendable, Encodable, ValidatablePayload {
-//    public var recipient_id: UserSnowflake? // deprecated
+    //    public var recipient_id: UserSnowflake? // deprecated
     public var recipients: [UserSnowflake]?
 
     @inlinable
     public init(recipient: UserSnowflake) {
       self.recipients = [recipient]
     }
-    
+
     @inlinable
     public init(recipients: [UserSnowflake]) {
       self.recipients = recipients
@@ -2665,15 +2665,15 @@ public enum Payloads {
     }
   }
 
-//  public struct CreateGroupDM: Sendable, Encodable, ValidatablePayload {
-//    public var recipients: [UserSnowflake]
-//
-//    public init(recipients: [UserSnowflake]) {
-//      self.recipients = recipients
-//    }
-//
-//    public func validate() -> [ValidationFailure] {}
-//  }
+  //  public struct CreateGroupDM: Sendable, Encodable, ValidatablePayload {
+  //    public var recipients: [UserSnowflake]
+  //
+  //    public init(recipients: [UserSnowflake]) {
+  //      self.recipients = recipients
+  //    }
+  //
+  //    public func validate() -> [ValidationFailure] {}
+  //  }
 
   /// https://discord.com/developers/docs/resources/user#update-user-application-role-connection-json-params
   public struct UpdateUserApplicationRoleConnection: Sendable, Encodable,
@@ -2874,5 +2874,124 @@ public enum Payloads {
       validateNumberInRangeOrNil(duration, min: 1, max: 144, name: "duration")
       /// 7 days max
     }
+  }
+
+  /// https://docs.discord.food/resources/relationships#send-friend-request
+  public struct SendFriendRequest: Sendable, Encodable, ValidatablePayload {
+    public var username: String
+    public var discriminator: String?  // nil for migrated users
+
+    public init(username: String, discriminator: String? = nil) {
+      self.username = username
+      self.discriminator = discriminator
+    }
+
+    public func validate() -> [ValidationFailure] {
+      validateCharacterCountInRange(username, min: 2, max: 32, name: "username")
+      if let discriminator {
+        validateCharacterCountInRange(
+          discriminator,
+          min: 4,
+          max: 4,
+          name: "discriminator"
+        )
+      }
+    }
+  }
+
+  /// https://docs.discord.food/resources/relationships#create-relationship
+  public struct CreateRelationship: Sendable, Encodable, ValidatablePayload {
+    public var type: DiscordRelationship.Kind?
+    public var from_friend_suggestion: Bool?
+
+    public init(
+      type: DiscordRelationship.Kind?,
+      from_friend_suggestion: Bool? = nil
+    ) {
+      self.type = type
+      self.from_friend_suggestion = from_friend_suggestion
+    }
+
+    public func validate() -> [ValidationFailure] {}
+  }
+
+  /// https://docs.discord.food/resources/relationships#modify-relationship
+  public struct ModifyRelationship: Sendable, Encodable, ValidatablePayload {
+    public var nickname: String?
+
+    public init(nickname: String?) {
+      self.nickname = nickname
+    }
+
+    public func validate() -> [ValidationFailure] {
+      validateCharacterCountInRangeOrNil(
+        nickname,
+        min: 1,
+        max: 32,
+        name: "nickname"
+      )
+    }
+  }
+
+  /// https://docs.discord.food/resources/relationships#bulk-remove-relationships
+  public struct BulkRemoveRelationships: Sendable, Encodable, ValidatablePayload
+  {
+    public var filters: Set<Filter>?
+    public init(filters: Set<Filter>? = nil) {
+      self.filters = filters
+    }
+    public func validate() -> [ValidationFailure] {}
+
+    public enum Filter: Int, Sendable, Codable {
+      case spam = 1
+      case ignored = 2
+    }
+  }
+
+  /// https://docs.discord.food/resources/relationships#bulk-add-relationships
+  public struct BulkAddRelationships: Sendable, Encodable, ValidatablePayload {
+    public var user_ids: [UserSnowflake]
+    public var token: String  // contact sync is the only way to bulk add. contact sync token required.
+    public init(user_ids: [UserSnowflake], token: String) {
+      self.user_ids = user_ids
+      self.token = token
+    }
+
+    public func validate() -> [ValidationFailure] {}
+  }
+
+  /// https://docs.discord.food/resources/soundboard#send-soundboard-sound
+  public struct SendSoundboardSound: Sendable, Encodable, ValidatablePayload {
+    public var sound_id: SoundSnowflake
+    public var source_guild_id: GuildSnowflake?
+
+    public init(sound_id: SoundSnowflake, source_guild_id: GuildSnowflake? = nil) {
+      self.sound_id = sound_id
+      self.source_guild_id = source_guild_id
+    }
+
+    public func validate() -> [ValidationFailure] {}
+  }
+
+  /// https://docs.discord.food/resources/invite#accept-invite
+  public struct AcceptInvite: Sendable, Encodable, ValidatablePayload {
+    public var session_id: String?
+    
+    public init(session_id: String? = nil) {
+      self.session_id = session_id
+    }
+    
+    public func validate() -> [ValidationFailure] {}
+  }
+  
+  /// https://docs.discord.food/resources/invite#create-user-invite
+  public struct CreateUserInvite: Sendable, Encodable, ValidatablePayload {
+    public var code: String?
+    
+    public init(code: String? = nil) {
+      self.code = code
+    }
+    
+    public func validate() -> [ValidationFailure] {}
   }
 }

@@ -81,6 +81,21 @@ public struct DiscordApplication: Sendable, Codable {
 	public var integration_types_config:
 		[IntegrationKind: IntegrationKindConfiguration]?
 	public var custom_install_url: String?
+  
+  /// https://docs.discord.food/resources/application#application-asset-object
+  public struct Asset: Sendable, Codable, Equatable, Hashable {
+    public var id: ApplicationAssetSnowflake
+    public var type: Kind
+    public var name: String
+    
+    /// https://docs.discord.food/resources/application#application-asset-type
+    @UnstableEnum<UInt>
+    public enum Kind: Sendable, Codable {
+      case one // 1
+      case two // 2
+      case __undocumented(UInt)
+    }
+  }
 }
 
 /// https://discord.com/developers/docs/resources/application#application-object-application-structure
@@ -117,4 +132,68 @@ public struct PartialApplication: Sendable, Codable, Equatable, Hashable {
 		[DiscordApplication.IntegrationKind: DiscordApplication
 			.IntegrationKindConfiguration]?
 	public var custom_install_url: String?
+}
+
+/// https://docs.discord.food/resources/application#get-embedded-activities
+public struct EmbeddedActivities: Sendable, Codable, Equatable, Hashable {
+  public var activities: [ActivityConfiguration]
+  public var applications: [PartialApplication]
+  public var assets: [ApplicationAssetSnowflake: [DiscordApplication.Asset]]
+  
+  /// https://docs.discord.food/resources/application#embedded-activity-config-object
+  public struct ActivityConfiguration: Sendable, Codable, Equatable, Hashable {
+    public var application_id: ApplicationSnowflake?
+    public var activity_preview_video_asset_id: ApplicationAssetSnowflake?
+    public var supported_platforms: [SupportedPlatform]
+    public var default_orientation_lock_state: OrientationLockState
+    public var tablet_default_orientation_lock_state: OrientationLockState
+    public var requires_age_gate: Bool
+    public var legacy_responsive_aspect_ratio: Bool
+    public var client_platform_config: [String: PlatformConfiguration]
+    public var shelf_rank: Int
+    public var has_csp_exception: Bool
+    public var displays_advertisements: Bool
+    
+    @UnstableEnum<String>
+    public enum SupportedPlatform: Sendable, Codable {
+      case web
+      case ios
+      case android
+      case __undocumented(String)
+    }
+    
+    @UnstableEnum<UInt>
+    public enum OrientationLockState: Sendable, Codable {
+      case unlocked // 0
+      case portrait // 1
+      case landscape // 2
+      case __undocumented(UInt)
+    }
+    
+    public struct PlatformConfiguration: Sendable, Codable, Equatable, Hashable {
+      public var label_type: LabelType
+      public var label_until: DiscordTimestamp?
+      public var release_phase: ReleasePhase
+      public var omit_badge_from_surfaces: [String]
+      
+      @UnstableEnum<UInt>
+      public enum LabelType: Sendable, Codable {
+        case none // 0
+        case new // 1
+        case updated // 2
+        case __undocumented(UInt)
+      }
+      
+      @UnstableEnum<String>
+      public enum ReleasePhase: Sendable, Codable {
+        case inDevelopment // in_development
+        case activitiesTeam // activities_team
+        case employeeRelease // employee_release
+        case softLaunch // soft_launch
+        case softLaunchMultiGeo // soft_launch_multi_geo
+        case globalLaunch // global_launch
+        case __undocumented(String)
+      }
+    }
+  }
 }

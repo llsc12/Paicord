@@ -19,15 +19,11 @@ enum Profile {
     var showDecoration: Bool = false
 
     var body: some View {
-      WebImage(url: avatarURL(animated: animated)) { phase in
-        switch phase {
-        case .success(let image):
-          image
-            .resizable()
-            .scaledToFit()
-        default:
-          Circle()
-            .foregroundStyle(.gray.opacity(0.3))
+      Group {
+        if let member {
+          MemberAvatar(user: user, member: member)
+        } else {
+          UserAvatar(user: user)
         }
       }
       .clipShape(Circle())
@@ -46,6 +42,120 @@ enum Profile {
       .padding(-10)
     }
 
+    struct UserAvatar: View {
+      var user: DiscordUser?
+      var animated: Bool = false
+      
+      var body: some View {
+        WebImage(url: avatarURL(animated: animated)) { phase in
+          switch phase {
+          case .success(let image):
+            image
+              .resizable()
+              .scaledToFit()
+          default:
+            Circle()
+              .foregroundStyle(.gray.opacity(0.3))
+          }
+        }
+      }
+
+      func avatarURL(animated: Bool) -> URL? {
+        // there is probably a nicer way to write this
+        if let user, let avatar = user.avatar {
+          if avatar.starts(with: "a_"), animated {
+            return URL(
+              string: CDNEndpoint.userAvatar(userId: user.id, avatar: avatar)
+                .url
+                + ".gif?size=128&animated=true"
+            )
+          } else {
+            return URL(
+              string: CDNEndpoint.userAvatar(userId: user.id, avatar: avatar)
+                .url
+                + ".png?size=128&animated=false"
+            )
+          }
+        } else {
+          let discrim = user?.discriminator ?? "0000"
+          return URL(
+            string: CDNEndpoint.defaultUserAvatar(discriminator: discrim).url
+              + "?size=128"
+          )
+        }
+      }
+    }
+
+    struct MemberAvatar: View {
+      // use env for guildstore only if we have a member,
+      // then we can be sure guildstore is available
+      @Environment(GuildStore.self) var guildStore
+      var user: DiscordUser?
+      var member: Guild.PartialMember?
+      var animated: Bool = false
+      
+      var body: some View {
+        WebImage(url: avatarURL(animated: animated)) { phase in
+          switch phase {
+          case .success(let image):
+            image
+              .resizable()
+              .scaledToFit()
+          default:
+            Circle()
+              .foregroundStyle(.gray.opacity(0.3))
+          }
+        }
+      }
+      
+      func avatarURL(animated: Bool) -> URL? {
+        let guildId = guildStore.guildId
+        if let user, member?.avatar ?? user.avatar != nil {
+          let id = user.id
+          if let avatar = member?.avatar {
+            if avatar.starts(with: "a_"), animated {
+              return URL(
+                string: CDNEndpoint.guildMemberAvatar(
+                  guildId: guildId,
+                  userId: id,
+                  avatar: avatar
+                ).url
+                  + ".gif?size=128&animated=true"
+              )
+            } else {
+              return URL(
+                string: CDNEndpoint.guildMemberAvatar(
+                  guildId: guildId,
+                  userId: id,
+                  avatar: avatar
+                ).url
+                  + ".png?size=128&animated=false"
+              )
+            }
+          } else if let avatar = user.avatar {
+            if avatar.starts(with: "a_"), animated {
+              return URL(
+                string: CDNEndpoint.userAvatar(userId: id, avatar: avatar).url
+                  + ".gif?size=128&animated=true"
+              )
+            } else {
+              return URL(
+                string: CDNEndpoint.userAvatar(userId: id, avatar: avatar).url
+                  + ".png?size=128&animated=false"
+              )
+            }
+          }
+        } else {
+          let discrim = user?.discriminator ?? "0000"
+          return URL(
+            string: CDNEndpoint.defaultUserAvatar(discriminator: discrim).url
+              + "?size=128"
+          )
+        }
+        return nil
+      }
+    }
+
     func showsAvatarDecoration(_ shown: Bool = true) -> Self {
       var copy = self
       copy.showDecoration = shown
@@ -58,28 +168,6 @@ enum Profile {
       return copy
     }
 
-    func avatarURL(animated: Bool) -> URL? {
-      if let user, let avatar = member?.avatar ?? user.avatar {
-        let id = user.id
-        if avatar.starts(with: "a_"), animated {
-          return URL(
-            string: CDNEndpoint.userAvatar(userId: id, avatar: avatar).url
-              + ".gif?size=128&animated=true"
-          )
-        } else {
-          return URL(
-            string: CDNEndpoint.userAvatar(userId: id, avatar: avatar).url
-              + ".png?size=128&animated=false"
-          )
-        }
-      } else {
-        let discrim = user?.discriminator ?? "0000"
-        return URL(
-          string: CDNEndpoint.defaultUserAvatar(discriminator: discrim).url
-            + "?size=128"
-        )
-      }
-    }
   }
 
   // Helper shape that draws a rect with a circular hole (uses even-odd fill)
@@ -90,12 +178,14 @@ enum Profile {
     func path(in rect: CGRect) -> Path {
       var p = Path()
       p.addRect(rect)
-      p.addEllipse(in: CGRect(
-        x: holeCenter.x - holeRadius,
-        y: holeCenter.y - holeRadius,
-        width: holeRadius * 2,
-        height: holeRadius * 2
-      ))
+      p.addEllipse(
+        in: CGRect(
+          x: holeCenter.x - holeRadius,
+          y: holeCenter.y - holeRadius,
+          width: holeRadius * 2,
+          height: holeRadius * 2
+        )
+      )
       return p
     }
   }
@@ -116,7 +206,7 @@ enum Profile {
 
         let presence: ActivityData? = {
           if user.id == gw.user.currentUser?.id,
-             let session = gw.user.sessions.last
+            let session = gw.user.sessions.last
           {
             return session
           } else {
@@ -130,7 +220,10 @@ enum Profile {
         let scaleUp: CGFloat = 1.0 / scaleDown
 
         let center = CGPoint(x: geo.size.width * 0.5, y: geo.size.height * 0.5)
-        let originalHole = CGPoint(x: geo.size.width - inset, y: geo.size.height - inset)
+        let originalHole = CGPoint(
+          x: geo.size.width - inset,
+          y: geo.size.height - inset
+        )
         let scaledHole = CGPoint(
           x: center.x + scaleDown * (originalHole.x - center.x),
           y: center.y + scaleDown * (originalHole.y - center.y)
@@ -143,8 +236,11 @@ enum Profile {
             .showsAvatarDecoration(showDecoration)
             .scaleEffect(scaleDown)
             .mask(
-              RectWithCircleHole(holeCenter: scaledHole, holeRadius: scaledHoleRadius)
-                .fill(style: FillStyle(eoFill: true))
+              RectWithCircleHole(
+                holeCenter: scaledHole,
+                holeRadius: scaledHoleRadius
+              )
+              .fill(style: FillStyle(eoFill: true))
             )
             .scaleEffect(scaleUp)
 
@@ -391,8 +487,8 @@ struct AvatarDecorationView: View {
     .animated(true)
     .showsAvatarDecoration()
     .frame(width: 100, height: 100)
-    
+
   }
   .environment(GatewayStore())
-//  .padding()
+  //  .padding()
 }

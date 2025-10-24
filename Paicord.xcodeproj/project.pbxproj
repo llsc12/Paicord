@@ -51,6 +51,8 @@
 		AA1878F32E81A30C009C7E40 /* GuildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1878F22E81A305009C7E40 /* GuildView.swift */; };
 		AA1878F92E81FC1A009C7E40 /* FLEX in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = AA1878F82E81FC1A009C7E40 /* FLEX */; };
 		AA21D27E2EA8ED4400C75093 /* ProfileFullSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA21D27D2EA8ED3E00C75093 /* ProfileFullSheetView.swift */; };
+		AA21D2802EAA220300C75093 /* MaskEdgesModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA21D27F2EAA220300C75093 /* MaskEdgesModifier.swift */; };
+		AA21D2832EAA557C00C75093 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; platformFilters = (macos, ); productRef = AA21D2822EAA557C00C75093 /* Sparkle */; };
 		AA2278C52EA44828002C335F /* ProfilePopoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2278C42EA4481F002C335F /* ProfilePopoutView.swift */; };
 		AA2278C72EA448C7002C335F /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2278C62EA448BD002C335F /* Profile.swift */; };
 		AA5CA6522E9BCCFF00C7C82A /* Maths.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5CA6512E9BCCFC00C7C82A /* Maths.swift */; };
@@ -130,6 +132,7 @@
 		AA13A1E22EA83766005A3613 /* TypingIndicatorBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypingIndicatorBar.swift; sourceTree = "<group>"; };
 		AA1878F22E81A305009C7E40 /* GuildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuildView.swift; sourceTree = "<group>"; };
 		AA21D27D2EA8ED3E00C75093 /* ProfileFullSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileFullSheetView.swift; sourceTree = "<group>"; };
+		AA21D27F2EAA220300C75093 /* MaskEdgesModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaskEdgesModifier.swift; sourceTree = "<group>"; };
 		AA2278C42EA4481F002C335F /* ProfilePopoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePopoutView.swift; sourceTree = "<group>"; };
 		AA2278C62EA448BD002C335F /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
 		AA5CA6512E9BCCFC00C7C82A /* Maths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Maths.swift; sourceTree = "<group>"; };
@@ -176,6 +179,7 @@
 				AA5CA6582E9D2CBA00C7C82A /* HighlightSwift in Frameworks */,
 				AA1878F92E81FC1A009C7E40 /* FLEX in Frameworks */,
 				579DF34B2E6D9B9800BD8B97 /* SwiftUIX in Frameworks */,
+				AA21D2832EAA557C00C75093 /* Sparkle in Frameworks */,
 				572B694C2E7079FB00BCED00 /* PaicordLib in Frameworks */,
 				AA9C818C2E6702930086B1DA /* SwiftUIIntrospect in Frameworks */,
 				57CDD87F2E71CB6000022203 /* HCaptcha in Frameworks */,
@@ -494,6 +498,7 @@
 			children = (
 				AA9C81812E6660AB0086B1DA /* Components */,
 				AA9C81852E66670E0086B1DA /* CornerRadius.swift */,
+				AA21D27F2EAA220300C75093 /* MaskEdgesModifier.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -560,6 +565,7 @@
 				AA13780A2E969D6100100969 /* DiscordMarkdownParser */,
 				AA5CA6572E9D2CBA00C7C82A /* HighlightSwift */,
 				AA5CA65F2E9D435800C7C82A /* SDWebImageSwiftUI */,
+				AA21D2822EAA557C00C75093 /* Sparkle */,
 			);
 			productName = PaiCord;
 			productReference = AA1096DB2E63BE84005BC3D2 /* Paicord.app */;
@@ -600,6 +606,7 @@
 				AA1378072E969A9000100969 /* XCRemoteSwiftPackageReference "lottie-spm" */,
 				AA5CA6562E9D2CBA00C7C82A /* XCRemoteSwiftPackageReference "HighlightSwift" */,
 				AA5CA65E2E9D435800C7C82A /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
+				AA21D2812EAA557C00C75093 /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = AA1096DC2E63BE84005BC3D2 /* Products */;
@@ -660,6 +667,7 @@
 				57F5AF4D2E7CB14A00AD5674 /* PaicordSheetsAlerts.swift in Sources */,
 				AAB50A502E9AA6800048E8B0 /* ChatInputCommand.swift in Sources */,
 				57E05C5D2E6CBCDC00B81AA7 /* GatewayStore.swift in Sources */,
+				AA21D2802EAA220300C75093 /* MaskEdgesModifier.swift in Sources */,
 				57F5AF552E7CBDF400AD5674 /* MFAView.swift in Sources */,
 				AA63EB722EA711D000A5F21D /* EmbedsView.swift in Sources */,
 				AAB50A582E9AD4BB0048E8B0 /* Utilities.swift in Sources */,
@@ -969,6 +977,14 @@
 				minimumVersion = 5.22.10;
 			};
 		};
+		AA21D2812EAA557C00C75093 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.8.0;
+			};
+		};
 		AA5CA6562E9D2CBA00C7C82A /* XCRemoteSwiftPackageReference "HighlightSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/llsc12/HighlightSwift";
@@ -1041,6 +1057,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AA1878F72E81FC1A009C7E40 /* XCRemoteSwiftPackageReference "FLEX" */;
 			productName = FLEX;
+		};
+		AA21D2822EAA557C00C75093 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AA21D2812EAA557C00C75093 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
 		};
 		AA5CA6572E9D2CBA00C7C82A /* HighlightSwift */ = {
 			isa = XCSwiftPackageProductDependency;
