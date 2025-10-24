@@ -11,25 +11,6 @@ import PaicordLib
 import XCTest
 
 class UserGatewayTests: XCTestCase {
-	func testGateway() async throws {
-		// insane logging pls dont use
-		DiscordGlobalConfiguration.makeLogger = { loggerLabel in
-			var logger = Logger(label: loggerLabel)
-			logger.logLevel = .trace
-			return logger
-		}
-
-		let gateway = await UserGatewayManager(
-			token:"redacted"
-		)
-
-		await gateway.connect()
-
-		for await event in await gateway.events {
-			print(event, "\n")
-		}
-	}
-
 	func testFormErrorDecode() throws {
 		let data = """
 			{

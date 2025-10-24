@@ -22,7 +22,7 @@ public protocol Endpoint: Sendable, CustomStringConvertible {
 /// Just to switch between the 4 endpoint types.
 public enum AnyEndpoint: Endpoint {
   case userApi(UserAPIEndpoint)
-  case botApi(APIEndpoint)
+  case api(APIEndpoint)
   case cdn(CDNEndpoint)
   case loose(LooseEndpoint)
 
@@ -31,7 +31,7 @@ public enum AnyEndpoint: Endpoint {
 
   public var url: String {
     switch self {
-    case let .botApi(endpoint):
+    case let .api(endpoint):
       return endpoint.url
     case let .userApi(endpoint):
       return endpoint.url
@@ -48,7 +48,7 @@ public enum AnyEndpoint: Endpoint {
 
   public var urlDescription: String {
     switch self {
-    case let .botApi(endpoint):
+    case let .api(endpoint):
       return endpoint.urlDescription
 		case let .userApi(endpoint):
 			return endpoint.urlDescription
@@ -65,7 +65,7 @@ public enum AnyEndpoint: Endpoint {
 
   public var httpMethod: HTTPMethod {
     switch self {
-    case let .botApi(endpoint):
+    case let .api(endpoint):
       return endpoint.httpMethod
 		case let .userApi(endpoint):
 			return endpoint.httpMethod
@@ -82,7 +82,7 @@ public enum AnyEndpoint: Endpoint {
 
   public var countsAgainstGlobalRateLimit: Bool {
     switch self {
-    case let .botApi(endpoint):
+    case let .api(endpoint):
       return endpoint.countsAgainstGlobalRateLimit
 		case let .userApi(endpoint):
 			return endpoint.countsAgainstGlobalRateLimit
@@ -99,7 +99,7 @@ public enum AnyEndpoint: Endpoint {
 
   public var requiresAuthorizationHeader: Bool {
     switch self {
-    case let .botApi(endpoint):
+    case let .api(endpoint):
       return endpoint.requiresAuthorizationHeader
 		case let .userApi(endpoint):
 			return endpoint.requiresAuthorizationHeader
@@ -116,7 +116,7 @@ public enum AnyEndpoint: Endpoint {
 
   public var parameters: [String] {
     switch self {
-    case let .botApi(endpoint):
+    case let .api(endpoint):
       return endpoint.parameters
 		case let .userApi(endpoint):
 			return endpoint.parameters
@@ -133,7 +133,7 @@ public enum AnyEndpoint: Endpoint {
 
   public var id: Int {
     switch self {
-    case let .botApi(endpoint):
+    case let .api(endpoint):
       return endpoint.id
 		case let .userApi(endpoint):
 			return endpoint.id
@@ -150,7 +150,7 @@ public enum AnyEndpoint: Endpoint {
 
   public var description: String {
     switch self {
-    case let .botApi(endpoint):
+    case let .api(endpoint):
       return "AnyEndpoint.botApi(\(endpoint))"
 		case let .userApi(endpoint):
 			return "AnyEndpoint.userApi(\(endpoint))"
@@ -167,7 +167,7 @@ public enum AnyEndpoint: Endpoint {
   
   public var specialisedRatelimit: (maxRequests: Int, for: Duration)? {
     switch self {
-    case let .botApi(endpoint):
+    case let .api(endpoint):
       return endpoint.specialisedRatelimit
     case let .userApi(endpoint):
       return endpoint.specialisedRatelimit

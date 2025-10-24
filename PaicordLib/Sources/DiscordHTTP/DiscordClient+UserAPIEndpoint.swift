@@ -541,7 +541,7 @@ extension DiscordClient {
   /// https://docs.discord.food/resources/sticker#get-sticker-packs
   @inlinable
   public func getStickerPacks() async throws -> DiscordClientResponse<
-    [StickerPack]
+    Responses.ListStickerPacks
   > {
     let endpoint = UserAPIEndpoint.getStickerPacks
     return try await self.send(request: .init(to: endpoint))

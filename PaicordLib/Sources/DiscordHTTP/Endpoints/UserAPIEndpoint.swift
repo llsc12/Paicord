@@ -158,7 +158,8 @@ public enum UserAPIEndpoint: Endpoint {
     case .getApplications(let withTeamApplications):
       suffix = "applications?with_team_applications=\(withTeamApplications)"
     case .getApplicationsWithAssets(let withTeamApplications):
-      suffix = "applications-with-assets?with_team_applications=\(withTeamApplications)"
+      suffix =
+        "applications-with-assets?with_team_applications=\(withTeamApplications)"
     case .getEmbeddedActivities(let guildId):
       if let guildId {
         suffix = "activities/shelf?guild_id=\(guildId.rawValue)"
@@ -302,7 +303,8 @@ public enum UserAPIEndpoint: Endpoint {
     case .getPartialApplication(let id, let withGuild):
       suffix = "applications/public/\(id.rawValue)?with_guild=\(withGuild)"
     case .getApplicationsWithAssets(let withTeamApplications):
-      suffix = "applications-with-assets?with_team_applications=\(withTeamApplications)"
+      suffix =
+        "applications-with-assets?with_team_applications=\(withTeamApplications)"
     case .getEmbeddedActivities(let guildId):
       if let guildId {
         suffix = "activities/shelf?guild_id=\(guildId.rawValue)"
@@ -615,7 +617,13 @@ public enum UserAPIEndpoint: Endpoint {
     case .getStickerPacks: return []
     case .getStickerPack(let stickerPackId): return [stickerPackId.rawValue]
     case .getStickerGuild(let stickerId): return [stickerId.rawValue]
-    case .getUserProfile(let userId, let withMutualGuilds, let withMutualFriends, let withMutualFriendsCount, let guildId):
+    case .getUserProfile(
+      let userId,
+      let withMutualGuilds,
+      let withMutualFriends,
+      let withMutualFriendsCount,
+      let guildId
+    ):
       var params: [String] = [userId.rawValue]
       if withMutualGuilds {
         params.append("with_mutual_guilds=true")
@@ -716,7 +724,8 @@ public enum UserAPIEndpoint: Endpoint {
       return "getPartialApplications(ids: [\(idsString)])"
     case .getDetectableApplications: return "getDetectableApplications"
     case .getPartialApplication(let id, let withGuild):
-      return "getPartialApplication(id: \(id.rawValue), withGuild: \(withGuild))"
+      return
+        "getPartialApplication(id: \(id.rawValue), withGuild: \(withGuild))"
     case .validateAutoModRule(let guildId):
       return "validateAutoModRule(guildId: \(guildId.rawValue), ...)"
     case .executeAutoModAlertAction(let guildId):
@@ -788,6 +797,97 @@ public enum UserAPIEndpoint: Endpoint {
 
   public var specialisedRatelimit: (maxRequests: Int, for: Duration)? {
     switch self {
+    default: return nil
+    }
+  }
+}
+
+public enum CacheableUserAPIEndpointIdentity: Int, Sendable, Hashable,
+  CustomStringConvertible
+{
+
+  // MARK: - Applications
+  case getApplications
+  case getApplicationsWithAssets
+  case getEmbeddedActivities
+  case getPartialApplications
+  case getPartialApplication
+  case getDetectableApplications
+
+  // MARK: - Soundboard
+  case getDefaultSoundboardSounds
+  case getGuildSoundboardSounds
+  case getGuildSoundboardSound
+  case getSoundboardSoundGuild
+
+  // MARK: - Stickers
+  case getStickerPacks
+  case getStickerPack
+  case getStickerGuild
+
+  // MARK: - Emojis
+  case getGuildTopEmojis
+
+  // MARK: - Users
+  case getUserProfile
+
+  /// This case serves as a way of discouraging exhaustive switch statements
+  case __DO_NOT_USE_THIS_CASE
+
+  public var description: String {
+    switch self {
+    case .getApplications:
+      return "getApplications"
+    case .getApplicationsWithAssets:
+      return "getApplicationsWithAssets"
+    case .getEmbeddedActivities:
+      return "getEmbeddedActivities"
+    case .getPartialApplications:
+      return "getPartialApplications"
+    case .getPartialApplication:
+      return "getPartialApplication"
+    case .getDetectableApplications:
+      return "getDetectableApplications"
+    case .getDefaultSoundboardSounds:
+      return "getDefaultSoundboardSounds"
+    case .getGuildSoundboardSounds:
+      return "getGuildSoundboardSounds"
+    case .getGuildSoundboardSound:
+      return "getGuildSoundboardSound"
+    case .getSoundboardSoundGuild:
+      return "getSoundboardSoundGuild"
+    case .getStickerPack:
+      return "getStickerPack"
+    case .getStickerPacks:
+      return "getStickerPacks"
+    case .getStickerGuild:
+      return "getStickerGuild"
+    case .getGuildTopEmojis:
+      return "getGuildTopEmojis"
+    case .getUserProfile:
+      return "getUserProfile"
+    case .__DO_NOT_USE_THIS_CASE:
+      fatalError(
+        "If the case name wasn't already clear enough: '__DO_NOT_USE_THIS_CASE' MUST NOT be used"
+      )
+    }
+  }
+
+  init?(endpoint: UserAPIEndpoint) {
+    switch endpoint {
+    case .getDefaultSoundboardSounds: self = .getDefaultSoundboardSounds
+    case .getGuildSoundboardSounds: self = .getGuildSoundboardSounds
+    case .getGuildSoundboardSound: self = .getGuildSoundboardSound
+    case .getSoundboardSoundGuild: self = .getSoundboardSoundGuild
+    case .getStickerPacks: self = .getStickerPacks
+    case .getStickerPack: self = .getStickerPack
+    case .getStickerGuild: self = .getStickerGuild
+    case .getGuildTopEmojis: self = .getGuildTopEmojis
+    case .getUserProfile: self = .getUserProfile
+    case .__DO_NOT_USE_THIS_CASE:
+      fatalError(
+        "If the case name wasn't already clear enough: '__DO_NOT_USE_THIS_CASE' MUST NOT be used"
+      )
     default: return nil
     }
   }

@@ -4,6 +4,7 @@ public enum CacheableEndpointIdentity: Sendable, Hashable,
   CustomStringConvertible
 {
   case api(CacheableAPIEndpointIdentity)
+  case userApi(CacheableUserAPIEndpointIdentity)
   case cdn(CDNEndpointIdentity)
   case loose(LooseEndpoint)
 
@@ -14,12 +15,12 @@ public enum CacheableEndpointIdentity: Sendable, Hashable,
   init?(endpoint: AnyEndpoint) {
     switch endpoint {
     case let .userApi(endpoint):
-      if let endpoint = CacheableAPIEndpointIdentity(endpoint: endpoint) {
-        self = .api(endpoint)
+      if let endpoint = CacheableUserAPIEndpointIdentity(endpoint: endpoint) {
+        self = .userApi(endpoint)
       } else {
         return nil
       }
-    case let .botApi(endpoint):
+    case let .api(endpoint):
       if let endpoint = CacheableAPIEndpointIdentity(endpoint: endpoint) {
         self = .api(endpoint)
       } else {
@@ -38,6 +39,8 @@ public enum CacheableEndpointIdentity: Sendable, Hashable,
 
   public var description: String {
     switch self {
+    case .userApi(let endpoint):
+      return "CacheableEndpointIdentity.userApi(\(endpoint))"
     case .api(let endpoint):
       return "CacheableEndpointIdentity.api(\(endpoint))"
     case .cdn(let endpoint):

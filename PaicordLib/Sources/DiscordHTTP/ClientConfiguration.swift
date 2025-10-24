@@ -8,12 +8,16 @@ public struct ClientConfiguration: Sendable {
 	/// How to cache Discord API responses.
 	public struct CachingBehavior: Sendable {
 
-		/// [ID: TTL]
-		var apiEndpointsStorage = [CacheableAPIEndpointIdentity: Duration]()
-		/// [ID: TTL]
+    /// [ID: TTL]
+    var apiEndpointsStorage = [CacheableAPIEndpointIdentity: Duration]()
+    /// [ID: TTL]
+    var userApiEndpointsStorage = [CacheableUserAPIEndpointIdentity: Duration]()
+    /// [ID: TTL]
 		var cdnEndpointsStorage = [CDNEndpointIdentity: Duration]()
-		/// This instance's default TTL (Time-To-Live) for API endpoints.
-		var apiEndpointsDefaultTTL: Duration?
+    /// This instance's default TTL (Time-To-Live) for API endpoints.
+    var apiEndpointsDefaultTTL: Duration?
+		/// This instance's default TTL (Time-To-Live) for User API endpoints.
+		var userApiEndpointsDefaultTTL: Duration?
 		/// This instance's default TTL (Time-To-Live) for CDN endpoints.
 		var cdnEndpointsDefaultTTL: Duration?
 		/// This instance's default TTL (Time-To-Live) for Loose endpoints.
@@ -21,15 +25,19 @@ public struct ClientConfiguration: Sendable {
 
 		@usableFromInline
 		init(
-			apiEndpointsStorage: [CacheableAPIEndpointIdentity: Duration] = [:],
+      apiEndpointsStorage: [CacheableAPIEndpointIdentity: Duration] = [:],
+			userApiEndpointsStorage: [CacheableUserAPIEndpointIdentity: Duration] = [:],
 			cdnEndpointsStorage: [CDNEndpointIdentity: Duration] = [:],
-			apiEndpointsDefaultTTL: Duration? = nil,
+      apiEndpointsDefaultTTL: Duration? = nil,
+			userApiEndpointsDefaultTTL: Duration? = nil,
 			cdnEndpointsDefaultTTL: Duration? = nil,
 			looseEndpointsTTL: Duration? = nil
 		) {
 			self.apiEndpointsStorage = apiEndpointsStorage
+      self.userApiEndpointsStorage = userApiEndpointsStorage
 			self.cdnEndpointsStorage = cdnEndpointsStorage
 			self.apiEndpointsDefaultTTL = apiEndpointsDefaultTTL
+      self.userApiEndpointsDefaultTTL = userApiEndpointsDefaultTTL
 			self.cdnEndpointsDefaultTTL = cdnEndpointsDefaultTTL
 			self.looseEndpointsTTL = looseEndpointsTTL
 
@@ -49,15 +57,19 @@ public struct ClientConfiguration: Sendable {
 		@inlinable
 		public static func custom(
 			apiEndpoints: [CacheableAPIEndpointIdentity: Duration] = [:],
+      userApiEndpoints: [CacheableUserAPIEndpointIdentity: Duration] = [:],
 			cdnEndpoints: [CDNEndpointIdentity: Duration] = [:],
 			apiEndpointsDefaultTTL: Duration? = nil,
+      userApiEndpointsDefaultTTL: Duration? = nil,
 			cdnEndpointsDefaultTTL: Duration? = nil,
 			looseEndpointsTTL: Duration? = nil
 		) -> CachingBehavior {
 			CachingBehavior(
 				apiEndpointsStorage: apiEndpoints,
+        userApiEndpointsStorage: userApiEndpoints,
 				cdnEndpointsStorage: cdnEndpoints,
 				apiEndpointsDefaultTTL: apiEndpointsDefaultTTL,
+        userApiEndpointsDefaultTTL: userApiEndpointsDefaultTTL,
 				cdnEndpointsDefaultTTL: cdnEndpointsDefaultTTL
 			)
 		}
@@ -99,6 +111,10 @@ public struct ClientConfiguration: Sendable {
 				guard let ttl = self.apiEndpointsStorage[cacheableAPIEndpointIdentity]
 				else { return self.apiEndpointsDefaultTTL }
 				return ttl.components == (0, 0) ? nil : ttl
+      case let .userApi(cacheableUserAPIEndpointIdentity):
+        guard let ttl = self.userApiEndpointsStorage[cacheableUserAPIEndpointIdentity]
+        else { return self.userApiEndpointsDefaultTTL }
+        return ttl.components == (0, 0) ? nil : ttl
 			case let .cdn(cdnEndpointIdentity):
 				guard let ttl = self.cdnEndpointsStorage[cdnEndpointIdentity]
 				else { return self.cdnEndpointsDefaultTTL }

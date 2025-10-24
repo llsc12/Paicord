@@ -2511,15 +2511,6 @@ extension DiscordClient {
     return try await self.send(request: .init(to: endpoint))
   }
 
-  /// https://discord.com/developers/docs/resources/sticker#list-nitro-sticker-packs
-  @inlinable
-  public func listStickerPacks() async throws -> DiscordClientResponse<
-    Responses.ListStickerPacks
-  > {
-    let endpoint = APIEndpoint.listStickerPacks
-    return try await self.send(request: .init(to: endpoint))
-  }
-
   /// https://discord.com/developers/docs/resources/sticker#list-guild-stickers
   @inlinable
   public func listGuildStickers(

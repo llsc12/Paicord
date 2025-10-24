@@ -29,7 +29,7 @@ public struct DiscordHTTPRequest: Sendable {
     queries: [(String, String?)] = [],
     headers: HTTPHeaders = [:]
   ) {
-    self.endpoint = .botApi(endpoint)
+    self.endpoint = .api(endpoint)
     self.queries = queries
     self.headers = headers
   }
