@@ -362,7 +362,7 @@ extension Gateway {
     public var heartbeat_interval: Int
   }
 
-  /// https://discord.com/developers/docs/topics/gateway-events#ready-ready-event-fields
+  /// https://docs.discord.food/topics/gateway-events#ready
   public struct Ready: Sendable, Codable {
     // shared fields
     public var v: Int

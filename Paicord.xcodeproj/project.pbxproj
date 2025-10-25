@@ -34,6 +34,7 @@
 		57F5AF512E7CBC7700AD5674 /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57F5AF502E7CBC7700AD5674 /* LoginViewModel.swift */; };
 		57F5AF532E7CBDD000AD5674 /* AccountPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57F5AF522E7CBDD000AD5674 /* AccountPicker.swift */; };
 		57F5AF552E7CBDF400AD5674 /* MFAView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57F5AF542E7CBDF400AD5674 /* MFAView.swift */; };
+		8702A5382EAA6753008DD55A /* MemberRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8702A5372EAA6751008DD55A /* MemberRowView.swift */; };
 		AA0C43D72E9F190B000FA834 /* AttributedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0C43D62E9F18AD000FA834 /* AttributedText.swift */; };
 		AA0C43D92E9F1D41000FA834 /* EmojiAttachmentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0C43D82E9F1D41000FA834 /* EmojiAttachmentCell.swift */; };
 		AA1097142E64C181005BC3D2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA1097102E64C181005BC3D2 /* Assets.xcassets */; };
@@ -53,6 +54,7 @@
 		AA21D27E2EA8ED4400C75093 /* ProfileFullSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA21D27D2EA8ED3E00C75093 /* ProfileFullSheetView.swift */; };
 		AA21D2802EAA220300C75093 /* MaskEdgesModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA21D27F2EAA220300C75093 /* MaskEdgesModifier.swift */; };
 		AA21D2832EAA557C00C75093 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; platformFilters = (macos, ); productRef = AA21D2822EAA557C00C75093 /* Sparkle */; };
+		AA21D2872EAB090200C75093 /* MemberSidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA21D2862EAB08FE00C75093 /* MemberSidebarView.swift */; };
 		AA2278C52EA44828002C335F /* ProfilePopoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2278C42EA4481F002C335F /* ProfilePopoutView.swift */; };
 		AA2278C72EA448C7002C335F /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2278C62EA448BD002C335F /* Profile.swift */; };
 		AA5CA6522E9BCCFF00C7C82A /* Maths.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5CA6512E9BCCFC00C7C82A /* Maths.swift */; };
@@ -117,6 +119,8 @@
 		57F5AF502E7CBC7700AD5674 /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
 		57F5AF522E7CBDD000AD5674 /* AccountPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountPicker.swift; sourceTree = "<group>"; };
 		57F5AF542E7CBDF400AD5674 /* MFAView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MFAView.swift; sourceTree = "<group>"; };
+		8702A5372EAA6751008DD55A /* MemberRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberRowView.swift; sourceTree = "<group>"; };
+		8702A5392EAA6FC2008DD55A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		AA0C43D62E9F18AD000FA834 /* AttributedText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributedText.swift; sourceTree = "<group>"; };
 		AA0C43D82E9F1D41000FA834 /* EmojiAttachmentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiAttachmentCell.swift; sourceTree = "<group>"; };
 		AA1096DB2E63BE84005BC3D2 /* Paicord.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Paicord.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -134,6 +138,7 @@
 		AA1878F22E81A305009C7E40 /* GuildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuildView.swift; sourceTree = "<group>"; };
 		AA21D27D2EA8ED3E00C75093 /* ProfileFullSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileFullSheetView.swift; sourceTree = "<group>"; };
 		AA21D27F2EAA220300C75093 /* MaskEdgesModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaskEdgesModifier.swift; sourceTree = "<group>"; };
+		AA21D2862EAB08FE00C75093 /* MemberSidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberSidebarView.swift; sourceTree = "<group>"; };
 		AA2278C42EA4481F002C335F /* ProfilePopoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePopoutView.swift; sourceTree = "<group>"; };
 		AA2278C62EA448BD002C335F /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
 		AA5CA6512E9BCCFC00C7C82A /* Maths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Maths.swift; sourceTree = "<group>"; };
@@ -405,6 +410,15 @@
 			path = Paicord;
 			sourceTree = "<group>";
 		};
+		AA21D2852EAB08E500C75093 /* Member Sidebar */ = {
+			isa = PBXGroup;
+			children = (
+				AA21D2862EAB08FE00C75093 /* MemberSidebarView.swift */,
+				8702A5372EAA6751008DD55A /* MemberRowView.swift */,
+			);
+			path = "Member Sidebar";
+			sourceTree = "<group>";
+		};
 		AA2278C32EA44819002C335F /* Profiles */ = {
 			isa = PBXGroup;
 			children = (
@@ -480,6 +494,7 @@
 				57DA04282E79893B00DB4C7C /* Launch */,
 				57A55C552E7560BB005C8226 /* Guilds */,
 				AA1097082E64C181005BC3D2 /* Chat */,
+				AA21D2852EAB08E500C75093 /* Member Sidebar */,
 				57DA042D2E79DC4400DB4C7C /* Settings */,
 				AA2278C32EA44819002C335F /* Profiles */,
 				57A55C542E7560B3005C8226 /* Sheets */,
@@ -669,9 +684,11 @@
 				AAB50A542E9AD4470048E8B0 /* MessageBody.swift in Sources */,
 				57E05C592E6C6AE400B81AA7 /* Design Constants.swift in Sources */,
 				AABED5A62E7F514B005BDD63 /* SettingsStore.swift in Sources */,
+				8702A5382EAA6753008DD55A /* MemberRowView.swift in Sources */,
 				AABED5A02E7F48FD005BDD63 /* CurrentUserStore.swift in Sources */,
 				57F5AF4D2E7CB14A00AD5674 /* PaicordSheetsAlerts.swift in Sources */,
 				AAB50A502E9AA6800048E8B0 /* ChatInputCommand.swift in Sources */,
+				AA21D2872EAB090200C75093 /* MemberSidebarView.swift in Sources */,
 				57E05C5D2E6CBCDC00B81AA7 /* GatewayStore.swift in Sources */,
 				AA21D2802EAA220300C75093 /* MaskEdgesModifier.swift in Sources */,
 				57F5AF552E7CBDF400AD5674 /* MFAView.swift in Sources */,

@@ -6,6 +6,7 @@
 // Copyright © 2025 Lakhan Lothiyi.
 //
 
+import DiscordModels
 @_spi(Advanced) import SwiftUIIntrospect
 import SwiftUIX
 
@@ -60,9 +61,15 @@ struct LargeBaseplate: View {
             .environment(currentChannelStore)
         } else {
           // placeholder
-          Text(":3")
-            .font(.largeTitle)
-            .foregroundStyle(.secondary)
+          VStack {
+            Text(":3")
+              .font(.largeTitle)
+              .foregroundStyle(.secondary)
+
+            Text("Select a channel to start chatting")
+              .foregroundStyle(.secondary)
+              .font(.title2)
+          }
         }
       }
       #if os(macOS)
@@ -78,8 +85,10 @@ struct LargeBaseplate: View {
       #endif
     }
     .inspector(isPresented: $showingInspector) {
-      Text("gm")
-        .inspectorColumnWidth(min: 240, ideal: 260, max: 280)
+      MemberSidebarView(
+        guildStore: currentGuildStore,
+        channelStore: currentChannelStore
+      )
     }
     .toolbar {
       Button {
