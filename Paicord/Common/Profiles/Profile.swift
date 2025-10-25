@@ -13,6 +13,7 @@ import SwiftUIX
 /// Collection of ui components for profiles
 enum Profile {
   struct Avatar: View {
+    var guildStore: GuildStore? = nil
     let member: Guild.PartialMember?
     let user: PartialUser?
     var animated: Bool = false
@@ -20,8 +21,8 @@ enum Profile {
 
     var body: some View {
       Group {
-        if let member {
-          MemberAvatar(user: user, member: member)
+        if let guildStore, let member {
+          MemberAvatar(guildStore: guildStore, user: user, member: member)
         } else {
           UserAvatar(user: user)
         }
@@ -87,9 +88,7 @@ enum Profile {
     }
 
     struct MemberAvatar: View {
-      // use env for guildstore only if we have a member,
-      // then we can be sure guildstore is available
-      @Environment(GuildStore.self) var guildStore
+      var guildStore: GuildStore
       var user: PartialUser?
       var member: Guild.PartialMember?
       var animated: Bool = false

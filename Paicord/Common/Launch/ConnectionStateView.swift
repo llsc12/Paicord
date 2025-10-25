@@ -82,6 +82,7 @@ struct ConnectionStateView: View {
     "Also try Terraria!",
     "where's the also try minecraft!",
     "Δ",
+    "swift!",
   ].randomElement()!
 }
 

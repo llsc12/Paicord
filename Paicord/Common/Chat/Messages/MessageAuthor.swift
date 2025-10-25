@@ -26,6 +26,7 @@ extension MessageCell {
             message.author != nil
             ? guildStore?.members[message.author!.id] : nil
           Profile.Avatar(
+            guildStore: guildStore,
             member: guildstoremember ?? message.member,
             user: message.author?.toPartialUser()
           )

@@ -36,6 +36,7 @@ extension MessageCell {
           HStack(alignment: .bottom) {
             MessageAuthor.Avatar(
               message: message,
+              guildStore: channelStore.guildStore,
               profileOpen: $profileOpen,
               animated: avatarAnimated
             )
