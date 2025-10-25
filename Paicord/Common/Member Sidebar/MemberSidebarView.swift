@@ -73,7 +73,8 @@ struct MemberSidebarView: View {
             url: bannerURL(animated: true),
           )
           .resizable()
-          .frame(height: 120)
+          .scaledToFill()
+          .frame(height: 110)
           .maxWidth(.infinity)
           .background(.blue)
           
@@ -100,7 +101,11 @@ struct MemberSidebarView: View {
                .font(.title)
                .bold()
               
-              Text(user.username)
+              Text(
+                profile?.user_profile?.pronouns != nil
+                ? "\(user.username)・\(profile?.user_profile?.pronouns ?? "")"
+                : user.username
+              )
                 .font(.subheadline)
                 .foregroundColor(.gray)
             }
