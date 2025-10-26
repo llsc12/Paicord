@@ -69,6 +69,7 @@
 		AA9C81862E66670E0086B1DA /* CornerRadius.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9C81852E66670E0086B1DA /* CornerRadius.swift */; };
 		AA9C818C2E6702930086B1DA /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = AA9C818B2E6702930086B1DA /* SwiftUIIntrospect */; };
 		AAB22FD82EAD0A2400413310 /* SwiftPrettyPrint in Frameworks */ = {isa = PBXBuildFile; productRef = AAB22FD72EAD0A2400413310 /* SwiftPrettyPrint */; };
+		AAB22FDB2EAD86B700413310 /* ColorCube in Frameworks */ = {isa = PBXBuildFile; productRef = AAB22FDA2EAD86B700413310 /* ColorCube */; };
 		AAB50A502E9AA6800048E8B0 /* ChatInputCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB50A4F2E9AA67C0048E8B0 /* ChatInputCommand.swift */; };
 		AAB50A522E9AC9CB0048E8B0 /* ChannelHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB50A512E9AC9CB0048E8B0 /* ChannelHeader.swift */; };
 		AAB50A542E9AD4470048E8B0 /* MessageBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB50A532E9AD4470048E8B0 /* MessageBody.swift */; };
@@ -120,7 +121,6 @@
 		57F5AF522E7CBDD000AD5674 /* AccountPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountPicker.swift; sourceTree = "<group>"; };
 		57F5AF542E7CBDF400AD5674 /* MFAView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MFAView.swift; sourceTree = "<group>"; };
 		8702A5372EAA6751008DD55A /* MemberRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberRowView.swift; sourceTree = "<group>"; };
-		8702A5392EAA6FC2008DD55A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		AA0C43D62E9F18AD000FA834 /* AttributedText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributedText.swift; sourceTree = "<group>"; };
 		AA0C43D82E9F1D41000FA834 /* EmojiAttachmentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiAttachmentCell.swift; sourceTree = "<group>"; };
 		AA1096DB2E63BE84005BC3D2 /* Paicord.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Paicord.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -191,6 +191,7 @@
 				AA9C818C2E6702930086B1DA /* SwiftUIIntrospect in Frameworks */,
 				57CDD87F2E71CB6000022203 /* HCaptcha in Frameworks */,
 				AA13780B2E969D6100100969 /* DiscordMarkdownParser in Frameworks */,
+				AAB22FDB2EAD86B700413310 /* ColorCube in Frameworks */,
 				AAB22FD82EAD0A2400413310 /* SwiftPrettyPrint in Frameworks */,
 				AAEEC7222E6515C400EB5FC9 /* KeychainAccess in Frameworks */,
 				5783AA922E6B8F6500F73F6D /* MeshGradientCHeaders in Frameworks */,
@@ -436,8 +437,8 @@
 				AA0C43D52E9EF91D000FA834 /* Markdown */,
 				AA63EB742EA7125300A5F21D /* ComponentsV2 */,
 				AA63EB702EA711C200A5F21D /* Embeds */,
-				AAB50A552E9AD4680048E8B0 /* StickersView.swift */,
-				AADD7F8C2E99EB060025B644 /* Attachments.swift */,
+				AAB22FDE2EAD9EB100413310 /* Stickers */,
+				AAB22FDF2EAD9EB900413310 /* Attachments */,
 				AA63EB732EA7124200A5F21D /* Reactions */,
 			);
 			path = "Message Body";
@@ -522,6 +523,22 @@
 			path = Utilities;
 			sourceTree = "<group>";
 		};
+		AAB22FDE2EAD9EB100413310 /* Stickers */ = {
+			isa = PBXGroup;
+			children = (
+				AAB50A552E9AD4680048E8B0 /* StickersView.swift */,
+			);
+			path = Stickers;
+			sourceTree = "<group>";
+		};
+		AAB22FDF2EAD9EB900413310 /* Attachments */ = {
+			isa = PBXGroup;
+			children = (
+				AADD7F8C2E99EB060025B644 /* Attachments.swift */,
+			);
+			path = Attachments;
+			sourceTree = "<group>";
+		};
 		AABED5A72E7FF970005BDD63 /* PaicordLib++ */ = {
 			isa = PBXGroup;
 			children = (
@@ -586,6 +603,7 @@
 				AA5CA65F2E9D435800C7C82A /* SDWebImageSwiftUI */,
 				AA21D2822EAA557C00C75093 /* Sparkle */,
 				AAB22FD72EAD0A2400413310 /* SwiftPrettyPrint */,
+				AAB22FDA2EAD86B700413310 /* ColorCube */,
 			);
 			productName = PaiCord;
 			productReference = AA1096DB2E63BE84005BC3D2 /* Paicord.app */;
@@ -628,6 +646,7 @@
 				AA5CA65E2E9D435800C7C82A /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 				AA21D2812EAA557C00C75093 /* XCRemoteSwiftPackageReference "Sparkle" */,
 				AAB22FD62EAD0A2300413310 /* XCRemoteSwiftPackageReference "SwiftPrettyPrint" */,
+				AAB22FD92EAD86B600413310 /* XCRemoteSwiftPackageReference "ColorCube" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = AA1096DC2E63BE84005BC3D2 /* Products */;
@@ -1044,6 +1063,14 @@
 				minimumVersion = 1.4.0;
 			};
 		};
+		AAB22FD92EAD86B600413310 /* XCRemoteSwiftPackageReference "ColorCube" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/llsc12/ColorCube";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		AAEEC7202E6515C400EB5FC9 /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess";
@@ -1117,6 +1144,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AAB22FD62EAD0A2300413310 /* XCRemoteSwiftPackageReference "SwiftPrettyPrint" */;
 			productName = SwiftPrettyPrint;
+		};
+		AAB22FDA2EAD86B700413310 /* ColorCube */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AAB22FD92EAD86B600413310 /* XCRemoteSwiftPackageReference "ColorCube" */;
+			productName = ColorCube;
 		};
 		AAEEC7212E6515C400EB5FC9 /* KeychainAccess */ = {
 			isa = XCSwiftPackageProductDependency;

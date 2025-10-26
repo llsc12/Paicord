@@ -10,7 +10,8 @@ import PaicordLib
 import SwiftUI
 
 extension DiscordColor {
-  func asColor() -> Color {
+  func asColor() -> Color? {
+    if self.value == 0 { return nil }  // no color?
     let (red, green, blue) = self.asRGB()
     // values are between 0 and 255, divide by 255
     return Color(

@@ -676,9 +676,14 @@ class MarkdownRendererVM {
       if let r = node as? AST.RoleMentionNode {
         // construct paicord link so text view can intercept clicks
         if let role = guildStore?.roles[r.id] {
-          let color: AppKitOrUIKitColor = AppKitOrUIKitColor(
-            role.color.asColor()
-          )
+          let color: AppKitOrUIKitColor = {
+            let discordColor = role.color
+            if let color = discordColor.asColor() {
+              return AppKitOrUIKitColor(color)
+            } else {
+              return AppKitOrUIKitColor.labelCompatible
+            }
+          }()
           var attrs = baseAttributes
           // base role background is tertiary (as requested)
           attrs[.backgroundColor] =

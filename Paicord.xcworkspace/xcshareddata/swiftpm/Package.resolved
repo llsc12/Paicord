@@ -1,5 +1,5 @@
 {
-  "originHash" : "05111b662ae647fc3b79cf5fb7e6c54c37c617d8a8286b7c1197ac51d02ffb55",
+  "originHash" : "7a6580397f7f8bd804abef4efb89eacb66c8d26ae4fd1ff7bf54e9834c5e1a6c",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "254d34096123cd5da4f82e69f52f622ac7526d68",
         "version" : "1.27.0"
+      }
+    },
+    {
+      "identity" : "colorcube",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/llsc12/ColorCube",
+      "state" : {
+        "branch" : "main",
+        "revision" : "c071095f6afa7452b8953f9136c0cbd1d0fd5237"
       }
     },
     {

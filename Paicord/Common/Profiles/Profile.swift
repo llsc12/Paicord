@@ -46,7 +46,7 @@ enum Profile {
     struct UserAvatar: View {
       var user: PartialUser?
       var animated: Bool = false
-      
+
       var body: some View {
         WebImage(url: avatarURL(animated: animated)) { phase in
           switch phase {
@@ -64,19 +64,11 @@ enum Profile {
       func avatarURL(animated: Bool) -> URL? {
         // there is probably a nicer way to write this
         if let user, let avatar = user.avatar {
-          if avatar.starts(with: "a_"), animated {
-            return URL(
-              string: CDNEndpoint.userAvatar(userId: user.id, avatar: avatar)
-                .url
-                + ".gif?size=128&animated=true"
-            )
-          } else {
-            return URL(
-              string: CDNEndpoint.userAvatar(userId: user.id, avatar: avatar)
-                .url
-                + ".png?size=128&animated=false"
-            )
-          }
+          return URL(
+            string: CDNEndpoint.userAvatar(userId: user.id, avatar: avatar)
+              .url
+              + ".\(animated && avatar.starts(with: "a_") ? "gif" : "png")?size=128&animated=\(animated.description)"
+          )
         } else {
           let discrim = user?.discriminator ?? "0000"
           return URL(
@@ -92,7 +84,7 @@ enum Profile {
       var user: PartialUser?
       var member: Guild.PartialMember?
       var animated: Bool = false
-      
+
       var body: some View {
         WebImage(url: avatarURL(animated: animated)) { phase in
           switch phase {
@@ -106,43 +98,25 @@ enum Profile {
           }
         }
       }
-      
+
       func avatarURL(animated: Bool) -> URL? {
         let guildId = guildStore.guildId
         if let user, member?.avatar ?? user.avatar != nil {
           let id = user.id
           if let avatar = member?.avatar {
-            if avatar.starts(with: "a_"), animated {
-              return URL(
-                string: CDNEndpoint.guildMemberAvatar(
-                  guildId: guildId,
-                  userId: id,
-                  avatar: avatar
-                ).url
-                  + ".gif?size=128&animated=true"
-              )
-            } else {
-              return URL(
-                string: CDNEndpoint.guildMemberAvatar(
-                  guildId: guildId,
-                  userId: id,
-                  avatar: avatar
-                ).url
-                  + ".png?size=128&animated=false"
-              )
-            }
+            return URL(
+              string: CDNEndpoint.guildMemberAvatar(
+                guildId: guildId,
+                userId: id,
+                avatar: avatar
+              ).url
+                + ".\(animated && avatar.starts(with: "a_") ? "gif" : "png")?size=128&animated=\(animated.description)"
+            )
           } else if let avatar = user.avatar {
-            if avatar.starts(with: "a_"), animated {
-              return URL(
-                string: CDNEndpoint.userAvatar(userId: id, avatar: avatar).url
-                  + ".gif?size=128&animated=true"
-              )
-            } else {
-              return URL(
-                string: CDNEndpoint.userAvatar(userId: id, avatar: avatar).url
-                  + ".png?size=128&animated=false"
-              )
-            }
+            return URL(
+              string: CDNEndpoint.userAvatar(userId: id, avatar: avatar).url
+                + ".\(animated && avatar.starts(with: "a_") ? "gif" : "png")?size=128&animated=\(animated.description)"
+            )
           }
         } else {
           let discrim = user?.discriminator ?? "0000"
@@ -196,7 +170,7 @@ enum Profile {
     var hideOffline: Bool = false
     var animated: Bool = false
     var showDecoration: Bool = false
-    
+
     init(member: Guild.PartialMember?, user: DiscordUser) {
       self.member = member
       self.user = user.toPartialUser()
@@ -323,9 +297,9 @@ enum Profile {
     var color: Color {
       switch colorScheme {
       case .light:
-        nameplate.palette.color.light.asColor()
+        nameplate.palette.color.light.asColor()!
       case .dark:
-        nameplate.palette.color.dark.asColor()
+        nameplate.palette.color.dark.asColor()!
       @unknown default:
         fatalError()
       }
