@@ -64,7 +64,6 @@ struct MessageCell: View {
       case .default, .reply:
         DefaultMessage(
           message: message,
-          priorMessage: priorMessage,
           channelStore: channelStore,
           inline: inline
         )

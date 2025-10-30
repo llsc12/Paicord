@@ -12,7 +12,7 @@ import SwiftUIX
 extension MessageCell {
   struct DefaultMessage: View {
     let message: DiscordChannel.Message
-    let priorMessage: DiscordChannel.Message?
+//    let priorMessage: DiscordChannel.Message?
     let channelStore: ChannelStore
     let inline: Bool
 

@@ -31,7 +31,6 @@ struct ChatView: View {
               let prior = vm.getMessage(before: msg)
               if messageAllowed(msg) {
                 MessageCell(for: msg, prior: prior, channel: vm)
-                  .padding(.bottom, msg == vm.messages.values.last ? 18 : 0)
                   .onAppear {
                     guard msg == vm.messages.values.last else { return }
                     self.isNearBottom = true
@@ -45,6 +44,7 @@ struct ChatView: View {
           }
           .scrollTargetLayout()
         }
+        .safeAreaPadding(.bottom, 18)
         .bottomAnchored()
         .scrollDismissesKeyboard(.interactively)
         .onAppear {

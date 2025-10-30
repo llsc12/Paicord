@@ -36,7 +36,7 @@ enum Profile {
             decoration: decoration,
             animated: animated
           )
-          .scaleEffect(1.18)
+          .scaleEffect(1.2)
         }
       }
       .padding(10)
@@ -70,10 +70,8 @@ enum Profile {
               + ".\(animated && avatar.starts(with: "a_") ? "gif" : "png")?size=128&animated=\(animated.description)"
           )
         } else {
-          let discrim = user?.discriminator ?? "0000"
           return URL(
-            string: CDNEndpoint.defaultUserAvatar(discriminator: discrim).url
-              + "?size=128"
+            string: CDNEndpoint.defaultUserAvatar(userId: user?.id ?? (try! .makeFake())).url + ".png"
           )
         }
       }
@@ -119,10 +117,8 @@ enum Profile {
             )
           }
         } else {
-          let discrim = user?.discriminator ?? "0000"
           return URL(
-            string: CDNEndpoint.defaultUserAvatar(discriminator: discrim).url
-              + "?size=128"
+            string: CDNEndpoint.defaultUserAvatar(userId: user?.id ?? (try! .makeFake())).url + ".png"
           )
         }
         return nil

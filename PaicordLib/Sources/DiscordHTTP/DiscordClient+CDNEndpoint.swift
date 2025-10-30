@@ -86,15 +86,13 @@ extension DiscordClient {
 
 	/// https://discord.com/developers/docs/reference#image-formatting-cdn-endpoints
 	@inlinable
-	public func getCDNDefaultUserAvatar(discriminator: Int) async throws
+	public func getCDNDefaultUserAvatar(userId: UserSnowflake) async throws
 		-> DiscordCDNResponse
 	{
-		/// `discriminator % 5` is what Discord says.
-		let modulo = "\(discriminator % 5)"
-		let endpoint = CDNEndpoint.defaultUserAvatar(discriminator: modulo)
+		let endpoint = CDNEndpoint.defaultUserAvatar(userId: userId)
 		return try await self.send(
 			request: .init(to: endpoint),
-			fallbackFileName: "\(discriminator)"
+			fallbackFileName: "index.png"
 		)
 	}
 

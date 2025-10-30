@@ -973,7 +973,7 @@ extension AppKitOrUIKitColor {
 
 // used as fallback whilst parsing markdown (almost instant)
 extension Text {
-  fileprivate init(
+  init(
     markdown: String,
     fallback: AttributedString = "",
     syntax: AttributedString.MarkdownParsingOptions.InterpretedSyntax =

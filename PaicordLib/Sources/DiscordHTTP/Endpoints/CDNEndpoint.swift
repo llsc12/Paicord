@@ -12,7 +12,7 @@ public enum CDNEndpoint: Endpoint {
   case guildBanner(guildId: GuildSnowflake, banner: String)
   case guildTagBadge(guildId: GuildSnowflake, badge: String)
   case userBanner(userId: UserSnowflake, banner: String)
-  case defaultUserAvatar(discriminator: String)
+  case defaultUserAvatar(userId: UserSnowflake)
   case userAvatar(userId: UserSnowflake, avatar: String)
   case guildMemberAvatar(
     guildId: GuildSnowflake,
@@ -80,8 +80,11 @@ public enum CDNEndpoint: Endpoint {
       suffix = "guild-tag-badges/\(guildId.rawValue)/\(badge)"
     case let .userBanner(userId, banner):
       suffix = "banners/\(userId.rawValue)/\(banner)"
-    case .defaultUserAvatar(_):
-      suffix = "assets/2ccd8ae8b2379360.png" // old default avatar path no longer functional. Using static asset.
+    case .defaultUserAvatar(let id):
+      // old system used discriminator modulo 5
+      // new system uses user id bit shift left 22 then modulo 6
+      let index = ((Int(id.rawValue) ?? 0) >> 22) % 6
+      suffix = "embed/avatars/\(index)"
     case let .userAvatar(userId, avatar):
       suffix = "avatars/\(userId.rawValue)/\(avatar)"
     case let .guildMemberAvatar(guildId, userId, avatar):
@@ -189,8 +192,8 @@ public enum CDNEndpoint: Endpoint {
       return [guildId.rawValue, badge]
     case .userBanner(let userId, let banner):
       return [userId.rawValue, banner]
-    case .defaultUserAvatar(let discriminator):
-      return [discriminator]
+    case .defaultUserAvatar(let id):
+      return [id.rawValue]
     case .userAvatar(let userId, let avatar):
       return [userId.rawValue, avatar]
     case .guildMemberAvatar(let guildId, let userId, let avatar):

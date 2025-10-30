@@ -45,13 +45,12 @@ struct ProfilePopoutView: View {
           case .success(let image):
             image
               .resizable()
-              .scaledToFill()
-              .frame(width: 300, height: 100)
+              .aspectRatio(3, contentMode: .fill)
           default:
             let color =
               profile?.user_profile?.accent_color ?? user.accent_color
             Rectangle()
-              .frame(width: 300, height: 100)
+              .aspectRatio(3, contentMode: .fit)
               .foregroundStyle((color?.asColor() ?? accentColor))
           }
         }
@@ -152,8 +151,6 @@ struct ProfilePopoutView: View {
   }
 
   func avatarURL(animated: Bool) -> URL? {
-    print("[Profile] Generating avatar URL for user \(user.id)")
-    Pretty.prettyPrint(member, user)
     if member?.avatar ?? user.avatar != nil {
       let id = user.id
       if let guildId = guild?.guildId, let avatar = member?.avatar {
@@ -172,10 +169,8 @@ struct ProfilePopoutView: View {
         )
       }
     } else {
-      let discrim = user.discriminator ?? "0"
       return URL(
-        string: CDNEndpoint.defaultUserAvatar(discriminator: discrim).url
-          + "?size=128"
+        string: CDNEndpoint.defaultUserAvatar(userId: user.id).url + ".png"
       )
     }
     return nil
