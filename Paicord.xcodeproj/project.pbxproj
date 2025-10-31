@@ -66,6 +66,8 @@
 		AA63EB722EA711D000A5F21D /* EmbedsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA63EB712EA711CD00A5F21D /* EmbedsView.swift */; };
 		AA63EB762EA712D900A5F21D /* ReactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA63EB752EA712D500A5F21D /* ReactionsView.swift */; };
 		AA70EFB12EA1B3BD00344D98 /* InputBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA70EFB02EA1B3BA00344D98 /* InputBar.swift */; };
+		AA7B38F22EB37F9B00CA4A3C /* PermsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7B38F12EB37F9500CA4A3C /* PermsHelper.swift */; };
+		AA7B38F42EB50F0100CA4A3C /* MessageDrainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7B38F32EB50EFD00CA4A3C /* MessageDrainStore.swift */; };
 		AA9C81832E6660BE0086B1DA /* GuildButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9C81822E6660BE0086B1DA /* GuildButton.swift */; };
 		AA9C81862E66670E0086B1DA /* CornerRadius.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9C81852E66670E0086B1DA /* CornerRadius.swift */; };
 		AA9C818C2E6702930086B1DA /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = AA9C818B2E6702930086B1DA /* SwiftUIIntrospect */; };
@@ -148,6 +150,8 @@
 		AA63EB712EA711CD00A5F21D /* EmbedsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbedsView.swift; sourceTree = "<group>"; };
 		AA63EB752EA712D500A5F21D /* ReactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReactionsView.swift; sourceTree = "<group>"; };
 		AA70EFB02EA1B3BA00344D98 /* InputBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputBar.swift; sourceTree = "<group>"; };
+		AA7B38F12EB37F9500CA4A3C /* PermsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermsHelper.swift; sourceTree = "<group>"; };
+		AA7B38F32EB50EFD00CA4A3C /* MessageDrainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageDrainStore.swift; sourceTree = "<group>"; };
 		AA9C81822E6660BE0086B1DA /* GuildButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuildButton.swift; sourceTree = "<group>"; };
 		AA9C81852E66670E0086B1DA /* CornerRadius.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CornerRadius.swift; sourceTree = "<group>"; };
 		AAB22FD52EABB04300413310 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -234,6 +238,7 @@
 		57A4E7122E6B44B500470131 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				AA7B38F12EB37F9500CA4A3C /* PermsHelper.swift */,
 				AABED5A72E7FF970005BDD63 /* PaicordLib++ */,
 				57A4E7132E6B44BC00470131 /* Extensions */,
 				AAB50A5D2E9B21AE0048E8B0 /* Thumbhash.swift */,
@@ -561,6 +566,7 @@
 				AABED5A32E7F4DAE005BDD63 /* GuildStore.swift */,
 				AABED5A52E7F5148005BDD63 /* SettingsStore.swift */,
 				AABED59D2E7F4637005BDD63 /* ChannelStore.swift */,
+				AA7B38F32EB50EFD00CA4A3C /* MessageDrainStore.swift */,
 			);
 			path = Stores;
 			sourceTree = "<group>";
@@ -686,6 +692,7 @@
 				AAB50A5E2E9B21B30048E8B0 /* Thumbhash.swift in Sources */,
 				AAEEC71F2E65120000EB5FC9 /* TokenStore.swift in Sources */,
 				AA1097182E64C181005BC3D2 /* HomeView.swift in Sources */,
+				AA7B38F42EB50F0100CA4A3C /* MessageDrainStore.swift in Sources */,
 				AA10971D2E64C18C005BC3D2 /* ChatView.swift in Sources */,
 				AA9C81862E66670E0086B1DA /* CornerRadius.swift in Sources */,
 				57CDD8812E71FF7600022203 /* CaptchaSheet.swift in Sources */,
@@ -715,6 +722,7 @@
 				57E05C5D2E6CBCDC00B81AA7 /* GatewayStore.swift in Sources */,
 				AA21D2802EAA220300C75093 /* MaskEdgesModifier.swift in Sources */,
 				57F5AF552E7CBDF400AD5674 /* MFAView.swift in Sources */,
+				AA7B38F22EB37F9B00CA4A3C /* PermsHelper.swift in Sources */,
 				AA63EB722EA711D000A5F21D /* EmbedsView.swift in Sources */,
 				AAB50A582E9AD4BB0048E8B0 /* Utilities.swift in Sources */,
 				5783AA942E6B8FD100F73F6D /* MeshGradient.swift in Sources */,

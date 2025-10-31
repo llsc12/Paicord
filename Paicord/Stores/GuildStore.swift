@@ -150,11 +150,6 @@ class GuildStore: DiscordDataStore {
     }
   }
 
-  func cancelEventHandling() {
-    eventTask?.cancel()
-    eventTask = nil
-  }
-
   // MARK: - Event Handlers
   private func handleGuildUpdate(_ updatedGuild: Guild) {
     guild = updatedGuild

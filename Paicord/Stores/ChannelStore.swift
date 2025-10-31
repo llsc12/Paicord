@@ -139,11 +139,6 @@ class ChannelStore: DiscordDataStore {
     }
   }
 
-  func cancelEventHandling() {
-    eventTask?.cancel()
-    eventTask = nil
-  }
-
   // MARK: - Event Handlers
   private func handleChannelUpdate(_ updatedChannel: DiscordChannel) {
     channel = updatedChannel

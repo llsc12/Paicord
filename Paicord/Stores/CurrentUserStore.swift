@@ -97,11 +97,6 @@ class CurrentUserStore: DiscordDataStore {
     }
   }
 
-  func cancelEventHandling() {
-    eventTask?.cancel()
-    eventTask = nil
-  }
-
   // MARK: - Event Handlers
   private func handleReady(_ readyData: Gateway.Ready) {
     sessions = readyData.sessions

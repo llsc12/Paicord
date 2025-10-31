@@ -63,6 +63,7 @@ class SettingsStore: DiscordDataStore {
   }
 
   func cancelEventHandling() {
+    // overrides default impl of protocol
     eventTask?.cancel()
     eventTask = nil
 

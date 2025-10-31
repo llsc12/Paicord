@@ -16,3 +16,10 @@ protocol DiscordDataStore: AnyObject {
   func setupEventHandling()
   func cancelEventHandling()
 }
+
+extension DiscordDataStore {
+  func cancelEventHandling() {
+    eventTask?.cancel()
+    eventTask = nil
+  }
+}
