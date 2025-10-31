@@ -16,7 +16,6 @@ struct SlideoverDoubleView<Primary: View, Secondary: View>: View {
   private let animation: Animation = .easeOut(duration: 0.2)
   @State private var dragOffset: CGFloat = 0
   @ViewStorage var width: CGFloat = 0
-  @ViewStorage private var gestureDirectionLocked: Bool? = nil
 
   @Environment(\.slideoverDisabled) var slideoverDisabled
 
@@ -51,7 +50,7 @@ struct SlideoverDoubleView<Primary: View, Secondary: View>: View {
     .onGeometryChange(for: CGFloat.self, of: { $0.size.width }) {
       self.width = $0
     }
-    .simultaneousGesture(gesture)  // allow dragging over child views like buttons etc
+    .gesture(gesture)  // allow dragging over child views like buttons etc
     .onChange(of: swap) {
       withAnimation(animation) {
         dragOffset = 0
@@ -74,18 +73,6 @@ struct SlideoverDoubleView<Primary: View, Secondary: View>: View {
 
         let translation = drag.translation
         let horizontal = translation.width
-        let vertical = translation.height
-
-        // decide drag direction
-        if gestureDirectionLocked == nil {
-          if abs(horizontal) > 10 || abs(vertical) > 10 {
-            gestureDirectionLocked = abs(horizontal) > abs(vertical)
-          } else {
-            return  // too small to decide yet
-          }
-        }
-
-        guard gestureDirectionLocked == true else { return }
 
         if swap {
           dragOffset = horizontal < 0 ? 0 : horizontal
@@ -94,13 +81,10 @@ struct SlideoverDoubleView<Primary: View, Secondary: View>: View {
         }
       }
       .onEnded { drag in
-        defer { gestureDirectionLocked = nil }  // reset lock
         guard !slideoverDisabled else {
           swap = false
           return
         }
-
-        guard gestureDirectionLocked == true else { return }
 
         let translation = drag.translation.width
         let velocity = drag.velocity.width

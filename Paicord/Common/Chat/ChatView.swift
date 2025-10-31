@@ -15,6 +15,7 @@ struct ChatView: View {
   @Environment(GatewayStore.self) var gw
   @Environment(PaicordAppState.self) var appState
   @Environment(\.accessibilityReduceMotion) var accessibilityReduceMotion
+  @Environment(\.userInterfaceIdiom) var idiom
 
   @ViewStorage private var isNearBottom = true  // used to track if we are near the bottom, if so scroll.
   @ViewStorage private var pendingScrollWorkItem: DispatchWorkItem?
@@ -44,7 +45,7 @@ struct ChatView: View {
           }
           .scrollTargetLayout()
         }
-        .safeAreaPadding(.bottom, 18)
+        .safeAreaPadding(.bottom, 22)
         .bottomAnchored()
         .scrollDismissesKeyboard(.interactively)
         .onAppear {
@@ -84,6 +85,7 @@ struct ChatView: View {
           } label: {
             Image(systemName: "arrow.left")
           }
+          .tint(.tertiaryButton)
         }
       }
     #endif

@@ -48,6 +48,7 @@ struct SmallBaseplate: View {
             .tabItem { Label("Profile", systemImage: "person.circle") }
             .tag(CurrentTab.profile)
         }
+        .tint(.tertiaryButton)
       }
 
     } secondary: {
