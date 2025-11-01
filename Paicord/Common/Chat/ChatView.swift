@@ -81,7 +81,9 @@ struct ChatView: View {
       .toolbar {
         ToolbarItem(placement: .topBarLeading) {
           Button {
-            appState.chatOpen.toggle()
+            withAnimation {
+              appState.chatOpen.toggle()
+            }
           } label: {
             Image(systemName: "arrow.left")
           }
