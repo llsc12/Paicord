@@ -46,11 +46,13 @@ extension MarkdownRendererVM {
     #endif
     // set accessibilityCustomText attribute for copy text
     let mutable = NSMutableAttributedString(attributedString: .init(attachment: attachment))
+    #if os(macOS)
     mutable.addAttribute(
       .accessibilityCustomText,
       value: copyText,
       range: NSRange(location: 0, length: mutable.length)
     )
+    #endif
     return mutable
   }
 
