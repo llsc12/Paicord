@@ -74,7 +74,7 @@ struct ChatView: View {
       TypingIndicatorBar(vm: vm)
     }
     .safeAreaInset(edge: .bottom, spacing: 0) {
-      InputBar(vm: vm)
+      InputBar()
     }
     .background(.tableBackground)
     #if os(iOS)

@@ -553,6 +553,7 @@ public enum Payloads {
   }
 
   /// https://discord.com/developers/docs/resources/channel#create-message-jsonform-params
+  /// https://docs.discord.food/resources/message#create-message
   public struct CreateMessage: Sendable, MultipartEncodable, ValidatablePayload
   {
     public var content: String?
@@ -566,7 +567,7 @@ public enum Payloads {
     public var files: [RawFile]?
     public var attachments: [Attachment]?
     public var flags: IntBitField<DiscordChannel.Message.Flag>?
-    public var enforce_nonce: Bool?
+//    public var enforce_nonce: Bool?
     public var poll: CreatePollRequest?
 
     enum CodingKeys: String, CodingKey {
@@ -580,7 +581,7 @@ public enum Payloads {
       case sticker_ids
       case attachments
       case flags
-      case enforce_nonce
+//      case enforce_nonce
       case poll
     }
 
@@ -596,7 +597,7 @@ public enum Payloads {
       files: [RawFile]? = nil,
       attachments: [Attachment]? = nil,
       flags: IntBitField<DiscordChannel.Message.Flag>? = nil,
-      enforce_nonce: Bool? = nil,
+//      enforce_nonce: Bool? = nil,
       poll: CreatePollRequest? = nil
     ) {
       self.content = content
@@ -610,7 +611,7 @@ public enum Payloads {
       self.files = files
       self.attachments = attachments
       self.flags = flags
-      self.enforce_nonce = enforce_nonce
+//      self.enforce_nonce = enforce_nonce
       self.poll = poll
     }
 
@@ -2993,5 +2994,77 @@ public enum Payloads {
     }
     
     public func validate() -> [ValidationFailure] {}
+  }
+  
+  /// https://docs.discord.food/interactions/receiving-and-responding#create-interaction
+  public struct CreateInteraction: Sendable, Encodable, ValidatablePayload {
+    public var type: Interaction.Kind
+    public var application_id: ApplicationSnowflake
+    public var guild_id: GuildSnowflake?
+    public var channel_id: ChannelSnowflake
+    public var message_id: MessageSnowflake? // Only for MESSAGE_COMPONENT type
+    public var message_flags: IntBitField<DiscordChannel.Message.Flag>? // Only for MESSAGE_COMPONENT type
+    public var session_id: String? // Required so Discord can send send accompanying interaction events
+    public var data: Interaction.Data
+    public var files: [RawFile]?
+    public var nonce: StringOrInt?
+//    public var analytics_location
+    public var section_name: String?
+//    public var source
+    
+    public func validate() -> [ValidationFailure] {
+      // TODO: validate fields here
+    }
+    
+    init(type: Interaction.Kind, application_id: ApplicationSnowflake, guild_id: GuildSnowflake? = nil, channel_id: ChannelSnowflake, message_id: MessageSnowflake? = nil, message_flags: IntBitField<DiscordChannel.Message.Flag>? = nil, session_id: String? = nil, files: [RawFile]? = nil, nonce: StringOrInt? = nil, section_name: String? = nil, data: Interaction.Data) {
+      self.type = type
+      self.application_id = application_id
+      self.guild_id = guild_id
+      self.channel_id = channel_id
+      self.message_id = message_id
+      self.message_flags = message_flags
+      self.session_id = session_id
+      self.files = files
+      self.nonce = nonce
+      self.section_name = section_name
+      self.data = data
+    }
+    
+    enum CodingKeys: String, CodingKey {
+      case type
+      case application_id
+      case guild_id
+      case channel_id
+      case message_id
+      case message_flags
+      case data
+      case session_id
+      case files
+      case nonce
+      case section_name
+    }
+    
+    public func encode(to encoder: any Encoder) throws {
+      var container = encoder.container(keyedBy: CodingKeys.self)
+      try container.encode(type, forKey: .type)
+      try container.encode(application_id, forKey: .application_id)
+      try container.encodeIfPresent(guild_id, forKey: .guild_id)
+      try container.encode(channel_id, forKey: .channel_id)
+      try container.encodeIfPresent(message_id, forKey: .message_id)
+      try container.encodeIfPresent(message_flags, forKey: .message_flags)
+      try container.encodeIfPresent(session_id, forKey: .session_id)
+      try container.encodeIfPresent(nonce, forKey: .nonce)
+      try container.encodeIfPresent(section_name, forKey: .section_name)
+      try container.encodeIfPresent(files, forKey: .files)
+      
+      switch data {
+      case .applicationCommand(let applicationCommand):
+        try container.encode(applicationCommand, forKey: .data)
+      case .messageComponent(let messageComponent):
+        try container.encode(messageComponent, forKey: .data)
+      case .modalSubmit(let modalSubmit):
+        try container.encode(modalSubmit, forKey: .data)
+      }
+    }
   }
 }

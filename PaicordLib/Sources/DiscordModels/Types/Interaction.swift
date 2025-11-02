@@ -238,7 +238,9 @@ public struct Interaction: Sendable, Codable {
 	}
 
 	/// https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data
+  /// https://docs.discord.food/interactions/receiving-and-responding#interaction-type
 	public enum Data: Sendable {
+    // TODO:
 		case applicationCommand(ApplicationCommand)
 		case messageComponent(MessageComponent)
 		case modalSubmit(ModalSubmit)

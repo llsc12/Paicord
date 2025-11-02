@@ -12,77 +12,120 @@ import SwiftUIX
 struct InputBar: View {
   @Environment(PaicordAppState.self) var appState
   @Environment(GatewayStore.self) var gw
-  var vm: ChannelStore
 
   @State var text: String = ""
 
   var body: some View {
-    HStack {
+    HStack(alignment: .bottom, spacing: 8) {
+      Button {
+
+      } label: {
+        Image(systemName: "plus")
+          .imageScale(.large)
+          .padding(7.5)
+          .background(.regularMaterial)
+          .clipShape(.circle)
+      }
+      .buttonStyle(.borderless)
+      .tint(.primary)
       #if os(iOS)
         TextField("Message", text: $text, axis: .vertical)
           .textFieldStyle(.plain)
           .maxHeight(150)
           .fixedSize(horizontal: false, vertical: true)
           .disabled(appState.chatOpen == false)
+
+          .padding(8)
+          .background(.regularMaterial)
+          .clipShape(.capsule)
       #else
-        TextView(text: $text)
-          .onSubmit(sendMessage)
+        TextView("Message", text: $text, submit: sendMessage)
+          .padding(8)
+          .background(.regularMaterial)
+          .clipShape(.rect(cornerRadius: 16))
       #endif
 
       #if os(iOS)
-        if text.isEmpty == false {
-          Button(action: sendMessage) {
-            Image(systemName: "paperplane.fill")
-              .imageScale(.large)
-              .padding(5)
-              .foregroundStyle(.white)
-              .background(.primaryButton)
-              .clipShape(.circle)
+        Group {
+          if text.isEmpty == false {
+            Button(action: sendMessage) {
+              Image(systemName: "paperplane.fill")
+                .imageScale(.large)
+                .padding(5)
+                .foregroundStyle(.white)
+                .background(.primaryButton)
+                .clipShape(.circle)
+            }
+            .buttonStyle(.borderless)
+            .foregroundStyle(.primaryButton)
+            .transition(.move(edge: .trailing).combined(with: .opacity))
           }
-          .buttonStyle(.borderless)
-          .foregroundStyle(.primaryButton)
-          .transition(.move(edge: .trailing).combined(with: .opacity))
         }
+        .animation(.default, value: text.isEmpty)
+
       #endif
     }
-    .padding(5)
-    .background(.regularMaterial)
+    .padding([.horizontal, .bottom], 8)
+    .padding(.top, 4)
   }
 
   private func sendMessage() {
     let msg = text.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !msg.isEmpty else { return }
+    guard let channelId = appState.selectedChannel else { return }
     text = ""  // clear input field
     Task.detached {
-      let nonce: MessageSnowflake? = try? .makeFake(date: .now)
-      return try await gw.client.createMessage(
-        channelId: vm.channelId,
-        payload: .init(
-          content: msg,
-          nonce: nonce != nil ? .string(nonce!.rawValue) : nil
-        )
-      )
+      //      let message: Payloads.CreateMessage = try! .init(
+      //        content: msg,
+      //        nonce: .string(MessageSnowflake.makeFake(date: .now).rawValue),
+      //        tts: false,
+      //        message_reference: nil,
+      //        sticker_ids: nil,
+      //        files: nil,
+      //        attachments: nil,
+      //        flags: nil,
+      //        poll: nil
+      //      )
+      do {
+        _ = try await gw.client.createMessage(
+          channelId: channelId,
+          payload: .init(
+            content: msg,
+            nonce: .string(MessageSnowflake.makeFake(date: .now).rawValue)
+          )
+        ).guardSuccess()
+      } catch {
+        await MainActor.run {
+          self.appState.error = error
+        }
+      }
     }
   }
 }
 
 #if os(macOS)
   private struct TextView: View {
+    var prompt: String
     @Binding var text: String
-    var submit: () -> Void = {}
+    var submit: () -> Void
 
-    func onSubmit(_ action: @escaping () -> Void) -> TextView {
-      var copy = self
-      copy.submit = action
-      return copy
+    init(
+      _ prompt: String,
+      text: Binding<String>,
+      submit: @escaping () -> Void = {}
+    ) {
+      self.prompt = prompt
+      self._text = text
+      self.submit = submit
     }
 
     var body: some View {
       _TextView(text: $text, onSubmit: submit)
         .overlay(alignment: .leading) {
           if text.isEmpty {
-            Text("Message")
+            Text(prompt)
               .foregroundStyle(.secondary)
+              .padding(5)
               .allowsHitTesting(false)
           }
         }
@@ -105,6 +148,10 @@ struct InputBar: View {
         textView.textContainerInset = .zero
         textView.delegate = context.coordinator
         textView.drawsBackground = false
+        textView.typingAttributes = [
+          .font: preferredBodyFont(),
+          .foregroundColor: labelColor()
+        ]
 
         scrollView.hasVerticalScroller = true
         scrollView.drawsBackground = false
@@ -190,6 +237,23 @@ struct InputBar: View {
 
           parent.textUpdated(oldText: oldText, newText: newText)
         }
+      }
+      
+      func preferredBodyFont() -> Any {
+        #if os(macOS)
+          return NSFont.systemFont(ofSize: NSFont.systemFontSize)
+        #else
+          let font = UIFont.preferredFont(forTextStyle: .body)
+          return UIFontMetrics(forTextStyle: .body).scaledFont(for: font)
+        #endif
+      }
+      
+      func labelColor() -> Any {
+#if os(macOS)
+        return NSColor.labelColor
+#else
+        return UIColor.label
+#endif
       }
     }
   }
