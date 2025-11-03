@@ -1691,7 +1691,8 @@ extension Gateway {
   }
 
   /// https://docs.discord.food/resources/presence#session-object
-  public struct Session: Sendable, Codable {
+  public struct Session: Sendable, Codable, Identifiable {
+    public var id: String { session_id }
     public var session_id: String
     public var client_info: ClientInfo
     public var status: Status

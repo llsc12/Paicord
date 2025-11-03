@@ -25,6 +25,7 @@ struct RootView: View {
     Group {
       if gatewayStore.accounts.currentAccountID == nil {
         LoginView()
+          .tint(.primary) // text tint in buttons etc.
           .environment(gatewayStore)
           .environment(appState)
       } else if gatewayStore.state != .connected {

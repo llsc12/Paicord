@@ -71,7 +71,9 @@ enum Profile {
           )
         } else {
           return URL(
-            string: CDNEndpoint.defaultUserAvatar(userId: user?.id ?? (try! .makeFake())).url + ".png"
+            string: CDNEndpoint.defaultUserAvatar(
+              userId: user?.id ?? (try! .makeFake())
+            ).url + ".png"
           )
         }
       }
@@ -118,7 +120,9 @@ enum Profile {
           }
         } else {
           return URL(
-            string: CDNEndpoint.defaultUserAvatar(userId: user?.id ?? (try! .makeFake())).url + ".png"
+            string: CDNEndpoint.defaultUserAvatar(
+              userId: user?.id ?? (try! .makeFake())
+            ).url + ".png"
           )
         }
         return nil

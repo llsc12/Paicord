@@ -10,18 +10,29 @@ import SwiftUIX
 
 extension ChatView {
   struct ChannelHeader: View {
+    @Environment(\.userInterfaceIdiom) var idiom
     var vm: ChannelStore
 
     var body: some View {
       if let name = vm.channel?.name {
         HStack(spacing: 4) {
-          Image(systemName: "number")
-            .foregroundStyle(.secondary)
-            .imageScale(.large)
-
-          Text(name)
-            .font(.title3)
-            .fontWeight(.semibold)
+          if idiom == .phone {
+              Image(systemName: "number")
+                .foregroundStyle(.secondary)
+                .imageScale(.medium)
+              
+              Text(name)
+                .font(.headline)
+                .fontWeight(.semibold)
+          } else {
+            Image(systemName: "number")
+              .foregroundStyle(.secondary)
+              .imageScale(.large)
+            
+            Text(name)
+              .font(.title3)
+              .fontWeight(.semibold)
+          }
         }
       } else if let ppl = vm.channel?.recipients {
         Text(

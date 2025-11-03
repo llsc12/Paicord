@@ -13,6 +13,11 @@ struct InputBar: View {
   @Environment(PaicordAppState.self) var appState
   @Environment(GatewayStore.self) var gw
 
+  #if os(iOS)
+    @Environment(\.safeAreaInsets) var safeAreaInsets
+  #endif
+
+  @FocusState private var isFocused: Bool
   @State var text: String = ""
 
   var body: some View {
@@ -34,10 +39,10 @@ struct InputBar: View {
           .maxHeight(150)
           .fixedSize(horizontal: false, vertical: true)
           .disabled(appState.chatOpen == false)
-
           .padding(8)
           .background(.regularMaterial)
-          .clipShape(.capsule)
+          .clipShape(.rect(cornerRadius: 16))
+          .focused($isFocused)
       #else
         TextView("Message", text: $text, submit: sendMessage)
           .padding(8)
@@ -65,7 +70,15 @@ struct InputBar: View {
     .padding(.top, 4)
     #if os(iOS)
       .animation(.default, value: text.isEmpty)
-    #endif
+#endif
+      .background {
+        VariableBlurView(blurRadius: 10)
+        .rotationEffect(.degrees(180))
+#if os(iOS)
+        .padding(.bottom, isFocused ? 0 : (safeAreaInsets.bottom * -1) )
+        .animation(.default, value: isFocused)
+#endif
+      }
   }
 
   private func sendMessage() {
@@ -254,6 +267,42 @@ struct InputBar: View {
           return UIColor.label
         #endif
       }
+    }
+  }
+#endif
+
+#if os(iOS)
+  extension EnvironmentValues {
+    fileprivate var safeAreaInsets: EdgeInsets {
+      self[SafeAreaInsetsKey.self]
+    }
+  }
+
+  private struct SafeAreaInsetsKey: EnvironmentKey {
+    static var defaultValue: EdgeInsets {
+      UIApplication.shared.keyWindow?.safeAreaInsets.swiftUIInsets
+        ?? EdgeInsets()
+    }
+  }
+
+  extension UIEdgeInsets {
+    fileprivate var swiftUIInsets: EdgeInsets {
+      EdgeInsets(top: top, leading: left, bottom: bottom, trailing: right)
+    }
+  }
+
+  extension UIApplication {
+    fileprivate var keyWindow: UIWindow? {
+      connectedScenes
+        .compactMap {
+          $0 as? UIWindowScene
+        }
+        .flatMap {
+          $0.windows
+        }
+        .first {
+          $0.isKeyWindow
+        }
     }
   }
 #endif

@@ -8,6 +8,7 @@
 
 import PaicordLib
 import SDWebImageSwiftUI
+import SwiftPrettyPrint
 import SwiftUIX
 
 struct ProfileBar: View {
@@ -20,30 +21,69 @@ struct ProfileBar: View {
 
   var body: some View {
     HStack {
-      if let user = gw.user.currentUser {
-        Profile.AvatarWithPresence(
-          member: nil,
-          user: user
-        )
-        .maxHeight(40)
-      }
+      Menu {
+        HStack {
+          if let user = gw.user.currentUser {
+            Profile.AvatarWithPresence(
+              member: nil,
+              user: user
+            )
+            .maxHeight(22)
+          }
 
-      VStack(alignment: .leading) {
-        Text(
-          gw.user.currentUser?.global_name ?? gw.user.currentUser?.username
-            ?? "Unknown User"
-        )
-        .bold()
-        if showingUsername {
-          Text("@\(gw.user.currentUser?.username ?? "Unknown User")")
-            .transition(.opacity)
-        } else {
-          // show status
+          Text(
+            gw.user.currentUser?.global_name ?? gw.user.currentUser?.username
+              ?? "Unknown User"
+          )
+          .bold()
+        }
+      } label: {
+        HStack {
+          if let user = gw.user.currentUser {
+            Profile.AvatarWithPresence(
+              member: nil,
+              user: user
+            )
+            .maxHeight(40)
+          }
+
+          VStack(alignment: .leading) {
+            Text(
+              gw.user.currentUser?.global_name ?? gw.user.currentUser?.username
+                ?? "Unknown User"
+            )
+            .bold()
+            if showingUsername {
+              Text("@\(gw.user.currentUser?.username ?? "Unknown User")")
+                .transition(.opacity)
+            } else {
+              if let session = gw.user.sessions.first(where: { $0.id == "all" }),
+                let status = session.activities.first,
+                status.type == .custom
+              {
+                if let emoji = status.emoji {
+                  if let url = emojiURL(for: emoji, animated: true) {
+                    WebImage(url: url)
+                      .resizable()
+                      .scaledToFit()
+                      .frame(width: 16, height: 16)
+                  } else {
+                    Text(emoji.name)
+                      .font(.system(size: 14))
+                  }
+                }
+
+                Text(status.state ?? "")
+                  .transition(.opacity)
+              }
+            }
+          }
+          .background(.black.opacity(0.001))
+          .onHover { showingUsername = $0 }
+          .animation(.spring(), value: showingUsername)
         }
       }
-      .background(.black.opacity(0.001))
-      .onHover { showingUsername = $0 }
-      .animation(.spring(), value: showingUsername)
+      .buttonStyle(.plain)
 
       Spacer()
 
@@ -72,4 +112,15 @@ struct ProfileBar: View {
     }
     .clipped()
   }
+
+  func emojiURL(for emoji: Gateway.Activity.ActivityEmoji, animated: Bool)
+    -> URL?
+  {
+    guard let id = emoji.id else { return nil }
+    return URL(
+      string: CDNEndpoint.customEmoji(emojiId: id).url
+        + (animated && emoji.animated == true ? ".gif" : ".png") + "?size=44"
+    )
+  }
 }
+

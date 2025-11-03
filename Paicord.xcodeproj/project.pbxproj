@@ -97,6 +97,7 @@
 		AAEEC71F2E65120000EB5FC9 /* TokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEEC71E2E6511F800EB5FC9 /* TokenStore.swift */; };
 		AAEEC7222E6515C400EB5FC9 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = AAEEC7212E6515C400EB5FC9 /* KeychainAccess */; };
 		AAEEF5012E9900F60034FA04 /* Default.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEEF5002E9900E50034FA04 /* Default.swift */; };
+		AAFC9DDA2EB7DAE300BB8028 /* VariableBlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFC9DD92EB7DAE200BB8028 /* VariableBlurView.swift */; };
 		AAFD41382E92FA43002BC9BE /* Array+safe.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFD41372E92FA42002BC9BE /* Array+safe.swift */; };
 /* End PBXBuildFile section */
 
@@ -178,6 +179,7 @@
 		AADD7F8C2E99EB060025B644 /* Attachments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Attachments.swift; sourceTree = "<group>"; };
 		AAEEC71E2E6511F800EB5FC9 /* TokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenStore.swift; sourceTree = "<group>"; };
 		AAEEF5002E9900E50034FA04 /* Default.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Default.swift; sourceTree = "<group>"; };
+		AAFC9DD92EB7DAE200BB8028 /* VariableBlurView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariableBlurView.swift; sourceTree = "<group>"; };
 		AAFD41372E92FA42002BC9BE /* Array+safe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+safe.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -522,6 +524,7 @@
 		AA9C81812E6660AB0086B1DA /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				AAFC9DD92EB7DAE200BB8028 /* VariableBlurView.swift */,
 				57DA042B2E79B25F00DB4C7C /* AsyncButton.swift */,
 				578E1CE02E67780B00C6DEA3 /* GradientText.swift */,
 			);
@@ -721,6 +724,7 @@
 				5724CD6F2E733D0E00931FEF /* MFASheet.swift in Sources */,
 				AAB50A542E9AD4470048E8B0 /* MessageBody.swift in Sources */,
 				57E05C592E6C6AE400B81AA7 /* Design Constants.swift in Sources */,
+				AAFC9DDA2EB7DAE300BB8028 /* VariableBlurView.swift in Sources */,
 				AABED5A62E7F514B005BDD63 /* SettingsStore.swift in Sources */,
 				8702A5382EAA6753008DD55A /* MemberRowView.swift in Sources */,
 				AABED5A02E7F48FD005BDD63 /* CurrentUserStore.swift in Sources */,
