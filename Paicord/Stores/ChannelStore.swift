@@ -25,6 +25,7 @@ class ChannelStore: DiscordDataStore {
   var channel: DiscordChannel?
   var messages: OrderedDictionary<MessageSnowflake, DiscordChannel.Message> =
     [:]
+  var newMessages: OrderedDictionary<MessageSnowflake, DiscordChannel.Message>? = nil
   var reactions: [MessageSnowflake: Reactions] = [:]
   var burstReactions: [MessageSnowflake: Reactions] = [:]
   // number of reactions per emoji per message, since message fetch wont return users
@@ -39,7 +40,7 @@ class ChannelStore: DiscordDataStore {
 
   // MARK: - State Properties
   var isLoadingMessages = false
-  var hasMoreHistory = true
+  var hasMoreOlderMessages = true
   var lastReadMessageId: MessageSnowflake?
 
   init(
@@ -67,6 +68,7 @@ class ChannelStore: DiscordDataStore {
       // ig also fetch latest messages too
       do {
         try await self.fetchMessages()
+        self.updateMessages()
       } catch {
         PaicordAppState.shared.error = error
       }
@@ -355,19 +357,32 @@ class ChannelStore: DiscordDataStore {
     around: MessageSnowflake? = nil,
     before: MessageSnowflake? = nil,
     after: MessageSnowflake? = nil,
-    limit: Int? = nil
+    limit: Int = 50
   ) async throws {
     #warning("make this handle pagination etc maybe?")
     guard let gateway = gateway?.gateway else { return }
     self.isLoadingMessages = true
     defer { self.isLoadingMessages = false }
-    let res = try await gateway.client.listMessages(channelId: channelId)
+    let res = try await gateway.client.listMessages(channelId: channelId, around: around, before: before, after: after, limit: limit)
     do {
       // ensure request was successful
       try res.guardSuccess()
       let messages = try res.decode()
-      for message in messages.reversed() {
-        self.messages[message.id] = message
+      
+      newMessages = self.messages
+      
+      if before != nil {
+        for message in messages {
+          newMessages!.updateValue(message, forKey: message.id, insertingAt: 0)
+        }
+      } else {
+        for message in messages.reversed() {
+          newMessages![message.id] = message
+        }
+      }
+      
+      if (messages.count < limit) {
+        hasMoreOlderMessages = false
       }
       
       // populate buffreactions etc
@@ -402,6 +417,12 @@ class ChannelStore: DiscordDataStore {
       } else {
         PaicordAppState.shared.error = error
       }
+    }
+  }
+  
+  func updateMessages() -> Void {
+    if newMessages != nil {
+      messages = newMessages!
     }
   }
 

@@ -16,6 +16,12 @@ struct ChatView: View {
   @Environment(PaicordAppState.self) var appState
   @Environment(\.accessibilityReduceMotion) var accessibilityReduceMotion
   @Environment(\.userInterfaceIdiom) var idiom
+  
+  private let coordinateSpaceName = "chat_coordinate_space"
+  
+  @State var position: CGPoint = .zero
+  @State var loadingInMessages = false
+  @State var scrollToMessage: String? = nil
 
   @ViewStorage private var isNearBottom = true  // used to track if we are near the bottom, if so scroll.
   @ViewStorage private var pendingScrollWorkItem: DispatchWorkItem?
@@ -32,6 +38,7 @@ struct ChatView: View {
               let prior = vm.getMessage(before: msg)
               if messageAllowed(msg) {
                 MessageCell(for: msg, prior: prior, channel: vm)
+                  .id(msg.id.rawValue)
                   .onAppear {
                     guard msg == vm.messages.values.last else { return }
                     self.isNearBottom = true
@@ -44,6 +51,32 @@ struct ChatView: View {
             }
           }
           .scrollTargetLayout()
+          .background(GeometryReader { geometry in
+            Color.clear.preference(
+              key: PreferenceKey.self,
+              value: geometry.frame(in: .named(coordinateSpaceName)).origin
+            )
+          })
+          .onPreferenceChange(PreferenceKey.self) { position in
+            self.position = position
+            if (abs(position.y) <= 0.01 && vm.messages.count > 0 && vm.hasMoreOlderMessages && !vm.isLoadingMessages && !loadingInMessages) {
+              Task { @MainActor in
+                if (vm.isLoadingMessages) {
+                  return
+                }
+                loadingInMessages = true
+                let beforeId = vm.messages.keys.min()!
+                do {
+                  try await self.vm.fetchMessages(before: beforeId)
+                } catch {
+                  PaicordAppState.shared.error = error
+                }
+                self.vm.updateMessages()
+                scrollToMessage = beforeId.rawValue
+                loadingInMessages = false
+              }
+            }
+          }
         }
         .safeAreaPadding(.bottom, 22)
         .bottomAnchored()
@@ -61,6 +94,10 @@ struct ChatView: View {
               messages: orderedMessages
             )
           }
+          if scrollToMessage != nil {
+            proxy.scrollTo(scrollToMessage!, anchor: .top)
+            scrollToMessage = nil
+          }
         }
         .onChange(of: vm.channelId) {
           scheduleScrollToBottom(
@@ -68,6 +105,7 @@ struct ChatView: View {
             messages: orderedMessages
           )
         }
+        .coordinateSpace(name: coordinateSpaceName)
       }
     }
     .overlay(alignment: .bottom) {
@@ -162,5 +200,15 @@ fileprivate extension View {
       return self
         .defaultScrollAnchor(.bottom)
     }
+  }
+}
+
+private extension ChatView {
+  struct PreferenceKey: SwiftUI.PreferenceKey {
+      static var defaultValue: CGPoint { .zero }
+
+      static func reduce(value: inout CGPoint, nextValue: () -> CGPoint) {
+          
+      }
   }
 }

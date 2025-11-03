@@ -195,6 +195,7 @@ final class GatewayStore {
       Task { @MainActor in
         do {
           try await channel.fetchMessages()
+          channel.updateMessages()
         } catch {
           PaicordAppState.shared.error = error
         }
