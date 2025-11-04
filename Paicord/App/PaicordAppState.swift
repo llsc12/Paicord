@@ -14,14 +14,21 @@ final class PaicordAppState {
   static let shared = PaicordAppState()
 
   // MARK: - iOS Specific
-  var chatOpen: Bool = false
+  var chatOpen: Bool = true 
 
   // MARK: - Selected Guild & Channel Persistence
 
   private let storageKey = "AppState.PrevSelectedChannels"
   private var suppressChannelSave = false
 
-  private var _selectedGuild: GuildSnowflake? = nil
+  private var _selectedGuild: GuildSnowflake? = nil {
+    didSet {
+      UserDefaults.standard.set(
+        _selectedGuild?.rawValue,
+        forKey: "AppState.PrevSelectedGuild"
+      )
+    }
+  }
   var selectedGuild: GuildSnowflake? {
     get { _selectedGuild }
     set {
@@ -68,7 +75,7 @@ final class PaicordAppState {
       self.selectedChannel = nil
     }
   }
-  
+
   func resetStore() {
     selectedGuild = nil
     selectedChannel = nil
@@ -78,10 +85,19 @@ final class PaicordAppState {
 
   // MARK: - Persistence Helpers
 
+  func loadPrevGuild() {
+    let guildIdString = UserDefaults.standard.string(
+      forKey: "AppState.PrevSelectedGuild"
+    )
+    guard let guildIdString else { return }
+    let guildId = GuildSnowflake(guildIdString)
+    guard GatewayStore.shared.user.guilds.keys.contains(guildId) else { return }
+    self.selectedGuild = GuildSnowflake(guildId)
+  }
+
   private func loadPrevSelectedChannels() {
     let defaults = UserDefaults.standard
 
-    // 1) Try JSON Data (if older code wrote Data)
     if let data = defaults.data(forKey: storageKey) {
       if let obj = try? JSONSerialization.jsonObject(with: data),
         let dict = obj as? [String: String]
@@ -91,13 +107,6 @@ final class PaicordAppState {
       }
     }
 
-    // 2) Fall back to a directly-stored dictionary
-    if let dict = defaults.dictionary(forKey: storageKey) as? [String: String] {
-      rawPrevSelectedChannels = dict
-      return
-    }
-
-    // 3) Nothing found
     rawPrevSelectedChannels = [:]
   }
 

@@ -33,12 +33,17 @@ struct RootView: View {
           .transition(.opacity.combined(with: .scale(scale: 1.1)))
           .task { await gatewayStore.connectIfNeeded() }
       } else {
-        if idiom == .phone {
-          #if os(iOS)
-            SmallBaseplate(appState: self.appState)
-          #endif
-        } else {
-          LargeBaseplate()
+        Group {
+          if idiom == .phone {
+            #if os(iOS)
+              SmallBaseplate(appState: self.appState)
+            #endif
+          } else {
+            LargeBaseplate()
+          }
+        }
+        .task {
+          appState.loadPrevGuild()
         }
       }
     }
