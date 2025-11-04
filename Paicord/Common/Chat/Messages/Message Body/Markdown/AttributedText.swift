@@ -44,7 +44,7 @@ struct AttributedText: View {
       textView.drawsBackground = false
       textView.textContainer?.lineFragmentPadding = 0
       textView.textStorage?.setAttributedString(attributedString)
-      textView.isAutomaticLinkDetectionEnabled = true
+      textView.isAutomaticLinkDetectionEnabled = false
       textView.linkTextAttributes = [:]  // use original attributes
       return textView
     }
@@ -179,7 +179,7 @@ class ModifiedCopyingTextView: NSTextView {
       textView.textContainer.maximumNumberOfLines = lineLimit ?? 0
 
       textView.textStorage.setAttributedString(attributedString)
-      textView.dataDetectorTypes = [.link]
+      textView.dataDetectorTypes = []
       textView.isUserInteractionEnabled = true
       textView.linkTextAttributes = [:]
       

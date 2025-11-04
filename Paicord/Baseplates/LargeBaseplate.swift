@@ -19,26 +19,14 @@ struct LargeBaseplate: View {
   @State var currentGuildStore: GuildStore? = nil
   @State var currentChannelStore: ChannelStore? = nil
 
-  #if os(macOS)
-    @Weak var splitViewController: NSSplitViewController?
-  #endif
+  @State private var columnVisibility: NavigationSplitViewVisibility = .all
 
   var body: some View {
-    NavigationSplitView {
+    NavigationSplitView(columnVisibility: $columnVisibility) {
       SidebarView(currentGuildStore: $currentGuildStore)
         .safeAreaInset(edge: .bottom, spacing: 0) {
           ProfileBar()
         }
-        #if os(macOS)
-          .introspect(
-            .navigationSplitView,
-            on: .macOS(.v14...),
-            scope: .ancestor
-          ) { (splitView: NSSplitView) -> Void in
-            self.splitViewController =
-              (splitView.delegate as? NSSplitViewController)
-          }
-        #endif
         .toolbar(removing: .sidebarToggle)
         .toolbar {
           if let currentGuildStore {
@@ -76,7 +64,7 @@ struct LargeBaseplate: View {
         .toolbar {
           ToolbarItem(placement: .navigation) {
             Button {
-              splitViewController?.toggleSidebar(nil)
+              columnVisibility = (columnVisibility == .all) ? NavigationSplitViewVisibility.detailOnly : NavigationSplitViewVisibility.all
             } label: {
               Label("Toggle Sidebar", systemImage: "sidebar.left")
             }

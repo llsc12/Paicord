@@ -16,23 +16,13 @@ extension ChatView {
     var body: some View {
       if let name = vm.channel?.name {
         HStack(spacing: 4) {
-          if idiom == .phone {
-              Image(systemName: "number")
-                .foregroundStyle(.secondary)
-                .imageScale(.medium)
-              
-              Text(name)
-                .font(.headline)
-                .fontWeight(.semibold)
-          } else {
-            Image(systemName: "number")
-              .foregroundStyle(.secondary)
-              .imageScale(.large)
-            
-            Text(name)
-              .font(.title3)
-              .fontWeight(.semibold)
-          }
+          Image(systemName: "number")
+            .foregroundStyle(.secondary)
+            .imageScale(idiom == .phone ? .medium : .large)
+
+          Text(name)
+            .font(idiom == .phone ? .headline : .title3)
+            .fontWeight(.semibold)
         }
       } else if let ppl = vm.channel?.recipients {
         Text(
@@ -44,34 +34,34 @@ extension ChatView {
     }
   }
 
-//  struct ChannelTopic: View {
-//    var topic: String
-//    @State private var showChannelInfo: Bool = false
-//
-//    var body: some View {
-//      Button {
-//        showChannelInfo.toggle()
-//      } label: {
-//        LabeledContent {
-//          HStack(spacing: 5) {
-//            Text("•")
-//              .foregroundStyle(.tertiary)
-//
-//            Text(topic)
-//              .lineLimit(1)
-//              .truncationMode(.tail)
-//              .foregroundStyle(.secondary)
-//              .font(.body)
-//          }
-//        } label: {
-//          Text(topic)
-//        }
-//      }
-//      .buttonStyle(.plain)
-//      .sheet(isPresented: $showChannelInfo) {
-//        Text(topic)
-//          .padding()
-//      }
-//    }
-//  }
+  //  struct ChannelTopic: View {
+  //    var topic: String
+  //    @State private var showChannelInfo: Bool = false
+  //
+  //    var body: some View {
+  //      Button {
+  //        showChannelInfo.toggle()
+  //      } label: {
+  //        LabeledContent {
+  //          HStack(spacing: 5) {
+  //            Text("•")
+  //              .foregroundStyle(.tertiary)
+  //
+  //            Text(topic)
+  //              .lineLimit(1)
+  //              .truncationMode(.tail)
+  //              .foregroundStyle(.secondary)
+  //              .font(.body)
+  //          }
+  //        } label: {
+  //          Text(topic)
+  //        }
+  //      }
+  //      .buttonStyle(.plain)
+  //      .sheet(isPresented: $showChannelInfo) {
+  //        Text(topic)
+  //          .padding()
+  //      }
+  //    }
+  //  }
 }

@@ -97,7 +97,7 @@ struct MessageCell: View {
       Color(hexadecimal6: 0xce9c5c).opacity(userMentioned ? 1 : 0)
         .maxWidth(2)
     }
-    .padding(.top, inline ? 0 : 10)  // adds space between message groups
+    .padding(.top, inline ? 0 : 15)  // adds space between message groups
 
   }
 }

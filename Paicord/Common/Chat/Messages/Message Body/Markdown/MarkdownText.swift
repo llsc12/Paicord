@@ -610,9 +610,8 @@ class MarkdownRendererVM {
         if let url = URL(string: link.url) {
           newAttrs[.link] = url
         } else {
-          newAttrs[.foregroundColor] = AppKitOrUIKitColor.systemBlue
+          newAttrs[.foregroundColor] = AppKitOrUIKitColor(Color(hexadecimal6: 0x00aafc))
         }
-        newAttrs[.underlineStyle] = NSUnderlineStyle.single.rawValue
         inner.addAttributes(
           newAttrs,
           range: NSRange(location: 0, length: inner.length)
@@ -625,7 +624,7 @@ class MarkdownRendererVM {
         var attrs = baseAttributes
         attrs[.link] = URL(string: a.url)
         attrs[.foregroundColor] = AppKitOrUIKitColor(Color(hexadecimal6: 0x00aafc))
-        let s = NSAttributedString(string: a.text, attributes: baseAttributes)
+        let s = NSAttributedString(string: a.text, attributes: attrs)
         container.append(s)
       }
 

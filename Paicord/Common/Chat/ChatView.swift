@@ -70,11 +70,10 @@ struct ChatView: View {
         }
       }
     }
-    .overlay(alignment: .bottom) {
-      TypingIndicatorBar(vm: vm)
-    }
     .safeAreaInset(edge: .bottom, spacing: 0) {
-      InputBar()
+      VStack(spacing: 0) {
+        InputBar(vm: vm)
+      }
     }
     .background(.tableBackground)
     #if os(iOS)

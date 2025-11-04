@@ -55,7 +55,6 @@ struct ChannelButton: View {
         }
         .clipShape(.rounded)
       }
-      .buttonStyle(.borderless)
       .tint(.primary)
     case .groupDm:
       textChannelButton { _ in
@@ -130,6 +129,7 @@ struct ChannelButton: View {
         content(isHovered)
       }
       .onHover { isHovered = $0 }
+      .buttonStyle(.borderless)
     }
   }
 

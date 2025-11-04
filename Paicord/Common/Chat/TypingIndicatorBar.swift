@@ -6,8 +6,8 @@
 //  Copyright © 2025 Lakhan Lothiyi.
 //
 
-import SwiftUIX
 import PaicordLib
+import SwiftUIX
 
 extension ChatView {
   struct TypingIndicatorBar: View {
@@ -28,22 +28,26 @@ extension ChatView {
           HStack {
             TypingIndicator()
               .padding(.horizontal, 9)
-            if typingUsernames.count == 1, let username = typingUsernames.first {
+            if typingUsernames.count == 1, let username = typingUsernames.first
+            {
               Text(username).fontWeight(.heavy) + Text(" is typing...")
             } else if typingUsernames.count == 2,
               let first = typingUsernames.first,
               let last = typingUsernames.last
             {
-              Text(first).fontWeight(.heavy) + Text(" and ") + Text(last).fontWeight(.heavy)
+              Text(first).fontWeight(.heavy) + Text(" and ")
+                + Text(last).fontWeight(.heavy)
                 + Text(" are typing...")
             } else {
               let ppl = typingUsernames.reduce(Text("")) {
                 partialResult,
                 username in
                 if username == typingUsernames.last {
-                  return partialResult + Text("and ") + Text(username).fontWeight(.heavy)
+                  return partialResult + Text("and ")
+                    + Text(username).fontWeight(.heavy)
                 } else {
-                  return partialResult + Text(username).fontWeight(.heavy) + Text(", ")
+                  return partialResult + Text(username).fontWeight(.heavy)
+                    + Text(", ")
                 }
               }
               ppl + Text(" are typing...")
@@ -55,14 +59,12 @@ extension ChatView {
           .truncationMode(.head)
           .padding(.horizontal, 6)
           .padding(.vertical, 2)
-          .background(.regularMaterial)
-          .background(.black.opacity(0.5))
         }
       }
+
     }
   }
-  
-  
+
   struct TypingIndicator: View {
     @State var dotsToggle: Bool = false
 

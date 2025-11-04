@@ -304,6 +304,8 @@ class ChannelStore: DiscordDataStore {
 
   private func handleTypingStart(_ typing: Gateway.TypingStart) {
     let userId = typing.user_id
+    guard !checkUserBlocked(userId) else { return }
+    guard gateway?.user.currentUser?.id != userId else { return }
 
     let token = UUID()
     typingTimeoutTokens[userId] = token
@@ -326,6 +328,15 @@ class ChannelStore: DiscordDataStore {
   }
 
   // MARK: - Helpers
+  
+  func checkUserBlocked(_ userId: UserSnowflake) -> Bool {
+    if let relationship = gateway?.user.relationships[userId] {
+      if relationship.type == .blocked || relationship.user_ignored {
+        return true
+      }
+    }
+    return false
+  }
   
   /// Look at reactions and remove any with zero users.
   func pruneReactions() {

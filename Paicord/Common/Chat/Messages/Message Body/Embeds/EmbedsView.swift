@@ -116,6 +116,7 @@ extension MessageCell {
                       .font(.headline)
                       .multilineTextAlignment(.leading)
                   }
+                  .tint(Color(hexadecimal6: 0x00aafc))
                 } else {
                   Text(title)
                     .font(.headline)
@@ -125,7 +126,7 @@ extension MessageCell {
               }
 
               if let desc = embed.description {
-                Text(markdown: desc)
+                MarkdownText(content: desc)
               }
             }
 
@@ -258,7 +259,6 @@ extension MessageCell {
           player: player,
           templateItem: item
         )
-
       }
       var body: some View {
         let aspectRatio: CGFloat? = {
