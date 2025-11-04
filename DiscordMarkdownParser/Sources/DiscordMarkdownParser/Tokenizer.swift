@@ -128,13 +128,18 @@ public final class MarkdownTokenizer {
     while !isAtEnd {
       if let token = nextToken() {
         tokens.append(token)
-        
+
         // hacky check for blockquote after newline, sorry.
         if token.type == .newline && !isAtEnd {
           if currentChar == ">" {
-            tokens.append(tokenizeBlockQuote())
-            if !isAtEnd && currentChar.isWhitespace {
-              tokens.append(tokenizeWhitespace())
+            // Only treat as blockquote if the '>' is followed by whitespace, another '>' (for >>>), or EOL
+            let next = peek()
+            if next == ">" || next.isWhitespace || next == "\n" || next == "\r"
+            {
+              tokens.append(tokenizeBlockQuote())
+              if !isAtEnd && currentChar.isWhitespace {
+                tokens.append(tokenizeWhitespace())
+              }
             }
           }
         }
@@ -280,6 +285,14 @@ public final class MarkdownTokenizer {
       }
     }
 
+    // Detect bare http/https autolinks (e.g. https://example.com) and treat them as autolink tokens
+    let remainingForAutolink = String(characters[position...])
+    if remainingForAutolink.hasPrefix("http://")
+      || remainingForAutolink.hasPrefix("https://")
+    {
+      return tokenizeAutolink()
+    }
+
     // Handle whitespace
     if char.isWhitespace && char != "\n" && char != "\r" {
       return tokenizeWhitespace()
@@ -311,12 +324,16 @@ public final class MarkdownTokenizer {
       return tokenizeExclamation()
     case ">":
       // Discord does not support nested blockquotes. Only treat '>' as a block quote
-      // marker at the true start of a line (or after leading whitespace on a new line).
+      // marker at the true start of a line (or after leading whitespace on a new line),
+      // and only if it's followed by whitespace, another '>' (for >>>), or end-of-line.
       if isAtLineStart() {
-        return tokenizeBlockQuote()
-      } else {
-        return tokenizeText()
+        let next = peek()
+        if next == ">" || next.isWhitespace || next == "\n" || next == "\r" {
+          return tokenizeBlockQuote()
+        }
       }
+      // Otherwise treat '>' as plain text (e.g. ">gm")
+      return tokenizeText()
     case "|":
       return tokenizePipeOrSpoiler()
     case "\\":
@@ -416,8 +433,12 @@ public final class MarkdownTokenizer {
     // Check for block quotes (>)
     if currentChar == ">" {
       // Only treat '>' as a block quote marker at the true start of a line
+      // and only if it's followed by whitespace, another '>' (for >>>), or EOL.
       if isAtLineStart() {
-        return tokenizeBlockQuote()
+        let next = peek()
+        if next == ">" || next.isWhitespace || next == "\n" || next == "\r" {
+          return tokenizeBlockQuote()
+        }
       }
     }
 
@@ -473,6 +494,31 @@ public final class MarkdownTokenizer {
     while !isAtEnd && !isSpecialCharacter(currentChar) && currentChar != "\n"
       && currentChar != "\r"
     {
+      // If we encounter an underscore, decide whether it should be included
+      // in this text token or treated as a delimiter token. We include it
+      // when it appears inside a word (alphanumeric on both sides), e.g.
+      // "foo_bar", but we stop before underscores that look like emphasis
+      // delimiters (e.g. trailing or leading underscores) so they are
+      // tokenized separately and can be parsed as underline/italic.
+      if currentChar == "_" {
+        // previous character inside this token (if any)
+        let prevCharIsAlnum = content.last.map { $0.isLetter || $0.isNumber } ?? false
+        // next character in the input
+        let nextChar = peek()
+        let nextCharIsAlnum = nextChar.isLetter || nextChar.isNumber
+
+        if prevCharIsAlnum && nextCharIsAlnum {
+          // inside a word, include underscore
+          content.append(currentChar)
+          advance()
+          continue
+        } else {
+          // delimiter-like underscore: stop here so tokenizer will emit
+          // underscore tokens separately
+          break
+        }
+      }
+
       content.append(currentChar)
       advance()
     }
@@ -487,7 +533,9 @@ public final class MarkdownTokenizer {
   }
 
   private func isSpecialCharacter(_ char: Character) -> Bool {
-    return "*_#`~[]()!>|\\&<-+@".contains(char) || char.isWhitespace
+    // Do not treat '_' or '&' as special here so URLs and params containing
+    // underscores/ampersands are not split into separate tokens.
+    return "*#`~[]()!>|\\<-+@".contains(char) || char.isWhitespace
   }
 
   private func tokenizeAsterisk() -> Token {
@@ -745,12 +793,23 @@ public final class MarkdownTokenizer {
   }
 
   private func tokenizeDiscordEntityOrAutolink() -> Token {
-    // Check if this looks like a Discord entity
+    // Preserve Discord entity parsing priority: e.g. <:name:id> must be recognized as a custom emoji
+    // before treating angle-bracketed content as an autolink.
+    let remaining = String(characters[position...])
+
+    // If this looks like a Discord entity, handle it first
     if isDiscordEntity() {
       return tokenizeDiscordEntity()
     }
 
-    // Check if this looks like an autolink
+    // Handle angle-bracket autolinks like <https://...> or <mailto:...>
+    if remaining.hasPrefix("<http://") || remaining.hasPrefix("<https://")
+      || remaining.hasPrefix("<mailto:")
+    {
+      return tokenizeAutolinkAngleBrackets()
+    }
+
+    // Bare autolinks (http(s):// or emails)
     if isAutolink() {
       return tokenizeAutolink()
     }
@@ -854,6 +913,30 @@ public final class MarkdownTokenizer {
     }
 
     return false
+  }
+
+  /// Tokenize an autolink enclosed in angle brackets: <https://...> or <mailto:...>
+  private func tokenizeAutolinkAngleBrackets() -> Token {
+    let startLocation = currentLocation
+    // Consume the leading '<'
+    advance()
+
+    var content = ""
+    while !isAtEnd {
+      // Stop at the closing '>' or on whitespace (malformed)
+      if currentChar == ">" || currentChar.isWhitespace {
+        break
+      }
+      content.append(currentChar)
+      advance()
+    }
+
+    // Consume the closing '>' if present
+    if currentChar == ">" {
+      advance()
+    }
+
+    return Token(type: .autolink, content: content, location: startLocation)
   }
 
   private func tokenizeDiscordEntity() -> Token {
@@ -1030,10 +1113,20 @@ public final class MarkdownTokenizer {
     let startLocation = currentLocation
     var content = ""
 
-    // Read until whitespace or special character
-    while !isAtEnd && !currentChar.isWhitespace && !"[]()".contains(currentChar)
-    {
-      content.append(currentChar)
+    // Read until whitespace or delimiter characters that cannot be part of a URL
+    // Allow the broad set of URL-safe characters per RFC3986 and common query characters.
+    while !isAtEnd {
+      let c = currentChar
+
+      // Stop on whitespace or explicit token delimiters
+      if c.isWhitespace || c == "<" || c == ">" || c == "\"" || c == "'"
+        || c == "(" || c == ")" || c == "[" || c == "]"
+      {
+        break
+      }
+
+      // Accept everything else as part of the URL (this includes ?,=,&,_,%,+,/,:,#, etc.)
+      content.append(c)
       advance()
     }
 

@@ -373,6 +373,7 @@ final class DiscordMarkdownParserTests: XCTestCase {
   func testTripleUnderscoreUnderlineAndItalic() async throws {
     let markdown = "___triple___"
     let document = try await parser.parseToAST(markdown)
+    print(document)
     guard let paragraphNode = document.children.first,
       paragraphNode.nodeType == .paragraph
     else {
@@ -412,6 +413,7 @@ final class DiscordMarkdownParserTests: XCTestCase {
       in markdowns
     {
       let document = try await parser.parseToAST(markdown)
+      print(document)
       guard let node = document.children.first else {
         XCTFail("No node found for: \(markdown)")
         continue
@@ -974,7 +976,10 @@ final class DiscordMarkdownParserTests: XCTestCase {
     let maybeBreak = document.children[safe: 10]
     let nextIndexAfterBreak = (maybeBreak is AST.LineBreakNode) ? 11 : 10
 
-    guard let footnote2 = document.children[safe: nextIndexAfterBreak] as? AST.FootnoteNode else {
+    guard
+      let footnote2 = document.children[safe: nextIndexAfterBreak]
+        as? AST.FootnoteNode
+    else {
       XCTFail("No second footnote node found")
       return
     }
@@ -982,7 +987,10 @@ final class DiscordMarkdownParserTests: XCTestCase {
       (footnote2.children.first as? AST.TextNode)?.content,
       "with highlighting"
     )
-    guard let codeblock3 = document.children[safe: nextIndexAfterBreak + 1] as? AST.CodeBlockNode else {
+    guard
+      let codeblock3 = document.children[safe: nextIndexAfterBreak + 1]
+        as? AST.CodeBlockNode
+    else {
       XCTFail("No sixth codeblock node found")
       return
     }
@@ -991,7 +999,10 @@ final class DiscordMarkdownParserTests: XCTestCase {
       codeblock3.content,
       "fn main() {}\n// you can omit the next line break"
     )
-    guard let codeblock4 = document.children[safe: nextIndexAfterBreak + 2] as? AST.CodeBlockNode else {
+    guard
+      let codeblock4 = document.children[safe: nextIndexAfterBreak + 2]
+        as? AST.CodeBlockNode
+    else {
       XCTFail("No seventh codeblock node found")
       return
     }
@@ -1020,59 +1031,146 @@ final class DiscordMarkdownParserTests: XCTestCase {
     }
     XCTAssertEqual(paragraph2.children.count, 1)  // Just text
   }
-  
+
   func testNestedFormattingInsideStrikethrough() async throws {
     let markdown = "~~***__hi__***~~"
     let document = try await parser.parseToAST(markdown)
+    print(document)
     guard let paragraph = document.children.first as? AST.ParagraphNode else {
       XCTFail("No paragraph node found")
       return
     }
-    XCTAssertEqual(paragraph.children.count, 1, "Paragraph should have exactly one child (strikethrough)")
+    XCTAssertEqual(
+      paragraph.children.count,
+      1,
+      "Paragraph should have exactly one child (strikethrough)"
+    )
     guard let strike = paragraph.children.first as? AST.StrikethroughNode else {
       XCTFail("Expected StrikethroughNode as first child")
       return
     }
-    XCTAssertEqual(strike.children.count, 1, "Strikethrough should contain one child (bold)")
+    XCTAssertEqual(
+      strike.children.count,
+      1,
+      "Strikethrough should contain one child (bold)"
+    )
     guard let bold = strike.children.first as? AST.BoldNode else {
       XCTFail("Expected BoldNode inside StrikethroughNode")
       return
     }
-    XCTAssertEqual(bold.children.count, 1, "Bold should contain one child (italic)")
+    XCTAssertEqual(
+      bold.children.count,
+      1,
+      "Bold should contain one child (italic)"
+    )
     guard let italic = bold.children.first as? AST.ItalicNode else {
       XCTFail("Expected ItalicNode inside BoldNode")
       return
     }
-    XCTAssertEqual(italic.children.count, 1, "Italic should contain one child (underline)")
+    XCTAssertEqual(
+      italic.children.count,
+      1,
+      "Italic should contain one child (underline)"
+    )
     guard let underline = italic.children.first as? AST.UnderlineNode else {
       XCTFail("Expected UnderlineNode inside ItalicNode")
       return
     }
-    XCTAssertEqual(underline.children.count, 1, "Underline should contain one child (text)")
+    XCTAssertEqual(
+      underline.children.count,
+      1,
+      "Underline should contain one child (text)"
+    )
     guard let text = underline.children.first as? AST.TextNode else {
       XCTFail("Expected TextNode inside UnderlineNode")
       return
     }
     XCTAssertEqual(text.content, "hi", "Final text content should be 'hi'")
   }
-  
+
   func testEmojisLargeVariant() async throws {
-    let markdown1 = "<:blobcatcozy:1026533070955872337> <:blobcatcozy:1026533070955872337> <:blobcatcozy:1026533070955872337>"
+    let markdown1 =
+      "<:blobcatcozy:1026533070955872337> <:blobcatcozy:1026533070955872337> <:blobcatcozy:1026533070955872337>"
     let markdown2 = "<:blobcatcozy:1026533070955872337> 🥺"
     let markdown3 = "<:blobcatcozy:1026533070955872337> hii"
     let document1 = try await parser.parseToAST(markdown1)
     let document2 = try await parser.parseToAST(markdown2)
     let document3 = try await parser.parseToAST(markdown3)
-    
+
     XCTAssertTrue(document1.isEmojisOnly())
     XCTAssertTrue(document2.isEmojisOnly())
     XCTAssertFalse(document3.isEmojisOnly())
   }
+
+  func testBlockquoteEdgeCase() async throws {
+    let markdown1 = """
+      >gm
+      >gn
+      """
+    let document1 = try await parser.parseToAST(markdown1)
+    // there is no blockquote here - the > is treated as a literal character
+    print(document1)
+    XCTAssertEqual(document1.children.count, 1)
+    guard let paragraph1 = document1.children.first as? AST.ParagraphNode else {
+      XCTFail("No paragraph node found")
+      return
+    }
+    XCTAssertEqual(paragraph1.children.count, 3)
+    // first text. line break. second text.
+    XCTAssertEqual((paragraph1.children[0] as? AST.TextNode)?.content, ">gm")
+    XCTAssertTrue(paragraph1.children[1] is AST.LineBreakNode)
+    XCTAssertEqual((paragraph1.children[2] as? AST.TextNode)?.content, ">gn")
+  }
+
+  func testLinks() async throws {
+    let markdown1 =
+      "https://open.spotify.com/embed/track/1UQA2QQKA56UqeNqucy04R?utm_source=discord&utm_medium=desktop <@1274066499786768416>"
+    let document1 = try await parser.parseToAST(markdown1)
+
+    // Validate structure: [AutolinkNode, TextNode(" "), UserMentionNode]
+    guard let para1 = document1.children.first as? AST.ParagraphNode else {
+      XCTFail("Expected paragraph node for markdown1")
+      return
+    }
+    XCTAssertGreaterThanOrEqual(para1.children.count, 3)
+
+    // First child should be an autolink
+    let maybeAutolink1 = para1.children[0] as? AST.AutolinkNode
+    XCTAssertNotNil(maybeAutolink1)
+
+    // Second child should be a single space text node
+    let maybeSpaceNode = para1.children[1] as? AST.TextNode
+    XCTAssertNotNil(maybeSpaceNode)
+    XCTAssertEqual(maybeSpaceNode?.content, " ")
+
+    // Third child should be a user mention with the expected id
+    let maybeMention1 = para1.children[2] as? AST.UserMentionNode
+    XCTAssertNotNil(maybeMention1)
+    XCTAssertEqual(maybeMention1?.id.rawValue, "1274066499786768416")
+
+    let markdown2 =
+      "https://open.spotify.com/embed/track/1UQA2QQKA56UqeNqucy04R?utm_source=discord&utm_medium=desktop test"
+    let document2 = try await parser.parseToAST(markdown2)
+
+    // Validate structure: [AutolinkNode, TextNode(" test")]
+    guard let para2 = document2.children.first as? AST.ParagraphNode else {
+      XCTFail("Expected paragraph node for markdown2")
+      return
+    }
+    XCTAssertGreaterThanOrEqual(para2.children.count, 2)
+
+    let maybeAutolink2 = para2.children[0] as? AST.AutolinkNode
+    XCTAssertNotNil(maybeAutolink2)
+
+    let maybeText2 = para2.children[1] as? AST.TextNode
+    XCTAssertNotNil(maybeText2)
+    XCTAssertEqual(maybeText2?.content, " test")
+  }
 }
 
 // MARK: - Safe indexing helper used above
-private extension Array where Element == ASTNode {
-  subscript(safe index: Int) -> ASTNode? {
+extension Array where Element == ASTNode {
+  fileprivate subscript(safe index: Int) -> ASTNode? {
     guard index >= 0 && index < count else { return nil }
     return self[index]
   }

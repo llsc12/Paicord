@@ -125,7 +125,17 @@ public final class InlineParser {
     switch token.type {
     case .text, .whitespace, .blockQuoteMarker:
       var content = ""
-      let startLocation = tokenStream.current.location
+
+      // Defensive: capture the first token (and its location) before consuming
+      // so the resulting TextNode has the accurate start location even when
+      // the tokenizer uses lookahead or stateful logic that may have altered
+      // tokenStream.current.location semantics.
+      guard !tokenStream.isAtEnd else {
+        return [AST.TextNode(content: "", sourceLocation: nil)]
+      }
+
+      let firstToken = tokenStream.current
+      let startLocation = firstToken.location
 
       // Merge consecutive text, whitespace, and any stray block quote markers as plain text
       while !tokenStream.isAtEnd
@@ -133,7 +143,8 @@ public final class InlineParser {
           || tokenStream.current.type == .whitespace
           || tokenStream.current.type == .blockQuoteMarker)
       {
-        content += tokenStream.consume().content
+        let t = tokenStream.consume()
+        content += t.content
       }
 
       return [AST.TextNode(content: content, sourceLocation: startLocation)]
@@ -146,38 +157,56 @@ public final class InlineParser {
       }
     case .underscore:
       // Discord: double underscore is underline, single is italics, triple is underline+italics
-      if tokenStream.current.content == "__" {
+      // The tokenizer may split runs of '_' into multiple tokens ("_","_") or emit
+      // combined tokens ("__", "___"). Count consecutive underscore characters by
+      // peeking ahead so we can decide which parsing path to take.
+      var underscoreCount = 0
+      // count current token
+      underscoreCount += tokenStream.current.content.count
+      // look ahead for more underscore tokens
+      var lookahead = 1
+      while tokenStream.peek(lookahead).type == .underscore {
+        underscoreCount += tokenStream.peek(lookahead).content.count
+        lookahead += 1
+      }
+
+      // Triple underscore -> underline + italics
+      if underscoreCount >= 3 {
+        // Prefer the combined parser which can produce an Underline node wrapping
+        // an Italic node when three underscores are used.
+        if let combinedNode = try? parseItalicOrBold(delimiter: "_") {
+          return [combinedNode]
+        }
+
+        // Fallback: attempt to parse as underline only
+        if let underlineNode = try? parseUnderline() {
+          return [underlineNode].compactMap { $0 }
+        } else {
+          // Fallback: consume a single token as text
+          return [AST.TextNode(content: tokenStream.consume().content)]
+        }
+      }
+
+      // Double underscore -> underline
+      if underscoreCount >= 2 {
         if let underlineNode = try? parseUnderline() {
           return [underlineNode].compactMap { $0 }
         } else {
           return [AST.TextNode(content: tokenStream.consume().content)]
         }
-      } else if tokenStream.current.content == "_" {
+      }
+
+      // Single underscore -> italics
+      if underscoreCount == 1 {
         if let italicNode = try parseItalicOrBold(delimiter: "_") {
           return [italicNode]
         } else {
           return [AST.TextNode(content: tokenStream.consume().content)]
         }
-      } else if tokenStream.current.content == "___" {
-        // Discord: triple underscore is underline+italics
-        // Parse underline, then parse italics inside
-        if let underlineNode = try? parseUnderline() {
-          if let italicNode = try? parseItalicOrBold(delimiter: "_") {
-            return [
-              AST.UnderlineNode(
-                children: [italicNode],
-                sourceLocation: tokenStream.current.location
-              )
-            ]
-          } else {
-            return [underlineNode].compactMap { $0 }
-          }
-        } else {
-          return [AST.TextNode(content: tokenStream.consume().content)]
-        }
-      } else {
-        return [AST.TextNode(content: tokenStream.consume().content)]
       }
+
+      // Fallback
+      return [AST.TextNode(content: tokenStream.consume().content)]
     case .backtick:
       // Handle code spans
       if let codeSpan = try parseCodeSpan() {
@@ -376,6 +405,25 @@ public final class InlineParser {
           let extraDelimiters = closingCount - 1
           if extraDelimiters > 0 {
             tokenStream.setPosition(tokenStream.currentPosition - 1)
+          }
+
+          // Before returning Italic, handle the case where tokenizer left
+          // underline delimiters as text nodes inside `content` (e.g. "_", "_", "hi__").
+          // If the collected `content` is all TextNodes and their concatenation is
+          // wrapped in __...__, convert that into an UnderlineNode inside Italic.
+          if delimiterChar == "*" || delimiterChar == "_" {
+            // Only attempt this heuristic if content is non-empty and all text nodes
+            let allText = content.compactMap { $0 as? AST.TextNode }
+            if allText.count == content.count {
+              let combined = allText.map { $0.content }.joined()
+              if combined.hasPrefix("__") && combined.hasSuffix("__") && combined.count > 4 {
+                let inner = String(combined.dropFirst(2).dropLast(2))
+                // Re-parse inner as inline content to preserve nested formatting
+                let parsedInner = try parseInlineContent(inner)
+                let underlineNode = AST.UnderlineNode(children: parsedInner, sourceLocation: startLocation)
+                return AST.ItalicNode(children: [underlineNode], sourceLocation: startLocation)
+              }
+            }
           }
 
           return AST.ItalicNode(
@@ -968,33 +1016,50 @@ public final class InlineParser {
     let startPosition = tokenStream.currentPosition
     let startLocation = tokenStream.current.location
 
-    // Check if we have opening __
+    // Need at least two underscores to open an underline
     guard tokenStream.check(.underscore) else { return nil }
-    let openingUnderscore = tokenStream.current
-    guard openingUnderscore.content == "__" else {
-      // Single underscore, not underline - handle as italic
-      return nil
+
+    // Consume underscores until we've consumed at least two characters (handles '__' or '_' '_')
+    var openingCount = 0
+    while !tokenStream.isAtEnd && tokenStream.check(.underscore) && openingCount < 3 {
+      openingCount += tokenStream.current.content.count
+      tokenStream.advance()
     }
 
-    // Consume the opening __
-    tokenStream.advance()
+    // If we didn't consume at least two underscores, it's not an underline opener
+    guard openingCount >= 2 else {
+      tokenStream.setPosition(startPosition)
+      return nil
+    }
 
     var content: [ASTNode] = []
     var foundClosing = false
 
-    // Look for closing __
+    // Look for closing delimiter with at least the same count (2 or 3)
     while !tokenStream.isAtEnd {
+      // If we see underscore tokens, check if there are enough to close
       if tokenStream.check(.underscore) {
-        let closingUnderscore = tokenStream.current
-        if closingUnderscore.content == "__" {
-          // Found closing __
-          tokenStream.advance()
+        // Count consecutive underscores available
+        var closingCount = 0
+        var offset = 0
+        while tokenStream.peek(offset).type == .underscore {
+          closingCount += tokenStream.peek(offset).content.count
+          offset += 1
+        }
+
+        if closingCount >= openingCount {
+          // Consume as many tokens as needed to account for openingCount
+          var remaining = openingCount
+          while remaining > 0 {
+            let c = tokenStream.consume()
+            remaining -= c.content.count
+          }
           foundClosing = true
           break
         }
       }
 
-      // Add content inside underline
+      // Parse content inside underline
       let inlineNodes = try parseInline()
       for inline in inlineNodes {
         if let fragment = inline as? AST.FragmentNode {
@@ -1006,15 +1071,12 @@ public final class InlineParser {
     }
 
     if foundClosing {
-      return AST.UnderlineNode(
-        children: content,
-        sourceLocation: startLocation
-      )
-    } else {
-      // No closing delimiter found, backtrack and treat as text
-      tokenStream.setPosition(startPosition)
-      return nil
+      return AST.UnderlineNode(children: content, sourceLocation: startLocation)
     }
+
+    // No closing delimiter found, restore position and bail
+    tokenStream.setPosition(startPosition)
+    return nil
   }
 
   // MARK: - Text Consolidation
@@ -1044,7 +1106,13 @@ public final class InlineParser {
   /// Parse and consolidate consecutive text-producing tokens
   private func parseConsolidatedText() throws -> AST.TextNode {
     var content = ""
-    let startLocation = tokenStream.current.location
+    // Capture the start location from the first token we'll consume to ensure
+    // the returned TextNode has an accurate SourceLocation.
+    guard !tokenStream.isAtEnd else {
+      return AST.TextNode(content: "", sourceLocation: nil)
+    }
+    let firstToken = tokenStream.current
+    let startLocation = firstToken.location
 
     while !tokenStream.isAtEnd
       && shouldConsolidateAsText(tokenStream.current.type)
