@@ -17,7 +17,7 @@ struct MarkdownText: View {
   var channelStore: ChannelStore?
 
   var renderer: MarkdownRendererVM
-  
+
   init(
     content: String,
     channelStore: ChannelStore? = nil
@@ -79,7 +79,9 @@ struct MarkdownText: View {
       if let user = gw.user.users[userID] {
         userPopover = user
       }
-    default: return .discarded  // other paicord links not handled yet, todo.
+    default:
+      print("[MarkdownText] Unhandled special link: \(cmd)")
+      return .discarded  // other paicord links not handled yet, todo.
     }
 
     return .handled
@@ -161,46 +163,48 @@ struct MarkdownText: View {
     var language: String?
     @State private var isHovered: Bool = false
     var body: some View {
-      Group {
-        if let language {
-          CodeText(code)
-            .highlightMode(.languageAlias(language))
-        } else {
-          Text(code)  // no highlighting
-        }
-      }
-      .fontDesign(.monospaced)
-      .containerRelativeFrame(.horizontal, alignment: .leading) { length, _ in
-        max(length * 0.8, 250)
-      }
-      .padding(8)
-      .background(Color(hexadecimal: "#1f202f"))
-      .clipShape(.rounded)
-      .overlay(
-        RoundedRectangle(cornerSize: .init(10), style: .continuous)
-          .stroke(Color(hexadecimal: "#373745"), lineWidth: 1)
-      )
-      .overlay(alignment: .topTrailing) {
-        if isHovered {
-          Button {
-            #if os(macOS)
-              let pasteboard = NSPasteboard.general
-              pasteboard.clearContents()
-              pasteboard.setString(code, forType: .string)
-            #else
-              UIPasteboard.general.string = code
-            #endif
-          } label: {
-            Image(systemName: "doc.on.doc")
-              .padding(6)
-              .background(.ultraThinMaterial)
-              .clipShape(Circle())
+      VStack {
+        Group {
+          if let language {
+            CodeText(code)
+              .highlightMode(.languageAlias(language))
+          } else {
+            Text(code)  // no highlighting
           }
-          .buttonStyle(.plain)
-          .padding(6)
         }
+        .fontDesign(.monospaced)
+        .containerRelativeFrame(.horizontal, alignment: .leading) { length, _ in
+          max(length * 0.8, 250)
+        }
+        .padding(8)
+        .background(Color(hexadecimal: "#1f202f"))
+        .clipShape(.rounded)
+        .overlay(
+          RoundedRectangle(cornerSize: .init(10), style: .continuous)
+            .stroke(Color(hexadecimal: "#373745"), lineWidth: 1)
+        )
+        .overlay(alignment: .topTrailing) {
+          if isHovered {
+            Button {
+              #if os(macOS)
+                let pasteboard = NSPasteboard.general
+                pasteboard.clearContents()
+                pasteboard.setString(code, forType: .string)
+              #else
+                UIPasteboard.general.string = code
+              #endif
+            } label: {
+              Image(systemName: "doc.on.doc")
+                .padding(6)
+                .background(.ultraThinMaterial)
+                .clipShape(Circle())
+            }
+            .buttonStyle(.plain)
+            .padding(6)
+          }
+        }
+        .onHover { self.isHovered = $0 }
       }
-      .onHover { self.isHovered = $0 }
     }
   }
 }
@@ -224,15 +228,15 @@ class MarkdownRendererVM {
   }()
 
   // document cache is redundant if we have block cache
-//  static let documentCache: NSCache<NSString, CachedDocument> = .init()
+  //  static let documentCache: NSCache<NSString, CachedDocument> = .init()
   static let blockCache: NSCache<NSString, CachedDocumentBlocks> = .init()
 
-//  class CachedDocument: NSObject {
-//    let document: AST.DocumentNode
-//    init(document: AST.DocumentNode) {
-//      self.document = document
-//    }
-//  }
+  //  class CachedDocument: NSObject {
+  //    let document: AST.DocumentNode
+  //    init(document: AST.DocumentNode) {
+  //      self.document = document
+  //    }
+  //  }
   class CachedDocumentBlocks: NSObject {
     let blocks: [BlockElement]
     init(blocks: [BlockElement]) {
@@ -612,7 +616,9 @@ class MarkdownRendererVM {
         if let url = URL(string: link.url) {
           newAttrs[.link] = url
         } else {
-          newAttrs[.foregroundColor] = AppKitOrUIKitColor(Color(hexadecimal6: 0x00aafc))
+          newAttrs[.foregroundColor] = AppKitOrUIKitColor(
+            Color(hexadecimal6: 0x00aafc)
+          )
         }
         inner.addAttributes(
           newAttrs,
@@ -625,7 +631,9 @@ class MarkdownRendererVM {
       if let a = node as? AST.AutolinkNode {
         var attrs = baseAttributes
         attrs[.link] = URL(string: a.url)
-        attrs[.foregroundColor] = AppKitOrUIKitColor(Color(hexadecimal6: 0x00aafc))
+        attrs[.foregroundColor] = AppKitOrUIKitColor(
+          Color(hexadecimal6: 0x00aafc)
+        )
         let s = NSAttributedString(string: a.text, attributes: attrs)
         container.append(s)
       }
@@ -1181,7 +1189,7 @@ enum PaicordChatLink {
   case roleMention(RoleSnowflake)
   case channelMention(ChannelSnowflake)
 
-  case discordMessageLink(UserSnowflake)
+  case discordMessageLink(GuildSnowflake?, ChannelSnowflake, MessageSnowflake)
 
   init?(url: URL) {
     guard
@@ -1190,8 +1198,28 @@ enum PaicordChatLink {
     else { return nil }
     switch url.host() {
     case "discord.com":
-      return nil
-      #warning("impl discord.com links")
+      let pathComponents = url.pathComponents.filter { $0 != "/" }
+      guard let first = pathComponents.first else { return nil }
+      switch first {
+      case "channels":
+        guard pathComponents.count >= 4,
+          let guildId = pathComponents[safe: 1],
+          let channelId = pathComponents[safe: 2],
+          let messageId = pathComponents[safe: 3]
+        else { return nil }
+        let guildSnowflake = guildId == "@me" ? nil : GuildSnowflake(guildId)
+        let channelSnowflake = ChannelSnowflake(channelId)
+        let messageSnowflake = MessageSnowflake(messageId)
+        
+        self = .discordMessageLink(
+          guildSnowflake,
+          channelSnowflake,
+          messageSnowflake
+        )
+      default:
+        return nil
+      }
+      #warning("impl any other discord.com links")
 
     case "mention":
       let pathComponents = url.pathComponents.filter { $0 != "/" }
