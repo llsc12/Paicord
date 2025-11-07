@@ -172,6 +172,7 @@ extension MessageCell {
               .overlay(
                 Button {
                   wantsPlayback = true
+                  try? AVAudioSession.sharedInstance().setCategory(.playback)
                 } label: {
                   Image(systemName: "play.fill")
                     .resizable()
