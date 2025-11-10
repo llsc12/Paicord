@@ -26,7 +26,7 @@ extension DiscordChannel.Message: @retroactive Identifiable {}
 protocol ActivityData {
   var status: Gateway.Status { get }
   var activities: [Gateway.Activity] { get }
-  var hidden_activities: [Gateway.Activity] { get }
+  var hidden_activities: [Gateway.Activity]? { get }
 }
 
 extension Gateway.PresenceUpdate: ActivityData {}

@@ -39,6 +39,7 @@ final class GatewayStore {
 
   @ObservationIgnored
   var eventTask: Task<Void, Never>? = nil
+  var errorTask: Task<Void, Never>? = nil
 
   // MARK: - Gateway Management
 
@@ -94,6 +95,13 @@ final class GatewayStore {
           handleReady(readyData)
         default: break
         }
+      }
+    }
+    
+    errorTask = Task { @MainActor in
+      guard let gateway else { return }
+      for await (error, buffer) in await gateway.eventFailures {
+        print(String(buffer: buffer), error)
       }
     }
 

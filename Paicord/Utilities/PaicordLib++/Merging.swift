@@ -147,6 +147,7 @@ extension DiscordChannel.Message {
     self.application = new.application ?? self.application
     self.application_id = new.application_id ?? self.application_id
     self.message_reference = new.message_reference ?? self.message_reference
+    self.message_snapshots = new.message_snapshots ?? self.message_snapshots
     self.flags = new.flags ?? self.flags
     self.interaction = new.interaction ?? self.interaction
     self.thread = new.thread ?? self.thread
@@ -169,6 +170,52 @@ extension DiscordChannel.Message {
         selfref == nil ? nil : .init(value: selfref!)
       self.referenced_message = box ?? self.referenced_message
     }
+  }
+
+  func toPartialMessage() -> DiscordChannel.PartialMessage {
+    let refMsg = self.referenced_message?.value.toPartialMessage()
+    let box: DereferenceBox<DiscordChannel.PartialMessage>? =
+      refMsg == nil ? nil : .init(value: refMsg!)
+
+    return .init(
+      id: self.id,
+      channel_id: self.channel_id,
+      author: self.author,
+      content: self.content,
+      timestamp: self.timestamp,
+      edited_timestamp: self.edited_timestamp,
+      tts: self.tts,
+      mention_everyone: self.mention_everyone,
+      mentions: self.mentions,
+      mention_roles: self.mention_roles,
+      mention_channels: self.mention_channels,
+      attachments: self.attachments,
+      embeds: self.embeds,
+      reactions: self.reactions,
+      nonce: self.nonce,
+      pinned: self.pinned,
+      webhook_id: self.webhook_id,
+      type: self.type,
+      activity: self.activity,
+      application: self.application,
+      application_id: self.application_id,
+      message_reference: self.message_reference,
+      flags: self.flags,
+      referenced_message: box,
+      message_snapshots: self.message_snapshots,
+      interaction: self.interaction,
+      thread: self.thread,
+      components: self.components,
+      sticker_items: self.sticker_items,
+      stickers: self.stickers,
+      position: self.position,
+      role_subscription_data: self.role_subscription_data,
+      resolved: self.resolved,
+      poll: self.poll,
+      call: self.call,
+      member: self.member,
+      guild_id: self.guild_id
+    )
   }
 }
 
@@ -201,6 +248,7 @@ extension Gateway.MessageCreate {
       application: self.application,
       application_id: self.application_id,
       message_reference: self.message_reference,
+      message_snapshots: self.message_snapshots,
       flags: self.flags,
       referenced_message: box,
       interaction: self.interaction,
@@ -352,5 +400,56 @@ extension PartialUser {
     self.system = new.system ?? self.system
     self.accent_color = new.accent_color ?? self.accent_color
     self.public_flags = new.public_flags ?? self.public_flags
+  }
+}
+
+extension DiscordChannel.PartialMessage {
+  func partialMessageForSnapshot() -> DiscordChannel.PartialMessage? {
+    guard
+      let id = self.message_reference?.message_id,
+      let channelId = self.message_reference?.channel_id,
+      let snapshot = self.message_snapshots?.first?.message
+    else {
+      return nil
+    }
+    return .init(
+      id: id,
+      channel_id: channelId,
+      author: nil,
+      content: snapshot.content,
+      timestamp: snapshot.timestamp,
+      edited_timestamp: snapshot.edited_timestamp,
+      tts: nil,
+      mention_everyone: nil,
+      mentions: snapshot.mentions,
+      mention_roles: snapshot.mention_roles,
+      mention_channels: nil,
+      attachments: snapshot.attachments,
+      embeds: snapshot.embeds,
+      reactions: nil,
+      nonce: nil,
+      pinned: nil,
+      webhook_id: nil,
+      type: snapshot.type,
+      activity: nil,
+      application: nil,
+      application_id: nil,
+      message_reference: nil,
+      flags: snapshot.flags,
+      referenced_message: nil,
+      message_snapshots: nil,
+      interaction: nil,
+      thread: nil,
+      components: snapshot.components,
+      sticker_items: snapshot.sticker_items,
+      stickers: nil,
+      position: nil,
+      role_subscription_data: nil,
+      resolved: snapshot.resolved,
+      poll: nil,
+      call: nil,
+      member: nil,
+      guild_id: nil
+    )
   }
 }

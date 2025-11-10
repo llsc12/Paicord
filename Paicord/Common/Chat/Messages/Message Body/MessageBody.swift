@@ -11,7 +11,24 @@ import SwiftUIX
 
 extension MessageCell {
   struct MessageBody: View {
-    let message: DiscordChannel.Message
+    let message: DiscordChannel.PartialMessage  // to allow both message types
+
+    init(
+      message: DiscordChannel.Message,
+      channelStore: ChannelStore
+    ) {
+      self.message = message.toPartialMessage()
+      self.channelStore = channelStore
+    }
+
+    init(
+      message: DiscordChannel.PartialMessage,
+      channelStore: ChannelStore
+    ) {
+      self.message = message
+      self.channelStore = channelStore
+    }
+
     let channelStore: ChannelStore
 
     var body: some View {
@@ -19,24 +36,27 @@ extension MessageCell {
         // Content
         Group {
           if !messageContentHidden {
+            let content = message.content ?? ""
             if message.flags?.contains(.isComponentsV2) == true {
               ComponentsV2View( /*components: message.components*/)
                 .equatable(by: message.components)
-            } else if !message.content.isEmpty {
-              MarkdownText(content: message.content, channelStore: channelStore)
+            } else if !content.isEmpty {
+              MarkdownText(content: content, channelStore: channelStore)
                 .equatable(by: message.content)
             }
           }
         }
 
         // Attachments
-        if !message.attachments.isEmpty {
-          AttachmentsView(attachments: message.attachments)
+        let attachments = message.attachments ?? []
+        if !attachments.isEmpty {
+          AttachmentsView(attachments: attachments)
         }
 
         // Embeds
-        if !message.embeds.isEmpty {
-          EmbedsView(message: message, embeds: message.embeds)
+        let embeds = message.embeds ?? []
+        if !embeds.isEmpty {
+          EmbedsView(embeds: embeds)
         }
 
         // Stickers
@@ -60,11 +80,34 @@ extension MessageCell {
           || !buffReactions.isEmpty || !buffBurstReactions.isEmpty
         {
           ReactionsView(
-            message: message,
             reactions: reactions,
             burstReactions: burstReactions,
             buffReactions: buffReactions,
             buffBurstReactions: buffBurstReactions
+          )
+        }
+
+        if let msgSnapshot = message.partialMessageForSnapshot() {
+          VStack(alignment: .leading, spacing: 4) {
+            Group {
+              Text(Image(systemName: "arrowshape.turn.up.right.fill"))
+                + Text(" Forwarded")
+            }
+            .font(.caption.italic())
+            .foregroundStyle(.tertiary)
+
+            MessageBody(
+              message: msgSnapshot,
+              channelStore: channelStore
+            )
+          }
+          .padding(.leading, 8)
+          .overlay(
+            Rectangle()
+              .frame(width: 3)
+              .foregroundStyle(.tertiary)
+              .cornerRadius(1),
+            alignment: .leading
           )
         }
       }
@@ -73,11 +116,11 @@ extension MessageCell {
 
     /// Determines if the message content should be hidden based on things like if the embed is a gif.
     var messageContentHidden: Bool {
-      if message.embeds.count == 1,  // only one embed
-        let embed = message.embeds.first,  // get that first embed
+      if message.embeds?.count == 1,  // only one embed
+        let embed = message.embeds?.first,  // get that first embed
         [Embed.Kind.image, .gifv, .video].contains(embed.type),  // is of type image, gifv or video
         let url = embed.url,
-        message.content.trimmingCharacters(in: .whitespacesAndNewlines) == url  // ensure content is just the url
+        message.content?.trimmingCharacters(in: .whitespacesAndNewlines) == url  // ensure content is just the url
       {
         return true  // then hide the content
       }

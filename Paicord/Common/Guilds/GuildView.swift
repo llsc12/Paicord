@@ -36,22 +36,32 @@ struct GuildView: View {
             .padding()
 
             Divider()
-              .padding(.bottom, 4)
           }
         }
 
         // these are channels without a category, aka categories themselves or actually uncategorized channels
+        // also, while sorting ($0.position ?? 0) < ($1.position ?? 0), sort channels to the top and categories to the bottom
         let uncategorizedChannels = guild.channels.values
           .filter { $0.parent_id == nil }
-          .sorted { ($0.position ?? 0) < ($1.position ?? 0) }
+//          .sorted { ($0.position ?? 0) < ($1.position ?? 0) }
+          .sorted { lhs, rhs in
+            let lhsIsCategory = lhs.type == .guildCategory
+            let rhsIsCategory = rhs.type == .guildCategory
+            if lhsIsCategory == rhsIsCategory {
+              return (lhs.position ?? 0) < (rhs.position ?? 0)
+            } else {
+              return !lhsIsCategory && rhsIsCategory
+            }
+          }
 
-        VStack(spacing: 4) {
+        VStack(spacing: 1) {
           ForEach(uncategorizedChannels) { channel in
             ChannelButton(channels: guild.channels, channel: channel)
-              .padding(.horizontal, 10)
+              .padding(.horizontal, 4)
               .frame(maxWidth: .infinity, alignment: .leading)
           }
         }
+        .padding(.vertical, 4)
       }
     }
     .frame(maxWidth: .infinity)

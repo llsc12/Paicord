@@ -28,6 +28,8 @@ struct MarkdownText: View {
   }
 
   @State var userPopover: PartialUser?
+  
+  @State var lastGuildMemberCount: Int = -1
 
   var body: some View {
     VStack(alignment: .leading, spacing: 4) {
@@ -39,19 +41,10 @@ struct MarkdownText: View {
       if renderer.blocks.isEmpty {
         Text(markdown: content)  // apple's markdown
           .opacity(0.6)
-      } else {
-        let _ = gw.user.users
-        let _ = channelStore?.guildStore?.members
       }
     }
-    .task(id: content) {
-      guard content != renderer.rawContent else { return }  // skip reparsing of same content.
-      renderer.passRefs(
-        gw: gw,
-        channelStore: channelStore
-      )  // it isnt expensive to call this, its just refs.
-      await renderer.update(content)
-    }
+    .task(id: content, render)
+    .task(id: channelStore?.guildStore?.members.count, render)
     .environment(
       \.openURL,
       OpenURLAction { url in
@@ -66,6 +59,26 @@ struct MarkdownText: View {
         user: user
       )
     }
+  }
+  
+  @Sendable
+  func render() async {
+    if let count = channelStore?.guildStore?.members.count {
+      // re-render if member count changed (for mentions resolving), ignoring content similarity.
+      // but if count is same as last time, do the normal content check.
+      if count != lastGuildMemberCount {
+        lastGuildMemberCount = count // resolved mentions, render
+      } else {
+        guard content != renderer.rawContent else { return } // avoid redundant renders
+      }
+    } else {
+      guard content != renderer.rawContent else { return } // avoid redundant renders
+    }
+    renderer.passRefs(
+      gw: gw,
+      channelStore: channelStore
+    )  // it isnt expensive to call this, its just refs.
+    await renderer.update(content)
   }
 
   func handleURL(_ url: URL) -> OpenURLAction.Result {
@@ -163,7 +176,7 @@ struct MarkdownText: View {
     var language: String?
     @State private var isHovered: Bool = false
     var body: some View {
-      VStack {
+      HStack {
         Group {
           if let language {
             CodeText(code)
@@ -173,9 +186,9 @@ struct MarkdownText: View {
           }
         }
         .fontDesign(.monospaced)
-        .containerRelativeFrame(.horizontal, alignment: .leading) { length, _ in
-          max(length * 0.8, 250)
-        }
+        //        .containerRelativeFrame(.horizontal, alignment: .leading) { length, _ in
+        //          max(length * 0.8, 250)
+        //        }
         .padding(8)
         .background(Color(hexadecimal: "#1f202f"))
         .clipShape(.rounded)
@@ -204,6 +217,13 @@ struct MarkdownText: View {
           }
         }
         .onHover { self.isHovered = $0 }
+        
+        // instead of resizing the codeblock, we use a spacer that fills the smaller area.
+        // fixes codeblocks leaving blockquotes, and fixes codeblocks inside embeds.
+        Spacer()
+          .containerRelativeFrame(.horizontal, alignment: .leading) { length, _ in
+            min(length * 0.2, 50)
+          }
       }
     }
   }

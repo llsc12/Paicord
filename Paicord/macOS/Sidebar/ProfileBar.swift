@@ -18,25 +18,12 @@ struct ProfileBar: View {
   #endif
 
   @State var showingUsername = false
+  @State var showingPopover = false
 
   var body: some View {
     HStack {
-      Menu {
-        HStack {
-          if let user = gw.user.currentUser {
-            Profile.AvatarWithPresence(
-              member: nil,
-              user: user
-            )
-            .maxHeight(22)
-          }
-
-          Text(
-            gw.user.currentUser?.global_name ?? gw.user.currentUser?.username
-              ?? "Unknown User"
-          )
-          .bold()
-        }
+      Button {
+        showingPopover.toggle()
       } label: {
         HStack {
           if let user = gw.user.currentUser {
@@ -57,7 +44,8 @@ struct ProfileBar: View {
               Text("@\(gw.user.currentUser?.username ?? "Unknown User")")
                 .transition(.opacity)
             } else {
-              if let session = gw.user.sessions.first(where: { $0.id == "all" }),
+              if let session = gw.user.sessions.first(where: { $0.id == "all" }
+              ),
                 let status = session.activities.first,
                 status.type == .custom
               {
@@ -84,6 +72,32 @@ struct ProfileBar: View {
         }
       }
       .buttonStyle(.plain)
+      .popover(isPresented: $showingPopover) {
+        VStack {
+          Menu {
+
+          } label: {
+            HStack {
+              if let user = gw.user.currentUser {
+                Profile.AvatarWithPresence(
+                  member: nil,
+                  user: user
+                )
+                .maxHeight(22)
+              }
+
+              Text(
+                gw.user.currentUser?.global_name ?? gw.user.currentUser?
+                  .username
+                  ?? "Unknown User"
+              )
+              .bold()
+            }
+
+          }
+        }
+        .maxWidth(250)
+      }
 
       Spacer()
 
@@ -123,4 +137,3 @@ struct ProfileBar: View {
     )
   }
 }
-

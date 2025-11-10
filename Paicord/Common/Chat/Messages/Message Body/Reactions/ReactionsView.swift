@@ -11,7 +11,6 @@ import SDWebImageSwiftUI
 import SwiftUIX
 
 struct ReactionsView: View {
-  let message: DiscordChannel.Message
   let reactions: ChannelStore.Reactions
   let burstReactions: ChannelStore.Reactions
   let buffReactions: ChannelStore.BuffReactions
@@ -22,17 +21,15 @@ struct ReactionsView: View {
       let emojiReactions = Array(reactions.keys)
       let emojiBurstReactions = Array(burstReactions.keys)
 
-      ForEach(emojiReactions, id: \.name) { emoji in
+      ForEach(emojiReactions, id: \.id) { emoji in
         Reaction(
-          message: message,
           emoji: emoji,
           users: reactions[emoji] ?? [],
           countBuff: buffReactions[emoji]
         )
       }
-      ForEach(emojiBurstReactions, id: \.name) { emoji in
+      ForEach(emojiBurstReactions, id: \.id) { emoji in
         Reaction(
-          message: message,
           emoji: emoji,
           users: burstReactions[emoji] ?? [],
           countBuff: buffBurstReactions[emoji]
@@ -42,7 +39,6 @@ struct ReactionsView: View {
   }
 
   struct Reaction: View {
-    let message: DiscordChannel.Message
     let emoji: Emoji
     let users: Set<UserSnowflake>
     let countBuff: Int?

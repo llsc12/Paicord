@@ -65,6 +65,14 @@ class ChannelStore: DiscordDataStore {
     guard let gateway = gateway?.gateway else { return }
     Task { @MainActor in
       // ig also fetch latest messages too
+
+      defer {
+        NotificationCenter.default.post(
+          name: .chatViewShouldScrollToBottom,
+          object: nil
+        )
+      }
+      
       do {
         try await self.fetchMessages()
       } catch {
@@ -152,6 +160,13 @@ class ChannelStore: DiscordDataStore {
   }
 
   private func handleMessageCreate(_ messageData: Gateway.MessageCreate) {
+    defer {
+      NotificationCenter.default.post(
+        name: .chatViewShouldScrollToBottom,
+        object: nil
+      )
+    }
+    
     let message = messageData.toMessage()
     // Insert the new message at the end of the ordered dictionary
     messages.updateValue(
@@ -183,6 +198,7 @@ class ChannelStore: DiscordDataStore {
       guildStore.members[authorId, default: member].update(with: member)
     }
     
+    // Get unknown member data from mentions if we have a guild store
     if let guildStore {
       var unknownMemberIds: Set<UserSnowflake> = []
       for mention in messageData.mentions {
@@ -204,6 +220,13 @@ class ChannelStore: DiscordDataStore {
   private func handleMessageUpdate(
     _ partialMessage: DiscordChannel.PartialMessage
   ) {
+    defer {
+      NotificationCenter.default.post(
+        name: .chatViewShouldScrollToBottom,
+        object: nil
+      )
+    }
+    
     guard var msg = messages[partialMessage.id] else { return }
     msg.update(with: partialMessage)
     messages.updateValue(msg, forKey: msg.id)
@@ -247,6 +270,13 @@ class ChannelStore: DiscordDataStore {
   private func handleMessageReactionAdd(
     _ reactionAdd: Gateway.MessageReactionAdd
   ) {
+    defer {
+      NotificationCenter.default.post(
+        name: .chatViewShouldScrollToBottom,
+        object: nil
+      )
+    }
+    
     if let member = reactionAdd.member?.toPartialMember(), let guildStore,
       let userId = member.user?.id
     {
@@ -395,7 +425,15 @@ class ChannelStore: DiscordDataStore {
 //        }
 //      }
       
-      // lastly request members if member data for any author is missing
+      // cache user data from mentions in user cache
+      for message in messages {
+        for mention in message.mentions {
+          let user = mention.toPartialUser()
+          self.gateway?.user.users[user.id, default: user].update(with: user)
+        }
+      }
+      
+      // lastly request members if member data for any author is missing, also mentions
       if let guildStore {
         let unknownMembers = Set(messages.map { message in
           ([message.author?.id] + message.mentions.map(\.id)).compactMap({ $0 })

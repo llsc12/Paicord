@@ -38,7 +38,18 @@ struct MessageCell: View {
     guard let currentUserID = gw.user.currentUser?.id else {
       return false
     }
-    return message.mentions.contains(where: { $0.id == currentUserID })
+    let mentionedUser: Bool = message.mentions.contains(where: { $0.id == currentUserID })
+    let mentionedEveryone: Bool = message.mention_everyone
+    let mentionedUserByRole: Bool = {
+      let usersRoles = channelStore.guildStore?.members[currentUserID]?.roles ?? []
+      for roleID in message.mention_roles {
+        if usersRoles.contains(roleID) {
+          return true
+        }
+      }
+      return false
+    }()
+    return mentionedUser || mentionedEveryone || mentionedUserByRole
   }
 
   var body: some View {

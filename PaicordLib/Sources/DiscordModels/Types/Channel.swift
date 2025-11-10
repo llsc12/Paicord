@@ -199,6 +199,7 @@ extension DiscordChannel {
 			application: PartialApplication? = nil,
 			application_id: ApplicationSnowflake? = nil,
 			message_reference: MessageReference? = nil,
+      message_snapshots: [MessageSnapshot]? = nil,
 			flags: IntBitField<Flag>? = nil,
 			referenced_message: DereferenceBox<Message>? = nil,
 			interaction: MessageInteraction? = nil,
@@ -236,6 +237,7 @@ extension DiscordChannel {
 			self.application = application
 			self.application_id = application_id
 			self.message_reference = message_reference
+      self.message_snapshots = message_snapshots
 			self.flags = flags
 			self.referenced_message = referenced_message
 			//			self.interaction_metadata = interaction_metadata
@@ -575,6 +577,7 @@ extension DiscordChannel {
 		public var application: PartialApplication?
 		public var application_id: ApplicationSnowflake?
 		public var message_reference: MessageReference?
+    public var message_snapshots: [MessageSnapshot]?
 		public var flags: IntBitField<Flag>?
 		public var referenced_message: DereferenceBox<Message>?
 		//		@_spi(UserInstallableApps) @DecodeOrNil
@@ -593,11 +596,72 @@ extension DiscordChannel {
 		public var guild_id: GuildSnowflake?
 		public var member: Guild.PartialMember?
 	}
+  
+  public struct MessageSnapshot: Sendable, Codable, Equatable, Hashable {
+    public var message: SnapshotMessage
+    
+    public struct SnapshotMessage: Sendable, Codable, Equatable, Hashable {
+      public var content: String
+      public var timestamp: DiscordTimestamp
+      public var edited_timestamp: DiscordTimestamp?
+      public var mentions: [MentionUser]
+      public var mention_roles: [RoleSnowflake]
+      public var attachments: [DiscordChannel.Message.Attachment]
+      public var embeds: [Embed]
+      public var type: DiscordChannel.Message.Kind
+      public var flags: IntBitField<DiscordChannel.Message.Flag>?
+      public var components: Interaction.ComponentSwitch?
+      public var resolved: Interaction.ApplicationCommand.ResolvedData?
+      public var sticker_items: [StickerItem]?
+      public var soundboard_sounds: [SoundboardSound]?
+    }
+  }
 }
 
 extension DiscordChannel {
 	/// Partial ``DiscordChannel.Message`` object.
 	public struct PartialMessage: Sendable, Codable, Equatable, Hashable {
+    
+    public init(id: MessageSnowflake, channel_id: ChannelSnowflake, author: DiscordUser? = nil, content: String? = nil, timestamp: DiscordTimestamp? = nil, edited_timestamp: DiscordTimestamp? = nil, tts: Bool? = nil, mention_everyone: Bool? = nil, mentions: [MentionUser]? = nil, mention_roles: [RoleSnowflake]? = nil, mention_channels: [DiscordChannel.Message.ChannelMention]? = nil, attachments: [DiscordChannel.Message.Attachment]? = nil, embeds: [Embed]? = nil, reactions: [DiscordChannel.Message.Reaction]? = nil, nonce: StringOrInt? = nil, pinned: Bool? = nil, webhook_id: WebhookSnowflake? = nil, type: DiscordChannel.Message.Kind? = nil, activity: DiscordChannel.Message.Activity? = nil, application: PartialApplication? = nil, application_id: ApplicationSnowflake? = nil, message_reference: DiscordChannel.Message.MessageReference? = nil, flags: IntBitField<DiscordChannel.Message.Flag>? = nil, referenced_message: DereferenceBox<PartialMessage>? = nil, message_snapshots: [DiscordChannel.MessageSnapshot]? = nil, interaction: MessageInteraction? = nil, thread: DiscordChannel? = nil, components: Interaction.ComponentSwitch? = nil, sticker_items: [StickerItem]? = nil, stickers: [Sticker]? = nil, position: Int? = nil, role_subscription_data: RoleSubscriptionData? = nil, resolved: Interaction.ApplicationCommand.ResolvedData? = nil, poll: Poll? = nil, call: DiscordChannel.Message.Call? = nil, member: Guild.PartialMember? = nil, guild_id: GuildSnowflake? = nil) {
+      self.id = id
+      self.channel_id = channel_id
+      self.author = author
+      self.content = content
+      self.timestamp = timestamp
+      self.edited_timestamp = edited_timestamp
+      self.tts = tts
+      self.mention_everyone = mention_everyone
+      self.mentions = mentions
+      self.mention_roles = mention_roles
+      self.mention_channels = mention_channels
+      self.attachments = attachments
+      self.embeds = embeds
+      self.reactions = reactions
+      self.nonce = nonce
+      self.pinned = pinned
+      self.webhook_id = webhook_id
+      self.type = type
+      self.activity = activity
+      self.application = application
+      self.application_id = application_id
+      self.message_reference = message_reference
+      self.flags = flags
+      self.referenced_message = referenced_message
+      self.message_snapshots = message_snapshots
+      self.interaction = interaction
+      self.thread = thread
+      self.components = components
+      self.sticker_items = sticker_items
+      self.stickers = stickers
+      self.position = position
+      self.role_subscription_data = role_subscription_data
+      self.resolved = resolved
+      self.poll = poll
+      self.call = call
+      self.member = member
+      self.guild_id = guild_id
+    }
+    
 		public var id: MessageSnowflake
 		public var channel_id: ChannelSnowflake
 		public var author: DiscordUser?
@@ -622,6 +686,7 @@ extension DiscordChannel {
 		public var message_reference: DiscordChannel.Message.MessageReference?
 		public var flags: IntBitField<DiscordChannel.Message.Flag>?
 		public var referenced_message: DereferenceBox<PartialMessage>?
+    public var message_snapshots: [DiscordChannel.MessageSnapshot]?
 		//		@_spi(UserInstallableApps) @DecodeOrNil
 		//		public var interaction_metadata: DiscordChannel.Message.InteractionMetadata?
 		public var interaction: MessageInteraction?

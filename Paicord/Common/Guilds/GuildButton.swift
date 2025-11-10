@@ -17,6 +17,7 @@ struct GuildButton: View {
   var folder: DiscordProtos_DiscordUsers_V1_PreloadedUserSettings.GuildFolder?
   @Environment(\.appState) var appState
   @Environment(\.gateway) var gw
+  @Environment(\.colorScheme) var colorScheme
 
   init(guild: Guild?) {
     self.guild = guild
@@ -225,21 +226,22 @@ struct GuildButton: View {
               .resizable()
               .scaledToFill()
             } else {
-              Rectangle()
-                .fill(.primaryButtonBackground)
+              // server name initials TODO
+              Spacer()
                 .aspectRatio(1, contentMode: .fit)
+                .background(isSelected ? .accent : .primaryButtonBackground)
             }
           }
         } else {
           Rectangle()
-            .fill(.black.opacity(0.25))
+            .fill(.clear)
             .aspectRatio(1, contentMode: .fit)
             .overlay {
               Image(systemName: "bubble.left.and.bubble.right.fill")
                 .font(.title2)
-                .foregroundStyle(.tertiaryButton)
+                .foregroundStyle(colorScheme == .dark ? .white : isSelected ? .white : .black)
             }
-            .background(.black.opacity(0.001))  // makes it easier to click
+            .background(isSelected ? .accent : .primaryButtonBackground)
         }
       }
       .clipShape(.rect(cornerRadius: isSelected ? 10 : 32, style: .continuous))
