@@ -85,6 +85,8 @@ struct ConnectionStateView: View {
     "Δ",
     "swift!",
     "Loomly Loomly, I guess I'm Loomly",
+    "green green / it's green, they say / on the far side of the hill",
+    "green green / I'm going away / to where the grass is greener still",
   ].randomElement()!
 }
 
