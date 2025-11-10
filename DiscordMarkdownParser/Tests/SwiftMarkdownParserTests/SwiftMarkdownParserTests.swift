@@ -1165,6 +1165,18 @@ final class DiscordMarkdownParserTests: XCTestCase {
     let maybeText2 = para2.children[1] as? AST.TextNode
     XCTAssertNotNil(maybeText2)
     XCTAssertEqual(maybeText2?.content, " test")
+    
+    let markdown3 =
+      "https://cf407f6265b8.ngrok-free.app/latex-solver.php?step-by-step=true&q=[\int%20\frac{\sec^2%20x}{\sqrt{\tan^2\big(\sinh^{-1}(\sqrt{\sec^2%20x%20-%201})\big)%20+%201}}%20,%20dx]"
+    let document3 = try await parser.parseToAST(markdown3)
+    // Validate structure: [AutolinkNode]
+    guard let para3 = document3.children.first as? AST.ParagraphNode else {
+      XCTFail("Expected paragraph node for markdown3")
+      return
+    }
+    XCTAssertGreaterThanOrEqual(para3.children.count, 1)
+    let maybeAutolink3 = para3.children[0] as? AST.AutolinkNode
+    XCTAssertNotNil(maybeAutolink3)
   }
   
   func testListEdgeCases() async throws {

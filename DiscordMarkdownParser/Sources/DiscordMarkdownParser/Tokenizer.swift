@@ -1120,7 +1120,7 @@ public final class MarkdownTokenizer {
 
       // Stop on whitespace or explicit token delimiters
       if c.isWhitespace || c == "<" || c == ">" || c == "\"" || c == "'"
-        || c == "(" || c == ")" || c == "[" || c == "]"
+        //|| c == "(" || c == ")" || c == "[" || c == "]"
       {
         break
       }
