@@ -84,7 +84,7 @@ struct ConnectionStateView: View {
     "where's the also try minecraft!",
     "Δ",
     "swift!",
-    "Loomy Loomy, I guess I'm Loomy",
+    "Loomly Loomly, I guess I'm Loomly",
   ].randomElement()!
 }
 
