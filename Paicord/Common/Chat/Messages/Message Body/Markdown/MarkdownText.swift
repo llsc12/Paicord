@@ -186,9 +186,6 @@ struct MarkdownText: View {
           }
         }
         .fontDesign(.monospaced)
-        //        .containerRelativeFrame(.horizontal, alignment: .leading) { length, _ in
-        //          max(length * 0.8, 250)
-        //        }
         .padding(8)
         .background(Color(hexadecimal: "#1f202f"))
         .clipShape(.rounded)
@@ -222,7 +219,12 @@ struct MarkdownText: View {
         // fixes codeblocks leaving blockquotes, and fixes codeblocks inside embeds.
         Spacer()
           .containerRelativeFrame(.horizontal, alignment: .leading) { length, _ in
+            #if os(iOS)
+            let value = min(length * 0.2, 50) - 200
+            return max(0, value)
+            #else
             min(length * 0.2, 50)
+            #endif
           }
       }
     }
@@ -725,9 +727,7 @@ class MarkdownRendererVM {
         attrs[.backgroundColor] = AppKitOrUIKitColor(
           Color(hexadecimal6: 0x383c6f).opacity(0.8)
         )
-        attrs[.foregroundColor] = AppKitOrUIKitColor(
-          Color(AppKitOrUIKitColor.labelCompatible).opacity(0.95)
-        )
+        attrs[.foregroundColor] = AppKitOrUIKitColor(Color(AppKitOrUIKitColor.white).opacity(0.8))
         attrs[.underlineStyle] = .none
 
         let s = NSAttributedString(string: "@\(name)", attributes: attrs)
@@ -753,9 +753,8 @@ class MarkdownRendererVM {
             attrs[.backgroundColor] = AppKitOrUIKitColor(
               Color(hexadecimal6: 0x383c6f).opacity(0.8)
             )
-            attrs[.foregroundColor] = AppKitOrUIKitColor(
-              Color(AppKitOrUIKitColor.labelCompatible).opacity(0.95)
-            )
+            attrs[.foregroundColor] = AppKitOrUIKitColor(Color(AppKitOrUIKitColor.white).opacity(0.8))
+
           }
 
           attrs[.underlineStyle] = .none
@@ -793,9 +792,7 @@ class MarkdownRendererVM {
           attrs[.backgroundColor] = AppKitOrUIKitColor(
             Color(hexadecimal6: 0x383c6f)
           )
-          attrs[.foregroundColor] = AppKitOrUIKitColor(
-            Color(AppKitOrUIKitColor.labelCompatible).opacity(0.95)
-          )
+          attrs[.foregroundColor] = AppKitOrUIKitColor(Color(AppKitOrUIKitColor.white).opacity(0.8))
           let name = channel.name ?? c.id.rawValue
           let s = NSAttributedString(
             string: "#\(name)",
@@ -822,9 +819,7 @@ class MarkdownRendererVM {
       attrs[.backgroundColor] = AppKitOrUIKitColor(
         Color(hexadecimal6: 0x383c6f)
       )
-      attrs[.foregroundColor] = AppKitOrUIKitColor(
-        Color(AppKitOrUIKitColor.labelCompatible).opacity(0.95)
-      )
+      attrs[.foregroundColor] = AppKitOrUIKitColor(Color(AppKitOrUIKitColor.white).opacity(0.8))
       if let url = URL(string: "paicord://mention/everyone") {
         attrs[.link] = url
       }
@@ -840,9 +835,7 @@ class MarkdownRendererVM {
       attrs[.backgroundColor] = AppKitOrUIKitColor(
         Color(hexadecimal6: 0x383c6f)
       )
-      attrs[.foregroundColor] = AppKitOrUIKitColor(
-        Color(AppKitOrUIKitColor.labelCompatible).opacity(0.95)
-      )
+      attrs[.foregroundColor] = AppKitOrUIKitColor(Color(AppKitOrUIKitColor.white).opacity(0.8))
       container.append(
         NSAttributedString(string: "@here", attributes: attrs)
       )

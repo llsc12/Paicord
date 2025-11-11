@@ -69,7 +69,7 @@ class ChannelStore: DiscordDataStore {
       defer {
         NotificationCenter.default.post(
           name: .chatViewShouldScrollToBottom,
-          object: nil
+          object: ["channelId": channelId]
         )
       }
       
@@ -163,7 +163,7 @@ class ChannelStore: DiscordDataStore {
     defer {
       NotificationCenter.default.post(
         name: .chatViewShouldScrollToBottom,
-        object: nil
+        object: ["channelId": channelId]
       )
     }
     
@@ -223,7 +223,7 @@ class ChannelStore: DiscordDataStore {
     defer {
       NotificationCenter.default.post(
         name: .chatViewShouldScrollToBottom,
-        object: nil
+        object: ["channelId": channelId]
       )
     }
     
@@ -273,7 +273,7 @@ class ChannelStore: DiscordDataStore {
     defer {
       NotificationCenter.default.post(
         name: .chatViewShouldScrollToBottom,
-        object: nil
+        object: ["channelId": channelId]
       )
     }
     

@@ -41,8 +41,7 @@ struct SlideoverDoubleView<Primary: View, Secondary: View>: View {
         .background(.background)
         .shadow(radius: 10)
         .visualEffect { vs, proxy in
-          return
-            vs
+          vs
             .offset(x: swap ? dragOffset : proxy.size.width + 10 + dragOffset)
         }
         .id("secondary")

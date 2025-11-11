@@ -13,8 +13,8 @@ extension ChatView {
   struct InputBar: View {
     @Environment(\.appState) var appState
     @Environment(\.gateway) var gw
-  var vm: ChannelStore
-    
+    var vm: ChannelStore
+
     #if os(iOS)
       @Environment(\.safeAreaInsets) var safeAreaInsets
     #endif
@@ -26,7 +26,7 @@ extension ChatView {
       VStack(spacing: 0) {
         TypingIndicatorBar(vm: vm)
           .shadow(color: .black, radius: 10)
-        
+
         HStack(alignment: .bottom, spacing: 8) {
           Button {
 
@@ -46,14 +46,15 @@ extension ChatView {
               .fixedSize(horizontal: false, vertical: true)
               .disabled(appState.chatOpen == false)
               .padding(8)
+              .padding(.horizontal, 4)
               .background(.regularMaterial)
-              .clipShape(.rect(cornerRadius: 16))
+              .clipShape(.rect(cornerRadius: 18))
               .focused($isFocused)
           #else
             TextView("Message", text: $text, submit: sendMessage)
               .padding(8)
               .background(.regularMaterial)
-              .clipShape(.rect(cornerRadius: 16))
+              .clipShape(.rect(cornerRadius: 18))
           #endif
 
           #if os(iOS)
@@ -76,16 +77,16 @@ extension ChatView {
         .padding(.top, 4)
         #if os(iOS)
           .animation(.default, value: text.isEmpty)
-    #endif
+        #endif
       }
-        .background {
-          VariableBlurView()
+      .background {
+        VariableBlurView()
           .rotationEffect(.degrees(180))
-  #if os(iOS)
-          .padding(.bottom, isFocused ? 0 : (safeAreaInsets.bottom * -1) )
-          .animation(.default, value: isFocused)
-  #endif
-        }
+          #if os(iOS)
+            .padding(.bottom, isFocused ? 0 : (safeAreaInsets.bottom * -1))
+            .animation(.default, value: isFocused)
+          #endif
+      }
     }
 
     private func sendMessage() {
@@ -156,25 +157,38 @@ extension ChatView {
         var maxHeight: CGFloat = 150
 
         func makeNSView(context: Context) -> NSScrollView {
-          let scrollView = NSTextView.scrollableTextView()
-          let textView = scrollView.documentView as! NSTextView
+          let textStorage = NSTextStorage()
+          let layoutManager = NSLayoutManager()
+          textStorage.addLayoutManager(layoutManager)
+          let textContainer = NSTextContainer()
+          layoutManager.addTextContainer(textContainer)
 
+          let textView = SubmissiveTextView(
+            frame: .zero,
+            textContainer: textContainer
+          )
           textView.isEditable = true
           textView.isRichText = false
           textView.isVerticallyResizable = true
           textView.isHorizontallyResizable = false
           textView.textContainer?.widthTracksTextView = true
           textView.textContainerInset = .zero
-          textView.delegate = context.coordinator
           textView.drawsBackground = false
           textView.typingAttributes = [
             .font: preferredBodyFont(),
             .foregroundColor: labelColor(),
           ]
+          textView.delegate = context.coordinator
+          textView.onSubmit = onSubmit
 
+          let scrollView = NSScrollView()
+          scrollView.documentView = textView
           scrollView.hasVerticalScroller = true
           scrollView.drawsBackground = false
           scrollView.borderType = .noBorder
+
+          textView.frame = scrollView.bounds
+          textView.autoresizingMask = [.width]
 
           return scrollView
         }
@@ -212,49 +226,37 @@ extension ChatView {
           }
         }
 
-        // horrid way of doing this
-        func textUpdated(
-          oldText: String,
-          newText: String
-        ) {
-          // detect if a new line was added
-          if newText.count > oldText.count,
-            newText.hasSuffix("\n")
-          {
-            // return early if shift key is pressed (to allow new lines)
-            let shiftPressed = NSEvent.modifierFlags.contains(.shift)
-            if shiftPressed { return }
-            // trim new lines and submit
-            text = newText.trimmingCharacters(in: .newlines)
-            onSubmit()
-          }
-        }
-
         func makeCoordinator() -> Coordinator {
           Coordinator(self)
         }
 
         class Coordinator: NSObject, NSTextViewDelegate {
           var parent: _TextView
-          private var lastText: String
 
           init(_ parent: _TextView) {
             self.parent = parent
-            self.lastText = parent.text
           }
 
           func textDidChange(_ notification: Notification) {
             guard let textView = notification.object as? NSTextView else {
               return
             }
+            parent.text = textView.string
+          }
+        }
 
-            let oldText = lastText
-            let newText = textView.string
-            lastText = newText
+        class SubmissiveTextView: NSTextView {
+          var onSubmit: (() -> Void)?
 
-            parent.text = newText
-
-            parent.textUpdated(oldText: oldText, newText: newText)
+          override func keyDown(with event: NSEvent) {
+            if event.keyCode == 36 {  // Return key
+              let shiftPressed = event.modifierFlags.contains(.shift)
+              if !shiftPressed {
+                onSubmit?()
+                return
+              }
+            }
+            super.keyDown(with: event)
           }
         }
 
@@ -276,6 +278,8 @@ extension ChatView {
         }
       }
     }
+  #elseif os(iOS)
+  
   #endif
 }
 

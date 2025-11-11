@@ -52,20 +52,25 @@ struct ChatView: View {
         .onAppear {
           NotificationCenter.default.post(
             name: .chatViewShouldScrollToBottom,
-            object: nil
+            object: ["channelId": self.vm.channelId]
           )
         }
         .onChange(of: vm.channelId) {
           NotificationCenter.default.post(
             name: .chatViewShouldScrollToBottom,
-            object: nil
+            object: ["channelId": vm.channelId]
           )
         }
         .onReceive(
           NotificationCenter.default.publisher(
             for: .chatViewShouldScrollToBottom
           )
-        ) { _ in
+        ) { object in
+          guard let info = object.object as? [String: Any],
+            let channelId = info["channelId"] as? ChannelSnowflake,
+            channelId == vm.channelId
+          else { return }
+            
           scheduleScrollToBottom(
             proxy: proxy,
             messages: orderedMessages
