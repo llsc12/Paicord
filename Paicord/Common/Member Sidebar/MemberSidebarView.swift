@@ -6,10 +6,10 @@
 //  Copyright © 2025 Lakhan Lothiyi.
 //
 
-import PaicordLib
-import SwiftUIX
 import DiscordModels
+import PaicordLib
 import SDWebImageSwiftUI
+import SwiftUIX
 
 struct MemberSidebarView: View {
   @Environment(\.gateway) var gw
@@ -18,11 +18,15 @@ struct MemberSidebarView: View {
   var body: some View {
     Group {
       if let channelStore {
-        if let recipients = channelStore.channel?.recipients, recipients.count > 1 {
+        if channelStore.channel?.type == .groupDm,
+          let recipients = channelStore.channel?.recipients
+        {
           GroupDMsMemberList(channelStore: channelStore, recipients: recipients)
         } else if let guildStore {
           GuildMemberList(guildStore: guildStore, channelStore: channelStore)
-        } else if let user = channelStore.channel?.recipients?.first {
+        } else if channelStore.channel?.type == .dm,
+          let user = channelStore.channel?.recipients?.first
+        {
           DMProfilePanel(user: user)
         } else {
           EmptyView()
@@ -33,16 +37,16 @@ struct MemberSidebarView: View {
     }
     .ignoresSafeArea()
   }
-  
+
   struct GuildMemberList: View {
     var guildStore: GuildStore
     var channelStore: ChannelStore
-    
+
     var body: some View {
       Text("Unimplemented")
     }
   }
-  
+
   struct GroupDMsMemberList: View {
     var channelStore: ChannelStore
     var recipients: [DiscordUser]
@@ -58,16 +62,16 @@ struct MemberSidebarView: View {
       .padding(4)
     }
   }
-  
+
   struct DMProfilePanel: View {
-    @Environment(GatewayStore.self) var gw
-    @Environment(PaicordAppState.self) var appState
+    @Environment(\.gateway) var gw
+    @Environment(\.appState) var appState
     var user: DiscordUser
-    
+
     @State private var profile: DiscordUser.Profile?
-    
+
     var body: some View {
-      VStack() {
+      VStack {
         ZStack(alignment: .bottomLeading) {
           WebImage(
             url: bannerURL(animated: true),
@@ -77,7 +81,7 @@ struct MemberSidebarView: View {
           .frame(height: 110)
           .maxWidth(.infinity)
           .background(.blue)
-          
+
           Profile.AvatarWithPresence(
             member: nil,
             user: user
@@ -93,44 +97,44 @@ struct MemberSidebarView: View {
           .offset(x: 35, y: 30)
         }
         .zIndex(1)
-        
+
         VStack(alignment: .leading, spacing: 16) {
           HStack(alignment: .center, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
-             Text(user.global_name ?? user.username)
-               .font(.title)
-               .bold()
-              
+              Text(user.global_name ?? user.username)
+                .font(.title)
+                .bold()
+
               Text(
                 profile?.user_profile?.pronouns != nil
-                ? "\(user.username)・\(profile?.user_profile?.pronouns ?? "")"
-                : user.username
+                  ? "\(user.username)・\(profile?.user_profile?.pronouns ?? "")"
+                  : user.username
               )
-                .font(.subheadline)
-                .foregroundColor(.gray)
+              .font(.subheadline)
+              .foregroundColor(.gray)
             }
-            
-//            Spacer()
-            
-//            // guild tag
-//            if let tag_guild = user.primary_guild,
-//               let tag = tag_guild.tag {
-//              Label(tag, systemImage: "flame.fill")
-//                .labelStyle(.titleAndIcon)
-//                .padding(6)
-//                .background(Color.purple.opacity(0.15))
-//                .cornerRadius(8)
-//            }
+
+            //            Spacer()
+
+            //            // guild tag
+            //            if let tag_guild = user.primary_guild,
+            //               let tag = tag_guild.tag {
+            //              Label(tag, systemImage: "flame.fill")
+            //                .labelStyle(.titleAndIcon)
+            //                .padding(6)
+            //                .background(Color.purple.opacity(0.15))
+            //                .cornerRadius(8)
+            //            }
           }
-          
-//          HStack(spacing: 10) {
-//            // badges
-//            Label("", systemImage: "number")
-//          }
-//          .foregroundColor(.gray)
-          
+
+          //          HStack(spacing: 10) {
+          //            // badges
+          //            Label("", systemImage: "number")
+          //          }
+          //          .foregroundColor(.gray)
+
           Divider()
-          
+
           VStack(alignment: .leading, spacing: 6) {
             Text("About Me")
               .font(.caption)
@@ -151,9 +155,9 @@ struct MemberSidebarView: View {
                 .font(.body)
             }
           }
-          
+
           Divider()
-          
+
           VStack(alignment: .leading, spacing: 6) {
             if let guildCount = profile?.mutual_guilds?.count, guildCount > 0 {
               MutualItem(
@@ -162,7 +166,8 @@ struct MemberSidebarView: View {
                 action: {}
               )
             }
-            if let friendCount = profile?.mutual_friends_count, friendCount > 0 {
+            if let friendCount = profile?.mutual_friends_count, friendCount > 0
+            {
               MutualItem(
                 title: "Mutual Friends",
                 count: friendCount,
@@ -170,7 +175,7 @@ struct MemberSidebarView: View {
               )
             }
           }
-          
+
           Spacer()
         }
         .padding(.horizontal, 20)
@@ -205,7 +210,7 @@ struct MemberSidebarView: View {
         }
       }
     }
-    
+
     func bannerURL(animated: Bool) -> URL? {
       let userId = user.id
       if let banner = user.banner {
@@ -214,8 +219,8 @@ struct MemberSidebarView: View {
             userId: userId,
             banner: banner
           ).url
-          + ((banner.hasPrefix("a_") && animated)
-             ? ".gif" : ".png") + "?size=600"
+            + ((banner.hasPrefix("a_") && animated)
+              ? ".gif" : ".png") + "?size=600"
         )
       } else if let banner = profile?.user_profile?.banner {
         return URL(
@@ -233,25 +238,25 @@ struct MemberSidebarView: View {
 }
 
 struct MutualItem: View {
-    let title: String
-    let count: Int
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            HStack {
-                Text("\(title) — \(count)")
-                    .foregroundColor(.white)
-                    .fontWeight(.medium)
-                Spacer()
-                Image(systemName: "chevron.right")
-                    .foregroundColor(.white.opacity(0.6))
-                    .font(.system(size: 14, weight: .semibold))
-            }
-            .padding(.vertical, 10)
-            .padding(.horizontal, 16)
-            .background(Color.clear)
-        }
-        .buttonStyle(PlainButtonStyle())
+  let title: String
+  let count: Int
+  let action: () -> Void
+
+  var body: some View {
+    Button(action: action) {
+      HStack {
+        Text("\(title) — \(count)")
+          .foregroundColor(.white)
+          .fontWeight(.medium)
+        Spacer()
+        Image(systemName: "chevron.right")
+          .foregroundColor(.white.opacity(0.6))
+          .font(.system(size: 14, weight: .semibold))
+      }
+      .padding(.vertical, 10)
+      .padding(.horizontal, 16)
+      .background(Color.clear)
     }
+    .buttonStyle(PlainButtonStyle())
+  }
 }
