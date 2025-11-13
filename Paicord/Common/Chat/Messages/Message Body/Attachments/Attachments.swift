@@ -53,34 +53,22 @@ extension MessageCell {
               return nil
             }
           }()
-          let (width, height): (CGFloat?, CGFloat?) = {
-            // cap sizes so attachments fit in a 400x300 box, then fix via aspect ratio
-            let maxWidth: CGFloat = 400
-            let maxHeight: CGFloat = 300
-            if let width = attachment.width, let height = attachment.height {
-              let w = min(width.toCGFloat, maxWidth)
-              let h = min(height.toCGFloat, maxHeight)
-              let aspect = width.toCGFloat / height.toCGFloat
-              if aspect >= 1 {
-                // wide image
-                return (w, w / aspect)
-              } else {
-                // tall image
-                return (h * aspect, h)
-              }
-            } else {
-              return (min(400, 300), min(300, 400))
-            }
-          }()
           AttachmentGridItemPreview(
             attachment: attachment
           )
           .clipShape(.rounded)
           .aspectRatio(aspectRatio, contentMode: .fit)
-          // TODO: replace all occurrences of this to the one below supported by code above
+          // TODO: replace all occurrences of this to the one below
+//          .frame(
+//            minWidth: 1,
+//            maxWidth: min(attachment.width?.toCGFloat, 400),
+//            minHeight: 1,
+//            maxHeight: min(attachment.height?.toCGFloat, 300),
+//            alignment: .leading
+//          )
           .frame(
-            width: width,
-            height: height,
+            width: min(attachment.width?.toCGFloat, 400),
+            height: min(attachment.height?.toCGFloat, 300),
             alignment: .leading
           )
         //					case
