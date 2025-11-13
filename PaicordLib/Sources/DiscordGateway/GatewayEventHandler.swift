@@ -96,6 +96,7 @@ public protocol GatewayEventHandler: Sendable {
 	func onMessageCreate(_ payload: Gateway.MessageCreate) async throws
 	func onMessageUpdate(_ payload: DiscordChannel.PartialMessage) async throws
 	func onMessageDelete(_ payload: Gateway.MessageDelete) async throws
+  func onMessageAcknowledge(_ payload: Gateway.MessageAcknowledge) async throws
 	func onMessageDeleteBulk(_ payload: Gateway.MessageDeleteBulk) async throws
 	func onMessageReactionAdd(_ payload: Gateway.MessageReactionAdd) async throws
 	func onMessageReactionRemove(_ payload: Gateway.MessageReactionRemove)
@@ -299,6 +300,7 @@ extension GatewayEventHandler {
 	public func onMessageCreate(_: Gateway.MessageCreate) async throws {}
 	public func onMessageUpdate(_: DiscordChannel.PartialMessage) async throws {}
 	public func onMessageDelete(_: Gateway.MessageDelete) async throws {}
+  public func onMessageAcknowledge(_ payload: Gateway.MessageAcknowledge) async throws {}
 	public func onMessageDeleteBulk(_: Gateway.MessageDeleteBulk) async throws {}
 	public func onMessageReactionAdd(_: Gateway.MessageReactionAdd) async throws {
 	}
@@ -684,6 +686,10 @@ extension GatewayEventHandler {
 			await withLogging(for: "onMessageDelete") {
 				try await onMessageDelete(payload)
 			}
+    case let .messageAcknowledge(payload):
+      await withLogging(for: "onMessageAcknowledge") {
+        try await onMessageAcknowledge(payload)
+      }
 		case let .messageDeleteBulk(payload):
 			await withLogging(for: "onMessageDeleteBulk") {
 				try await onMessageDeleteBulk(payload)

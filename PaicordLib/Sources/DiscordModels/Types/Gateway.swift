@@ -237,7 +237,9 @@ public struct Gateway: Sendable, Codable {
 			case messageCreate(MessageCreate)
 			case messageUpdate(DiscordChannel.PartialMessage)
 			case messageDelete(MessageDelete)
-			case messageDeleteBulk(MessageDeleteBulk)
+      case messageDeleteBulk(MessageDeleteBulk)
+        
+      case messageAcknowledge(MessageAcknowledge)
 
 			case messagePollVoteAdd(MessagePollVote)
 			case messagePollVoteRemove(MessagePollVote)
@@ -375,7 +377,7 @@ public struct Gateway: Sendable, Codable {
 					return [.guildVoiceStates]
 				case .presenceUpdate:
 					return [.guildPresences]
-				case .messageCreate, .messageUpdate, .messageDelete:
+        case .messageCreate, .messageUpdate, .messageDelete, .messageAcknowledge:
 					return [.guildMessages, .directMessages]
 				case .messageDeleteBulk:
 					return [.guildMessages]
@@ -580,8 +582,10 @@ public struct Gateway: Sendable, Codable {
 					self.data = try .messageCreate(decodeData())
 				case "MESSAGE_UPDATE":
 					self.data = try .messageUpdate(decodeData())
-				case "MESSAGE_DELETE":
-					self.data = try .messageDelete(decodeData())
+        case "MESSAGE_DELETE":
+          self.data = try .messageDelete(decodeData())
+				case "MESSAGE_ACK":
+					self.data = try .messageAcknowledge(decodeData())
 				case "MESSAGE_DELETE_BULK":
 					self.data = try .messageDeleteBulk(decodeData())
 				case "MESSAGE_REACTION_ADD":
