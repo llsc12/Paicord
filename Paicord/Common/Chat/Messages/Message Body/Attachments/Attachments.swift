@@ -58,11 +58,17 @@ extension MessageCell {
           )
           .clipShape(.rounded)
           .aspectRatio(aspectRatio, contentMode: .fit)
+          // TODO: replace all occurrences of this to the one below
+//          .frame(
+//            minWidth: 1,
+//            maxWidth: min(attachment.width?.toCGFloat, 400),
+//            minHeight: 1,
+//            maxHeight: min(attachment.height?.toCGFloat, 300),
+//            alignment: .leading
+//          )
           .frame(
-            minWidth: 1,
-            maxWidth: min(attachment.width?.toCGFloat, 400),
-            minHeight: 1,
-            maxHeight: min(attachment.height?.toCGFloat, 300),
+            width: min(attachment.width?.toCGFloat, 400),
+            height: min(attachment.height?.toCGFloat, 300),
             alignment: .leading
           )
         //					case

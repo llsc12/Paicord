@@ -18,8 +18,8 @@ struct ReactionsView: View {
 
   var body: some View {
     FlowLayout(spacing: 4) {
-      let emojiReactions = Array(reactions.keys)
-      let emojiBurstReactions = Array(burstReactions.keys)
+      let emojiReactions = reactions.keys
+      let emojiBurstReactions = burstReactions.keys
 
       ForEach(emojiReactions, id: \.id) { emoji in
         Reaction(
