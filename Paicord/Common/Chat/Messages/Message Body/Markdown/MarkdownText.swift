@@ -1006,11 +1006,14 @@ private enum FontHelpers {
       case .bold:
         traits.insert(.traitBold)
       }
-      let descriptor =
-        font.fontDescriptor.withSymbolicTraits(traits) ?? font.fontDescriptor
-      // size 0 keeps the same size; then scale for Dynamic Type
+      guard let descriptor = font.fontDescriptor.withSymbolicTraits(traits)
+      else {
+        return font
+      }
+
       let updated = UIFont(descriptor: descriptor, size: font.pointSize)
-      return UIFontMetrics.default.scaledFont(for: updated)
+
+      return updated
     }
 
     private static func textStyle(forHeading level: Int) -> UIFont.TextStyle {
@@ -1036,90 +1039,94 @@ private enum FontHelpers {
   #endif
 
   static func makeFontBold(_ font: Any) -> Any {
-  #if os(macOS)
+    #if os(macOS)
       guard let f = font as? NSFont else { return font }
 
       if let semi = f.withWeight(weight: .semibold) {
-          return semi
+        return semi
       }
 
       // Fallback: system semibold
       return NSFont.systemFont(ofSize: f.pointSize, weight: .semibold)
 
-  #else
+    #else
       guard let f = font as? UIFont else { return font }
 
       // If the font is already semibold or heavier, return as-is
-      if let traits = f.fontDescriptor.fontAttributes[.traits] as? [UIFontDescriptor.TraitKey: Any],
-         let weightValue = traits[.weight] as? CGFloat,
-         weightValue >= UIFont.Weight.semibold.rawValue {
-          return f
+      if let traits = f.fontDescriptor.fontAttributes[.traits]
+        as? [UIFontDescriptor.TraitKey: Any],
+        let weightValue = traits[.weight] as? CGFloat,
+        weightValue >= UIFont.Weight.semibold.rawValue
+      {
+        return f
       }
 
       // Create a semibold descriptor
-      let descriptor = f.fontDescriptor.addingAttributes([
-          UIFontDescriptor.AttributeName.traits: [
-              UIFontDescriptor.TraitKey.weight: UIFont.Weight.semibold
-          ]
+      //      let descriptor = f.fontDescriptor.addingAttributes([
+      //        UIFontDescriptor.AttributeName.traits: [
+      //          UIFontDescriptor.TraitKey.weight: UIFont.Weight.semibold
+      //        ]
+      //      ])
+      return f.addingAttributes([
+        .traits: [UIFontDescriptor.TraitKey.weight: UIFont.Weight.semibold]
       ])
 
-      let updated = UIFont(descriptor: descriptor, size: f.pointSize)
-      let scaled = UIFontMetrics.default.scaledFont(for: updated)
-
-      // Fallback if the font didn’t actually change
-      if scaled.fontName == f.fontName {
-          return UIFont.systemFont(ofSize: f.pointSize, weight: .semibold)
-      }
-
-      return scaled
-  #endif
+    //      let updated = UIFont(descriptor: descriptor, size: f.pointSize)
+    //      let scaled = UIFontMetrics.default.scaledFont(for: updated)
+    //
+    //      // Fallback if the font didn’t actually change
+    //      if scaled.fontName == f.fontName {
+    //        return UIFont.systemFont(ofSize: f.pointSize, weight: .semibold)
+    //      }
+    //
+    //      return scaled
+    #endif
   }
 }
 
 #if os(macOS)
-// Source - https://stackoverflow.com/a/76143011
-// Posted by Sören Kuklau
-// Retrieved 2025-11-13, License - CC BY-SA 4.0
-
-extension NSFont
-{
+  // Source - https://stackoverflow.com/a/76143011
+  // Posted by Sören Kuklau
+  // Retrieved 2025-11-13, License - CC BY-SA 4.0
+  extension NSFont {
     /// Rough mapping from behavior of `.systemFont(…weight:)`
     /// to `NSFontManager`'s `Int`-based weight,
     /// as of 13.4 Ventura
-    func withWeight(weight: NSFont.Weight) -> NSFont?
-    {
-        let fontManager=NSFontManager.shared
+    func withWeight(weight: NSFont.Weight) -> NSFont? {
+      let fontManager = NSFontManager.shared
 
-        var intWeight: Int
+      var intWeight: Int
 
-        switch weight
-        {
-        case .ultraLight:
-            intWeight=0
-        case .light:
-            intWeight=2 // treated as ultraLight
-        case .thin:
-            intWeight=3
-        case .medium:
-            intWeight=6
-        case .semibold:
-            intWeight=8 // treated as bold
-        case .bold:
-            intWeight=9
-        case .heavy:
-            intWeight=10 // treated as bold
-        case .black:
-            intWeight=15 // .systemFont does bold here; we do condensed black
-        default:
-            intWeight=5 // treated as regular
-        }
+      switch weight
+      {
+      case .ultraLight:
+        intWeight = 0
+      case .light:
+        intWeight = 2  // treated as ultraLight
+      case .thin:
+        intWeight = 3
+      case .medium:
+        intWeight = 6
+      case .semibold:
+        intWeight = 8  // treated as bold
+      case .bold:
+        intWeight = 9
+      case .heavy:
+        intWeight = 10  // treated as bold
+      case .black:
+        intWeight = 15  // .systemFont does bold here; we do condensed black
+      default:
+        intWeight = 5  // treated as regular
+      }
 
-        return fontManager.font(withFamily: self.familyName ?? "",
-                                traits: .unboldFontMask,
-                                weight: intWeight,
-                                size: self.pointSize)
+      return fontManager.font(
+        withFamily: self.familyName ?? "",
+        traits: .unboldFontMask,
+        weight: intWeight,
+        size: self.pointSize
+      )
     }
-}
+  }
 #endif
 
 // UIColor wrappers for cross-platform compatibility
@@ -1186,150 +1193,12 @@ extension Text {
   }
 }
 
-#Preview {
-  @Previewable @State var profileOpen: Bool = false
-  @Previewable @State var avatarAnimated: Bool = false
-
-  let message: DiscordChannel.Message = .init(
-    id: try! .makeFake(),
-    channel_id: try! .makeFake(),
-    author: DiscordUser(
-      id: .init("381538809180848128"),
-      username: "llsc12",
-      discriminator: "0",
-      global_name: nil,
-      avatar: "df71b3f223666fd8331c9940c6f7cbd9",
-      banner: nil,
-      bot: false,
-      system: false,
-      mfa_enabled: true,
-      accent_color: nil,
-      locale: nil,
-      verified: true,
-      email: nil,
-      flags: .init(rawValue: 4_194_352),
-      premium_type: DiscordUser.PremiumKind.none,
-      public_flags: .init(rawValue: 4_194_304),
-      collectibles: .init(
-        nameplate: .init(
-          asset: "nameplates/nameplates_v3/bonsai/",
-          sku_id: .init("1382845914225442886"),
-          label: "COLLECTIBLES_NAMEPLATES_VOL_3_BONSAI_A11Y",
-          palette: .bubble_gum,
-          expires_at: nil
-        )
-      ),
-      avatar_decoration_data: nil
-    ),
-    content:
-      """
-      gn
-      # Regular markdown
-      ||spoiler||
-      ~~strikethrough~~
-      __underline__
-      *italics* or _italics_
-      **bold**
-      ***bold & italics***
-      ***~~strikethrough, bold & italics~~*** (you can mix them)
-      `codeline`
-      **`bold codeline`**
-      ``codeline with ` in it``
-      ``codeline that ends with ` ``
-      and `` ` starts with`` or `` ` has on both sides ` ``
-      > single line quote
-
-      > multiple line
-      > quote
-
-      >>> (if you type \">>>\" at the beginning of any line, it will 
-      expand them to the lines remaining\nuntil the end of the message
-      -# doesn't save the \">>>\" if sent from desktop
-      """,
-    timestamp: .init(date: .now),
-    edited_timestamp: nil,
-    tts: false,
-    mention_everyone: false,
-    mentions: [],
-    mention_roles: [],
-    mention_channels: [],
-    attachments: [],
-    embeds: [],
-    reactions: [],
-    nonce: nil,
-    pinned: false,
-    webhook_id: nil,
-    type: .default,
-    activity: nil,
-    application: nil,
-    application_id: nil,
-    message_reference: nil,
-    flags: .init(rawValue: 0),
-    referenced_message: nil,
-    interaction: nil,
-    thread: nil,
-    components: nil,
-    sticker_items: nil,
-    stickers: nil,
-    position: nil,
-    role_subscription_data: nil,
-    resolved: nil,
-    poll: nil,
-    call: nil,
-    guild_id: nil,
-    member: nil
-  )
-  ScrollView {
-    //    LazyVStack {
-    VStack {
-      HStack(alignment: .bottom) {
-        MessageCell.MessageAuthor.Avatar(
-          message: message,
-          profileOpen: $profileOpen,
-          animated: false
-        )
-        #if os(macOS)
-          .padding(.trailing, 4)  // balancing
-        #endif
-        VStack(spacing: 0) {
-          HStack(alignment: .bottom) {
-            MessageCell.MessageAuthor.Username(  // username line
-              message: message,
-              guildStore: nil,
-              profileOpen: $profileOpen
-            )
-            //                        Date(for: message.timestamp.date)  // message date
-            //          if let edit = message.edited_timestamp {  // edited notice
-            //            MessageCell.DefaultMessage.EditStamp(edited: edit)
-            //          }
-          }
-          .border(.green)
-          .frame(
-            maxWidth: .infinity,
-            maxHeight: .infinity,
-            alignment: .bottomLeading
-          )
-          .fixedSize(horizontal: false, vertical: true)
-          .border(.red)
-
-          MarkdownText(content: message.content)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .border(.blue)
-        }
-        .frame(maxHeight: .infinity, alignment: .bottom)  // align text to bottom of cell
-      }
-      .fixedSize(horizontal: false, vertical: true)
-    }
-    .padding(.horizontal, 4)
-    //    .onHover { avatarAnimated = $0 }
-  }
-  //}
-}
-
 enum PaicordChatLink {
   case userMention(UserSnowflake)
   case roleMention(RoleSnowflake)
   case channelMention(ChannelSnowflake)
+  case everyoneMention
+  case hereMention
 
   case discordMessageLink(GuildSnowflake?, ChannelSnowflake, MessageSnowflake)
 
@@ -1382,6 +1251,10 @@ enum PaicordChatLink {
           let channelId = pathComponents[safe: 1]
         else { return nil }
         self = .channelMention(.init(channelId))
+      case "everyone":
+        self = .everyoneMention
+      case "here":
+        self = .hereMention
       default:
         return nil
       }

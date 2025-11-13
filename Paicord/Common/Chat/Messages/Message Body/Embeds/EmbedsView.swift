@@ -159,8 +159,7 @@ extension MessageCell {
                       Text(field.name)
                         .font(.subheadline)
                         .fontWeight(.semibold)
-                      Text(field.value)
-                        .font(.subheadline)
+                      MarkdownText(content: field.value)
                         .fixedSize(horizontal: false, vertical: true)
                     }
                   }

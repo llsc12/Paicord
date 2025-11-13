@@ -93,7 +93,7 @@ extension MessageCell {
         "image/jpeg",
         "image/jpg",
         "image/gif",
-        "image/webp",
+        "image/webp", 
         "video/mp4",
         "video/quicktime",
       ]
