@@ -25,40 +25,42 @@ extension ChatView {
           vm.guildStore?.members[$0.id]?.nick ?? $0.global_name ?? $0.username
         }
         if !typingUsernames.isEmpty {
-          HStack {
-            TypingIndicator()
-              .padding(.horizontal, 9)
-            if typingUsernames.count == 1, let username = typingUsernames.first
-            {
-              Text(username).fontWeight(.heavy) + Text(" is typing...")
-            } else if typingUsernames.count == 2,
-              let first = typingUsernames.first,
-              let last = typingUsernames.last
-            {
-              Text(first).fontWeight(.heavy) + Text(" and ")
+          IntrinsicGeometryReader { proxy in
+            HStack {
+              TypingIndicator()
+                .padding(.horizontal, 9)
+              if typingUsernames.count == 1, let username = typingUsernames.first
+              {
+                Text(username).fontWeight(.heavy) + Text(" is typing...")
+              } else if typingUsernames.count == 2,
+                        let first = typingUsernames.first,
+                        let last = typingUsernames.last
+              {
+                Text(first).fontWeight(.heavy) + Text(" and ")
                 + Text(last).fontWeight(.heavy)
                 + Text(" are typing...")
-            } else {
-              let ppl = typingUsernames.reduce(Text("")) {
-                partialResult,
-                username in
-                if username == typingUsernames.last {
-                  return partialResult + Text("and ")
+              } else {
+                let ppl = typingUsernames.reduce(Text("")) {
+                  partialResult,
+                  username in
+                  if username == typingUsernames.last {
+                    return partialResult + Text("and ")
                     + Text(username).fontWeight(.heavy)
-                } else {
-                  return partialResult + Text(username).fontWeight(.heavy)
+                  } else {
+                    return partialResult + Text(username).fontWeight(.heavy)
                     + Text(", ")
+                  }
                 }
+                ppl + Text(" are typing...")
               }
-              ppl + Text(" are typing...")
+              Spacer()
             }
-            Spacer()
+            .font(idiom == .phone ? .footnote : .subheadline)
+            .lineLimit(1)
+            .truncationMode(.head)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2)
           }
-          .font(idiom == .phone ? .footnote : .subheadline)
-          .lineLimit(1)
-          .truncationMode(.head)
-          .padding(.horizontal, 6)
-          .padding(.vertical, 2)
         }
       }
 

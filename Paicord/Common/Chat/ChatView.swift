@@ -46,6 +46,7 @@ struct ChatView: View {
           }
           .scrollTargetLayout()
         }
+        .maxHeight(.infinity)
         .safeAreaPadding(.bottom, 22)
         .bottomAnchored()
         .scrollDismissesKeyboard(.interactively)

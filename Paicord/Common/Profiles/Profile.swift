@@ -13,7 +13,7 @@ import SwiftUIX
 /// Collection of ui components for profiles
 enum Profile {
   struct Avatar: View {
-    var guildStore: GuildStore? = nil
+    @Environment(\.guildStore) var guildStore
     let member: Guild.PartialMember?
     let user: PartialUser?
     var animated: Bool = false

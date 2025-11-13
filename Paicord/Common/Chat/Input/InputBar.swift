@@ -23,10 +23,7 @@ extension ChatView {
     @State var text: String = ""
 
     var body: some View {
-      VStack(spacing: 0) {
-        TypingIndicatorBar(vm: vm)
-          .shadow(color: .black, radius: 10)
-
+      ZStack(alignment: .top) {
         HStack(alignment: .bottom, spacing: 8) {
           Button {
 
@@ -78,10 +75,15 @@ extension ChatView {
         #if os(iOS)
           .animation(.default, value: text.isEmpty)
         #endif
+        TypingIndicatorBar(vm: vm)
+          .shadow(color: .black, radius: 10)
+          .padding(.top, -18)  // away from bar
       }
       .background {
         VariableBlurView()
           .rotationEffect(.degrees(180))
+          // extend upwards slightly
+          .padding(.top, -8 + (vm.typingTimeoutTokens.isEmpty ? 0 : -10))
           #if os(iOS)
             .padding(.bottom, isFocused ? 0 : (safeAreaInsets.bottom * -1))
             .animation(.default, value: isFocused)
@@ -180,6 +182,11 @@ extension ChatView {
           ]
           textView.delegate = context.coordinator
           textView.onSubmit = onSubmit
+          textView.minSize = NSSize(width: 0, height: 0)
+          textView.maxSize = NSSize(
+            width: CGFloat.greatestFiniteMagnitude,
+            height: CGFloat.greatestFiniteMagnitude
+          )
 
           let scrollView = NSScrollView()
           scrollView.documentView = textView
@@ -187,7 +194,6 @@ extension ChatView {
           scrollView.drawsBackground = false
           scrollView.borderType = .noBorder
 
-          textView.frame = scrollView.bounds
           textView.autoresizingMask = [.width]
 
           return scrollView
@@ -279,7 +285,7 @@ extension ChatView {
       }
     }
   #elseif os(iOS)
-  
+
   #endif
 }
 

@@ -26,7 +26,6 @@ extension MessageCell {
             message.author != nil
             ? guildStore?.members[message.author!.id] : nil
           Profile.Avatar(
-            guildStore: guildStore,
             member: guildstoremember ?? message.member,
             user: message.author?.toPartialUser()
           )
@@ -38,6 +37,7 @@ extension MessageCell {
         .popover(isPresented: $profileOpen) {
           if let userId = message.author?.id, let user = message.author {
             ProfilePopoutView(
+              guild: guildStore,
               member: guildStore?.members[userId] ?? message.member,
               user: user.toPartialUser()
             )
