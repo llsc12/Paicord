@@ -48,9 +48,6 @@ struct PaicordApp: App {
   #endif
 
   init() {
-    #if os(macOS)
-      UserDefaults.standard.set(false, forKey: "NSQuitAlwaysKeepsWindows")  // disable restoring windows on macOS
-    #endif
     //     i foubnd out this rly cool thing if u avoid logging 40mb of data to console the client isnt slow !!!!
     //    #if DEBUG
     //      DiscordGlobalConfiguration.makeLogger = { loggerLabel in
@@ -80,6 +77,11 @@ struct PaicordApp: App {
           FLEXManager.shared.showExplorer()
         #endif
       }
+      #if os(macOS)
+      .introspect(.window, on: .macOS(.v14...)) { window in
+        window.isRestorable = false
+      }
+      #endif
     }
     #if os(macOS)
       .windowToolbarStyle(.unified)
