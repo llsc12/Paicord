@@ -87,7 +87,7 @@ extension PlaceholderMessageCell {
         )
         .fixedSize(horizontal: false, vertical: true)
         
-        ReactionsView.FlowLayout {
+        FlowLayout {
           switch length {
           case .short:
             Rectangle()

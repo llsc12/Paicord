@@ -16,6 +16,7 @@ struct RootView: View {
   @State var appState: PaicordAppState = .init()
   @Environment(\.challenges) var challenges
   @Environment(\.userInterfaceIdiom) var idiom
+  @Environment(\.horizontalSizeClass) var hSizeClass
 
   #if os(macOS)
     @Weak var window: NSWindow?
@@ -46,7 +47,7 @@ struct RootView: View {
           .task { await gatewayStore.connectIfNeeded() }
       } else {
         Group {
-          if idiom == .phone {
+          if idiom == .phone || (idiom == .pad && hSizeClass == .compact) {
             #if os(iOS)
               SmallBaseplate(appState: self.appState)
             #endif

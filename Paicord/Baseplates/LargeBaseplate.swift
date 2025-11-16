@@ -19,7 +19,8 @@ struct LargeBaseplate: View {
   @State var currentGuildStore: GuildStore? = nil
   @State var currentChannelStore: ChannelStore? = nil
 
-  @State private var columnVisibility: NavigationSplitViewVisibility = .doubleColumn
+  @State private var columnVisibility: NavigationSplitViewVisibility =
+    .doubleColumn
 
   var body: some View {
     NavigationSplitView(columnVisibility: $columnVisibility) {
@@ -31,14 +32,18 @@ struct LargeBaseplate: View {
         }
         .toolbar(removing: .sidebarToggle)
         .toolbar {
-          if let currentGuildStore {
-            Text(currentGuildStore.guild?.name ?? "Direct Messages")
-              .font(.title2)
-              .bold()
-          } else {
-            Text("Direct Messages")
-              .font(.title2)
-              .bold()
+          Group {
+            if columnVisibility != .detailOnly {
+              if let currentGuildStore {
+                Text(currentGuildStore.guild?.name ?? "Direct Messages")
+                  .font(.title2)
+                  .bold()
+              } else {
+                Text("Direct Messages")
+                  .font(.title2)
+                  .bold()
+              }
+            }
           }
         }
         .navigationSplitViewColumnWidth(min: 280, ideal: 310, max: 360)
@@ -62,19 +67,19 @@ struct LargeBaseplate: View {
           }
         }
       }
-      #if os(macOS)
-        .toolbar {
-          ToolbarItem(placement: .navigation) {
-            Button {
-              withAnimation {
-                columnVisibility = (columnVisibility == .doubleColumn) ? NavigationSplitViewVisibility.detailOnly : NavigationSplitViewVisibility.doubleColumn
-              }
-            } label: {
-              Label("Toggle Sidebar", systemImage: "sidebar.left")
+      .toolbar {
+        ToolbarItem(placement: .navigation) {
+          Button {
+            withAnimation {
+              columnVisibility =
+                (columnVisibility != .detailOnly) ? .detailOnly : .doubleColumn
             }
+          } label: {
+            Label("Toggle Sidebar", systemImage: "sidebar.left")
           }
+          .tint(.tertiaryButton)
         }
-      #endif
+      }
     }
     .inspector(isPresented: $showingInspector) {
       MemberSidebarView(

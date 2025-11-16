@@ -85,20 +85,6 @@ struct ChatView: View {
       }
     }
     .background(.tableBackground)
-    #if os(iOS)
-      .toolbar {
-        ToolbarItem(placement: .topBarLeading) {
-          Button {
-            withAnimation {
-              appState.chatOpen.toggle()
-            }
-          } label: {
-            Image(systemName: "arrow.left")
-          }
-          .tint(.tertiaryButton)
-        }
-      }
-    #endif
     .toolbar {
       ToolbarItem(placement: .navigation) {
         ChannelHeader(vm: vm)

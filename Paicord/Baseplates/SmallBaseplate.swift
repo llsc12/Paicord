@@ -13,7 +13,7 @@ import SwiftUIX
 struct SmallBaseplate: View {
   @Bindable var appState: PaicordAppState
   @Environment(\.gateway) var gw
-  
+
   @State var currentGuildStore: GuildStore? = nil
   @State var currentChannelStore: ChannelStore? = nil
 
@@ -58,6 +58,20 @@ struct SmallBaseplate: View {
           ChatView(vm: currentChannelStore)
             .environment(\.guildStore, currentGuildStore)
             .environment(\.channelStore, currentChannelStore)
+            #if os(iOS)
+              .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                  Button {
+                    withAnimation {
+                      appState.chatOpen.toggle()
+                    }
+                  } label: {
+                    Image(systemName: "arrow.left")
+                  }
+                  .tint(.tertiaryButton)
+                }
+              }
+            #endif
         } else {
           Text(":3")
             .font(.largeTitle)

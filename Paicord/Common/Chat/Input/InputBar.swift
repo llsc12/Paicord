@@ -25,34 +25,9 @@ extension ChatView {
     var body: some View {
       ZStack(alignment: .top) {
         HStack(alignment: .bottom, spacing: 8) {
-          Button {
+          inputBarButton
 
-          } label: {
-            Image(systemName: "plus")
-              .imageScale(.large)
-              .padding(7.5)
-              .background(.regularMaterial)
-              .clipShape(.circle)
-          }
-          .buttonStyle(.borderless)
-          .tint(.primary)
-          #if os(iOS)
-            TextField("Message", text: $text, axis: .vertical)
-              .textFieldStyle(.plain)
-              .maxHeight(150)
-              .fixedSize(horizontal: false, vertical: true)
-              .disabled(appState.chatOpen == false)
-              .padding(8)
-              .padding(.horizontal, 4)
-              .background(.regularMaterial)
-              .clipShape(.rect(cornerRadius: 18))
-              .focused($isFocused)
-          #else
-            TextView("Message", text: $text, submit: sendMessage)
-              .padding(8)
-              .background(.regularMaterial)
-              .clipShape(.rect(cornerRadius: 18))
-          #endif
+          inputBarField
 
           #if os(iOS)
             if text.isEmpty == false {
@@ -75,6 +50,7 @@ extension ChatView {
         #if os(iOS)
           .animation(.default, value: text.isEmpty)
         #endif
+
         TypingIndicatorBar(vm: vm)
           .shadow(color: .black, radius: 10)
           .padding(.top, -18)  // away from bar
@@ -89,6 +65,57 @@ extension ChatView {
             .animation(.default, value: isFocused)
           #endif
       }
+    }
+
+    @ViewBuilder
+    var inputBarButton: some View {
+      Menu {
+        Menu {
+          
+        } label: {
+          Label("Apps", systemImage: "puzzle.fill")
+        }
+        
+        Button {
+          
+        } label: {
+          Label("Upload Photos", systemImage: "photo.on.rectangle")
+        }
+      } label: {
+        Image(systemName: "plus")
+          .imageScale(.large)
+          .padding(7.5)
+          .background(.regularMaterial)
+          .clipShape(.circle)
+      }
+      #if os(macOS)
+      .menuStyle(.button)
+      .buttonStyle(.plain)
+      #else
+      .buttonStyle(.borderless)
+      #endif
+      .tint(.primary)
+    }
+
+    @ViewBuilder
+    var inputBarField: some View {
+      #if os(iOS)
+        TextField("Message", text: $text, axis: .vertical)
+          .textFieldStyle(.plain)
+          .maxHeight(150)
+          .fixedSize(horizontal: false, vertical: true)
+          .disabled(appState.chatOpen == false)
+          .padding(.vertical, 7)
+          .padding(.horizontal, 12)
+          .background(.regularMaterial)
+          .clipShape(.rect(cornerRadius: 18))
+          .focused($isFocused)
+      #else
+        TextView("Message", text: $text, submit: sendMessage)
+          .padding(8)
+          .background(.regularMaterial)
+          .clipShape(.rect(cornerRadius: 18))
+      #endif
     }
 
     private func sendMessage() {
@@ -123,6 +150,7 @@ extension ChatView {
         }
       }
     }
+
   }
 
   #if os(macOS)
