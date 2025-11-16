@@ -242,7 +242,7 @@ struct ChannelButton: View {
         .background(
           Group {
             if appState.selectedChannel == channel.id {
-              Color.gray.opacity(0.08)
+              Color.gray.opacity(0.13)
             } else {
               Color.clear
             }
