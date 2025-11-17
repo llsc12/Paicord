@@ -21,7 +21,8 @@ enum Profile {
 
     var body: some View {
       Group {
-        Utils.UserAvatarURL(member: member, user: user, animated: animated) { url in
+        Utils.UserAvatarURL(member: member, user: user, animated: animated) {
+          url in
           WebImage(url: url) { phase in
             switch phase {
             case .success(let image):
@@ -38,7 +39,8 @@ enum Profile {
       .clipShape(Circle())
       .overlay {
         if showDecoration,
-          let decoration = member?.avatar_decoration_data ?? user?.avatar_decoration_data
+          let decoration = member?.avatar_decoration_data
+            ?? user?.avatar_decoration_data
         {
           AvatarDecorationView(
             decoration: decoration,
@@ -257,13 +259,13 @@ enum Profile {
       }
     }
   }
-  
+
   struct BannerView: View {
     var body: some View {
       EmptyView()
     }
   }
-  
+
   struct Badge: View {
     var badge: DiscordUser.Profile.Badge
     @State private var isHovered: Bool = false
@@ -282,6 +284,21 @@ enum Profile {
       URL(
         string: CDNEndpoint.profileBadge(icon: badge.icon).url + ".png"
       )
+    }
+  }
+
+  struct ThemeColorsBackground: View {
+    var colors: [DiscordColor]?
+
+    var body: some View {
+      if let colors, let primaryColor = colors.first?.asColor(),
+        let secondaryColor = colors.last?.asColor()
+      {
+        LinearGradient(
+          gradient: .init(colors: [primaryColor, secondaryColor]),
+          direction: .down
+        )
+      }
     }
   }
 }

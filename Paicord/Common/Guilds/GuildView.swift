@@ -17,9 +17,11 @@ struct GuildView: View {
     ScrollView {
       VStack(spacing: 0) {
         Utils.GuildBannerURL(guild: guild, animated: true) { bannerURL in
-          AnimatedImage(url: bannerURL)
-            .resizable()
-            .aspectRatio(16 / 9, contentMode: .fill)
+          if let bannerURL {
+            AnimatedImage(url: bannerURL)
+              .resizable()
+              .aspectRatio(16 / 9, contentMode: .fill)
+          }
         }
 
         if idiom == .phone {

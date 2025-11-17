@@ -17,6 +17,7 @@ struct ProfilePopoutView: View {
   @Environment(\.gateway) var gw
   @Environment(\.appState) var appState
   @Environment(\.userInterfaceIdiom) var idiom
+  @Environment(\.channelStore) var channel
   var guild: GuildStore?
   let member: Guild.PartialMember?
   let user: PartialUser
@@ -41,8 +42,8 @@ struct ProfilePopoutView: View {
       VStack(alignment: .leading) {
         bannerView
 
-          profileBody
-        .padding()
+        profileBody
+          .padding()
       }
       .minWidth(idiom == .phone ? nil : 300)  // popover limits on larger devices
       .maxWidth(idiom == .phone ? nil : 300)  // popover limits on larger devices
@@ -52,14 +53,28 @@ struct ProfilePopoutView: View {
     .minHeight(idiom == .phone ? nil : 400)  // popover limits on larger devices
     .presentationDetents([.medium, .large])
     .scrollClipDisabled()
+    .background(
+      Profile.ThemeColorsBackground(
+        colors: showMainProfile
+          ? profile?.guild_member_profile?.theme_colors
+            ?? profile?.user_profile?.theme_colors
+          : profile?.user_profile?.theme_colors
+      )
+      .brightness(-0.5)
+    )
     #if os(iOS)
-    .presentationBackground(.ultraThinMaterial)
+      .presentationBackground(.ultraThinMaterial)
     #endif
   }
 
   @ViewBuilder
   var bannerView: some View {
-    Utils.UserBannerURL(user: user, profile: profile, mainProfileBanner: showMainProfile, animated: true) { bannerURL in
+    Utils.UserBannerURL(
+      user: user,
+      profile: profile,
+      mainProfileBanner: showMainProfile,
+      animated: true
+    ) { bannerURL in
       WebImage(url: bannerURL) { phase in
         switch phase {
         case .success(let image):
@@ -68,10 +83,16 @@ struct ProfilePopoutView: View {
             .aspectRatio(3, contentMode: .fill)
         default:
           let color =
-            profile?.user_profile?.accent_color ?? user.accent_color
+            showMainProfile
+            ? profile?.guild_member_profile?.theme_colors?.first ?? profile?
+              .user_profile?.theme_colors?.first ?? profile?
+              .guild_member_profile?.accent_color
+              ?? profile?.user_profile?.accent_color
+            : profile?.user_profile?.theme_colors?.first
+              ?? profile?.user_profile?.accent_color
           Rectangle()
             .aspectRatio(3, contentMode: .fit)
-            .foregroundStyle((color?.asColor() ?? accentColor))
+            .foregroundStyle(color?.asColor() ?? accentColor)
         }
       }
       .reverseMask(alignment: .bottomLeading) {
@@ -113,14 +134,14 @@ struct ProfilePopoutView: View {
       .bold()
       .lineLimit(1)
       .minimumScaleFactor(0.5)
-      
+
       FlowLayout(xSpacing: 8, ySpacing: 2) {
         Group {
           Text("@\(user.username ?? "unknown")")
           if let pronouns = profileMeta?.pronouns
-              ?? (showMainProfile
-                  ? user.pronouns : member?.pronouns ?? user.pronouns),
-             !pronouns.isEmpty
+            ?? (showMainProfile
+              ? user.pronouns : member?.pronouns ?? user.pronouns),
+            !pronouns.isEmpty
           {
             Text("•")
             Text(pronouns)
@@ -128,7 +149,7 @@ struct ProfilePopoutView: View {
         }
         .font(.subheadline)
         .foregroundStyle(.secondary)
-        
+
         HStack(spacing: 4) {
           let badges = profile?.badges ?? []
           ForEach(badges) { badge in
@@ -137,10 +158,14 @@ struct ProfilePopoutView: View {
         }
         .maxHeight(16)
       }
-      
-      
-      if let bio = profileMeta?.bio ?? profile?.user_profile?.bio {
-        MarkdownText(content: bio)
+
+      if let bio =
+        (profileMeta?.bio ?? profile?.user_profile?.bio)?.isEmpty ?? true
+        ? profile?.user_profile?.bio
+        : profileMeta?.bio ?? profile?.user_profile?.bio
+      {
+        MarkdownText(content: bio, channelStore: channel)
+
       }
     }
   }
@@ -175,8 +200,15 @@ struct ProfilePopoutView: View {
   func grabColor() async {
     let cc = CCColorCube()
     // use sdwebimage's image manager, get the avatar image and extract colors using colorcube
-    var m: Guild.PartialMember? = showMainProfile ? nil : member
-    guard let avatarURL = Utils.fetchUserAvatarURL(member: m, guildId: guild?.guildId, user: user, animated: false) else {
+    let m: Guild.PartialMember? = showMainProfile ? nil : member
+    guard
+      let avatarURL = Utils.fetchUserAvatarURL(
+        member: m,
+        guildId: guild?.guildId,
+        user: user,
+        animated: false
+      )
+    else {
       return
     }
     let imageManager: SDWebImageManager = .shared
@@ -203,5 +235,4 @@ struct ProfilePopoutView: View {
       }
     }
   }
- 
 }
