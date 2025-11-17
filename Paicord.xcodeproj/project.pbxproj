@@ -81,6 +81,7 @@
 		AA9C81862E66670E0086B1DA /* CornerRadius.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9C81852E66670E0086B1DA /* CornerRadius.swift */; };
 		AA9C818C2E6702930086B1DA /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = AA9C818B2E6702930086B1DA /* SwiftUIIntrospect */; };
 		AA9D26B12EC95EE4006071FE /* FlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9D26B02EC95EE3006071FE /* FlowLayout.swift */; };
+		AA9D26B32EC97721006071FE /* ViewUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9D26B22EC97714006071FE /* ViewUtils.swift */; };
 		AAB22FD82EAD0A2400413310 /* SwiftPrettyPrint in Frameworks */ = {isa = PBXBuildFile; productRef = AAB22FD72EAD0A2400413310 /* SwiftPrettyPrint */; };
 		AAB22FDB2EAD86B700413310 /* ColorCube in Frameworks */ = {isa = PBXBuildFile; productRef = AAB22FDA2EAD86B700413310 /* ColorCube */; };
 		AAB50A502E9AA6800048E8B0 /* ChatInputCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB50A4F2E9AA67C0048E8B0 /* ChatInputCommand.swift */; };
@@ -176,6 +177,7 @@
 		AA9C81822E6660BE0086B1DA /* GuildButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuildButton.swift; sourceTree = "<group>"; };
 		AA9C81852E66670E0086B1DA /* CornerRadius.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CornerRadius.swift; sourceTree = "<group>"; };
 		AA9D26B02EC95EE3006071FE /* FlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowLayout.swift; sourceTree = "<group>"; };
+		AA9D26B22EC97714006071FE /* ViewUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewUtils.swift; sourceTree = "<group>"; };
 		AAB22FD52EABB04300413310 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		AAB50A4F2E9AA67C0048E8B0 /* ChatInputCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatInputCommand.swift; sourceTree = "<group>"; };
 		AAB50A512E9AC9CB0048E8B0 /* ChannelHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelHeader.swift; sourceTree = "<group>"; };
@@ -491,7 +493,6 @@
 		AA2278C32EA44819002C335F /* Profiles */ = {
 			isa = PBXGroup;
 			children = (
-				AA2278C62EA448BD002C335F /* Profile.swift */,
 				AA2278C42EA4481F002C335F /* ProfilePopoutView.swift */,
 				AA21D27D2EA8ED3E00C75093 /* ProfileFullSheetView.swift */,
 			);
@@ -613,6 +614,8 @@
 		AA9C81842E6667050086B1DA /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				AA2278C62EA448BD002C335F /* Profile.swift */,
+				AA9D26B22EC97714006071FE /* ViewUtils.swift */,
 				AA74E4372EBC40F40031B285 /* Modifiers */,
 				AA9C81812E6660AB0086B1DA /* Components */,
 			);
@@ -828,6 +831,7 @@
 				AABED5A92E7FF982005BDD63 /* Merging.swift in Sources */,
 				578E1CE12E67781700C6DEA3 /* GradientText.swift in Sources */,
 				AA409ABC2EC6909800848045 /* Theming.swift in Sources */,
+				AA9D26B32EC97721006071FE /* ViewUtils.swift in Sources */,
 				AA078FC42EC809D600EDFFA8 /* AccountSection.swift in Sources */,
 				AA1097192E64C181005BC3D2 /* NotificationsView.swift in Sources */,
 				57F5AF472E7CAD2500AD5674 /* Challenges.swift in Sources */,

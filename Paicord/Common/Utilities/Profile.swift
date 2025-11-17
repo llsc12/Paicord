@@ -21,10 +21,18 @@ enum Profile {
 
     var body: some View {
       Group {
-        if let guildStore, let member {
-          MemberAvatar(guildStore: guildStore, user: user, member: member)
-        } else {
-          UserAvatar(user: user)
+        Utils.UserAvatarURL(member: member, user: user, animated: animated) { url in
+          WebImage(url: url) { phase in
+            switch phase {
+            case .success(let image):
+              image
+                .resizable()
+                .scaledToFit()
+            default:
+              Circle()
+                .foregroundStyle(.gray.opacity(0.3))
+            }
+          }
         }
       }
       .clipShape(Circle())
@@ -41,92 +49,6 @@ enum Profile {
       }
       .padding(10)
       .padding(-10)
-    }
-
-    struct UserAvatar: View {
-      var user: PartialUser?
-      var animated: Bool = false
-
-      var body: some View {
-        WebImage(url: avatarURL(animated: animated)) { phase in
-          switch phase {
-          case .success(let image):
-            image
-              .resizable()
-              .scaledToFit()
-          default:
-            Circle()
-              .foregroundStyle(.gray.opacity(0.3))
-          }
-        }
-      }
-
-      func avatarURL(animated: Bool) -> URL? {
-        // there is probably a nicer way to write this
-        if let user, let avatar = user.avatar {
-          return URL(
-            string: CDNEndpoint.userAvatar(userId: user.id, avatar: avatar)
-              .url
-              + ".\(animated && avatar.starts(with: "a_") ? "gif" : "png")?size=256&animated=\(animated.description)"
-          )
-        } else {
-          return URL(
-            string: CDNEndpoint.defaultUserAvatar(
-              userId: user?.id ?? (try! .makeFake())
-            ).url + ".png"
-          )
-        }
-      }
-    }
-
-    struct MemberAvatar: View {
-      var guildStore: GuildStore
-      var user: PartialUser?
-      var member: Guild.PartialMember?
-      var animated: Bool = false
-
-      var body: some View {
-        WebImage(url: avatarURL(animated: animated)) { phase in
-          switch phase {
-          case .success(let image):
-            image
-              .resizable()
-              .scaledToFit()
-          default:
-            Circle()
-              .foregroundStyle(.gray.opacity(0.3))
-          }
-        }
-      }
-
-      func avatarURL(animated: Bool) -> URL? {
-        let guildId = guildStore.guildId
-        if let user, member?.avatar ?? user.avatar != nil {
-          let id = user.id
-          if let avatar = member?.avatar {
-            return URL(
-              string: CDNEndpoint.guildMemberAvatar(
-                guildId: guildId,
-                userId: id,
-                avatar: avatar
-              ).url
-                + ".\(animated && avatar.starts(with: "a_") ? "gif" : "png")?size=256&animated=\(animated.description)"
-            )
-          } else if let avatar = user.avatar {
-            return URL(
-              string: CDNEndpoint.userAvatar(userId: id, avatar: avatar).url
-                + ".\(animated && avatar.starts(with: "a_") ? "gif" : "png")?size=256&animated=\(animated.description)"
-            )
-          }
-        } else {
-          return URL(
-            string: CDNEndpoint.defaultUserAvatar(
-              userId: user?.id ?? (try! .makeFake())
-            ).url + ".png"
-          )
-        }
-        return nil
-      }
     }
 
     func showsAvatarDecoration(_ shown: Bool = true) -> Self {
@@ -171,11 +93,11 @@ enum Profile {
     var animated: Bool = false
     var showDecoration: Bool = false
 
-    init(member: Guild.PartialMember?, user: DiscordUser) {
+    init(member: Guild.PartialMember? = nil, user: DiscordUser) {
       self.member = member
       self.user = user.toPartialUser()
     }
-    init(member: Guild.PartialMember?, user: PartialUser) {
+    init(member: Guild.PartialMember? = nil, user: PartialUser) {
       self.member = member
       self.user = user
     }

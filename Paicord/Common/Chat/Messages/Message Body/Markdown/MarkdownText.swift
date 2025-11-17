@@ -280,7 +280,7 @@ class MarkdownRendererVM {
   }
 
   var gw: GatewayStore!
-  var guildStore: GuildStore?
+  var guildStore: GuildStore? { channelStore?.guildStore }
   var channelStore: ChannelStore?
 
   func passRefs(
@@ -288,7 +288,6 @@ class MarkdownRendererVM {
     channelStore: ChannelStore?
   ) {
     self.gw = gw
-    self.guildStore = channelStore?.guildStore
     self.channelStore = channelStore
   }
 

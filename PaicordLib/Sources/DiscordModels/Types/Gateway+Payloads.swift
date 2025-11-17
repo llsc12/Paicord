@@ -388,7 +388,7 @@ extension Gateway {
     //		public var guild_join_requests
     //		public var broadcaster_user_ids
     //		public var session_type: String? // maybe this can become an unstable enum
-    //		public var read_state: ReadState?
+    		public var read_state: [ReadState]?
     public var presences: [Gateway.PresenceUpdate]
     //		public var notification_settings
     public var relationships: [DiscordRelationship]
@@ -690,7 +690,7 @@ extension Gateway {
   /// https://discord.com/developers/docs/topics/gateway-events#guild-member-remove-guild-member-remove-event-fields
   public struct GuildMemberRemove: Sendable, Codable {
     public var guild_id: GuildSnowflake
-    public var user: PartialUser // contains only id
+    public var user: PartialUser  // contains only id
   }
 
   /// https://discord.com/developers/docs/topics/gateway-events#guild-members-chunk
@@ -1901,7 +1901,41 @@ extension Gateway {
       public var id: ChannelSnowflake
     }
   }
-  
+
+  /// https://docs.discord.food/topics/read-state#read-state-structure
+  public struct ReadState: Sendable, Codable {
+    public var id: AnySnowflake  // can be for many types of entities
+    public var read_state_type: IntBitField<Kind>?
+    // last msg and last acked are mutually exclusive
+    public var last_message_id: MessageSnowflake?
+    public var last_acked_id: AnySnowflake?
+    public var mention_count: Int?
+    public var badge_count: Int?
+    public var last_pin_timestamp: DiscordTimestamp?
+    public var flags: IntBitField<Flags>?
+
+    @UnstableEnum<UInt>
+    public enum Kind: Sendable, Codable {
+      case channel  // 0
+      case guildEvent  // 1
+      case notificationCenter  // 2
+      case guildHome  // 3
+      case guildOnboardingQuestion  // 4
+      case messageRequests  // 5
+
+      case __undocumented(UInt)
+    }
+
+    @UnstableEnum<UInt>
+    public enum Flags: Sendable, Codable {
+      case isGuildChannel  // 0
+      case isThread  // 1
+      case isMentionLowImportance  // 2
+      
+      case __undocumented(UInt)
+    }
+  }
+
   public struct MessageAcknowledge: Sendable, Codable {
     public var version: Int
     public var message_id: MessageSnowflake

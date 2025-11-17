@@ -7,6 +7,7 @@
 //
 
 import PaicordLib
+import Playgrounds
 import SDWebImageSwiftUI
 import SwiftUIX
 
@@ -47,6 +48,7 @@ struct GuildButton: View {
   /// Contains its own list of buttons, expands and contracts.
   struct FolderButtons: View {
     @Environment(\.gateway) var gw
+    @Environment(\.colorScheme) var colorScheme
 
     var id: Int64
     var folder: DiscordProtos_DiscordUsers_V1_PreloadedUserSettings.GuildFolder
@@ -185,8 +187,23 @@ struct GuildButton: View {
           .clipShape(.circle)
       } else {
         Rectangle()
-          .fill(.primaryButtonBackground)
+          .fill(.gray.opacity(0.3))
           .aspectRatio(1, contentMode: .fit)
+          .overlay {
+            //            // get initials from guild name
+            let initials: String = guild.name
+              .split(separator: " ")
+              .compactMap(\.first)
+              .reduce("") { $0 + String($1) }
+
+            Text(initials)
+              .minimumScaleFactor(0.1)
+              .foregroundStyle(
+                colorScheme == .dark
+                  ? .white
+                  : .black
+              )
+          }
           .clipShape(.rounded)
       }
     }
@@ -227,9 +244,28 @@ struct GuildButton: View {
               .scaledToFill()
             } else {
               // server name initials TODO
-              Spacer()
+              Rectangle()
+                .fill(.clear)
                 .aspectRatio(1, contentMode: .fit)
-                .background(isSelected ? .accent : .primaryButtonBackground)
+                .background(isSelected ? .accent : .gray.opacity(0.3))
+                .overlay {
+                  // get initials from guild name
+                  let initials = (guild?.name ?? "")
+                    .split(separator: " ")
+                    .compactMap(\.first)
+                    .reduce("") { $0 + String($1) }
+
+                  Text(initials)
+                    .font(.title2)
+                    .minimumScaleFactor(0.1)
+                    .foregroundStyle(
+                      colorScheme == .dark
+                        ? Color.white
+                        : (isSelected
+                           ? Color.white
+                          : Color.black)
+                    )
+                }
             }
           }
         } else {
@@ -239,9 +275,11 @@ struct GuildButton: View {
             .overlay {
               Image(systemName: "bubble.left.and.bubble.right.fill")
                 .font(.title2)
-                .foregroundStyle(colorScheme == .dark ? .white : isSelected ? .white : .black)
+                .foregroundStyle(
+                  colorScheme == .dark ? .white : isSelected ? .white : .black
+                )
             }
-            .background(isSelected ? .accent : .primaryButtonBackground)
+            .background(isSelected ? .accent : .gray.opacity(0.3))
         }
       }
       .clipShape(.rect(cornerRadius: isSelected ? 10 : 32, style: .continuous))

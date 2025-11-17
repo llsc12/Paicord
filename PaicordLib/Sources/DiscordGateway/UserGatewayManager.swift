@@ -153,6 +153,7 @@ public actor UserGatewayManager: GatewayManager {
 			.authTokenRefresh,
 			.userSettingsProto,
 			.debounceMessageReactions,
+      .nonChannelReadStates,
 		],
 		captchaCallback: CaptchaChallengeHandler? = nil,
 		mfaCallback: MFAVerificationHandler? = nil,

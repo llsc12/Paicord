@@ -16,7 +16,7 @@ struct GuildView: View {
   var body: some View {
     ScrollView {
       VStack(spacing: 0) {
-        if let bannerURL = bannerURL(animated: true) {  // maybe add animation control?
+        Utils.GuildBannerURL(guild: guild, animated: true) { bannerURL in
           AnimatedImage(url: bannerURL)
             .resizable()
             .aspectRatio(16 / 9, contentMode: .fill)
@@ -67,22 +67,5 @@ struct GuildView: View {
     .frame(maxWidth: .infinity)
     .background(.tableBackground.opacity(0.5))
     .roundedCorners(radius: 10, corners: .topLeft)
-  }
-
-  func bannerURL(animated: Bool) -> URL? {
-    guard let banner = guild.guild?.banner else { return nil }
-    if banner.starts(with: "a_"), animated {
-      return URL(
-        string: CDNEndpoint.guildBanner(guildId: guild.guildId, banner: banner)
-          .url
-          + ".\(animated ? "gif" : "png")?size=600&animated=true"
-      )
-    } else {
-      return URL(
-        string: CDNEndpoint.guildBanner(guildId: guild.guildId, banner: banner)
-          .url
-          + ".png?size=600&animated=false"
-      )
-    }
   }
 }

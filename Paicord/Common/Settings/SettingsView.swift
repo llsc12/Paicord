@@ -169,8 +169,3 @@ struct SettingsPage: Hashable {
   var action:  (@Sendable () -> Void)? = nil
 }
 
-import Playgrounds
-
-#Playground {
-  SettingsPages.settingsPages
-}

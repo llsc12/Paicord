@@ -45,6 +45,7 @@ struct LargeBaseplate: View {
               }
             }
           }
+          .minimumScaleFactor(0.5)
         }
         .navigationSplitViewColumnWidth(min: 280, ideal: 310, max: 360)
 

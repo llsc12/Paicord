@@ -71,7 +71,7 @@ struct ChatView: View {
             let channelId = info["channelId"] as? ChannelSnowflake,
             channelId == vm.channelId
           else { return }
-            
+          guard isNearBottom else { return }
           scheduleScrollToBottom(
             proxy: proxy,
             messages: orderedMessages

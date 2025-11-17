@@ -155,7 +155,7 @@ public enum CommonMarkUtils {
 		let firstChar = trimmed.first!
 
 		// Unordered list markers
-		if firstChar == "-" || firstChar == "+" || firstChar == "*" {
+		if firstChar == "-" || firstChar == "*" {
 			if trimmed.count > 1 && trimmed.dropFirst().first?.isWhitespace == true {
 				return ListMarkerInfo(
 					isOrdered: false,

@@ -10,6 +10,7 @@ import DiscordModels
 import PaicordLib
 import SDWebImageSwiftUI
 import SwiftUIX
+import ColorCube
 
 struct MemberSidebarView: View {
   @Environment(\.gateway) var gw
@@ -27,7 +28,7 @@ struct MemberSidebarView: View {
         } else if channelStore.channel?.type == .dm,
           let user = channelStore.channel?.recipients?.first
         {
-          DMProfilePanel(user: user)
+          DMProfilePanel(user: user.toPartialUser())
         } else {
           EmptyView()
         }
@@ -66,197 +67,158 @@ struct MemberSidebarView: View {
   struct DMProfilePanel: View {
     @Environment(\.gateway) var gw
     @Environment(\.appState) var appState
-    var user: DiscordUser
+    var user: PartialUser
 
     @State private var profile: DiscordUser.Profile?
 
     var body: some View {
-      VStack {
-        ZStack(alignment: .bottomLeading) {
-          WebImage(
-            url: bannerURL(animated: true),
-          )
-          .resizable()
-          .scaledToFill()
-          .frame(height: 110)
-          .maxWidth(.infinity)
-          .background(.blue)
+      VStack(alignment: .leading) {
+        bannerView
 
-          Profile.AvatarWithPresence(
-            member: nil,
-            user: user
-          )
-          .animated(true)
-          .showsAvatarDecoration()
-          .frame(width: 60, height: 60)
-          .background(
-            Circle()
-              .fill(Color.secondarySystemBackground)
-              .stroke(Color.secondarySystemBackground, lineWidth: 6)
-          )
-          .offset(x: 35, y: 30)
+        profileBody
+          .padding()
+      }
+      .task(fetchProfile)
+      .task(grabColor)
+    }
+
+    @ViewBuilder
+    var bannerView: some View {
+      Utils.UserBannerURL(user: user, profile: profile, animated: true) {
+        bannerURL in
+        WebImage(url: bannerURL) { phase in
+          switch phase {
+          case .success(let image):
+            image
+              .resizable()
+              .aspectRatio(3, contentMode: .fill)
+          default:
+            let color =
+              profile?.user_profile?.accent_color ?? user.accent_color
+            Rectangle()
+              .aspectRatio(3, contentMode: .fit)
+              .foregroundStyle((color?.asColor() ?? accentColor))
+          }
         }
-        .zIndex(1)
+        .reverseMask(alignment: .bottomLeading) {
+          Circle()
+            .frame(width: 80, height: 80)
+            .padding(.leading, 16)
+            .scaleEffect(1.15)
+            .offset(x: -1, y: 40)
+        }
+        .overlay(alignment: .bottomLeading) {
+          Profile.AvatarWithPresence(user: user)
+            .animated(true)
+            .showsAvatarDecoration()
+            .frame(width: 80, height: 80)
+            .padding(.leading, 16)
+            .offset(y: 40)
+        }
+        .padding(.bottom, 30)
+      }
+    }
 
-        VStack(alignment: .leading, spacing: 16) {
-          HStack(alignment: .center, spacing: 12) {
-            VStack(alignment: .leading, spacing: 4) {
-              Text(user.global_name ?? user.username)
-                .font(.title)
-                .bold()
+    @ViewBuilder
+    var profileBody: some View {
+      VStack(alignment: .leading, spacing: 4) {
+        let profileMeta: DiscordUser.Profile.Metadata? = profile?.user_profile
+        Text(
+          user.global_name ?? user.username ?? "Unknown User"
+        )
+        .font(.title2)
+        .bold()
+        .lineLimit(1)
+        .minimumScaleFactor(0.5)
 
-              Text(
-                profile?.user_profile?.pronouns != nil
-                  ? "\(user.username)・\(profile?.user_profile?.pronouns ?? "")"
-                  : user.username
-              )
-              .font(.subheadline)
-              .foregroundColor(.gray)
-            }
-
-            //            Spacer()
-
-            //            // guild tag
-            //            if let tag_guild = user.primary_guild,
-            //               let tag = tag_guild.tag {
-            //              Label(tag, systemImage: "flame.fill")
-            //                .labelStyle(.titleAndIcon)
-            //                .padding(6)
-            //                .background(Color.purple.opacity(0.15))
-            //                .cornerRadius(8)
-            //            }
-          }
-
-          //          HStack(spacing: 10) {
-          //            // badges
-          //            Label("", systemImage: "number")
-          //          }
-          //          .foregroundColor(.gray)
-
-          Divider()
-
-          VStack(alignment: .leading, spacing: 6) {
-            Text("About Me")
-              .font(.caption)
-              .foregroundColor(.gray)
-            Text(profile?.user_profile?.bio ?? "")
-            if let userIdInfo = user.id.parse() {
-              Text("Member Since")
-                .font(.caption)
-                .foregroundColor(.gray)
-              Text(userIdInfo.date, style: .date)
-                .font(.body)
-            }
-            if let since = gw.user.relationships[user.id]?.since {
-              Text("Friends Since")
-                .font(.caption)
-                .foregroundColor(.gray)
-              Text(since.date, style: .date)
-                .font(.body)
-            }
-          }
-
-          Divider()
-
-          VStack(alignment: .leading, spacing: 6) {
-            if let guildCount = profile?.mutual_guilds?.count, guildCount > 0 {
-              MutualItem(
-                title: "Mutual Servers",
-                count: guildCount,
-                action: {}
-              )
-            }
-            if let friendCount = profile?.mutual_friends_count, friendCount > 0
+        FlowLayout(xSpacing: 8, ySpacing: 2) {
+          Group {
+            Text("@\(user.username ?? "unknown")")
+            if let pronouns = profileMeta?.pronouns ?? user.pronouns,
+              !pronouns.isEmpty
             {
-              MutualItem(
-                title: "Mutual Friends",
-                count: friendCount,
-                action: {}
-              )
+              Text("•")
+              Text(pronouns)
             }
           }
+          .font(.subheadline)
+          .foregroundStyle(.secondary)
 
-          Spacer()
-        }
-        .padding(.horizontal, 20)
-        .padding(.top, 75)
-        .padding(.bottom, 20)
-        .background(Color.secondarySystemBackground)
-        .cornerRadius(20)
-        .padding(.horizontal)
-        .offset(y: -40)
-        .zIndex(0)
-      }
-      .ignoresSafeArea(edges: .top)
-      .task(id: user.id) {
-        let res = try? await gw.client.getUserProfile(
-          userID: user.id,
-          withMutualGuilds: true,
-          withMutualFriends: true,
-          withMutualFriendsCount: true,
-          guildID: nil
-        )
-        do {
-          // ensure request was successful
-          try res?.guardSuccess()
-          let profile = try res?.decode()
-          self.profile = profile
-        } catch {
-          if let error = res?.asError() {
-            appState.error = error
-          } else {
-            appState.error = error
+          HStack(spacing: 4) {
+            let badges = profile?.badges ?? []
+            ForEach(badges) { badge in
+              Profile.Badge(badge: badge)
+            }
           }
+          .maxHeight(16)
+        }
+
+        if let bio = profileMeta?.bio ?? profile?.user_profile?.bio {
+          MarkdownText(content: bio)
         }
       }
     }
 
-    func bannerURL(animated: Bool) -> URL? {
-      let userId = user.id
-      if let banner = user.banner {
-        return URL(
-          string: CDNEndpoint.userBanner(
-            userId: userId,
-            banner: banner
-          ).url
-            + ((banner.hasPrefix("a_") && animated)
-              ? ".gif" : ".png") + "?size=600"
-        )
-      } else if let banner = profile?.user_profile?.banner {
-        return URL(
-          string: CDNEndpoint.userBanner(
-            userId: userId,
-            banner: banner
-          ).url
-            + ((banner.hasPrefix("a_") && animated)
-              ? ".gif" : ".png") + "?size=600"
-        )
+    @Sendable
+    func fetchProfile() async {
+      guard profile == nil else { return }
+      let res = try? await gw.client.getUserProfile(
+        userID: user.id,
+        withMutualGuilds: true,
+        withMutualFriends: true,
+        withMutualFriendsCount: true
+      )
+      do {
+        // ensure request was successful
+        try res?.guardSuccess()
+        let profile = try res?.decode()
+        self.profile = profile
+      } catch {
+        if let error = res?.asError() {
+          appState.error = error
+        } else {
+          appState.error = error
+        }
       }
-      return nil
     }
-  }
-}
 
-struct MutualItem: View {
-  let title: String
-  let count: Int
-  let action: () -> Void
+    @State var accentColor = Color.clear
 
-  var body: some View {
-    Button(action: action) {
-      HStack {
-        Text("\(title) — \(count)")
-          .foregroundColor(.white)
-          .fontWeight(.medium)
-        Spacer()
-        Image(systemName: "chevron.right")
-          .foregroundColor(.white.opacity(0.6))
-          .font(.system(size: 14, weight: .semibold))
+    @Sendable
+    func grabColor() async {
+      let cc = CCColorCube()
+      // use sdwebimage's image manager, get the avatar image and extract colors using colorcube
+      guard
+        let avatarURL = Utils.fetchUserAvatarURL(
+          user: user,
+          animated: false
+        )
+      else {
+        return
       }
-      .padding(.vertical, 10)
-      .padding(.horizontal, 16)
-      .background(Color.clear)
+      let imageManager: SDWebImageManager = .shared
+      imageManager.loadImage(
+        with: avatarURL,
+        progress: nil
+      ) { image, _, error, _, _, _ in
+        guard let image else {
+          return
+        }
+        let colors = cc.extractColors(
+          from: image,
+          flags: [.orderByBrightness, .avoidBlack, .avoidWhite]
+        )
+        if let firstColor = colors?.first {
+          print(
+            "[Profile] Extracted accent color: \(firstColor.debugDescription)"
+          )
+          DispatchQueue.main.async {
+            self.accentColor = Color(firstColor)
+          }
+        } else {
+          print("[Profile] No colors extracted from avatar.")
+        }
+      }
     }
-    .buttonStyle(PlainButtonStyle())
   }
 }

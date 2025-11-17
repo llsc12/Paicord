@@ -41,9 +41,7 @@ struct ProfilePopoutView: View {
       VStack(alignment: .leading) {
         bannerView
 
-        VStack(alignment: .leading) {
           profileBody
-        }
         .padding()
       }
       .minWidth(idiom == .phone ? nil : 300)  // popover limits on larger devices
@@ -54,89 +52,96 @@ struct ProfilePopoutView: View {
     .minHeight(idiom == .phone ? nil : 400)  // popover limits on larger devices
     .presentationDetents([.medium, .large])
     .scrollClipDisabled()
+    #if os(iOS)
+    .presentationBackground(.ultraThinMaterial)
+    #endif
   }
 
   @ViewBuilder
   var bannerView: some View {
-    WebImage(url: bannerURL(animated: true)) { phase in
-      switch phase {
-      case .success(let image):
-        image
-          .resizable()
-          .aspectRatio(3, contentMode: .fill)
-      default:
-        let color =
-          profile?.user_profile?.accent_color ?? user.accent_color
-        Rectangle()
-          .aspectRatio(3, contentMode: .fit)
-          .foregroundStyle((color?.asColor() ?? accentColor))
+    Utils.UserBannerURL(user: user, profile: profile, mainProfileBanner: showMainProfile, animated: true) { bannerURL in
+      WebImage(url: bannerURL) { phase in
+        switch phase {
+        case .success(let image):
+          image
+            .resizable()
+            .aspectRatio(3, contentMode: .fill)
+        default:
+          let color =
+            profile?.user_profile?.accent_color ?? user.accent_color
+          Rectangle()
+            .aspectRatio(3, contentMode: .fit)
+            .foregroundStyle((color?.asColor() ?? accentColor))
+        }
       }
-    }
-    .reverseMask(alignment: .bottomLeading) {
-      Circle()
+      .reverseMask(alignment: .bottomLeading) {
+        Circle()
+          .frame(width: 80, height: 80)
+          .padding(.leading, 16)
+          .scaleEffect(1.15)
+          .offset(x: -1, y: 40)
+      }
+      .overlay(alignment: .bottomLeading) {
+        Profile.AvatarWithPresence(
+          member: member,
+          user: user
+        )
+        .animated(true)
+        .showsAvatarDecoration()
         .frame(width: 80, height: 80)
         .padding(.leading, 16)
-        .scaleEffect(1.15)
-        .offset(x: -1, y: 40)
+        .offset(y: 40)
+      }
+      .padding(.bottom, 30)
     }
-    .overlay(alignment: .bottomLeading) {
-      Profile.AvatarWithPresence(
-        member: member,
-        user: user
-      )
-      .animated(true)
-      .showsAvatarDecoration()
-      .frame(width: 80, height: 80)
-      .padding(.leading, 16)
-      .offset(y: 40)
-    }
-    .padding(.bottom, 30)
   }
 
   @ViewBuilder
   var profileBody: some View {
-    let profileMeta: DiscordUser.Profile.Metadata? = {
-      if showMainProfile {
-        return profile?.user_profile
-      } else {
-        return profile?.guild_member_profile ?? profile?.user_profile
-      }
-    }()
-    Text(
-      member?.nick ?? user.global_name ?? user.username ?? "Unknown User"
-    )
-    .font(.title2)
-    .bold()
-    .lineLimit(1)
-    .minimumScaleFactor(0.5)
-
-    FlowLayout(spacing: 8) {
-      Group {
-        Text("@\(user.username ?? "unknown")")
-        if let pronouns = profileMeta?.pronouns
-          ?? (showMainProfile
-            ? user.pronouns : member?.pronouns ?? user.pronouns),
-          !pronouns.isEmpty
-        {
-          Text("•")
-          Text(pronouns)
+    VStack(alignment: .leading, spacing: 4) {
+      let profileMeta: DiscordUser.Profile.Metadata? = {
+        if showMainProfile {
+          return profile?.user_profile
+        } else {
+          return profile?.guild_member_profile ?? profile?.user_profile
         }
-      }
-      .font(.subheadline)
-      .foregroundStyle(.secondary)
+      }()
+      Text(
+        member?.nick ?? user.global_name ?? user.username ?? "Unknown User"
+      )
+      .font(.title2)
+      .bold()
+      .lineLimit(1)
+      .minimumScaleFactor(0.5)
       
-      HStack(spacing: 4) {
-        let badges = profile?.badges ?? []
-        ForEach(badges) { badge in
-          Profile.Badge(badge: badge)
+      FlowLayout(xSpacing: 8, ySpacing: 2) {
+        Group {
+          Text("@\(user.username ?? "unknown")")
+          if let pronouns = profileMeta?.pronouns
+              ?? (showMainProfile
+                  ? user.pronouns : member?.pronouns ?? user.pronouns),
+             !pronouns.isEmpty
+          {
+            Text("•")
+            Text(pronouns)
+          }
         }
+        .font(.subheadline)
+        .foregroundStyle(.secondary)
+        
+        HStack(spacing: 4) {
+          let badges = profile?.badges ?? []
+          ForEach(badges) { badge in
+            Profile.Badge(badge: badge)
+          }
+        }
+        .maxHeight(16)
       }
-      .maxHeight(16)
-    }
-    
-
-    if let bio = profileMeta?.bio ?? profile?.user_profile?.bio {
-      MarkdownText(content: bio)
+      
+      
+      if let bio = profileMeta?.bio ?? profile?.user_profile?.bio {
+        MarkdownText(content: bio)
+      }
     }
   }
 
@@ -170,7 +175,8 @@ struct ProfilePopoutView: View {
   func grabColor() async {
     let cc = CCColorCube()
     // use sdwebimage's image manager, get the avatar image and extract colors using colorcube
-    guard let avatarURL = self.avatarURL(animated: false) else {
+    var m: Guild.PartialMember? = showMainProfile ? nil : member
+    guard let avatarURL = Utils.fetchUserAvatarURL(member: m, guildId: guild?.guildId, user: user, animated: false) else {
       return
     }
     let imageManager: SDWebImageManager = .shared
@@ -197,58 +203,5 @@ struct ProfilePopoutView: View {
       }
     }
   }
-
-  func avatarURL(animated: Bool) -> URL? {
-    if member?.avatar ?? user.avatar != nil {
-      let id = user.id
-      if let guildId = guild?.guildId, let avatar = member?.avatar {
-        return URL(
-          string: CDNEndpoint.guildMemberAvatar(
-            guildId: guildId,
-            userId: id,
-            avatar: avatar
-          ).url
-            + ".\(animated && avatar.starts(with: "a_") ? "gif" : "png")?size=128&animated=\(animated.description)"
-        )
-      } else if let avatar = user.avatar {
-        return URL(
-          string: CDNEndpoint.userAvatar(userId: id, avatar: avatar).url
-            + ".\(animated && avatar.starts(with: "a_") ? "gif" : "png")?size=128&animated=\(animated.description)"
-        )
-      }
-    } else {
-      return URL(
-        string: CDNEndpoint.defaultUserAvatar(userId: user.id).url + ".png"
-      )
-    }
-    return nil
-  }
-
-  func bannerURL(animated: Bool) -> URL? {
-    let userId = user.id
-    if let guildProfile = profile?.guild_member_profile,
-      let guildId = profile?.guild_member_profile?.guild_id,
-      let banner = guildProfile.banner, self.showMainProfile == false
-    {
-      return URL(
-        string: CDNEndpoint.guildMemberBanner(
-          guildId: guildId,
-          userId: userId,
-          banner: banner
-        ).url
-          + ((banner.hasPrefix("a_") && animated)
-            ? ".gif" : ".png") + "?size=600"
-      )
-    } else if let banner = profile?.user_profile?.banner {
-      return URL(
-        string: CDNEndpoint.userBanner(
-          userId: userId,
-          banner: banner
-        ).url
-          + ((banner.hasPrefix("a_") && animated)
-            ? ".gif" : ".png") + "?size=600"
-      )
-    }
-    return nil
-  }
+ 
 }

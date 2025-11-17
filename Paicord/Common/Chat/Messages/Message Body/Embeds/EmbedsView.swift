@@ -23,7 +23,7 @@ extension MessageCell {
       )
       ForEach(embeds) { embed in
         switch embed.type {
-        case .rich:
+        case .rich, .article:
           EmbedView(embed: embed)
         case .image:
           if let image = embed.image ?? embed.thumbnail,
@@ -62,6 +62,7 @@ extension MessageCell {
       var embed: Embed
 
       @Environment(\.userInterfaceIdiom) var idiom
+      @Environment(\.channelStore) var channelStore
 
       var embedWidth: CGFloat {
         switch idiom {
@@ -125,7 +126,7 @@ extension MessageCell {
               }
 
               if let desc = embed.description {
-                MarkdownText(content: desc)
+                MarkdownText(content: desc, channelStore: channelStore)
               }
             }
 
@@ -139,6 +140,7 @@ extension MessageCell {
                 .frame(width: 72, height: 72)
                 .clipped()
                 .cornerRadius(6)
+                .id("embed-thumbnail-\(url.description)")
             }
           }
 
@@ -157,7 +159,7 @@ extension MessageCell {
                   ForEach(inlineFields) { field in
                     VStack(alignment: .leading, spacing: 4) {
                       Text(field.name)
-                        .font(.subheadline)
+                        .font(.headline)
                         .fontWeight(.semibold)
                       MarkdownText(content: field.value)
                         .fixedSize(horizontal: false, vertical: true)
@@ -169,11 +171,9 @@ extension MessageCell {
               ForEach(blockFields) { field in
                 VStack(alignment: .leading, spacing: 4) {
                   Text(field.name)
-                    .font(.caption)
-                    .foregroundColor(.gray)
-                  Text(field.value)
-                    .font(.subheadline)
-                    .foregroundColor(.white)
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                  MarkdownText(content: field.value)
                     .fixedSize(horizontal: false, vertical: true)
                 }
               }
@@ -202,6 +202,7 @@ extension MessageCell {
                 maxHeight: min(image.height?.toCGFloat, 300),
                 alignment: .leading
               )
+              .id("embed-image-\(url.description)")
           }
 
           if embed.footer != nil || embed.timestamp != nil {
