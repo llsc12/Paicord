@@ -60,6 +60,58 @@ extension Guild {
     self.version = new.version
     self.guild_id = new.guild_id
   }
+  
+  mutating func update(with new: Guild) {
+    self.id = new.id
+    self.name = new.name
+    self.icon = new.icon
+    self.icon_hash = new.icon_hash
+    self.splash = new.splash
+    self.discovery_splash = new.discovery_splash
+    self.owner = new.owner
+    self.owner_id = new.owner_id
+    self.permissions = new.permissions
+    self.afk_channel_id = new.afk_channel_id
+    self.afk_timeout = new.afk_timeout
+    self.widget_enabled = new.widget_enabled
+    self.widget_channel_id = new.widget_channel_id
+    self.verification_level = new.verification_level
+    self.default_message_notifications = new.default_message_notifications
+    self.explicit_content_filter = new.explicit_content_filter
+    self.roles = new.roles
+    self.emojis = new.emojis
+    self.features = new.features
+    self.mfa_level = new.mfa_level
+    self.application_id = new.application_id
+    self.system_channel_id = new.system_channel_id
+    self.system_channel_flags = new.system_channel_flags
+    self.rules_channel_id = new.rules_channel_id
+    self.max_presences = new.max_presences
+    self.max_members = new.max_members
+    self.vanity_url_code = new.vanity_url_code
+    self.description = new.description
+    self.banner = new.banner
+    self.premium_tier = new.premium_tier
+    self.premium_subscription_count = new.premium_subscription_count
+    self.preferred_locale = new.preferred_locale
+    self.public_updates_channel_id = new.public_updates_channel_id
+    self.max_video_channel_users = new.max_video_channel_users
+    self.max_stage_video_channel_users = new.max_stage_video_channel_users
+    self.member_count = new.member_count
+    self.approximate_member_count = new.approximate_member_count
+    self.approximate_presence_count = new.approximate_presence_count
+    self.welcome_screen = new.welcome_screen
+    self.nsfw_level = new.nsfw_level
+    self.stickers = new.stickers
+    self.premium_progress_bar_enabled = new.premium_progress_bar_enabled
+    self.`lazy` = new.`lazy`
+    //    self.hub_type = new.hub_type
+    self.nsfw = new.nsfw
+    self.application_command_counts = new.application_command_counts
+    self.embedded_activities = new.embedded_activities
+    self.version = new.version
+    self.guild_id = new.guild_id
+  }
 }
 
 extension Gateway.GuildCreate {

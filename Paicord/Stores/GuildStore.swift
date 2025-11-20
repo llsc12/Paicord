@@ -33,7 +33,7 @@ class GuildStore: DiscordDataStore {
     guard let guild else { return }
 
     // channels
-    guild.channels.forEach { channel in
+    guild.channels?.forEach { channel in
       channels[channel.id] = channel
     }
 

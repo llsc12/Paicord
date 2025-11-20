@@ -10,7 +10,7 @@ public struct Guild: Sendable, Codable {
     discovery_splash: String? = nil,
     owner: Bool? = nil,
     owner_id: UserSnowflake,
-    channels: [DiscordChannel],
+    channels: [DiscordChannel]? = nil,
     permissions: StringBitField<Permission>? = nil,
     afk_channel_id: ChannelSnowflake? = nil,
     afk_timeout: AFKTimeout,
@@ -387,7 +387,7 @@ public struct Guild: Sendable, Codable {
   public var discovery_splash: String?
   public var owner: Bool?
   public var owner_id: UserSnowflake
-  public var channels: [DiscordChannel]
+  public var channels: [DiscordChannel]?
   public var permissions: StringBitField<Permission>?
   public var afk_channel_id: ChannelSnowflake?
   public var afk_timeout: AFKTimeout
