@@ -15,6 +15,7 @@ struct MarkdownText: View {
   var content: String
   @Environment(\.gateway) var gw
   var channelStore: ChannelStore?
+  @Environment(\.font) var font
 
   var renderer: MarkdownRendererVM
 
@@ -29,7 +30,7 @@ struct MarkdownText: View {
 
   @State var userPopover: PartialUser?
 
-  @State var lastGuildMemberCount: Int = -1
+  @State var lastHash: Int = 0
 
   var body: some View {
     VStack(alignment: .leading, spacing: 4) {
@@ -45,6 +46,7 @@ struct MarkdownText: View {
     }
     .task(id: content, render)
     .task(id: channelStore?.guildStore?.members.count, render)
+    .task(id: font, render)
     .environment(
       \.openURL,
       OpenURLAction { url in
@@ -63,17 +65,22 @@ struct MarkdownText: View {
 
   @Sendable
   func render() async {
-    if let count = channelStore?.guildStore?.members.count {
-      // re-render if member count changed (for mentions resolving), ignoring content similarity.
-      // but if count is same as last time, do the normal content check.
-      if count != lastGuildMemberCount {
-        lastGuildMemberCount = count  // resolved mentions, render
-      } else {
-        guard content != renderer.rawContent else { return }  // avoid redundant renders
-      }
-    } else {
-      guard content != renderer.rawContent else { return }  // avoid redundant renders
+    // hash these values and see if the hash changed and update if hash is different.
+    var hasher = Hasher()
+    hasher.combine(content)
+    hasher.combine(gw.user.users.count)
+    if let memberCount = channelStore?.guildStore?.members.count {
+      hasher.combine(memberCount)
     }
+    if let font {
+      hasher.combine(font)
+    }
+    let newHash = hasher.finalize()
+    guard lastHash != newHash else {
+      return
+    }
+    lastHash = newHash
+
     renderer.passRefs(
       gw: gw,
       channelStore: channelStore
