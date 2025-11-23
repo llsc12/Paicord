@@ -168,10 +168,10 @@ struct GuildButton: View {
       }
       .background {
         if folder.hasColor,
-          let color = DiscordColor(value: Int(folder.color.value))
+           let color = DiscordColor(value: Int(folder.color.value))?.asColor()
         {
           Rectangle()
-            .fill(color.asColor()!.secondary.opacity(0.35))
+            .fill(color.secondary.opacity(0.35))
         } else {
           Rectangle()
             .fill(.tableBackground.secondary)
