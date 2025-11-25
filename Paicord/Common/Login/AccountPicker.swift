@@ -36,7 +36,7 @@ struct AccountPicker: View {
                 }
                 .padding(10)
                 .frame(maxWidth: .infinity)
-                .background(.primaryButtonBackground)
+                .background(.theme.common.primaryButtonBackground)
                 .clipShape(.rounded)
               }
               .buttonStyle(.borderless)
@@ -53,7 +53,7 @@ struct AccountPicker: View {
           }
           .frame(maxWidth: .infinity)
           .padding(10)
-          .background(.primaryButton)
+          .background(Color.theme.common.primaryButton)
           .clipShape(.rounded)
         }
         .buttonStyle(.borderless)

@@ -36,11 +36,11 @@ extension ChatView {
                   .imageScale(.large)
                   .padding(5)
                   .foregroundStyle(.white)
-                  .background(.primaryButton)
+                  .background(Color.theme.common.primaryButton)
                   .clipShape(.circle)
               }
               .buttonStyle(.borderless)
-              .foregroundStyle(.primaryButton)
+              .foregroundStyle(Color.theme.common.primaryButton)
               .transition(.move(edge: .trailing).combined(with: .opacity))
             }
           #endif
@@ -65,6 +65,7 @@ extension ChatView {
             .animation(.default, value: isFocused)
           #endif
       }
+      .ignoresSafeArea(.container, edges: .horizontal)
     }
 
     @ViewBuilder

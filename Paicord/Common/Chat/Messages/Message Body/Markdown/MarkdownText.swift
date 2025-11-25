@@ -97,6 +97,7 @@ struct MarkdownText: View {
     switch cmd {
     case .userMention(let userID):
       if let user = gw.user.users[userID] {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
         userPopover = user
       }
     default:
@@ -188,6 +189,8 @@ struct MarkdownText: View {
           if let language {
             CodeText(code)
               .highlightMode(.languageAlias(language))
+                Color.theme.markdown.codeBlockSyntaxTheme.highlightTheme
+              )
           } else {
             Text(code)  // no highlighting
           }

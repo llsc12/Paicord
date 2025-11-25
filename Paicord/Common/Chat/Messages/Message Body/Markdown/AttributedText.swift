@@ -112,14 +112,14 @@ struct AttributedText: View {
 
   // custom NSTextView to override copy behavior and additionally right click behavior
   class ModifiedCopyingTextView: NSTextView {
-    
+
     // let swiftui handle context menu
     override func rightMouseDown(with event: NSEvent) {
       // instead of super.rightMouseDown, pass to next responder
       self.nextResponder?.rightMouseDown(with: event)
     }
     // could also handle mouseDown with control key pressed but i think its good to keep that.
-    
+
     weak fileprivate var customCoordinator: _AttributedTextView.Coordinator?
 
     override func clicked(onLink link: Any, at charIndex: Int) {
@@ -142,7 +142,7 @@ struct AttributedText: View {
       )
 
       selectedAttributedStringCopy.enumerateAttribute(
-        NSAttributedString.Key.accessibilityCustomText,
+        NSAttributedString.Key.rawContent,
         in: NSMakeRange(0, selectedAttributedString.string.count),
         options: .reverse
       ) { value, range, _ in
@@ -169,6 +169,44 @@ struct AttributedText: View {
 #elseif os(iOS)
   import UIKit
 
+  class ModifiedCopyingTextView: UITextView {
+
+    override func canPerformAction(_ action: Selector, withSender sender: Any?)
+      -> Bool
+    {
+      if action == #selector(copy(_:)) {
+        return true
+      }
+      return super.canPerformAction(action, withSender: sender)
+    }
+
+    override func copy(_ sender: Any?) {
+      let attributed = self.attributedText.attributedSubstring(
+        from: selectedRange
+      )
+
+      let mutable = NSMutableAttributedString(attributedString: attributed)
+
+      mutable.enumerateAttribute(
+        NSAttributedString.Key.rawContent,
+        in: NSRange(location: 0, length: mutable.length),
+        options: []
+      ) { value, range, _ in
+        if let custom = value as? String {
+          mutable.replaceCharacters(
+            in: range,
+            with: NSAttributedString(string: custom)
+          )
+        }
+      }
+      
+      super.copy(sender)
+
+      UIPasteboard.general.string = mutable.string
+
+    }
+  }
+
   private struct _AttributedTextView: UIViewRepresentable {
     var attributedString: NSAttributedString
     @Environment(\.lineLimit) private var lineLimit
@@ -178,8 +216,8 @@ struct AttributedText: View {
       Coordinator(openURL: openURL)
     }
 
-    func makeUIView(context: Context) -> UITextView {
-      let textView = UITextView()
+    func makeUIView(context: Context) -> ModifiedCopyingTextView {
+      let textView = ModifiedCopyingTextView()
       textView.delegate = context.coordinator
       textView.isEditable = false
       textView.isSelectable = true
@@ -199,7 +237,7 @@ struct AttributedText: View {
       return textView
     }
 
-    func updateUIView(_ uiView: UITextView, context: Context) {
+    func updateUIView(_ uiView: ModifiedCopyingTextView, context: Context) {
       if !context.coordinator.isSame(as: attributedString) {
         uiView.attributedText = attributedString
         context.coordinator.remember(attributedString: attributedString)
@@ -211,7 +249,7 @@ struct AttributedText: View {
 
     func sizeThatFits(
       _ proposal: ProposedViewSize,
-      uiView: UITextView,
+      uiView: ModifiedCopyingTextView,
       context: Context
     ) -> CGSize? {
       let targetWidth = proposal.width ?? UIScreen.main.bounds.width
@@ -245,6 +283,7 @@ struct AttributedText: View {
         lastAttributedStringHash = hasher.finalize()
       }
 
+      // tap link handler
       func textView(
         _ textView: UITextView,
         shouldInteractWith URL: URL,
@@ -252,10 +291,12 @@ struct AttributedText: View {
         interaction: UITextItemInteraction
       ) -> Bool {
         openURL(URL)
+        if PaicordChatLink.init(url: URL) != nil {
+          return false
+        }
         return true
       }
     }
   }
 
 #endif
-

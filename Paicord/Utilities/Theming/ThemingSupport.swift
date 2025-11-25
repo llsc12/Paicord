@@ -1,5 +1,5 @@
 //
-//  Support.swift
+//  ThemingSupport.swift
 //  Paicord
 //
 //  Created by Lakhan Lothiyi on 14/11/2025.
@@ -15,6 +15,10 @@ import SwiftUIX
 #if canImport(UIKit)
   import UIKit
 #endif
+
+extension Color {
+  static let theme = Theming.shared.currentTheme
+}
 
 // A representation of an image that can be encoded and decoded across platforms.
 struct PlatformImageRepresentation: Codable, Hashable, Equatable, Sendable {
@@ -318,6 +322,33 @@ extension Gradient.Stop: @retroactive Codable {
   enum CodingKeys: String, CodingKey {
     case color
     case location
+  }
+}
+
+extension ColorScheme: @retroactive Codable {
+  public init(from decoder: any Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    let value = try container.decode(String.self)
+    switch value {
+    case "light":
+      self = .light
+    case "dark":
+      self = .dark
+    default:
+      self = .light
+    }
+  }
+  
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.singleValueContainer()
+    switch self {
+    case .light:
+      try container.encode("light")
+    case .dark:
+      try container.encode("dark")
+    @unknown default:
+      try container.encode("light")
+    }
   }
 }
 

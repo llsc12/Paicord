@@ -25,10 +25,14 @@ struct DMsView: View {
     ScrollView {
       if idiom == .phone {
         VStack(spacing: 0) {
-          Text("Direct Messages")
-            .font(.title2)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(8)
+          VStack(alignment: .leading) {
+            Text("Direct Messages")
+              .font(.title3)
+              .bold()
+              .frame(maxWidth: .infinity, alignment: .leading)
+          }
+          .padding()
+          
           Divider()
         }
       }
@@ -42,7 +46,7 @@ struct DMsView: View {
       .padding(.vertical, 4)
     }
     .frame(maxWidth: .infinity)
-    .background(.tableBackground.opacity(0.5))
+    .background(Color.theme.common.secondaryBackground.opacity(0.5))
     .roundedCorners(radius: 10, corners: .topLeft)
   }
 }

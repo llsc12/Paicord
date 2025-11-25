@@ -75,7 +75,7 @@ struct ReactionsView: View {
       .padding(.horizontal, 5)
       .padding(.vertical, 2)
       .background(.primary.opacity(0.08))
-      .background(.primaryButton.opacity(currentUserReacted ? 0.35 : 0))
+      .background(.theme.common.primaryButton.opacity(currentUserReacted ? 0.35 : 0))
       .clipShape(.rounded)
     }
 

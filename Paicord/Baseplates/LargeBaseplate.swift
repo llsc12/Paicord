@@ -78,7 +78,7 @@ struct LargeBaseplate: View {
           } label: {
             Label("Toggle Sidebar", systemImage: "sidebar.left")
           }
-          .tint(.tertiaryButton)
+          .tint(Color.theme.common.tertiaryButton)
         }
       }
     }

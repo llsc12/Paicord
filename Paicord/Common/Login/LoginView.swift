@@ -59,7 +59,7 @@ struct LoginView: View {
         }
         .padding(20)
         .frame(maxWidth: 400)
-        .background(.tabBarBackground.opacity(0.75))
+        .background(Color.theme.common.tertiaryBackground.opacity(0.75))
         .clipShape(.rounded)
         .shadow(radius: 10)
         .padding(5)
@@ -106,11 +106,14 @@ struct LoginForm: View {
           .padding(10)
           .frame(maxWidth: .infinity)
           .focused($loginFocused)
-          .background(.appBackground.opacity(0.75))
+          .background(Color.theme.common.primaryBackground.opacity(0.75))
           .clipShape(.rounded)
           .overlay {
             RoundedRectangle()
-              .stroke(loginFocused ? .primaryButton : .clear, lineWidth: 1)
+              .stroke(
+                loginFocused ? Color.theme.common.primaryButton : Color.clear,
+                lineWidth: 1
+              )
               .fill(.clear)
           }
           .padding(.bottom, 10)
@@ -121,12 +124,13 @@ struct LoginForm: View {
           .padding(10)
           .frame(maxWidth: .infinity)
           .focused($passwordFocused)
-          .background(.appBackground.opacity(0.75))
+          .background(Color.theme.common.primaryBackground.opacity(0.75))
           .clipShape(.rect(cornerSize: .init(10)))
           .overlay {
             RoundedRectangle()
               .stroke(
-                passwordFocused ? .primaryButton : .clear,
+                passwordFocused
+                  ? Color.theme.common.primaryButton : Color.clear,
                 lineWidth: 1
               )
               .fill(.clear)
@@ -153,7 +157,7 @@ private struct ForgotPasswordButton: View {
       Text("Forgot your password?")
     }
     .buttonStyle(.borderless)
-    .foregroundStyle(.hyperlink)
+    .foregroundStyle(Color.theme.common.hyperlink)
     .disabled(viewModel.login.isEmpty)
     .onHover {
       viewModel.forgotPasswordPopover = viewModel.login.isEmpty ? $0 : false
@@ -182,7 +186,7 @@ private struct LoginButton: View {
       Text("Log In")
         .frame(maxWidth: .infinity)
         .padding(10)
-        .background(.primaryButton)
+        .background(Color.theme.common.primaryButton)
         .clipShape(.rounded)
         .font(.title3)
     }

@@ -247,14 +247,14 @@ extension MessageCell {
         }
         .padding()
         .background(
-          Color.primaryButtonBackground.brightness(0.2)
+          Color.theme.common.primaryButtonBackground.brightness(0.2)
             .mask {
               RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .stroke(.white, lineWidth: 1)
                 .foregroundStyle(.clear)
             }
         )
-        .background(.primaryButtonBackground)
+        .background(.theme.common.primaryButtonBackground)
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
       }
     }

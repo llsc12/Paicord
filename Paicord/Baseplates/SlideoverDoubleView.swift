@@ -121,7 +121,7 @@ extension View {
           .font(.largeTitle)
           .foregroundColor(.white)
           .frame(maxWidth: .infinity, maxHeight: .infinity)
-          .background(.appBackground)
+          .background(Color.theme.common.primaryBackground)
       } secondary: {
         Text("im 2")
           .font(.largeTitle)

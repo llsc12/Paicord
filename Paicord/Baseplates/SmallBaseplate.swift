@@ -28,27 +28,29 @@ struct SmallBaseplate: View {
         TabView(selection: $currentTab) {
           HomeView(guild: currentGuildStore)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(.appBackground)
-            .toolbarBackground(.tabBarBackground, for: .tabBar)
+            .background(Color.theme.common.primaryBackground)
+            .toolbarBackground(Color.theme.common.tertiaryBackground, for: .tabBar)
             .toolbarBackground(.visible, for: .tabBar)
             .tabItem { Label("Home", systemImage: "house") }
             .tag(CurrentTab.home)
           NotificationsView()
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(.appBackground)
-            .toolbarBackground(.tabBarBackground, for: .tabBar)
+            .background(Color.theme.common.primaryBackground)
+            .toolbarBackground(Color.theme.common.tertiaryBackground, for: .tabBar)
             .toolbarBackground(.visible, for: .tabBar)
             .tabItem { Label("Notifications", systemImage: "bell") }
             .tag(CurrentTab.notifications)
+            .tint(nil)
           ProfileView()
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(.appBackground)
-            .toolbarBackground(.tabBarBackground, for: .tabBar)
+            .background(Color.theme.common.primaryBackground)
+            .toolbarBackground(Color.theme.common.tertiaryBackground, for: .tabBar)
             .toolbarBackground(.visible, for: .tabBar)
             .tabItem { Label("Profile", systemImage: "person.circle") }
             .tag(CurrentTab.profile)
+            .tint(nil)
         }
-        .tint(.tertiaryButton)
+        .tint(Color.theme.common.tertiaryButton)
       }
       .environment(\.guildStore, currentGuildStore)
       .environment(\.channelStore, currentChannelStore)
@@ -68,7 +70,7 @@ struct SmallBaseplate: View {
                   } label: {
                     Image(systemName: "arrow.left")
                   }
-                  .tint(.tertiaryButton)
+                  .tint(Color.theme.common.tertiaryButton)
                 }
               }
             #endif

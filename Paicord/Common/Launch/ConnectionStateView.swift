@@ -38,7 +38,7 @@ struct ConnectionStateView: View {
           .padding(5)
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
-      .background(.appBackground)
+      .background(Color.theme.common.primaryBackground)
 
       VStack {
         Text(state.description.capitalized)

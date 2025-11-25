@@ -44,15 +44,13 @@ extension MarkdownRendererVM {
       )
       attachment.bounds = CGRect(x: 0, y: 0, width: 15, height: 15)
     #endif
-    // set accessibilityCustomText attribute for copy text
+    // set rawContent attribute for copy text
     let mutable = NSMutableAttributedString(attributedString: .init(attachment: attachment))
-    #if os(macOS)
     mutable.addAttribute(
-      .accessibilityCustomText,
+      .rawContent,
       value: copyText,
       range: NSRange(location: 0, length: mutable.length)
     )
-    #endif
     return mutable
   }
 

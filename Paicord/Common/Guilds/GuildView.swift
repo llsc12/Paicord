@@ -28,7 +28,7 @@ struct GuildView: View {
           VStack(spacing: 0) {
             VStack(alignment: .leading) {
               Text(guild.guild?.name ?? "Unknown Guild")
-                .font(.headline)
+                .font(.title3)
                 .bold()
                 .frame(maxWidth: .infinity, alignment: .leading)
               Text("\(guild.guild?.member_count ?? 0) members")
@@ -67,7 +67,7 @@ struct GuildView: View {
       }
     }
     .frame(maxWidth: .infinity)
-    .background(.tableBackground.opacity(0.5))
+    .background(Color.theme.common.secondaryBackground.opacity(0.5))
     .roundedCorners(radius: 10, corners: .topLeft)
   }
 }

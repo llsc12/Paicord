@@ -35,7 +35,7 @@ struct MFASheet: View {
                 userFriendlyName(for: method.type)
                   .frame(maxWidth: .infinity)
                   .padding(10)
-                  .background(.primaryButton)
+                  .background(Color.theme.common.primaryButton)
                   .clipShape(.rounded)
                   .font(.title3)
               }
@@ -62,7 +62,7 @@ struct MFASheet: View {
     }
     .padding(.top, 15)
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(.appBackground)
+    .background(Color.theme.common.primaryBackground)
     .overlay(alignment: .topLeading) {
       if chosenMethod != nil {
         Button {
@@ -72,7 +72,7 @@ struct MFASheet: View {
           // chevron left
           Image(systemName: "chevron.left")
             .padding(5)
-            .background(.primaryButtonBackground)
+            .background(Color.theme.common.primaryButtonBackground)
             .clipShape(.circle)
         }
         .buttonStyle(.borderless)
@@ -166,7 +166,7 @@ struct SixDigitInput: View {
             .stroke(
               (textfield && enabled)
                 ? (character.isEmpty && !prevCharacter.isEmpty
-                  ? .hyperlink : .gray) : .gray,
+                  ? Color.theme.common.hyperlink : .gray) : .gray,
               lineWidth: 1
             )
             .frame(width: 40, height: 50)
@@ -186,9 +186,10 @@ struct SixDigitInput: View {
     .onAppear {
       textfield = true
     }
-    .background(.appBackground.opacity(0.001))
+    .background(Color.theme.common.primaryBackground.opacity(0.001))
     .overlay(
       TextField("", text: $input)
+        .textFieldStyle(.plain)
         .textContentType(.oneTimeCode)
         .opacity(0.008)
         .onChange(of: input) {

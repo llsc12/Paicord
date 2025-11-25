@@ -174,7 +174,7 @@ struct GuildButton: View {
             .fill(color.secondary.opacity(0.35))
         } else {
           Rectangle()
-            .fill(.tableBackground.secondary)
+            .fill(Color.theme.common.secondaryBackground.secondary)
         }
       }
       .clipShape(.rect(cornerRadius: 10, style: .continuous))
@@ -287,7 +287,7 @@ struct GuildButton: View {
                   colorScheme == .dark ? .white : isSelected ? .white : .black
                 )
             }
-            .background(isSelected ? .accent : .gray.opacity(0.3))
+            .background(isSelected ? Color.theme.common.accent : Color.theme.common.primaryButtonBackground.opacity(0.5))
         }
       }
       .clipShape(.rect(cornerRadius: isSelected ? 10 : 32, style: .continuous))

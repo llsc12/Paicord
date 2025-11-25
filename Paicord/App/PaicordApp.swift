@@ -75,6 +75,7 @@ struct PaicordApp: App {
       RootView(
         gatewayStore: gatewayStore
       )
+      .preferredColorScheme(Color.theme.common.colorScheme)
       #if os(macOS)
         .introspect(.window, on: .macOS(.v14...)) { window in
           window.isRestorable = false

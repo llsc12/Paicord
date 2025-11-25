@@ -84,7 +84,7 @@ struct ChatView: View {
         InputBar(vm: vm)
       }
     }
-    .background(.tableBackground)
+    .background(Color.theme.common.secondaryBackground)
     .toolbar {
       ToolbarItem(placement: .navigation) {
         ChannelHeader(vm: vm)

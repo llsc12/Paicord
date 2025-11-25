@@ -31,7 +31,7 @@ struct HomeView: View {
           DMsView()
         }
       }
-      .background(.tableBackground)
+      .background(Color.theme.common.secondaryBackground)
       .roundedCorners(radius: 25, corners: .topLeft)
     }
     .padding(.top, 4)

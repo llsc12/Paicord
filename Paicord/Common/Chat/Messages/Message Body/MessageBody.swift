@@ -91,7 +91,7 @@ extension MessageCell {
           VStack(alignment: .leading, spacing: 4) {
             Group {
               Text(Image(systemName: "arrowshape.turn.up.right.fill"))
-                + Text(" Forwarded")
+              + Text(" Forwarded").italic()
             }
             .font(.caption.italic())
             .foregroundStyle(.tertiary)
@@ -101,12 +101,12 @@ extension MessageCell {
               channelStore: channelStore
             )
           }
-          .padding(.leading, 8)
+          .padding(.leading, 12)
           .overlay(
             Rectangle()
               .frame(width: 3)
-              .foregroundStyle(.tertiary)
-              .cornerRadius(1),
+              .foregroundStyle(.quaternary)
+              .clipShape(.capsule),
             alignment: .leading
           )
         }

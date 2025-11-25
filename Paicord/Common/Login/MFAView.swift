@@ -56,7 +56,7 @@ struct MFAView: View {
                 userFriendlyName(for: method)
                   .frame(maxWidth: .infinity)
                   .padding(10)
-                  .background(.primaryButton)
+                  .background(Color.theme.common.primaryButton)
                   .clipShape(.rounded)
                   .font(.title3)
               }
@@ -86,7 +86,7 @@ struct MFAView: View {
       } label: {
         Image(systemName: chosenMethod != nil ? "chevron.left" : "xmark")
           .padding(5)
-          .background(.primaryButtonBackground)
+          .background(Color.theme.common.primaryButtonBackground)
           .clipShape(.circle)
           .contentTransition(.symbolEffect(.replace))
       }
