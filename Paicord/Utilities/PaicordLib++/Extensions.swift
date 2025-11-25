@@ -12,10 +12,10 @@ import SwiftUI
 extension DiscordColor {
   
   /// Converts the `DiscordColor` to a SwiftUI `Color`.
-  /// - Parameter ignoringZero: If `false`, a color value of zero will return `nil`.
-  /// - Returns: A `Color` representation of the `DiscordColor`, or `nil` if the value is zero and `ignoringZero` is `false`.
-  func asColor(ignoringZero: Bool = false) -> Color? {
-    if self.value == 0, ignoringZero == false { return nil }  // no color?
+  /// - Parameter ignoringZero: If `true`, a color value of zero will return `nil`.
+  /// - Returns: A `Color` representation of the `DiscordColor`, or `nil` if the value is zero and `ignoringZero` is `true`.
+  func asColor(ignoringZero: Bool = true) -> Color? {
+    if ignoringZero, self.value == 0 { return nil }  // no color?
     let (red, green, blue) = self.asRGB()
     // values are between 0 and 255, divide by 255
     return Color(
