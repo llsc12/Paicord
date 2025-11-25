@@ -383,8 +383,8 @@ extension Gateway {
     public var sessions: [Session]
     public var user_settings_proto:
       DiscordProtos_DiscordUsers_V1_PreloadedUserSettings?
-    //		public var connected_accounts
-    //		public var user_guild_settings
+    public var connected_accounts: [DiscordUser.Connection]
+    public var user_guild_settings: [Guild.UserGuildSettings]
     //		public var guild_join_requests
     //		public var broadcaster_user_ids
     //		public var session_type: String? // maybe this can become an unstable enum

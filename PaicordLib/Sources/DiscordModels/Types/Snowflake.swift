@@ -11,6 +11,7 @@ public protocol SnowflakeProtocol:
 {
 
 	var rawValue: String { get }
+  init(variable: StringOrInt)
 	init(_ rawValue: String)
 }
 
@@ -21,7 +22,7 @@ extension SnowflakeProtocol {
 	}
 
 	public init(from decoder: any Decoder) throws {
-		try self.init(.init(from: decoder))
+    try self.init(variable: .init(from: decoder))
 		#if DISCORDBM_ENABLE_LOGGING_DURING_DECODE
 			if self.parse() == nil {
 				DiscordGlobalConfiguration.makeDecodeLogger("SnowflakeProtocol")
@@ -80,6 +81,15 @@ public struct Snowflake<Tag>: SnowflakeProtocol {
 	}
 
 	public let rawValue: String
+  
+  public init(variable: StringOrInt) {
+    switch variable {
+    case let .string(value):
+      self.rawValue = value
+    case let .int(value):
+      self.rawValue = String(value)
+    }
+  }
 
 	public init(_ rawValue: String) {
 		self.rawValue = rawValue
@@ -116,6 +126,15 @@ public struct AnySnowflake: SnowflakeProtocol {
 	}
 
 	public let rawValue: String
+  
+  public init(variable: StringOrInt) {
+    switch variable {
+    case let .string(value):
+      self.rawValue = value
+    case let .int(value):
+      self.rawValue = String(value)
+    }
+  }
 
 	public init(_ rawValue: String) {
 		self.rawValue = rawValue

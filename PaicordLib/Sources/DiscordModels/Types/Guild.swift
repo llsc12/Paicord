@@ -675,7 +675,7 @@ extension Guild {
   public struct UserGuildSettings: Sendable, Codable {
     public var channel_overrides: [ChannelOverride]
     public var flags: IntBitField<Flag>
-    public var guild_id: GuildSnowflake
+    public var guild_id: GuildSnowflake?
     public var hide_muted_channels: Bool
     public var message_notifications: Int
     public var mobile_push: Bool
@@ -683,14 +683,15 @@ extension Guild {
     public var muted: Bool
     public var mute_config: MuteConfig?
     public var notify_highlights: Int
-    public var suppress_everyone: Int
-    public var suppress_roles: Int
+    public var suppress_everyone: Bool
+    public var suppress_roles: Bool
     public var version: Int
 
     /// https://docs.discord.food/resources/user-settings#partial-user-guild-settings-structure
     public struct Partial: Sendable, Codable {
       public var channel_overrides: [ChannelOverride]?
       public var flags: IntBitField<Flag>?
+      public var guild_id: GuildSnowflake?
       public var hide_muted_channels: Bool?
       public var message_notifications: Int?
       public var mobile_push: Bool?
@@ -698,8 +699,8 @@ extension Guild {
       public var muted: Bool?
       public var mute_config: MuteConfig??
       public var notify_highlights: Int?
-      public var suppress_everyone: Int?
-      public var suppress_roles: Int?
+      public var suppress_everyone: Bool?
+      public var suppress_roles: Bool?
     }
 
     /// https://docs.discord.food/resources/user-settings#channel-override-structure
