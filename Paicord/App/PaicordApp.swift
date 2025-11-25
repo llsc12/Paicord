@@ -96,6 +96,7 @@ struct PaicordApp: App {
     #if os(macOS)
       Settings {
         SettingsView()
+          .toolbar(removing: .sidebarToggle)
       }
       .windowToolbarStyle(.unifiedCompact)
     #endif

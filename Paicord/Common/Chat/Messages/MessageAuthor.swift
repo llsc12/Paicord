@@ -20,6 +20,7 @@ extension MessageCell {
       var body: some View {
         Button {
           guard message.author != nil else { return }
+          ImpactGenerator.impact(style: .light)
           profileOpen = true
         } label: {
           let guildstoremember =
@@ -54,6 +55,8 @@ extension MessageCell {
 
       var body: some View {
         Button {
+          guard message.author != nil else { return }
+          ImpactGenerator.impact(style: .light)
           profileOpen = true
         } label: {
           if let guildStore, let userID = message.author?.id {

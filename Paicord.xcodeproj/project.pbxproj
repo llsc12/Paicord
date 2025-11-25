@@ -105,9 +105,11 @@
 		AABED5A62E7F514B005BDD63 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABED5A52E7F5148005BDD63 /* SettingsStore.swift */; };
 		AABED5A92E7FF982005BDD63 /* Merging.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABED5A82E7FF979005BDD63 /* Merging.swift */; };
 		AAD4469D2ECFBC1A006CB07C /* UserGuildSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD4469C2ECFB915006CB07C /* UserGuildSettingsStore.swift */; };
+		AAD4469F2ECFD6D6006CB07C /* ReadStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD4469E2ECFD6D2006CB07C /* ReadStateStore.swift */; };
 		AAD73EB62E93E29E00470158 /* DMsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD73EB52E93E29E00470158 /* DMsView.swift */; };
 		AADD58652E82A95B00CBC8B6 /* GuildScrollBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = AADD58642E82A95100CBC8B6 /* GuildScrollBar.swift */; };
 		AADD7F8D2E99EB0B0025B644 /* Attachments.swift in Sources */ = {isa = PBXBuildFile; fileRef = AADD7F8C2E99EB060025B644 /* Attachments.swift */; };
+		AAEB3D952ED60816008BDD1D /* ImpactGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEB3D942ED60812008BDD1D /* ImpactGenerator.swift */; };
 		AAEEC71F2E65120000EB5FC9 /* TokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEEC71E2E6511F800EB5FC9 /* TokenStore.swift */; };
 		AAEEC7222E6515C400EB5FC9 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = AAEEC7212E6515C400EB5FC9 /* KeychainAccess */; };
 		AAEEF5012E9900F60034FA04 /* Default.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEEF5002E9900E50034FA04 /* Default.swift */; };
@@ -207,6 +209,7 @@
 		AAD73EB52E93E29E00470158 /* DMsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMsView.swift; sourceTree = "<group>"; };
 		AADD58642E82A95100CBC8B6 /* GuildScrollBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuildScrollBar.swift; sourceTree = "<group>"; };
 		AADD7F8C2E99EB060025B644 /* Attachments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Attachments.swift; sourceTree = "<group>"; };
+		AAEB3D942ED60812008BDD1D /* ImpactGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImpactGenerator.swift; sourceTree = "<group>"; };
 		AAEEC71E2E6511F800EB5FC9 /* TokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenStore.swift; sourceTree = "<group>"; };
 		AAEEF5002E9900E50034FA04 /* Default.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Default.swift; sourceTree = "<group>"; };
 		AAFC9DD92EB7DAE200BB8028 /* VariableBlurView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariableBlurView.swift; sourceTree = "<group>"; };
@@ -622,6 +625,7 @@
 		AA9C81842E6667050086B1DA /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				AAEB3D942ED60812008BDD1D /* ImpactGenerator.swift */,
 				AA2278C62EA448BD002C335F /* Profile.swift */,
 				AA9D26B22EC97714006071FE /* ViewUtils.swift */,
 				AA74E4372EBC40F40031B285 /* Modifiers */,
@@ -862,6 +866,7 @@
 				57A4E70B2E6B315F00470131 /* LoginView.swift in Sources */,
 				AAD73EB62E93E29E00470158 /* DMsView.swift in Sources */,
 				AABED59E2E7F463A005BDD63 /* ChannelStore.swift in Sources */,
+				AAEB3D952ED60816008BDD1D /* ImpactGenerator.swift in Sources */,
 				AA5DC55A2E9482ED00D81EB5 /* MessageCell.swift in Sources */,
 				57F5AF532E7CBDD000AD5674 /* AccountPicker.swift in Sources */,
 				AAB50A5A2E9AD5790048E8B0 /* MessageAuthor.swift in Sources */,

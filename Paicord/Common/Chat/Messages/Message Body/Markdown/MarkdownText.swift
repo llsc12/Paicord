@@ -101,7 +101,7 @@ struct MarkdownText: View {
     switch cmd {
     case .userMention(let userID):
       if let user = gw.user.users[userID] {
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        ImpactGenerator.impact(style: .light)
         userPopover = user
       }
     default:
@@ -1009,7 +1009,7 @@ private enum FontHelpers {
       return NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
     #else
       let pointSize = UIFontMetrics(forTextStyle: .footnote)
-      .scaledValue(for: 12)
+        .scaledValue(for: 12)
       let font = UIFont.systemFont(ofSize: pointSize)
       return font
     #endif
@@ -1254,18 +1254,29 @@ enum PaicordChatLink {
   case userMention(UserSnowflake)
   case roleMention(RoleSnowflake)
   case channelMention(ChannelSnowflake)
+  case invite(String)  // invite code
   case everyoneMention
   case hereMention
 
-  case discordMessageLink(GuildSnowflake?, ChannelSnowflake, MessageSnowflake)
+  // if guild id is nil, channel should probably exist
+  // if guild id is nil, it's a DM channel, possibly with message
+  // if guild id is not nil, it could be a guild only, or a guild and channel, or even a guild and channel and message
+  case discordNavigationLink(GuildSnowflake?, ChannelSnowflake?, MessageSnowflake?)
 
   init?(url: URL) {
     guard
       url.scheme == "paicord"
-        || (url.host() == "discord.com" && url.scheme == "https")
+        || ((url.host() == "discord.com" || url.host() == "discord.gg" || url.host() == "discordapp.com")
+          && url.scheme == "https")
     else { return nil }
     switch url.host() {
-    case "discord.com":
+    case "discord.gg":
+      // invite link
+      let pathComponents = url.pathComponents.filter { $0 != "/" }
+      guard let first = pathComponents.first else { return nil }
+      let inviteCode = first
+      self = .invite(inviteCode)
+    case "discord.com", "discordapp.com":
       let pathComponents = url.pathComponents.filter { $0 != "/" }
       guard let first = pathComponents.first else { return nil }
       switch first {
@@ -1279,15 +1290,20 @@ enum PaicordChatLink {
         let channelSnowflake = ChannelSnowflake(channelId)
         let messageSnowflake = MessageSnowflake(messageId)
 
-        self = .discordMessageLink(
+        self = .discordNavigationLink(
           guildSnowflake,
           channelSnowflake,
           messageSnowflake
         )
+      case "invite":
+        guard pathComponents.count >= 2,
+          let inviteCode = pathComponents[safe: 1]
+        else { return nil }
+        self = .invite(inviteCode)
       default:
         return nil
       }
-      #warning("impl any other discord.com links")
+      #warning("impl any other discord links")
 
     case "mention":
       let pathComponents = url.pathComponents.filter { $0 != "/" }
