@@ -15,17 +15,19 @@ struct MarkdownText: View {
   var content: String
   @Environment(\.gateway) var gw
   var channelStore: ChannelStore?
-  @Environment(\.font) var font
+  @Environment(\.dynamicTypeSize) var dynamicType
 
   var renderer: MarkdownRendererVM
 
   init(
     content: String,
-    channelStore: ChannelStore? = nil
+    channelStore: ChannelStore? = nil,
+    baseAttributesOverrides: [NSAttributedString.Key: Any] = [:]
   ) {
     self.content = content
     self.channelStore = channelStore
     self.renderer = MarkdownRendererVM(content)
+    self.renderer.baseAttributesOverrides = baseAttributesOverrides
   }
 
   @State var userPopover: PartialUser?
@@ -46,7 +48,7 @@ struct MarkdownText: View {
     }
     .task(id: content, render)
     .task(id: channelStore?.guildStore?.members.count, render)
-    .task(id: font, render)
+    .task(id: dynamicType, render)
     .environment(
       \.openURL,
       OpenURLAction { url in
@@ -63,8 +65,7 @@ struct MarkdownText: View {
     }
   }
 
-  @Sendable
-  func render() async {
+  func getHash() -> Int {
     // hash these values and see if the hash changed and update if hash is different.
     var hasher = Hasher()
     hasher.combine(content)
@@ -72,10 +73,13 @@ struct MarkdownText: View {
     if let memberCount = channelStore?.guildStore?.members.count {
       hasher.combine(memberCount)
     }
-    if let font {
-      hasher.combine(font)
-    }
-    let newHash = hasher.finalize()
+    hasher.combine(dynamicType)
+    return hasher.finalize()
+  }
+
+  @Sendable
+  func render() async {
+    let newHash = getHash()
     guard lastHash != newHash else {
       return
     }
@@ -189,19 +193,23 @@ struct MarkdownText: View {
           if let language {
             CodeText(code)
               .highlightMode(.languageAlias(language))
+              .codeTextColors(
                 Color.theme.markdown.codeBlockSyntaxTheme.highlightTheme
               )
+              .font(.footnote.monospaced())
           } else {
             Text(code)  // no highlighting
+              .font(.footnote.monospaced())
           }
         }
-        .fontDesign(.monospaced)
+        .environment(\.font, nil)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(8)
-        .background(Color(hexadecimal: "#1f202f"))
+        .background(Color.theme.markdown.codeBlockBackground)
         .clipShape(.rounded)
         .overlay(
           RoundedRectangle(cornerSize: .init(10), style: .continuous)
-            .stroke(Color(hexadecimal: "#373745"), lineWidth: 1)
+            .stroke(Color.theme.markdown.codeBlockBorder, lineWidth: 1)
         )
         .overlay(alignment: .topTrailing) {
           if isHovered {
@@ -283,7 +291,9 @@ class MarkdownRendererVM {
 
   var blocks: [BlockElement] = []
 
-  init(_ content: String? = nil) {
+  var baseAttributesOverrides: [NSAttributedString.Key: Any] = [:]
+
+  init(_ content: String? = nil, ) {
     guard let content else { return }
     // try cache check. do not parse if cache fail.
     if let cached = Self.blockCache.object(forKey: content as NSString) {
@@ -312,9 +322,10 @@ class MarkdownRendererVM {
         return ast
       }.value
       let blocks = await Task.detached {
-        if let cached = Self.blockCache.object(forKey: rawContent as NSString) {
-          return cached.blocks
-        }
+        // ignore cache check, we avoid unnecessary updates already.
+        //        if let cached = Self.blockCache.object(forKey: rawContent as NSString) {
+        //          return cached.blocks
+        //        }
         //        let emojisOnly = ast.isEmojisOnly()
         //        await MainActor.run {
         //          self.isEmojisOnly = emojisOnly
@@ -546,10 +557,10 @@ class MarkdownRendererVM {
     switch baseStyle {
     case .body:
       baseFont = FontHelpers.preferredBodyFont()
-      baseColor = AppKitOrUIKitColor.labelCompatible
+      baseColor = AppKitOrUIKitColor(Color.theme.markdown.text)
     case .footnote:
       baseFont = FontHelpers.preferredFootnoteFont()
-      baseColor = AppKitOrUIKitColor.secondaryLabelCompatible
+      baseColor = AppKitOrUIKitColor(Color.theme.markdown.secondaryText)
     }
     let baseAttributes: [NSAttributedString.Key: Any] = [
       .foregroundColor: baseColor,
@@ -641,9 +652,10 @@ class MarkdownRendererVM {
       if let code = node as? AST.CodeSpanNode {
         let attrs: [NSAttributedString.Key: Any] = [
           .font: FontHelpers.preferredMonospaceFont(),
-          .backgroundColor: AppKitOrUIKitColor
-            .tertiarySystemBackgroundCompatible,
-          .foregroundColor: AppKitOrUIKitColor.labelCompatible,
+          .backgroundColor: AppKitOrUIKitColor(
+            Color.theme.markdown.codeSpanBackground
+          ),
+          .foregroundColor: AppKitOrUIKitColor(Color.theme.markdown.text),
         ]
         let s = NSAttributedString(string: code.content, attributes: attrs)
         container.append(s)
@@ -666,7 +678,7 @@ class MarkdownRendererVM {
           newAttrs[.link] = url
         } else {
           newAttrs[.foregroundColor] = AppKitOrUIKitColor(
-            Color(hexadecimal6: 0x00aafc)
+            Color.theme.common.hyperlink
           )
         }
         inner.addAttributes(
@@ -687,7 +699,7 @@ class MarkdownRendererVM {
       if let a = node as? AST.AutolinkNode {
         var attrs = baseAttributes
         attrs[.foregroundColor] = AppKitOrUIKitColor(
-          Color(hexadecimal6: 0x00aafc)
+          Color.theme.common.hyperlink
         )
         attrs[.link] = URL(string: a.url)
         let s = NSAttributedString(string: a.text, attributes: attrs)
@@ -715,7 +727,9 @@ class MarkdownRendererVM {
         )
       }
       var newAttrs = baseAttributes
-      newAttrs[.foregroundColor] = AppKitOrUIKitColor.secondaryLabelCompatible
+      newAttrs[.foregroundColor] = AppKitOrUIKitColor(
+        Color.theme.markdown.secondaryText
+      )
       inner.addAttributes(
         newAttrs,
         range: NSRange(location: 0, length: inner.length)
@@ -758,14 +772,12 @@ class MarkdownRendererVM {
         if let url = URL(string: "paicord://mention/user/\(m.id.rawValue)") {
           attrs[.link] = url
         }
-        #if os(macOS)
-          attrs[.accessibilityCustomText] = "<@\(m.id.rawValue)>"
-        #endif
+        attrs[.rawContent] = "<@\(m.id.rawValue)>"
         attrs[.backgroundColor] = AppKitOrUIKitColor(
-          Color(hexadecimal6: 0x383c6f).opacity(0.8)
+          Color.theme.markdown.mentionBackground
         )
         attrs[.foregroundColor] = AppKitOrUIKitColor(
-          Color(AppKitOrUIKitColor.white).opacity(0.8)
+          Color.theme.markdown.mentionText
         )
         attrs[.underlineStyle] = .none
 
@@ -780,9 +792,7 @@ class MarkdownRendererVM {
           if let font = attrs[.font] {
             attrs[.font] = FontHelpers.makeFontBold(font)
           }
-          #if os(macOS)
-            attrs[.accessibilityCustomText] = "<@&\(r.id.rawValue)>"
-          #endif
+          attrs[.rawContent] = "<@&\(r.id.rawValue)>"
           if let url = URL(string: "paicord://mention/role/\(r.id.rawValue)") {
             attrs[.link] = url
           }
@@ -793,10 +803,10 @@ class MarkdownRendererVM {
             attrs[.foregroundColor] = AppKitOrUIKitColor(color)
           } else {
             attrs[.backgroundColor] = AppKitOrUIKitColor(
-              Color(hexadecimal6: 0x383c6f).opacity(0.8)
+              Color.theme.markdown.mentionBackground
             )
             attrs[.foregroundColor] = AppKitOrUIKitColor(
-              Color(AppKitOrUIKitColor.white).opacity(0.8)
+              Color.theme.markdown.mentionText
             )
 
           }
@@ -828,18 +838,16 @@ class MarkdownRendererVM {
           if let font = attrs[.font] {
             attrs[.font] = FontHelpers.makeFontBold(font)
           }
-          #if os(macOS)
-            attrs[.accessibilityCustomText] = "<#\(c.id.rawValue)>"
-          #endif
+          attrs[.rawContent] = "<#\(c.id.rawValue)>"
           if let url = URL(string: "paicord://mention/channel/\(c.id.rawValue)")
           {
             attrs[.link] = url
           }
           attrs[.backgroundColor] = AppKitOrUIKitColor(
-            Color(hexadecimal6: 0x383c6f).opacity(0.8)
+            Color.theme.markdown.mentionBackground
           )
           attrs[.foregroundColor] = AppKitOrUIKitColor(
-            Color(AppKitOrUIKitColor.white).opacity(0.8)
+            Color.theme.markdown.mentionText
           )
           let name = channel.name ?? c.id.rawValue
           let s = NSAttributedString(
@@ -868,10 +876,10 @@ class MarkdownRendererVM {
         attrs[.font] = FontHelpers.makeFontBold(font)
       }
       attrs[.backgroundColor] = AppKitOrUIKitColor(
-        Color(hexadecimal6: 0x383c6f)
+        Color.theme.markdown.mentionBackground
       )
       attrs[.foregroundColor] = AppKitOrUIKitColor(
-        Color(AppKitOrUIKitColor.white).opacity(0.8)
+        Color.theme.markdown.mentionText
       )
       if let url = URL(string: "paicord://mention/everyone") {
         attrs[.link] = url
@@ -889,10 +897,10 @@ class MarkdownRendererVM {
         attrs[.link] = url
       }
       attrs[.backgroundColor] = AppKitOrUIKitColor(
-        Color(hexadecimal6: 0x383c6f)
+        Color.theme.markdown.mentionBackground
       )
       attrs[.foregroundColor] = AppKitOrUIKitColor(
-        Color(AppKitOrUIKitColor.white).opacity(0.8)
+        Color.theme.markdown.mentionText
       )
       container.append(
         NSAttributedString(string: "@here", attributes: attrs)
@@ -901,15 +909,55 @@ class MarkdownRendererVM {
     case .timestamp:
       if let t = node as? AST.TimestampNode {
         let df = DateFormatter()
-        df.dateStyle = .medium
-        df.timeStyle = .short
+        //        all date stamp formats
+        //        Relative 2 months ago
+        //        Short time 11:59
+        //        Long time 11:59:00
+        //        Short date 14/09/2025
+        //        Long date 14 September 2025
+        //        Long date short time 14 September 2025 at 11:59
+        //        Long date with day of week short time Sunday, 14 September 2025 at 11:59
+        switch t.style ?? .relative {
+        case .relative:
+          df.dateFormat = "Relative"  // handled specially below
+        case .shortTime:
+          df.dateFormat = "HH:mm"
+        case .longTime:
+          df.dateFormat = "HH:mm:ss"
+        case .shortDate:
+          df.dateFormat = "dd/MM/yyyy"
+        case .longDate:
+          df.dateFormat = "dd MMMM yyyy"
+        case .longDateShortTime:
+          df.dateFormat = "dd MMMM yyyy 'at' HH:mm"
+        case .longDateWeekDayShortTime:
+          df.dateFormat = "EEEE, dd MMMM yyyy 'at' HH:mm"
+        }
+
+        // handle relative specially bc RelativeDateTimeFormatter does this
+        let timestampString: String
+        if t.style == .relative {
+          let relativeFormatter = RelativeDateTimeFormatter()
+          relativeFormatter.unitsStyle = .full
+          timestampString = relativeFormatter.localizedString(
+            for: t.date,
+            relativeTo: Date.now
+          )
+        } else {
+          timestampString = df.string(from: t.date)
+        }
+
+        var attrs = baseAttributes
+        attrs[.backgroundColor] = AppKitOrUIKitColor(
+          Color.theme.markdown.codeSpanBackground
+        )
+
         let s = NSAttributedString(
-          string: df.string(from: t.date),
-          attributes: baseAttributes
+          string: timestampString,
+          attributes: attrs
         )
         container.append(s)
       }
-
     default:
       // Generic recursion for unknown inline nodes
       for child in node.children {
@@ -931,8 +979,10 @@ private enum FontHelpers {
     #if os(macOS)
       return NSFont.systemFont(ofSize: NSFont.systemFontSize)
     #else
-      let font = UIFont.preferredFont(forTextStyle: .body)
-      return UIFontMetrics(forTextStyle: .body).scaledFont(for: font)
+      let pointSize = UIFontMetrics(forTextStyle: .caption1)
+        .scaledValue(for: 15)
+      let font = UIFont.systemFont(ofSize: pointSize)
+      return font
     #endif
   }
 
@@ -944,12 +994,13 @@ private enum FontHelpers {
         weight: .regular
       )
     #else
-      let base = UIFont.preferredFont(forTextStyle: .body)
+      let pointSize = UIFontMetrics(forTextStyle: .caption1)
+        .scaledValue(for: 15)
       let mono = UIFont.monospacedSystemFont(
-        ofSize: base.pointSize,
+        ofSize: pointSize,
         weight: .regular
       )
-      return UIFontMetrics(forTextStyle: .body).scaledFont(for: mono)
+      return mono
     #endif
   }
 
@@ -957,8 +1008,10 @@ private enum FontHelpers {
     #if os(macOS)
       return NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
     #else
-      let font = UIFont.preferredFont(forTextStyle: .footnote)
-      return UIFontMetrics(forTextStyle: .footnote).scaledFont(for: font)
+      let pointSize = UIFontMetrics(forTextStyle: .footnote)
+      .scaledValue(for: 12)
+      let font = UIFont.systemFont(ofSize: pointSize)
+      return font
     #endif
   }
 
@@ -1161,34 +1214,6 @@ private enum FontHelpers {
   }
 #endif
 
-// UIColor wrappers for cross-platform compatibility
-extension AppKitOrUIKitColor {
-  fileprivate static var labelCompatible: AppKitOrUIKitColor {
-    #if os(macOS)
-      return NSColor.label
-    #else
-      return UIColor.label
-    #endif
-  }
-
-  fileprivate static var secondaryLabelCompatible: AppKitOrUIKitColor {
-    #if os(macOS)
-      return NSColor.secondaryLabelColor
-    #else
-      return UIColor.secondaryLabel
-    #endif
-  }
-
-  fileprivate static var tertiarySystemBackgroundCompatible: AppKitOrUIKitColor
-  {
-    #if os(macOS)
-      return NSColor.windowBackgroundColor
-    #else
-      return UIColor.tertiarySystemBackground
-    #endif
-  }
-}
-
 #if os(iOS)
   extension UIFont {
     /// Returns a rounded system font with the given size and weight.
@@ -1295,4 +1320,9 @@ enum PaicordChatLink {
       return nil
     }
   }
+}
+
+extension NSAttributedString.Key {
+  static let rawContent =
+    NSAttributedString.Key("PaicordRawTextContentKey")
 }
