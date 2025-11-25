@@ -12,17 +12,17 @@ import PaicordLib
 @Observable
 final class GatewayStore {
   static let shared = GatewayStore()
-
+  
   // Some setup for the gateway
   @ObservationIgnored var captchaCallback: CaptchaChallengeHandler?
   @ObservationIgnored var mfaCallback: MFAVerificationHandler?
   @ObservationIgnored private(set) var gateway: UserGatewayManager?
-
+  
   @ObservationIgnored
   var client: DiscordClient {
     gateway?.client ?? unauthenticatedClient
   }
-
+  
   @ObservationIgnored
   lazy var unauthenticatedClient: DefaultDiscordClient = {
     DefaultDiscordClient(
@@ -30,19 +30,19 @@ final class GatewayStore {
       mfaCallback: mfaCallback
     )
   }()
-
+  
   var state: GatewayState = .noConnection {
     didSet {
       print("[GatewayStore] Gateway state changed to \(state)")
     }
   }
-
+  
   @ObservationIgnored
   var eventTask: Task<Void, Never>? = nil
   var errorTask: Task<Void, Never>? = nil
-
+  
   // MARK: - Gateway Management
-
+  
   /// Disconnects current gateway and cancels event task if needed
   private func disconnectIfNeeded() async {
     guard !([.stopped, .noConnection].contains(state)) else { return }
@@ -50,7 +50,7 @@ final class GatewayStore {
     eventTask?.cancel()
     eventTask = nil
   }
-
+  
   /// Connects to the gateway if it is not already connected
   func connectIfNeeded() async {
     guard [.stopped, .noConnection].contains(state), eventTask == nil else {
@@ -60,7 +60,7 @@ final class GatewayStore {
       await logIn(as: account)
     }
   }
-
+  
   /// Login with a specific token
   func logIn(as account: TokenStore.AccountData) async {
     await disconnectIfNeeded()
@@ -77,7 +77,7 @@ final class GatewayStore {
     setupEventHandling()
     await gateway?.connect()
   }
-
+  
   /// Disconnects from the gateway. You must remove the current account from TokenStore before calling this.
   /// This will reset all stores.
   func logOut() async {
@@ -85,7 +85,7 @@ final class GatewayStore {
     gateway = nil
     resetStores()
   }
-
+  
   func setupEventHandling() {
     eventTask = Task { @MainActor in
       guard let gateway else { return }
@@ -104,25 +104,29 @@ final class GatewayStore {
         print(String(buffer: buffer), error)
       }
     }
-
+    
     // Set up stores with gateway
     user.setGateway(self)
     settings.setGateway(self)
-
+    userGuildSettings.setGateway(self)
+    readStates.setGateway(self)
+    
     // Update existing channel stores
     for channelStore in channels.values {
       channelStore.setGateway(self)
     }
-
+    
     // Update existing guild stores
     for guildStore in guilds.values {
       guildStore.setGateway(self)
     }
   }
-
+  
   func resetStores() {
     user = CurrentUserStore()
     settings = SettingsStore()
+    userGuildSettings = UserGuildSettingsStore()
+    readStates = ReadStateStore()
     channels = [:]
     guilds = [:]
     subscribedGuilds = []
@@ -131,16 +135,19 @@ final class GatewayStore {
     }
     
   }
-
+  
   // MARK: - Data Stores
-
+  
   let accounts = TokenStore()
   var user = CurrentUserStore()
+  var userGuildSettings = UserGuildSettingsStore()
+  var readStates = ReadStateStore()
   var settings = SettingsStore()
-
+  let externalBadges = ExternalBadgeStore()
+  
   private var channels: [ChannelSnowflake: ChannelStore] = [:]
   func getChannelStore(for id: ChannelSnowflake, from guild: GuildStore? = nil)
-    -> ChannelStore
+  -> ChannelStore
   {
     if let store = channels[id] {
       return store
@@ -152,7 +159,7 @@ final class GatewayStore {
       return store
     }
   }
-
+  
   private var subscribedGuilds: Set<GuildSnowflake> = []
   private var guilds: [GuildSnowflake: GuildStore] = [:]
   func getGuildStore(for id: GuildSnowflake) -> GuildStore {
@@ -163,15 +170,15 @@ final class GatewayStore {
         Task {
           await gateway?.updateGuildSubscriptions(
             payload:
-              .init(subscriptions: [
-                id: .init(
-                  typing: true,
-                  activities: false,
-                  threads: false,
-                  channels: [:],
-                  thread_member_lists: nil
-                )
-              ])
+                .init(subscriptions: [
+                  id: .init(
+                    typing: true,
+                    activities: false,
+                    threads: false,
+                    channels: [:],
+                    thread_member_lists: nil
+                  )
+                ])
           )
           print("[GatewayStore] Subscribed to guild \(id.rawValue)")
         }
@@ -187,7 +194,7 @@ final class GatewayStore {
       return store
     }
   }
-
+  
   private var messageDrains: [ChannelSnowflake: MessageDrainStore] = [:]
   func getMessageDrainStore(for channelId: ChannelSnowflake) -> MessageDrainStore {
     if let store = messageDrains[channelId] {
@@ -199,12 +206,13 @@ final class GatewayStore {
       return store
     }
   }
-
+  
   
   // MARK: - Handlers
   
   private func handleReady(_ data: Gateway.Ready) {
-    guard self.subscribedGuilds.isEmpty == false else { return }
+    // if we have subscribed guilds, we need to clear out non-focused channel stores
+    //    guard self.subscribedGuilds.isEmpty == false else { return } // not needed, below logic wont do anything if empty
     print("[GatewayStore] Reconnected, removing ChannelStore instances excluding focused channel.")
     let channelIds = PaicordAppState.instances.compactMap(\.value.selectedChannel)
     channels = channels.filter { channelIds.contains($0.key) }
@@ -212,6 +220,12 @@ final class GatewayStore {
       print("[GatewayStore] Refetching messages on behalf of focused channel \(channel.channelId.rawValue).")
       channel.messages.removeAll()
       Task { @MainActor in
+        defer {
+          NotificationCenter.default.post(
+            name: .chatViewShouldScrollToBottom,
+            object: ["channelId": channel.channelId]
+          )
+        }
         do {
           try await channel.fetchMessages()
         } catch {
@@ -224,6 +238,28 @@ final class GatewayStore {
     PaicordAppState.instances.compactMap(\.value.selectedGuild).forEach { guildId in
       _ = getGuildStore(for: guildId)
     }
-  }
     
+    // Now that we've done that, we need to use this ready data to update any internal stores that need it
+    // guilds need repopulating. also guilds could have been left during the client down time. remove guilds if they don't exist anymore then repopulate.
+    let existingGuildIds = Set(data.guilds.map(\.id))
+    // remove guilds that don't exist anymore, also remove their guildstores and any of their channelstores
+    for (guildId, guildStore) in guilds {
+      if !existingGuildIds.contains(guildId) {
+        print("[GatewayStore] Removing guild store for non-existent guild \(guildId.rawValue).")
+        // remove their channels from channel stores
+        for channelId in guildStore.channels.keys {
+          channels.removeValue(forKey: channelId) // only really removes anything if the server that disappeared had a focused channel
+        }
+        // remove the guildstore itself
+        guilds.removeValue(forKey: guildId)
+      }
+    }
+    // repopulate guildstores
+    for guildStore in self.guilds.values {
+      if let guild = data.guilds.first(where: { $0.id == guildStore.guildId }) {
+        guildStore.populate(with: guild)
+      }
+    }
+    
+  }
 }

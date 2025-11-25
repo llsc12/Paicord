@@ -18,13 +18,6 @@ class MessageDrainStore: DiscordDataStore {
   init() {}
 
   // MARK: - Protocol Methods
-  func setGateway(_ gateway: GatewayStore?) {
-    cancelEventHandling()
-    self.gateway = gateway
-    if gateway != nil {
-      setupEventHandling()
-    }
-  }
 
   func setupEventHandling() {
     guard let gateway = gateway?.gateway else { return }

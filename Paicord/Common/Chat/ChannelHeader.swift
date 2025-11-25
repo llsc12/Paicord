@@ -6,33 +6,88 @@
 //  Copyright © 2025 Lakhan Lothiyi.
 //
 
+import PaicordLib
+import SDWebImageSwiftUI
 import SwiftUIX
 
 extension ChatView {
   struct ChannelHeader: View {
+    @Environment(\.gateway) var gw
     @Environment(\.userInterfaceIdiom) var idiom
     var vm: ChannelStore
 
     var body: some View {
       switch vm.channel?.type {
       case .dm, .groupDm:
-        if let name = vm.channel?.name, !name.isEmpty {
-          HStack(spacing: 4) {
-            Image(systemName: "number")
-              .foregroundStyle(.secondary)
-              .imageScale(idiom == .phone ? .medium : .large)
-            let name = vm.channel?.name ?? "Unknown Channel"
-            Text(name)
-              .font(idiom == .phone ? .headline : .title3)
-              .fontWeight(.semibold)
+        let ppl = vm.channel?.recipients ?? []
+        let channel = vm.channel
+        HStack(spacing: 8) {
+          Group {
+            if let icon = channel?.icon {
+              let url = URL(
+                string: CDNEndpoint.channelIcon(
+                  channelId: vm.channelId,
+                  icon: icon
+                )
+                .url + ".png?size=80"
+              )
+              WebImage(url: url)
+                .resizable()
+                .scaledToFit()
+                .clipShape(.circle)
+                .padding(2)
+            } else {
+              VStack {
+                if let firstUser = channel?.recipients?.first(where: {
+                  $0.id != gw.user.currentUser?.id
+                }),
+                  let lastUser = channel?.recipients?.last(where: {
+                    $0.id != gw.user.currentUser?.id && $0.id != firstUser.id
+                  })
+                {
+                  Group {
+                    Profile.Avatar(
+                      member: nil,
+                      user: firstUser.toPartialUser()
+                    )
+                    .showsAvatarDecoration()
+                    .scaleEffect(0.75, anchor: .topLeading)
+                    .overlay(
+                      Profile.Avatar(
+                        member: nil,
+                        user: lastUser.toPartialUser()
+                      )
+                      .showsAvatarDecoration()
+                      .scaleEffect(0.75, anchor: .bottomTrailing)
+                    )
+                  }
+                  .padding(2)
+                } else if let user = channel?.recipients?.first {
+                  Profile.AvatarWithPresence(
+                    member: nil,
+                    user: user.toPartialUser()
+                  )
+                  .showsAvatarDecoration()
+                  .padding(2)
+                } else {
+                  Circle()
+                    .fill(Color.gray)
+                    .padding(2)
+                }
+              }
+              .aspectRatio(1, contentMode: .fit)
+            }
           }
-        } else {
-          let ppl = vm.channel?.recipients ?? []
+          .frame(width: 36, height: 36)
+
           Text(
-            ppl.map({
-              $0.global_name ?? $0.username
-            }).joined(separator: ", ")
+            vm.channel?.name
+              ?? ppl.map({
+                $0.global_name ?? $0.username
+              }).joined(separator: ", ")
           )
+          .font(idiom == .phone ? .headline : .title3)
+          .fontWeight(.semibold)
         }
       default:
         HStack(spacing: 4) {

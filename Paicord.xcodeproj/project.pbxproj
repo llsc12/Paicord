@@ -83,6 +83,7 @@
 		AA9C818C2E6702930086B1DA /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = AA9C818B2E6702930086B1DA /* SwiftUIIntrospect */; };
 		AA9D26B12EC95EE4006071FE /* FlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9D26B02EC95EE3006071FE /* FlowLayout.swift */; };
 		AA9D26B32EC97721006071FE /* ViewUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9D26B22EC97714006071FE /* ViewUtils.swift */; };
+		AAAF79802ED1E9F7004B5B3F /* ExternalBadgeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAF797F2ED1E9ED004B5B3F /* ExternalBadgeStore.swift */; };
 		AAB22FD82EAD0A2400413310 /* SwiftPrettyPrint in Frameworks */ = {isa = PBXBuildFile; productRef = AAB22FD72EAD0A2400413310 /* SwiftPrettyPrint */; };
 		AAB22FDB2EAD86B700413310 /* ColorCube in Frameworks */ = {isa = PBXBuildFile; productRef = AAB22FDA2EAD86B700413310 /* ColorCube */; };
 		AAB50A502E9AA6800048E8B0 /* ChatInputCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB50A4F2E9AA67C0048E8B0 /* ChatInputCommand.swift */; };
@@ -103,6 +104,7 @@
 		AABED5A42E7F4DAE005BDD63 /* GuildStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABED5A32E7F4DAE005BDD63 /* GuildStore.swift */; };
 		AABED5A62E7F514B005BDD63 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABED5A52E7F5148005BDD63 /* SettingsStore.swift */; };
 		AABED5A92E7FF982005BDD63 /* Merging.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABED5A82E7FF979005BDD63 /* Merging.swift */; };
+		AAD4469D2ECFBC1A006CB07C /* UserGuildSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD4469C2ECFB915006CB07C /* UserGuildSettingsStore.swift */; };
 		AAD73EB62E93E29E00470158 /* DMsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD73EB52E93E29E00470158 /* DMsView.swift */; };
 		AADD58652E82A95B00CBC8B6 /* GuildScrollBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = AADD58642E82A95100CBC8B6 /* GuildScrollBar.swift */; };
 		AADD7F8D2E99EB0B0025B644 /* Attachments.swift in Sources */ = {isa = PBXBuildFile; fileRef = AADD7F8C2E99EB060025B644 /* Attachments.swift */; };
@@ -180,6 +182,7 @@
 		AA9C81852E66670E0086B1DA /* CornerRadius.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CornerRadius.swift; sourceTree = "<group>"; };
 		AA9D26B02EC95EE3006071FE /* FlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowLayout.swift; sourceTree = "<group>"; };
 		AA9D26B22EC97714006071FE /* ViewUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewUtils.swift; sourceTree = "<group>"; };
+		AAAF797F2ED1E9ED004B5B3F /* ExternalBadgeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalBadgeStore.swift; sourceTree = "<group>"; };
 		AAB22FD52EABB04300413310 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		AAB50A4F2E9AA67C0048E8B0 /* ChatInputCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatInputCommand.swift; sourceTree = "<group>"; };
 		AAB50A512E9AC9CB0048E8B0 /* ChannelHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelHeader.swift; sourceTree = "<group>"; };
@@ -199,6 +202,8 @@
 		AABED5A32E7F4DAE005BDD63 /* GuildStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuildStore.swift; sourceTree = "<group>"; };
 		AABED5A52E7F5148005BDD63 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
 		AABED5A82E7FF979005BDD63 /* Merging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Merging.swift; sourceTree = "<group>"; };
+		AAD4469C2ECFB915006CB07C /* UserGuildSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserGuildSettingsStore.swift; sourceTree = "<group>"; };
+		AAD4469E2ECFD6D2006CB07C /* ReadStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadStateStore.swift; sourceTree = "<group>"; };
 		AAD73EB52E93E29E00470158 /* DMsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMsView.swift; sourceTree = "<group>"; };
 		AADD58642E82A95100CBC8B6 /* GuildScrollBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuildScrollBar.swift; sourceTree = "<group>"; };
 		AADD7F8C2E99EB060025B644 /* Attachments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Attachments.swift; sourceTree = "<group>"; };
@@ -659,10 +664,13 @@
 				57E05C5C2E6CBCD700B81AA7 /* GatewayStore.swift */,
 				AAEEC71E2E6511F800EB5FC9 /* TokenStore.swift */,
 				AABED59F2E7F48F9005BDD63 /* CurrentUserStore.swift */,
+				AAD4469C2ECFB915006CB07C /* UserGuildSettingsStore.swift */,
+				AAD4469E2ECFD6D2006CB07C /* ReadStateStore.swift */,
 				AABED5A32E7F4DAE005BDD63 /* GuildStore.swift */,
-				AABED5A52E7F5148005BDD63 /* SettingsStore.swift */,
 				AABED59D2E7F4637005BDD63 /* ChannelStore.swift */,
 				AA7B38F32EB50EFD00CA4A3C /* MessageDrainStore.swift */,
+				AABED5A52E7F5148005BDD63 /* SettingsStore.swift */,
+				AAAF797F2ED1E9ED004B5B3F /* ExternalBadgeStore.swift */,
 			);
 			path = Stores;
 			sourceTree = "<group>";
@@ -831,6 +839,7 @@
 				57F5AF512E7CBC7700AD5674 /* LoginViewModel.swift in Sources */,
 				AA2278C52EA44828002C335F /* ProfilePopoutView.swift in Sources */,
 				AA21D27E2EA8ED4400C75093 /* ProfileFullSheetView.swift in Sources */,
+				AAD4469F2ECFD6D6006CB07C /* ReadStateStore.swift in Sources */,
 				AA5CA6542E9BD37D00C7C82A /* ComponentsV2.swift in Sources */,
 				AABED5A92E7FF982005BDD63 /* Merging.swift in Sources */,
 				578E1CE12E67781700C6DEA3 /* GradientText.swift in Sources */,
@@ -864,7 +873,9 @@
 				AA74E43F2EBE26E30031B285 /* PlaceholderMessageCell.swift in Sources */,
 				AA74E43B2EBCA9010031B285 /* Environment.swift in Sources */,
 				AA10971A2E64C181005BC3D2 /* ProfileView.swift in Sources */,
+				AAD4469D2ECFBC1A006CB07C /* UserGuildSettingsStore.swift in Sources */,
 				AA10971B2E64C181005BC3D2 /* PaicordApp.swift in Sources */,
+				AAAF79802ED1E9F7004B5B3F /* ExternalBadgeStore.swift in Sources */,
 				57DA042F2E79DC4C00DB4C7C /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

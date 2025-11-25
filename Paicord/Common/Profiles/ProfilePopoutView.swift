@@ -43,9 +43,9 @@ struct ProfilePopoutView: View {
     guard
       let firstColor =
         showMainProfile
-        ? profile?.guild_member_profile?.theme_colors?.first
+        ? profile?.user_profile?.theme_colors?.first
+        : profile?.guild_member_profile?.theme_colors?.first
           ?? profile?.user_profile?.theme_colors?.first
-        : profile?.user_profile?.theme_colors?.first
     else {
       return nil
     }
@@ -63,7 +63,7 @@ struct ProfilePopoutView: View {
       .minWidth(idiom == .phone ? nil : 300)  // popover limits on larger devices
       .maxWidth(idiom == .phone ? nil : 300)  // popover limits on larger devices
       .task(fetchProfile)
-      .task(grabColor) // way faster than profile fetch
+      .task(grabColor)  // way faster than profile fetch
       .scenePadding(.bottom)
     }
     .minHeight(idiom == .phone ? nil : 400)  // popover limits on larger devices
@@ -72,10 +72,11 @@ struct ProfilePopoutView: View {
     .background(
       Profile.ThemeColorsBackground(
         colors: showMainProfile
-          ? profile?.guild_member_profile?.theme_colors
+          ? profile?.user_profile?.theme_colors
+          : profile?.guild_member_profile?.theme_colors
             ?? profile?.user_profile?.theme_colors
-          : profile?.user_profile?.theme_colors
       )
+      .overlay(.ultraThinMaterial)
     )
     .ignoresSafeArea(.container, edges: .bottom)
     .environment(\.colorScheme, colorScheme ?? systemColorScheme)
@@ -101,11 +102,11 @@ struct ProfilePopoutView: View {
         default:
           let color =
             showMainProfile
-            ? profile?.guild_member_profile?.theme_colors?.first ?? profile?
+            ? profile?.user_profile?.theme_colors?.first
+              ?? profile?.user_profile?.accent_color
+            : profile?.guild_member_profile?.theme_colors?.first ?? profile?
               .user_profile?.theme_colors?.first ?? profile?
               .guild_member_profile?.accent_color
-              ?? profile?.user_profile?.accent_color
-            : profile?.user_profile?.theme_colors?.first
               ?? profile?.user_profile?.accent_color
           Rectangle()
             .aspectRatio(3, contentMode: .fit)
@@ -167,13 +168,11 @@ struct ProfilePopoutView: View {
         .font(.subheadline)
         .foregroundStyle(.secondary)
 
-        HStack(spacing: 4) {
-          let badges = profile?.badges ?? []
-          ForEach(badges) { badge in
-            Profile.Badge(badge: badge)
-          }
-        }
-        .maxHeight(16)
+        Profile.BadgesView(
+          profile: profile,
+          member: member,
+          user: user
+        )
       }
 
       if let bio =

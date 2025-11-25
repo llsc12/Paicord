@@ -28,13 +28,6 @@ class CurrentUserStore: DiscordDataStore {
   var stickers: [GuildSnowflake: [StickerSnowflake: Sticker]] = [:]
 
   // MARK: - Protocol Methods
-  func setGateway(_ gateway: GatewayStore?) {
-    cancelEventHandling()
-    self.gateway = gateway
-    if gateway != nil {
-      setupEventHandling()
-    }
-  }
 
   func setupEventHandling() {
     guard let gateway = gateway?.gateway else { return }

@@ -90,109 +90,114 @@ enum Profile {
   struct AvatarWithPresence: View {
     @Environment(\.gateway) var gw
     let member: Guild.PartialMember?
-    let user: PartialUser
+    let user: PartialUser?
     var hideOffline: Bool = false
     var animated: Bool = false
     var showDecoration: Bool = false
 
-    init(member: Guild.PartialMember? = nil, user: DiscordUser) {
+    init(member: Guild.PartialMember? = nil, user: DiscordUser?) {
       self.member = member
-      self.user = user.toPartialUser()
+      self.user = user?.toPartialUser()
     }
-    init(member: Guild.PartialMember? = nil, user: PartialUser) {
+    init(member: Guild.PartialMember? = nil, user: PartialUser?) {
       self.member = member
       self.user = user
     }
 
     var body: some View {
-      GeometryReader { geo in
-        let size = min(geo.size.width, geo.size.height)
-        let dotSize = size * 0.25
-        let inset = dotSize * 0.55
+      if let user {
+        GeometryReader { geo in
+          let size = min(geo.size.width, geo.size.height)
+          let dotSize = size * 0.25
+          let inset = dotSize * 0.55
 
-        let presence: ActivityData? = {
-          if user.id == gw.user.currentUser?.id,
-            let session = gw.user.sessions.last
-          {
-            return session
-          } else {
-            return gw.user.presences[user.id]
-          }
-        }()
-
-        // modified this to work around the masking cutting off avatar decorations that go out of frame.
-        // can make the view look worse maybe.
-        let scaleDown: CGFloat = 0.75
-        let scaleUp: CGFloat = 1.0 / scaleDown
-
-        let center = CGPoint(x: geo.size.width * 0.5, y: geo.size.height * 0.5)
-        let originalHole = CGPoint(
-          x: geo.size.width - inset,
-          y: geo.size.height - inset
-        )
-        let scaledHole = CGPoint(
-          x: center.x + scaleDown * (originalHole.x - center.x),
-          y: center.y + scaleDown * (originalHole.y - center.y)
-        )
-        let scaledHoleRadius = (dotSize * 1.5 / 2) * scaleDown
-
-        ZStack(alignment: .bottomTrailing) {
-          Avatar(member: member, user: user)
-            .animated(animated)
-            .showsAvatarDecoration(showDecoration)
-            .scaleEffect(scaleDown)
-            .mask(
-              RectWithCircleHole(
-                holeCenter: scaledHole,
-                holeRadius: scaledHoleRadius
-              )
-              .fill(style: FillStyle(eoFill: true))
-            )
-            .scaleEffect(scaleUp)
-
-          if let presence {
-            let color: Color = {
-              switch presence.status {
-              case .online: return .init(hexadecimal6: 0x42a25a)
-              case .afk: return .init(hexadecimal6: 0xca9653)
-              case .doNotDisturb: return .init(hexadecimal6: 0xd83a42)
-              default: return .init(hexadecimal6: 0x82838b)
-              }
-            }()
-
-            Group {
-              switch presence.status {
-              case .online:
-                StatusIndicatorShapes.OnlineShape()
-              case .afk:
-                StatusIndicatorShapes.IdleShape()
-              case .doNotDisturb:
-                StatusIndicatorShapes.DNDShape()
-              default:
-                StatusIndicatorShapes.InvisibleShape()
-                  .hidden(hideOffline)
-              }
+          let presence: ActivityData? = {
+            if user.id == gw.user.currentUser?.id,
+              let session = gw.user.sessions.last
+            {
+              return session
+            } else {
+              return gw.user.presences[user.id]
             }
-            .foregroundStyle(color)
-            .frame(width: dotSize, height: dotSize)
-            .position(
-              x: geo.size.width - inset,
-              y: geo.size.height - inset
-            )
-          } else {
-            StatusIndicatorShapes.InvisibleShape()
-              .foregroundStyle(Color.init(hexadecimal6: 0x82838b))
+          }()
+
+          // modified this to work around the masking cutting off avatar decorations that go out of frame.
+          // can make the view look worse maybe.
+          let scaleDown: CGFloat = 0.75
+          let scaleUp: CGFloat = 1.0 / scaleDown
+
+          let center = CGPoint(
+            x: geo.size.width * 0.5,
+            y: geo.size.height * 0.5
+          )
+          let originalHole = CGPoint(
+            x: geo.size.width - inset,
+            y: geo.size.height - inset
+          )
+          let scaledHole = CGPoint(
+            x: center.x + scaleDown * (originalHole.x - center.x),
+            y: center.y + scaleDown * (originalHole.y - center.y)
+          )
+          let scaledHoleRadius = (dotSize * 1.5 / 2) * scaleDown
+
+          ZStack(alignment: .bottomTrailing) {
+            Avatar(member: member, user: user)
+              .animated(animated)
+              .showsAvatarDecoration(showDecoration)
+              .scaleEffect(scaleDown)
+              .mask(
+                RectWithCircleHole(
+                  holeCenter: scaledHole,
+                  holeRadius: scaledHoleRadius
+                )
+                .fill(style: FillStyle(eoFill: true))
+              )
+              .scaleEffect(scaleUp)
+
+            if let presence {
+              let color: Color = {
+                switch presence.status {
+                case .online: return .init(hexadecimal6: 0x42a25a)
+                case .afk: return .init(hexadecimal6: 0xca9653)
+                case .doNotDisturb: return .init(hexadecimal6: 0xd83a42)
+                default: return .init(hexadecimal6: 0x82838b)
+                }
+              }()
+
+              Group {
+                switch presence.status {
+                case .online:
+                  StatusIndicatorShapes.OnlineShape()
+                case .afk:
+                  StatusIndicatorShapes.IdleShape()
+                case .doNotDisturb:
+                  StatusIndicatorShapes.DNDShape()
+                default:
+                  StatusIndicatorShapes.InvisibleShape()
+                    .hidden(hideOffline)
+                }
+              }
+              .foregroundStyle(color)
               .frame(width: dotSize, height: dotSize)
               .position(
                 x: geo.size.width - inset,
                 y: geo.size.height - inset
               )
-              .hidden(hideOffline)
+            } else {
+              StatusIndicatorShapes.InvisibleShape()
+                .foregroundStyle(Color.init(hexadecimal6: 0x82838b))
+                .frame(width: dotSize, height: dotSize)
+                .position(
+                  x: geo.size.width - inset,
+                  y: geo.size.height - inset
+                )
+                .hidden(hideOffline)
+            }
           }
+          .frame(width: geo.size.width, height: geo.size.height)
         }
-        .frame(width: geo.size.width, height: geo.size.height)
+        .aspectRatio(1, contentMode: .fit)
       }
-      .aspectRatio(1, contentMode: .fit)
     }
 
     func hideOffline(_ hide: Bool) -> Self {
@@ -281,7 +286,13 @@ enum Profile {
         }
     }
     func badgeURL() -> URL? {
-      URL(
+      // check if icon is already a url
+      if badge.icon.starts(with: "http") {
+        return URL(string: badge.icon)
+      }
+
+      // else fetch from cdn
+      return URL(
         string: CDNEndpoint.profileBadge(icon: badge.icon).url + ".png"
       )
     }
@@ -291,13 +302,31 @@ enum Profile {
     var colors: [DiscordColor]?
 
     var body: some View {
-      if let colors, let primaryColor = colors.first?.asColor(ignoringZero: true),
-        let secondaryColor = colors.last?.asColor(ignoringZero: true)
+      if let colors,
+        let primaryColor = colors.first?.asColor(ignoringZero: false),
+        let secondaryColor = colors.last?.asColor(ignoringZero: false)
       {
         LinearGradient(
           gradient: .init(colors: [primaryColor, secondaryColor]),
           direction: .down
         )
+      }
+    }
+  }
+
+  struct BadgesView: View {
+    @Environment(\.gateway) var gw
+    var profile: DiscordUser.Profile?
+    var member: Guild.PartialMember?
+    var user: PartialUser?
+
+    var body: some View {
+      let badges =
+      gw.externalBadges.badges(for: user?.id) + (profile?.guild_badges ?? []) + (profile?.badges ?? [])
+      LazyHStack(spacing: 2) {
+        ForEach(badges) { badge in
+          Badge(badge: badge)
+        }
       }
     }
   }

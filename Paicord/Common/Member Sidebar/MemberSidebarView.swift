@@ -6,11 +6,11 @@
 //  Copyright © 2025 Lakhan Lothiyi.
 //
 
+import ColorCube
 import DiscordModels
 import PaicordLib
 import SDWebImageSwiftUI
 import SwiftUIX
-import ColorCube
 
 struct MemberSidebarView: View {
   @Environment(\.gateway) var gw
@@ -75,7 +75,7 @@ struct MemberSidebarView: View {
       ScrollView {
         LazyVStack(alignment: .leading) {
           bannerView
-          
+
           profileBody
             .padding()
         }
@@ -151,13 +151,7 @@ struct MemberSidebarView: View {
           .font(.subheadline)
           .foregroundStyle(.secondary)
 
-          HStack(spacing: 4) {
-            let badges = profile?.badges ?? []
-            ForEach(badges) { badge in
-              Profile.Badge(badge: badge)
-            }
-          }
-          .maxHeight(16)
+          Profile.BadgesView(profile: profile, user: user)
         }
 
         if let bio = profileMeta?.bio ?? profile?.user_profile?.bio {

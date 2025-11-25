@@ -18,6 +18,14 @@ protocol DiscordDataStore: AnyObject {
 }
 
 extension DiscordDataStore {
+  func setGateway(_ gateway: GatewayStore?) {
+    cancelEventHandling()
+    self.gateway = gateway
+    if gateway != nil {
+      setupEventHandling()
+    }
+  }
+  
   func cancelEventHandling() {
     eventTask?.cancel()
     eventTask = nil

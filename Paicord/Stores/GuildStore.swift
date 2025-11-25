@@ -6,9 +6,10 @@
 //  Copyright © 2025 Lakhan Lothiyi.
 //
 
-import Foundation
 import Collections
+import Foundation
 import PaicordLib
+import SwiftPrettyPrint
 
 @Observable
 class GuildStore: DiscordDataStore {
@@ -31,7 +32,10 @@ class GuildStore: DiscordDataStore {
 
     // populate properties based on initial guild data
     guard let guild else { return }
+    populate(with: guild)
+  }
 
+  func populate(with guild: Guild) {
     // channels
     guild.channels?.forEach { channel in
       channels[channel.id] = channel
@@ -59,14 +63,7 @@ class GuildStore: DiscordDataStore {
   }
 
   // MARK: - Protocol Methods
-  func setGateway(_ gateway: GatewayStore?) {
-    cancelEventHandling()
-    self.gateway = gateway
-    if gateway != nil {
-      setupEventHandling()
-    }
-  }
-
+  
   func setupEventHandling() {
     guard let gateway = gateway?.gateway else { return }
 
@@ -213,11 +210,52 @@ class GuildStore: DiscordDataStore {
   }
 
   private func handleGuildRoleCreate(_ roleCreate: Gateway.GuildRole) {
-    roles[roleCreate.role.id] = roleCreate.role
+    // insert role based on position
+    let newRole = roleCreate.role
+    var inserted = false
+    for (index, existingRole) in roles.values.enumerated() {
+      if newRole.position > existingRole.position
+        || (newRole.position == existingRole.position
+          && newRole.id.rawValue < existingRole.id.rawValue)
+      {
+        roles.updateValue(newRole, forKey: newRole.id, insertingAt: index)
+      }
+      inserted = true
+      break
+    }
+    // if not inserted, it means it's the lowest role but unlikely since @everyone exists. whatever.
+    if !inserted {
+      roles[newRole.id] = newRole
+    }
   }
 
   private func handleGuildRoleUpdate(_ roleUpdate: Gateway.GuildRole) {
-    roles[roleUpdate.role.id] = roleUpdate.role
+    // compare positions and remove and re-insert if position changed
+    if let existingRole = roles[roleUpdate.role.id],
+      existingRole.position != roleUpdate.role.position
+    {
+      roles.removeValue(forKey: roleUpdate.role.id)
+      // re-insert based on new position
+      let newRole = roleUpdate.role
+      var inserted = false
+      for (index, existingRole) in roles.values.enumerated() {
+        if newRole.position > existingRole.position
+          || (newRole.position == existingRole.position
+            && newRole.id.rawValue < existingRole.id.rawValue)
+        {
+          roles.updateValue(newRole, forKey: newRole.id, insertingAt: index)
+          inserted = true
+          break
+        }
+      }
+      // if not inserted, it means it's the lowest role but unlikely since @everyone exists. whatever.
+      if !inserted {
+        roles[newRole.id] = newRole
+      }
+    } else {
+      // position didn't change, just update
+      roles[roleUpdate.role.id] = roleUpdate.role
+    }
   }
 
   private func handleGuildRoleDelete(_ roleDelete: Gateway.GuildRoleDelete) {
@@ -263,15 +301,15 @@ class GuildStore: DiscordDataStore {
   //	}
 
   // MARK: - Helpers
-  
+
   // Track requested member IDs to avoid duplicate requests
   var requestedMemberIds: Set<UserSnowflake> = []
-  
+
   func requestMembers(for ids: Set<UserSnowflake>) async {
     // Check IDs to request, excluding prior requested ppl
     let idsToRequest = ids.subtracting(requestedMemberIds)
     guard !idsToRequest.isEmpty else { return }
-    
+
     // Add to requested IDs and send gateway request
     requestedMemberIds.formUnion(idsToRequest)
     await gateway?.gateway?.requestGuildMembersChunk(
