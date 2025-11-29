@@ -664,7 +664,7 @@ extension Guild {
   public struct PremiumGuildSubscription: Sendable, Codable {
     public var id: EntitlementSnowflake
     public var user_id: UserSnowflake
-    public var user: PartialUser
+    public var user: PartialUser?
     public var guild_id: GuildSnowflake
     public var ended: Bool
     public var ends_at: DiscordTimestamp?
