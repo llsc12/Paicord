@@ -77,164 +77,164 @@ class Theming {
 }
 
 extension Theming {
-  /// A Paicord theme definition.
-  struct Theme: Sendable, Codable, Hashable, Equatable, Identifiable {
-    /// Unique identifier for the theme.
-    let id: String
-    /// Metadata about the theme.
-    let metadata: ThemeMetadata
+/// A Paicord theme definition.
+struct Theme: Sendable, Codable, Hashable, Equatable, Identifiable {
+  /// Unique identifier for the theme.
+  let id: String
+  /// Metadata about the theme.
+  let metadata: ThemeMetadata
 
-    /// Common UI theme properties.
-    let common: ThemeCommon
+  /// Common UI theme properties.
+  let common: ThemeCommon
 
-    /// Styling of Discord markdown elements.
-    let markdown: ThemeMarkdown
+  /// Styling of Discord markdown elements.
+  let markdown: ThemeMarkdown
 
-    /// Metadata about a theme.
-    struct ThemeMetadata: Sendable, Codable, Hashable, Equatable {
-      /// The name of the theme.
-      let name: String
-      /// The author of the theme.
-      let author: String
-      /// A description of the theme.
-      let description: String
-      /// The version of the theme, use whatever versioning system you'd prefer.
-      let version: String
-    }
+  /// Metadata about a theme.
+  struct ThemeMetadata: Sendable, Codable, Hashable, Equatable {
+    /// The name of the theme.
+    let name: String
+    /// The author of the theme.
+    let author: String
+    /// A description of the theme.
+    let description: String
+    /// The version of the theme, use whatever versioning system you'd prefer.
+    let version: String
+  }
 
-    /// Common UI theme properties.
-    struct ThemeCommon: Sendable, Codable, Hashable, Equatable {
-      /// Global accent color for the app, used on iOS and not macOS.
-      let accent: Color
-      
-      /// Whether the app should be light or dark themed, or follow the system setting.
-      /// If not included or `nil`, the app will follow the system setting.
-      let colorScheme: ColorScheme?
+  /// Common UI theme properties.
+  struct ThemeCommon: Sendable, Codable, Hashable, Equatable {
+    /// Global accent color for the app, used on iOS and not macOS.
+    let accent: Color
+    
+    /// Whether the app should be light or dark themed, or follow the system setting.
+    /// If not included or `nil`, the app will follow the system setting.
+    let colorScheme: ColorScheme?
 
-      /// Used for links.
-      let hyperlink: Color
+    /// Used for links.
+    let hyperlink: Color
 
-      /// Primary button color, when the button is activated or as a static background
-      let primaryButton: Color
+    /// Primary button color, when the button is activated or as a static background
+    let primaryButton: Color
 
-      /// Background color for primary buttons, when not activated or as a static background
-      let primaryButtonBackground: Color
+    /// Background color for primary buttons, when not activated or as a static background
+    let primaryButtonBackground: Color
 
-      /// Less prominent button color.
-      let tertiaryButton: Color
+    /// Less prominent button color.
+    let tertiaryButton: Color
 
-      /// Primary background color for views.
-      let primaryBackground: Color
+    /// Primary background color for views.
+    let primaryBackground: Color
 
-      /// Secondary background color for views.
-      let secondaryBackground: Color
+    /// Secondary background color for views.
+    let secondaryBackground: Color
 
-      /// Tertiary background color for views.
-      let tertiaryBackground: Color
-    }
+    /// Tertiary background color for views.
+    let tertiaryBackground: Color
+  }
 
-    /// Styling of Discord markdown elements.
-    struct ThemeMarkdown: Sendable, Codable, Hashable, Equatable {
-      /// Color of body text.
-      let text: Color
+  /// Styling of Discord markdown elements.
+  struct ThemeMarkdown: Sendable, Codable, Hashable, Equatable {
+    /// Color of body text.
+    let text: Color
 
-      /// Color of text that is less prominent, like in footnotes.
-      let secondaryText: Color
+    /// Color of text that is less prominent, like in footnotes.
+    let secondaryText: Color
 
-      /// Color of mentions.
-      let mentionText: Color
+    /// Color of mentions.
+    let mentionText: Color
 
-      /// Color of the background behind mentions.
-      let mentionBackground: Color
+    /// Color of the background behind mentions.
+    let mentionBackground: Color
 
-      /// The color of the capsule to the left of a blockquote.
-      let blockquoteCapsule: Color
+    /// The color of the capsule to the left of a blockquote.
+    let blockquoteCapsule: Color
 
-      /// Background to separate inline code spans from normal text. Also used for timestamps and shown spoilers.
-      let codeSpanBackground: Color
+    /// Background to separate inline code spans from normal text. Also used for timestamps and shown spoilers.
+    let codeSpanBackground: Color
 
-      /// Background color of code blocks.
-      let codeBlockBackground: Color
+    /// Background color of code blocks.
+    let codeBlockBackground: Color
 
-      /// Border that goes around code blocks.
-      let codeBlockBorder: Color
+    /// Border that goes around code blocks.
+    let codeBlockBorder: Color
 
-      let codeBlockSyntaxTheme: SyntaxTheme
+    let codeBlockSyntaxTheme: SyntaxTheme
 
-      enum SyntaxTheme: Sendable, Codable, Hashable, Equatable {
-        case a11y
-        case atomOne
-        case classic
-        case edge
-        case github
-        case google
-        case gradient
-        case grayscale
-        case harmonic16
-        case heetch
-        case horizon
-        case humanoid
-        case ia
-        case isblEditor
-        case kimbie
-        case nnfx
-        case pandaSyntax
-        case papercolor
-        case paraiso
-        case qtcreator
-        case silk
-        case solarFlare
-        case solarized
-        case stackoverflow
-        case standard
-        case summerfruit
-        case synthMidnightTerminal
-        case tokyoNight
-        case unikitty
-        case xcode
+    enum SyntaxTheme: Sendable, Codable, Hashable, Equatable {
+      case a11y
+      case atomOne
+      case classic
+      case edge
+      case github
+      case google
+      case gradient
+      case grayscale
+      case harmonic16
+      case heetch
+      case horizon
+      case humanoid
+      case ia
+      case isblEditor
+      case kimbie
+      case nnfx
+      case pandaSyntax
+      case papercolor
+      case paraiso
+      case qtcreator
+      case silk
+      case solarFlare
+      case solarized
+      case stackoverflow
+      case standard
+      case summerfruit
+      case synthMidnightTerminal
+      case tokyoNight
+      case unikitty
+      case xcode
 
-        case custom(lightCSS: String, darkCSS: String)
+      case custom(lightCSS: String, darkCSS: String)
 
-        var highlightTheme: CodeTextColors {
-          switch self {
-          case .a11y: .theme(.a11y)
-          case .atomOne: .theme(.atomOne)
-          case .classic: .theme(.classic)
-          case .edge: .theme(.edge)
-          case .github: .theme(.github)
-          case .google: .theme(.google)
-          case .gradient: .theme(.gradient)
-          case .grayscale: .theme(.grayscale)
-          case .harmonic16: .theme(.harmonic16)
-          case .heetch: .theme(.heetch)
-          case .horizon: .theme(.horizon)
-          case .humanoid: .theme(.humanoid)
-          case .ia: .theme(.ia)
-          case .isblEditor: .theme(.isblEditor)
-          case .kimbie: .theme(.kimbie)
-          case .nnfx: .theme(.nnfx)
-          case .pandaSyntax: .theme(.pandaSyntax)
-          case .papercolor: .theme(.papercolor)
-          case .paraiso: .theme(.paraiso)
-          case .qtcreator: .theme(.qtcreator)
-          case .silk: .theme(.silk)
-          case .solarFlare: .theme(.solarFlare)
-          case .solarized: .theme(.solarized)
-          case .stackoverflow: .theme(.stackoverflow)
-          case .standard: .theme(.standard)
-          case .summerfruit: .theme(.summerfruit)
-          case .synthMidnightTerminal: .theme(.synthMidnightTerminal)
-          case .tokyoNight: .theme(.tokyoNight)
-          case .unikitty: .theme(.unikitty)
-          case .xcode: .theme(.xcode)
+      var highlightTheme: CodeTextColors {
+        switch self {
+        case .a11y: .theme(.a11y)
+        case .atomOne: .theme(.atomOne)
+        case .classic: .theme(.classic)
+        case .edge: .theme(.edge)
+        case .github: .theme(.github)
+        case .google: .theme(.google)
+        case .gradient: .theme(.gradient)
+        case .grayscale: .theme(.grayscale)
+        case .harmonic16: .theme(.harmonic16)
+        case .heetch: .theme(.heetch)
+        case .horizon: .theme(.horizon)
+        case .humanoid: .theme(.humanoid)
+        case .ia: .theme(.ia)
+        case .isblEditor: .theme(.isblEditor)
+        case .kimbie: .theme(.kimbie)
+        case .nnfx: .theme(.nnfx)
+        case .pandaSyntax: .theme(.pandaSyntax)
+        case .papercolor: .theme(.papercolor)
+        case .paraiso: .theme(.paraiso)
+        case .qtcreator: .theme(.qtcreator)
+        case .silk: .theme(.silk)
+        case .solarFlare: .theme(.solarFlare)
+        case .solarized: .theme(.solarized)
+        case .stackoverflow: .theme(.stackoverflow)
+        case .standard: .theme(.standard)
+        case .summerfruit: .theme(.summerfruit)
+        case .synthMidnightTerminal: .theme(.synthMidnightTerminal)
+        case .tokyoNight: .theme(.tokyoNight)
+        case .unikitty: .theme(.unikitty)
+        case .xcode: .theme(.xcode)
 
-          case .custom(let lightCSS, let darkCSS):
-            .custom(dark: .custom(css: darkCSS), light: .custom(css: lightCSS))
-          }
+        case .custom(let lightCSS, let darkCSS):
+          .custom(dark: .custom(css: darkCSS), light: .custom(css: lightCSS))
         }
       }
     }
   }
+}
 }
 
 extension Theming {

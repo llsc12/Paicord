@@ -14,6 +14,8 @@ extension EnvironmentValues {
   @Entry var profileAnimated: Bool = false
   @Entry var profileShowAvatarDecoration: Bool = false
   @Entry var profileHideOfflinePresence: Bool = false
+  
+  @Entry var nameplateAnimated: Bool = false
 }
 
 extension View {
@@ -30,6 +32,11 @@ extension View {
   /// Whether to hide offline presence indicator
   func profileHidesOfflinePresence(_ hide: Bool) -> some View {
     environment(\.profileHideOfflinePresence, hide)
+  }
+  
+  /// Whether to show animated nameplates
+  func nameplateAnimated(_ animated: Bool = true) -> some View {
+    environment(\.nameplateAnimated, animated)
   }
 }
 
@@ -228,14 +235,15 @@ enum Profile {
 
   struct NameplateView: View {
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.nameplateAnimated) var animated
     let nameplate: DiscordUser.Collectibles.Nameplate
 
     var color: Color {
       switch colorScheme {
       case .light:
-        nameplate.palette.color.light.asColor()!
+        nameplate.palette.color.light.asColor(ignoringZero: false)!
       case .dark:
-        nameplate.palette.color.dark.asColor()!
+        nameplate.palette.color.dark.asColor(ignoringZero: false)!
       @unknown default:
         fatalError()
       }
@@ -246,6 +254,15 @@ enum Profile {
         string: CDNEndpoint.collectibleNameplate(
           asset: nameplate.asset,
           file: .static
+        ).url
+      )
+    }
+    
+    var animatedURL: URL? {
+      URL(
+        string: CDNEndpoint.collectibleNameplate(
+          asset: nameplate.asset,
+          file: .apng
         ).url
       )
     }
@@ -264,10 +281,29 @@ enum Profile {
             endPoint: .trailing
           )
         }
-        WebImage(url: staticURL)
-          .resizable()
-          .scaledToFill()
-          .clipped()
+        if animated,
+          let animatedURL
+        {
+          WebImage(url: animatedURL) { phase in
+            switch phase {
+            case .success(let image):
+              image
+                .resizable()
+                .scaledToFill()
+                .clipped()
+            default:
+              WebImage(url: staticURL)
+                .resizable()
+                .scaledToFill()
+                .clipped()
+            }
+          }
+        } else {
+          WebImage(url: staticURL)
+            .resizable()
+            .scaledToFill()
+            .clipped()
+        }
       }
     }
   }
@@ -310,8 +346,8 @@ enum Profile {
 
     var body: some View {
       if let colors,
-        let primaryColor = colors.first?.asColor(ignoringZero: false),
-        let secondaryColor = colors.last?.asColor(ignoringZero: false)
+        let primaryColor = colors.first?.asColor(ignoringZero: true),
+        let secondaryColor = colors.last?.asColor(ignoringZero: true)
       {
         LinearGradient(
           gradient: .init(colors: [primaryColor, secondaryColor]),

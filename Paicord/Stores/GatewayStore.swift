@@ -170,11 +170,12 @@ final class GatewayStore {
         Task {
           await gateway?.updateGuildSubscriptions(
             payload:
-                .init(subscriptions: [
+                .init(subscriptions: [ // dict of guilds to subscriptions
                   id: .init(
                     typing: true,
                     activities: false,
-                    threads: false,
+                    threads: true,
+                    member_updates: true,
                     channels: [:],
                     thread_member_lists: nil
                   )

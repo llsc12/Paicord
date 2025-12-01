@@ -48,6 +48,7 @@ struct ChannelButton: View {
             Profile.NameplateView(nameplate: nameplate)
               .opacity(0.5)
               .transition(.opacity.animation(.default))
+              .nameplateAnimated(hovered)
           }
         }
         .clipShape(.rounded)

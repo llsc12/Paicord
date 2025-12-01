@@ -11,6 +11,7 @@ import SwiftUIX
 
 @Observable
 final class PaicordAppState {
+  // each window gets its own app state
   static var instances: [UUID: PaicordAppState] = [:]
   
   let id = UUID()

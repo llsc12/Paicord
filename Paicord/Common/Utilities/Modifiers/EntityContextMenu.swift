@@ -128,7 +128,7 @@ struct EntityContextMenu<Entity>: ViewModifier {
           Label("Reply", systemImage: "arrowshape.turn.up.left.fill")
         }
       }
-      messageIsFromSelf(message).ifTrue {
+      if messageIsFromSelf(message) {
         Button {
         } label: {
           Label("Edit Message", systemImage: "pencil")

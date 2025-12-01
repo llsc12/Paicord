@@ -19,6 +19,7 @@ struct ProfileBar: View {
 
   @State var showingUsername = false
   @State var showingPopover = false
+  @State var barHovered = false
 
   var body: some View {
     HStack {
@@ -32,6 +33,8 @@ struct ProfileBar: View {
               user: user
             )
             .maxHeight(40)
+            .profileAnimated(barHovered)
+            .profileShowsAvatarDecoration()
           }
 
           VStack(alignment: .leading) {
@@ -121,10 +124,13 @@ struct ProfileBar: View {
     .background {
       if let nameplate = gw.user.currentUser?.collectibles?.nameplate {
         Profile.NameplateView(nameplate: nameplate)
-          .brightness(-0.2)
+          .nameplateAnimated(barHovered)
+          .saturation(0.9)
+          .brightness(0.1)
       }
     }
     .clipped()
+    .onHover { barHovered = $0 }
   }
 
   func emojiURL(for emoji: Gateway.Activity.ActivityEmoji, animated: Bool)

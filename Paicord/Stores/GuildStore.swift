@@ -94,7 +94,8 @@ class GuildStore: DiscordDataStore {
           if channel.guild_id == guildId {
             handleChannelDelete(channel)
           }
-
+//        case .threadSyncList(let threads):
+          
         case .guildMemberAdd(let memberAdd):
           if memberAdd.guild_id == guildId {
             handleGuildMemberAdd(memberAdd)

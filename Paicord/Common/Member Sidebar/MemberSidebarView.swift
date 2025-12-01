@@ -87,6 +87,12 @@ struct MemberSidebarView: View {
           }
         }
       }
+      .background(
+        Profile.ThemeColorsBackground(
+          colors: profile?.user_profile?.theme_colors
+        )
+        .overlay(.ultraThinMaterial)
+      )
     }
 
     @ViewBuilder

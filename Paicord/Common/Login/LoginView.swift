@@ -70,9 +70,7 @@ struct LoginView: View {
             try? await Task.sleep(for: .seconds(0.5))  // edge case problem when logging out ???
             viewModel.gw = gw
             viewModel.appState = appState
-            Task {
-              await viewModel.fingerprintSetup()
-            }
+            await viewModel.fingerprintSetup()
           }
       }
     }

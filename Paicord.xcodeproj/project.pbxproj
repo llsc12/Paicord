@@ -76,6 +76,7 @@
 		AA74E43B2EBCA9010031B285 /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA74E43A2EBCA8FD0031B285 /* Environment.swift */; };
 		AA74E43D2EBD0DFE0031B285 /* BitField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA74E43C2EBD0DFB0031B285 /* BitField.swift */; };
 		AA74E43F2EBE26E30031B285 /* PlaceholderMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA74E43E2EBE26DD0031B285 /* PlaceholderMessageCell.swift */; };
+		AA79479E2EDC7B9C00B7A1EE /* PresenceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA79479D2EDC7B9400B7A1EE /* PresenceStore.swift */; };
 		AA7B38F22EB37F9B00CA4A3C /* PermsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7B38F12EB37F9500CA4A3C /* PermsHelper.swift */; };
 		AA7B38F42EB50F0100CA4A3C /* MessageDrainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7B38F32EB50EFD00CA4A3C /* MessageDrainStore.swift */; };
 		AA9C81832E6660BE0086B1DA /* GuildButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9C81822E6660BE0086B1DA /* GuildButton.swift */; };
@@ -180,6 +181,7 @@
 		AA74E43A2EBCA8FD0031B285 /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
 		AA74E43C2EBD0DFB0031B285 /* BitField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitField.swift; sourceTree = "<group>"; };
 		AA74E43E2EBE26DD0031B285 /* PlaceholderMessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderMessageCell.swift; sourceTree = "<group>"; };
+		AA79479D2EDC7B9400B7A1EE /* PresenceStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresenceStore.swift; sourceTree = "<group>"; };
 		AA7B38F12EB37F9500CA4A3C /* PermsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermsHelper.swift; sourceTree = "<group>"; };
 		AA7B38F32EB50EFD00CA4A3C /* MessageDrainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageDrainStore.swift; sourceTree = "<group>"; };
 		AA9C81822E6660BE0086B1DA /* GuildButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuildButton.swift; sourceTree = "<group>"; };
@@ -680,6 +682,7 @@
 				AA7B38F32EB50EFD00CA4A3C /* MessageDrainStore.swift */,
 				AABED5A52E7F5148005BDD63 /* SettingsStore.swift */,
 				AAAF797F2ED1E9ED004B5B3F /* ExternalBadgeStore.swift */,
+				AA79479D2EDC7B9400B7A1EE /* PresenceStore.swift */,
 			);
 			path = Stores;
 			sourceTree = "<group>";
@@ -813,6 +816,7 @@
 				AA0BAA792ECE9A3600365661 /* Color.swift in Sources */,
 				AA078FCA2EC8220E00EDFFA8 /* PaicordSection.swift in Sources */,
 				57CDD8812E71FF7600022203 /* CaptchaSheet.swift in Sources */,
+				AA79479E2EDC7B9C00B7A1EE /* PresenceStore.swift in Sources */,
 				AAB905362E8451B000EA171B /* ProfileBar.swift in Sources */,
 				57E05C5B2E6C745900B81AA7 /* String+LocalizedError.swift in Sources */,
 				AABED5A42E7F4DAE005BDD63 /* GuildStore.swift in Sources */,
