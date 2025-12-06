@@ -17,24 +17,36 @@ import SwiftUIX
 extension SettingsView {
   var debugSection: some SettingsContent {
     CustomSettingsGroup("Debug", systemImage: "ladybug") {
-      NavigationLink {
-        ShellView().eraseToAnyView()
-      } label: {
-        Label("View Logs", systemImage: "apple.terminal")
-      }
-      #if canImport(FLEX)
-        Button {
-          FLEXManager.shared.showExplorer()
+      Section("Tools") {
+        NavigationLink {
+          ShellView().eraseToAnyView()
         } label: {
-          Label("Show FLEX", systemImage: "scope")
+          Label("View Logs", systemImage: "apple.terminal")
         }
-      #endif
+        #if canImport(FLEX)
+          Button {
+            FLEXManager.shared.showExplorer()
+          } label: {
+            Label("Show FLEX", systemImage: "scope")
+          }
+        #endif
+      }
       
-      AsyncButton("Force fallback account switcher") {
-        gw.accounts.currentAccountID = nil
-        await gw.disconnectIfNeeded()
-        gw.resetStores()
-      } catch: { _ in }
+      Section("Playgrounds") {
+        NavigationLink {
+          TestMessageView().eraseToAnyView()
+        } label: {
+          Label("Message Attachments Playground", systemImage: "app.dashed")
+        }
+      }
+      
+      Section("Sketchy shit") {
+        AsyncButton("Force fallback account switcher") {
+          gw.accounts.currentAccountID = nil
+          await gw.disconnectIfNeeded()
+          gw.resetStores()
+        } catch: { _ in }
+      }
     }
   }
 }
