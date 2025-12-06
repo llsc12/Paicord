@@ -71,8 +71,6 @@ struct TestMessageView: View {
       BottomBar()
     }
     .ignoresSafeArea(.keyboard, edges: .all)
-    .navigationTitle("gm")
-    .navigationBarTitleDisplayMode(.inline)
   }
 
   @ViewBuilder
