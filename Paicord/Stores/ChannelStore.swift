@@ -282,7 +282,8 @@ class ChannelStore: DiscordDataStore {
       let reaction = Reaction(
         message: message,
         messageReactionData: nil,
-        gatewayReactionAdd: reactionAdd
+        gatewayReactionAdd: reactionAdd,
+        gatewayReactionAddMany: nil
       )
       reactions[reactionAdd.message_id, default: [:]][reactionAdd.emoji] =
         reaction
@@ -296,16 +297,45 @@ class ChannelStore: DiscordDataStore {
   private func handleMessageReactionAddMany(
     _ reactionAddMany: Gateway.MessageReactionAddMany
   ) {
-    // we may have to discard this if no matching reactions exist. we can't init new reactions with this data
-    reactions[reactionAddMany.message_id, default: [:]].keys.forEach { emoji in
-      if var reaction = reactions[reactionAddMany.message_id, default: [:]][
-        emoji
-      ] {
-        reaction.addReactionData(
-          event: reactionAddMany,
-          reactions: reactionAddMany.reactions
+    //     we may have to discard this if no matching reactions exist. we can't init new reactions with this data
+    //    reactions[reactionAddMany.message_id, default: [:]].keys.forEach { emoji in
+    //      if var reaction = reactions[reactionAddMany.message_id, default: [:]][
+    //        emoji
+    //      ] {
+    //        reaction.addReactionData(
+    //          event: reactionAddMany,
+    //          reactions: reactionAddMany.reactions
+    //        )
+    //        reactions[reactionAddMany.message_id, default: [:]][emoji] = reaction
+    //      }
+    //    }
+    // nvm so any incoming reaction data can be init'd bc debounced reactions are specifically for normal reactions only, not burst
+    // init new reactions if they don't exist
+    
+    guard let message = messages[reactionAddMany.message_id] else { return }
+    for debouncedReaction in reactionAddMany.reactions {
+      if reactions[reactionAddMany.message_id, default: [:]][
+        debouncedReaction.emoji
+      ] == nil
+      {
+        // make new object
+        let reaction = Reaction(
+          message: message,
+          messageReactionData: nil,
+          gatewayReactionAdd: nil,
+          gatewayReactionAddMany: debouncedReaction
         )
-        reactions[reactionAddMany.message_id, default: [:]][emoji] = reaction
+        reactions[reactionAddMany.message_id, default: [:]][
+          debouncedReaction.emoji
+        ] = reaction
+      } else {
+        // add data to existing object
+        reactions[reactionAddMany.message_id, default: [:]][
+          debouncedReaction.emoji
+        ]?.addReactionData(
+          event: reactionAddMany,
+          reactions: [debouncedReaction]
+        )
       }
     }
   }
@@ -416,7 +446,8 @@ class ChannelStore: DiscordDataStore {
           let reaction = Reaction(
             message: message,
             messageReactionData: messageReaction,
-            gatewayReactionAdd: nil
+            gatewayReactionAdd: nil,
+            gatewayReactionAddMany: nil
           )
           self.reactions[message.id, default: [:]][messageReaction.emoji] =
             reaction
@@ -482,23 +513,30 @@ extension ChannelStore {
     private var messageReactionData: DiscordChannel.Message.Reaction?
     // oneshot data from gateway reaction add event, contains only emoji and user id data for one person
     private var gatewayReactionAddData: Gateway.MessageReactionAdd?
+    // oneshot data from gateway reaction add many event, contains only emoji and user id data for multiple people
+    private var gatewayReactionAddManyData:
+      Gateway.MessageReactionAddMany.DebouncedReactions?
     // array of known user ids to have reacted with this reaction by listing users via api or gateway events
     private var userIds: Set<UserSnowflake> = []
 
     /// The initialiser for when a new reaction was made on a message, or when constructing from rest api data.
-    /// Note that either messageReactionData or gatewayReactionAdd must be provided and are mutually exclusive.
+    /// Note that either messageReactionData or gatewayReactionAdd or Gateway.MessageReactionAddMany must be provided and are mutually exclusive.
     /// - Parameters:
     ///   - message: Underlying message data for validating incoming reaction data.
     ///   - messageReactionData: Message reaction data if initialising from rest api data.
     ///   - gatewayReactionAdd: Gateway reaction add data if initialising from a gateway event.
+    ///   - gatewayReactionAddMany: Gateway reaction add many data if initialising from a gateway event.
     init(
       message: DiscordChannel.Message,
       messageReactionData: DiscordChannel.Message.Reaction?,
-      gatewayReactionAdd: Gateway.MessageReactionAdd?
+      gatewayReactionAdd: Gateway.MessageReactionAdd?,
+      gatewayReactionAddMany: Gateway.MessageReactionAddMany.DebouncedReactions?
     ) {
       self.message = message
       self.messageReactionData = messageReactionData
       self.gatewayReactionAddData = gatewayReactionAdd
+      self.gatewayReactionAddManyData = gatewayReactionAddMany
+
       if let messageReactionData {
         // set up internal state
         self.emoji = messageReactionData.emoji
@@ -530,6 +568,19 @@ extension ChannelStore {
           == GatewayStore.shared.user.currentUser?.id
         // add the user id to known user ids
         self.userIds.insert(gatewayReactionAddData.user_id)
+        return
+      } else if let gatewayReactionAddManyData {
+        // set up internal state
+        // we can only init normal reactions from debounced reactions
+        self.emoji = gatewayReactionAddManyData.emoji
+        self.isBurst = false  // debounced reactions are always normal reactions
+        self.selfReacted = gatewayReactionAddManyData.users.contains(
+          GatewayStore.shared.user.currentUser?.id ?? UserSnowflake("0")
+        )
+        // add all user ids to known user ids
+        for userId in gatewayReactionAddManyData.users {
+          self.userIds.insert(userId)
+        }
         return
       }
       fatalError(
@@ -572,11 +623,17 @@ extension ChannelStore {
         }
       }
 
-      if selfReacted, !userIds.contains(GatewayStore.shared.user.currentUser?.id ?? .init("0")) {
+      if selfReacted,
+        !userIds.contains(
+          GatewayStore.shared.user.currentUser?.id ?? .init("0")
+        )
+      {
         total -= 1  // let our ui handle showing self reacted separately
       }
 
-      if let selfId = GatewayStore.shared.user.currentUser?.id, userIds.contains(selfId) {
+      if let selfId = GatewayStore.shared.user.currentUser?.id,
+        userIds.contains(selfId)
+      {
         total += userIds.count - 1
       } else {
         total += userIds.count
@@ -670,7 +727,7 @@ extension ChannelStore {
           }
         }
       }
-      
+
       if event.user_id
         == GatewayStore.shared.user.currentUser?.id
       {

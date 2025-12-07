@@ -6,10 +6,11 @@
 //  Copyright © 2025 Lakhan Lothiyi.
 //
 
+import Collections
 import PaicordLib
+import Playgrounds
 import SDWebImageSwiftUI
 import SwiftUIX
-import Collections
 
 struct ReactionsView: View {
   let reactions: OrderedDictionary<Emoji, ChannelStore.Reaction>
@@ -30,23 +31,37 @@ struct ReactionsView: View {
     var body: some View {
       let emoji = reaction.emoji
       let currentUserReacted = reaction.selfReacted
+      let burstColorShadow = {
+        let burstcolor = reaction.burstColors.compactMap({
+          $0.asColor(ignoringZero: true)
+        }).first
+        if let burstcolor {
+          return burstcolor.opacity(0.8)
+        } else {
+          return .clear
+        }
+      }()
       let burstColorStroke = {
-        let burstcolor = reaction.burstColors.first?.asColor(ignoringZero: false)
+        let burstcolor = reaction.burstColors.compactMap({
+          $0.asColor(ignoringZero: true)
+        }).first
         if currentUserReacted {
           return burstcolor?.opacity(0.4) ?? .primary.opacity(0.08)
         } else {
-          return burstcolor?.opacity(0.15) ?? .primary.opacity(0.08)
+          return burstcolor?.opacity(0.25) ?? .primary.opacity(0.08)
         }
       }()
       let burstColorBody = {
-        let burstcolor = reaction.burstColors.first?.asColor(ignoringZero: false)
+        let burstcolor = reaction.burstColors.compactMap({
+          $0.asColor(ignoringZero: true)
+        }).first
         if currentUserReacted {
           return burstcolor ?? theme.common.primaryButton.opacity(0.2)
         } else {
           return burstcolor?.opacity(0.35) ?? .primary.opacity(0.08)
         }
       }()
-      HStack {
+      HStack(spacing: 2) {
         if let emojiURL = emojiURL(emoji: emoji.id, animated: emoji.animated) {
           WebImage(url: emojiURL) { phase in
             switch phase {
@@ -72,6 +87,7 @@ struct ReactionsView: View {
         }
 
         Text("\(reaction.count + (currentUserReacted ? 1 : 0))")
+          .padding(.horizontal, 2s)
       }
       .padding(.horizontal, 5)
       .padding(.vertical, 2)
@@ -81,6 +97,7 @@ struct ReactionsView: View {
       )
       .clipShape(.rounded)
       .border(.rounded, stroke: .init(burstColorStroke, lineWidth: 1.5))
+      .shadow(color: burstColorShadow, radius: 8, x: 0, y: 0)
     }
 
     func emojiURL(emoji id: EmojiSnowflake?, animated: Bool?) -> URL? {
@@ -95,10 +112,12 @@ struct ReactionsView: View {
   }
 }
 
-import Playgrounds
 #Playground {
-  let color1 = DiscordColor.init(value: 5009487)!
-  let color2 = DiscordColor.init(value: 11542584)!
-  
-  print(color1.asColor(ignoringZero: false), color2.asColor(ignoringZero: false))
+  let color1 = DiscordColor.init(value: 5_009_487)!
+  let color2 = DiscordColor.init(value: 11_542_584)!
+
+  print(
+    color1.asColor(ignoringZero: false),
+    color2.asColor(ignoringZero: false)
+  )
 }

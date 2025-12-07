@@ -1096,7 +1096,7 @@ extension Gateway {
     public var guild_id: GuildSnowflake?
     public var reactions: [DebouncedReactions]
 
-    public struct DebouncedReactions: Sendable, Codable {
+    public struct DebouncedReactions: Sendable, Codable, Hashable, Equatable {
       public var emoji: Emoji
       public var users: [UserSnowflake]
     }
@@ -1803,7 +1803,7 @@ extension Gateway {
   }
 
   /// https://docs.discord.food/topics/gateway-events#sessions-replace
-  public typealias SessionReplace = [Session]
+  public typealias SessionsReplace = [Session]
 
   /// https://docs.discord.food/topics/gateway-events#user-application-update
   public struct UserApplicationUpdate: Sendable, Codable {
