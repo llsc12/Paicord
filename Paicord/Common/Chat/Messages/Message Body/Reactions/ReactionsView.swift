@@ -87,7 +87,7 @@ struct ReactionsView: View {
         }
 
         Text("\(reaction.count + (currentUserReacted ? 1 : 0))")
-          .padding(.horizontal, 2s)
+          .padding(.horizontal, 2)
       }
       .padding(.horizontal, 5)
       .padding(.vertical, 2)
