@@ -111,13 +111,3 @@ struct ReactionsView: View {
     }
   }
 }
-
-#Playground {
-  let color1 = DiscordColor.init(value: 5_009_487)!
-  let color2 = DiscordColor.init(value: 11_542_584)!
-
-  print(
-    color1.asColor(ignoringZero: false),
-    color2.asColor(ignoringZero: false)
-  )
-}

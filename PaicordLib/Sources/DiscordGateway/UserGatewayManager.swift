@@ -233,7 +233,14 @@ public actor UserGatewayManager: GatewayManager {
 
     let configuration = WebSocketClientConfiguration(
       maxFrameSize: self.maxFrameSize,
-      additionalHeaders: [.userAgent: SuperProperties.useragent(ws: false)!],
+      additionalHeaders: [
+        .userAgent: SuperProperties.useragent(ws: false)!,
+        .origin: "https://discord.com",
+        .cacheControl: "no-cache",
+        .acceptEncoding: "gzip, deflate, br, deflate",
+        .acceptLanguage: SuperProperties.GenerateLocaleHeader(),
+        
+      ],
       extensions: [.nonNegotiatedExtension { decompressorWSExtension }]
     )
 

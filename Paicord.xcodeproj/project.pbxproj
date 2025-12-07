@@ -1375,8 +1375,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/FLEXTool/FLEX";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.22.10;
+				branch = master;
+				kind = branch;
 			};
 		};
 		AA21D2812EAA557C00C75093 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
