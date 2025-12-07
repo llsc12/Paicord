@@ -1049,6 +1049,10 @@ extension UserGatewayManager {
     }
     self.outboundWriter = nil
   }
+  
+  public func getSessionID() -> String? {
+    return self.sessionId
+  }
 }
 
 extension UserGatewayManager {

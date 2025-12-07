@@ -66,7 +66,7 @@ public struct VoiceStateUpdate: Sendable, Codable {
   public var preferred_regions: [String]?
   public var flags: IntBitField<Flags>?
 
-  init(
+  public init(
     guild_id: GuildSnowflake? = nil,
     channel_id: ChannelSnowflake? = nil,
     self_mute: Bool,
@@ -93,15 +93,22 @@ public struct VoiceStateUpdate: Sendable, Codable {
     /// So don't use `encodeIfPresent`.
     try container.encode(self.guild_id, forKey: .guild_id)
     try container.encode(self.channel_id, forKey: .channel_id)
-    
-    /// rest of the properties can be omitted if `nil`
+
     try container.encode(self.self_deaf, forKey: .self_deaf)
     try container.encode(self.self_mute, forKey: .self_mute)
+
+    /// rest of the properties can be omitted if `nil`
     try container.encodeIfPresent(self.self_video, forKey: .self_video)
-    try container.encodeIfPresent(self.preferred_region, forKey: .preferred_region)
-    try container.encodeIfPresent(self.preferred_regions, forKey: .preferred_regions)
+    try container.encodeIfPresent(
+      self.preferred_region,
+      forKey: .preferred_region
+    )
+    try container.encodeIfPresent(
+      self.preferred_regions,
+      forKey: .preferred_regions
+    )
     try container.encodeIfPresent(self.flags, forKey: .flags)
-  
+
   }
 
   private enum CodingKeys: String, CodingKey {

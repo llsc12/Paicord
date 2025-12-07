@@ -74,8 +74,8 @@ class CurrentUserStore: DiscordDataStore {
         case .presenceUpdate(let presence):
           handlePresenceUpdate(presence)
 
-        case .sessionReplace(let sessionReplace):
-          self.sessions = sessionReplace
+        case .sessionsReplace(let sessionsReplace):
+          self.sessions = sessionsReplace
 
         case .guildEmojisUpdate(let emojisUpdate):
           handleGuildEmojisUpdate(emojisUpdate)

@@ -144,13 +144,13 @@ enum Profile {
           let dotSize = size * 0.25
           let inset = dotSize * 0.55
 
-          let presence: ActivityData? = {
-            if user.id == gw.user.currentUser?.id,
-              let session = gw.user.sessions.last
-            {
-              return session
+          let (status): (Gateway.Status)? = {
+            if user.id == gw.user.currentUser?.id {
+              let status = gw.presence.currentClientStatus
+              return (status)
             } else {
-              return gw.user.presences[user.id]
+              let presence = gw.user.presences[user.id]
+              return (presence?.status)
             }
           }()
 
@@ -185,9 +185,9 @@ enum Profile {
               )
               .scaleEffect(scaleUp)
 
-            if let presence {
+            if let status {
               let color: Color = {
-                switch presence.status {
+                switch status {
                 case .online: return .init(hexadecimal6: 0x42a25a)
                 case .afk: return .init(hexadecimal6: 0xca9653)
                 case .doNotDisturb: return .init(hexadecimal6: 0xd83a42)
@@ -196,7 +196,7 @@ enum Profile {
               }()
 
               Group {
-                switch presence.status {
+                switch status {
                 case .online:
                   StatusIndicatorShapes.OnlineShape()
                 case .afk:

@@ -76,30 +76,33 @@ struct ProfileBar: View {
       }
       .buttonStyle(.plain)
       .popover(isPresented: $showingPopover) {
-        VStack {
-          Menu {
+        ScrollView {
+          VStack {
+            Menu {
 
-          } label: {
-            HStack {
-              if let user = gw.user.currentUser {
-                Profile.AvatarWithPresence(
-                  member: nil,
-                  user: user
+            } label: {
+              HStack {
+                if let user = gw.user.currentUser {
+                  Profile.AvatarWithPresence(
+                    member: nil,
+                    user: user
+                  )
+                  .maxHeight(22)
+                }
+
+                Text(
+                  gw.user.currentUser?.global_name ?? gw.user.currentUser?
+                    .username
+                    ?? "Unknown User"
                 )
-                .maxHeight(22)
+                .bold()
               }
 
-              Text(
-                gw.user.currentUser?.global_name ?? gw.user.currentUser?
-                  .username
-                  ?? "Unknown User"
-              )
-              .bold()
             }
-
           }
         }
-        .maxWidth(250)
+        .minWidth(250)
+        .minHeight(300)
       }
 
       Spacer()

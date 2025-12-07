@@ -198,7 +198,7 @@ public protocol GatewayEventHandler: Sendable {
 	func onCallDelete(_ payload: Gateway.CallDelete) async throws
 	func onVoiceChannelStatusUpdate(_ payload: Gateway.VoiceChannelStatusUpdate)
 		async throws
-	func onSessionReplace(_ payload: Gateway.SessionReplace) async throws
+	func onSessionsReplace(_ payload: Gateway.SessionsReplace) async throws
 	func onUserApplicationUpdate(_ payload: Gateway.UserApplicationUpdate)
 		async throws
 	func onUserApplicationRemove(_ payload: Gateway.UserApplicationRemove)
@@ -440,7 +440,7 @@ extension GatewayEventHandler {
 	public func onVoiceChannelStatusUpdate(
 		_ payload: Gateway.VoiceChannelStatusUpdate
 	) async throws {}
-	public func onSessionReplace(_ payload: Gateway.SessionReplace) async throws {
+	public func onSessionsReplace(_ payload: Gateway.SessionsReplace) async throws {
 	}
 	public func onUserApplicationUpdate(_ payload: Gateway.UserApplicationUpdate)
 		async throws
@@ -930,9 +930,9 @@ extension GatewayEventHandler {
 			await withLogging(for: "onVoiceChannelStatusUpdate") {
 				try await onVoiceChannelStatusUpdate(payload)
 			}
-		case let .sessionReplace(payload):
-			await withLogging(for: "onSessionReplace") {
-				try await onSessionReplace(payload)
+		case let .sessionsReplace(payload):
+			await withLogging(for: "onSessionsReplace") {
+				try await onSessionsReplace(payload)
 			}
 		case let .userApplicationUpdate(payload):
 			await withLogging(for: "onUserApplicationUpdate") {
