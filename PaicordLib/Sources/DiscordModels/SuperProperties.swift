@@ -55,6 +55,8 @@ extension Gateway.Identify.ConnectionProperties {
     self.client_heartbeat_session_id =
       SuperProperties.client_heartbeat_session_id()
     self.client_event_source = nil
+    self.distro = SuperProperties.distro()
+    self.window_manager = SuperProperties.window_manager()
   }
 
   public static var __defaultOS: String {
@@ -232,8 +234,8 @@ public enum SuperProperties {
   }
 
   public static func os_version() -> String? {
-    #if os(macOS)
-      // get the kernel version on macos (idk why discord uses this)
+    #if os(macOS) || os(Linux)
+      // get the kernel version on macos & linux (idk why discord uses this)
       return Self.kernel_version()
     #elseif os(iOS)
       // avoids uikit, bc uikit is mainactor isolated
@@ -281,8 +283,70 @@ public enum SuperProperties {
     #endif
   }
 
+  public static func distro() -> String? {
+    #if os(Linux)
+      if let content = try? String(
+        contentsOfFile: "/etc/os-release", encoding: String.Encoding.unicode)
+      {
+        let lines = content.split(separator: "\n")
+        for line in lines {
+          if line.starts(with: "PRETTY_NAME=") {
+            let value = line.replacingOccurrences(of: "PRETTY_NAME=", with: "")
+            return value.trimmingCharacters(in: CharacterSet(charactersIn: "\""))
+          }
+        }
+      }
+      return "Ubuntu"  // i am become canonical
+    #else
+      return nil
+    #endif
+  }
+
+  public static func window_manager() -> String? {
+    #if os(Linux)
+      // if your DE doesn't set this, idk you're a KDE user now.
+      if let wm = ProcessInfo.processInfo.environment["XDG_CURRENT_DESKTOP"] {
+        return wm
+      }
+      return "KDE,unknown"
+    #else
+      return nil
+    #endif
+  }
+
+  public static func distro() -> String? {
+    #if os(Linux)
+      if let content = try? String(
+        contentsOfFile: "/etc/os-release", encoding: String.Encoding.unicode)
+      {
+        let lines = content.split(separator: "\n")
+        for line in lines {
+          if line.starts(with: "PRETTY_NAME=") {
+            let value = line.replacingOccurrences(of: "PRETTY_NAME=", with: "")
+            return value.trimmingCharacters(in: CharacterSet(charactersIn: "\""))
+          }
+        }
+      }
+      return "Ubuntu"  // i am become canonical
+    #else
+      return nil
+    #endif
+  }
+
+  public static func window_manager() -> String? {
+    #if os(Linux)
+      // if your DE doesn't set this, idk you're a KDE user now.
+      if let wm = ProcessInfo.processInfo.environment["XDG_CURRENT_DESKTOP"] {
+        return wm
+      }
+      return "KDE,unknown"
+    #else
+      return nil
+    #endif
+  }
+
   public static func os_arch() -> String? {
-    #if os(macOS)  // discord only wants to see what arch their mac client is running on
+    #if os(macOS) || os(Linux)  // discord only wants to see what arch desktop their client is running on
       #if arch(x86_64)
         return "x64"
       #elseif arch(arm64)
@@ -299,7 +363,7 @@ public enum SuperProperties {
     switch Gateway.Identify.ConnectionProperties.__defaultOS {
     case "iOS", "watchOS":
       return "Discord iOS"
-    case "Mac OS X":
+    case "Mac OS X", "Linux":
       return "Discord Client"
     default:
       return "Safari"
@@ -310,7 +374,7 @@ public enum SuperProperties {
     switch Gateway.Identify.ConnectionProperties.__defaultOS {
     case "iOS", "watchOS":
       return ""
-    case "Mac OS X":
+    case "Mac OS X", "Linux":
       return "37.6.0"
     default:
       return ""
@@ -323,6 +387,8 @@ public enum SuperProperties {
       return "310.3"
     case "Mac OS X":
       return "0.0.372"
+    case "Linux":
+      return "0.0.117"
     default:
       return "0.0.372"
     }
@@ -334,6 +400,8 @@ public enum SuperProperties {
       return 91102
     case "Mac OS X":
       return 485097
+    case "Linux":
+      return 475491
     default:
       return nil
     }
@@ -344,13 +412,13 @@ public enum SuperProperties {
   }
 
   public static func launch_signature() -> String? {
-    #if os(macOS)
-      return _launch_signature.uuidString.lowercased()
+    #if os(macOS) || os(Linux)
+        return _launch_signature.uuidString.lowercased()
     #elseif os(iOS) || os(watchOS)
-      // TODO: ios follows a different format, using an integer. not sure how this is generated yet.
-      // for now, i was told its safe to use macos one instead.
-      //    return nil
-      return _launch_signature.uuidString.lowercased()
+        // TODO: ios follows a different format, using an integer. not sure how this is generated yet.
+        // for now, i was told its safe to use macos one instead.
+            //    return nil
+        return _launch_signature.uuidString.lowercased()
     #else
       return nil
     #endif
@@ -392,7 +460,7 @@ public enum SuperProperties {
   public static func client_app_state() -> String {
     #if os(iOS) || os(watchOS)
       return "active"
-    #elseif os(macOS)
+    #elseif os(macOS) || os(Linux)
       return "focused"
     #else
       return "unknown"

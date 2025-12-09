@@ -1,0 +1,6 @@
+[workspace]
+resolver = "3"
+members = [
+    "paicord-rs",
+    "PaicordQt/rust"
+]

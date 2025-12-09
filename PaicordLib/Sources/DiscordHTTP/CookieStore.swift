@@ -9,6 +9,10 @@
 import Foundation
 import NIOHTTP1
 
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
+
 public struct Cookie: Codable, Sendable {
   public let name: String
   public let value: String
