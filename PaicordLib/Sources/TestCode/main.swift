@@ -6,7 +6,7 @@
 // Copyright © 2025 Lakhan Lothiyi.
 //
 
-import PaicordLib
+// import PaicordLib
 
-let client = await DefaultDiscordClient(token: .none)
+// let client = await DefaultDiscordClient(token: .none)
 

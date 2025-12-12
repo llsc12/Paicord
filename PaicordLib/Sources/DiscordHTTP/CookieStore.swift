@@ -9,6 +9,10 @@
 import Foundation
 import NIOHTTP1
 
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
+
 @usableFromInline
 actor CookieStore {
 	var cookies: [String: HTTPCookie] = [:]

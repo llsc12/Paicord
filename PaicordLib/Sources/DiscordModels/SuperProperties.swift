@@ -50,6 +50,8 @@ extension Gateway.Identify.ConnectionProperties {
     self.design_id = SuperProperties.design_id()
     self.client_heartbeat_session_id = SuperProperties.client_heartbeat_session_id()
     self.client_event_source = nil
+    self.distro = SuperProperties.distro()
+    self.window_manager = SuperProperties.window_manager()
   }
 
   public static var __defaultOS: String {
@@ -91,26 +93,27 @@ public enum SuperProperties {
   static let _initialisation_date = Date.now
   static let _client_launch_id = UUID()
   static let _launch_signature = UUID.generateLaunchSignature()
-  
+
   // this needs to be regenerated every 30 minutes
-  nonisolated(unsafe) private static var _client_heartbeat_session_id_last_generated: Date = Date.distantPast
+  nonisolated(unsafe) private static var _client_heartbeat_session_id_last_generated: Date = Date
+    .distantPast
   nonisolated(unsafe) private static var _client_heartbeat_session_id_cached: UUID? = nil
   static var _client_heartbeat_session_id: UUID {
-    get {
-      let now = Date.now
-      if now.timeIntervalSince(_client_heartbeat_session_id_last_generated) > Double(Duration.minutes(30).components.seconds) {
-        _client_heartbeat_session_id_last_generated = now
-        _client_heartbeat_session_id_cached = UUID()
-      }
-      return _client_heartbeat_session_id_cached!
+    let now = Date.now
+    if now.timeIntervalSince(_client_heartbeat_session_id_last_generated)
+      > Double(Duration.minutes(30).components.seconds)
+    {
+      _client_heartbeat_session_id_last_generated = now
+      _client_heartbeat_session_id_cached = UUID()
     }
+    return _client_heartbeat_session_id_cached!
   }
 
   public static func GenerateSuperPropertiesHeader() -> String {
     #if os(Android)
-    fatalError("Android smelly")
+      fatalError("Android smelly")
     #endif
-    
+
     let properties = Gateway.Identify.ConnectionProperties(ws: false)
     // try unsafe because it probably will be fine
     let encoded = try! DiscordGlobalConfiguration.encoder.encode(properties)
@@ -160,6 +163,9 @@ public enum SuperProperties {
     case "Mac OS X":
       return
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) discord/\(Self.client_version()) Chrome/134.0.6998.205 Electron/\(Self.browser_version()) Safari/537.36"
+    case "Linux":
+      return
+        "Mozilla/5.0 (X11; Linux \(Self.os_arch() ?? "x86_64")) AppleWebKit/537.36 (KHTML, like Gecko) discord/\(Self.client_version()) Chrome/138.0.7204.251 Electron/\(Self.browser_version()) Safari/537.36"
     default:
       // TODO: do something better for other OSes
       return
@@ -191,8 +197,8 @@ public enum SuperProperties {
   }
 
   public static func os_version() -> String? {
-    #if os(macOS)
-      // get the kernel version on macos (idk why discord uses this)
+    #if os(macOS) || os(Linux)
+      // get the kernel version on macos & linux (idk why discord uses this)
       return Self.kernel_version()
     #elseif os(iOS)
       // avoids uikit, bc uikit is mainactor isolated
@@ -211,8 +217,39 @@ public enum SuperProperties {
     #endif
   }
 
+  public static func distro() -> String? {
+    #if os(Linux)
+      if let content = try? String(
+        contentsOfFile: "/etc/os-release", encoding: String.Encoding.unicode)
+      {
+        let lines = content.split(separator: "\n")
+        for line in lines {
+          if line.starts(with: "PRETTY_NAME=") {
+            let value = line.replacingOccurrences(of: "PRETTY_NAME=", with: "")
+            return value.trimmingCharacters(in: CharacterSet(charactersIn: "\""))
+          }
+        }
+      }
+      return "Ubuntu"  // i am become canonical
+    #else
+      return nil
+    #endif
+  }
+
+  public static func window_manager() -> String? {
+    #if os(Linux)
+      // if your DE doesn't set this, idk you're a KDE user now.
+      if let wm = ProcessInfo.processInfo.environment["XDG_CURRENT_DESKTOP"] {
+        return wm
+      }
+      return "KDE,unknown"
+    #else
+      return nil
+    #endif
+  }
+
   public static func os_arch() -> String? {
-    #if os(macOS)  // discord only wants to see what arch mac their client is running on
+    #if os(macOS) || os(Linux)  // discord only wants to see what arch desktop their client is running on
       #if arch(x86_64)
         return "x64"
       #elseif arch(arm64)
@@ -229,7 +266,7 @@ public enum SuperProperties {
     switch Gateway.Identify.ConnectionProperties.__defaultOS {
     case "iOS":
       return "Discord iOS"
-    case "Mac OS X":
+    case "Mac OS X", "Linux":
       return "Discord Client"
     default:
       return "Safari"
@@ -242,6 +279,8 @@ public enum SuperProperties {
       return ""
     case "Mac OS X":
       return "35.3.0"
+    case "Linux":
+      return "37.6.0"
     default:
       return ""
     }
@@ -253,6 +292,8 @@ public enum SuperProperties {
       return "300.0"
     case "Mac OS X":
       return "0.0.364"
+    case "Linux":
+      return "0.0.117"
     default:
       return "18.5"
     }
@@ -264,6 +305,8 @@ public enum SuperProperties {
       return 86251
     case "Mac OS X":
       return 459631
+    case "Linux":
+      return 475491
     default:
       return nil
     }
@@ -274,13 +317,13 @@ public enum SuperProperties {
   }
 
   public static func launch_signature() -> String? {
-    #if os(macOS)
-    return _launch_signature.uuidString.lowercased()
+    #if os(macOS) || os(Linux)
+      return _launch_signature.uuidString.lowercased()
     #elseif os(iOS)
-    // TODO: ios follows a different format, using an integer. not sure how this is generated yet.
-    // for now, i was told its safe to use macos one instead.
-//    return nil
-    return _launch_signature.uuidString.lowercased()
+      // TODO: ios follows a different format, using an integer. not sure how this is generated yet.
+      // for now, i was told its safe to use macos one instead.
+      //    return nil
+      return _launch_signature.uuidString.lowercased()
     #endif
   }
 
@@ -318,7 +361,7 @@ public enum SuperProperties {
   public static func client_app_state() -> String {
     #if os(iOS)
       return "active"
-    #elseif os(macOS)
+    #elseif os(macOS) || os(Linux)
       return "focused"
     #else
       return "unknown"
@@ -349,7 +392,7 @@ public enum SuperProperties {
       return nil
     #endif
   }
-  
+
   public static func client_heartbeat_session_id() -> String {
     return _client_heartbeat_session_id.uuidString.lowercased()
   }
@@ -381,17 +424,17 @@ extension UUID {
   }
 }
 
-import Playgrounds
-import SwiftUI
+// import Playgrounds
+// import SwiftUI
 
-#Playground {
-  let number: UInt = 1734653
-  let parsed = IntBitField<Gateway.Capability>.init(rawValue: number)
-  var capabilities: [Gateway.Capability] = []
-  for cap in Gateway.Capability.allCases {
-    if parsed.contains(cap) {
-      capabilities.append(cap)
-    }
-  }
-  print(capabilities)
-}
+// #Playground {
+//   let number: UInt = 1734653
+//   let parsed = IntBitField<Gateway.Capability>.init(rawValue: number)
+//   var capabilities: [Gateway.Capability] = []
+//   for cap in Gateway.Capability.allCases {
+//     if parsed.contains(cap) {
+//       capabilities.append(cap)
+//     }
+//   }
+//   print(capabilities)
+// }

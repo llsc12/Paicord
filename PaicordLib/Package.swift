@@ -66,10 +66,10 @@ let package = Package(
 			url: "https://github.com/apple/swift-protobuf.git",
 			from: "1.27.0"
 		),
-    .package(
-      url: "https://github.com/Jitsusama/UInt128.git", 
-      branch: "master"
-    ),
+		.package(
+			url: "https://github.com/Jitsusama/UInt128.git",
+			branch: "master"
+		),
 	],
 	targets: [
 		.target(
@@ -119,7 +119,7 @@ let package = Package(
 				.target(name: "DiscordCore"),
 				.target(name: "UnstableEnumMacro"),
 				.product(name: "SwiftProtobuf", package: "swift-protobuf"),
-        .product(name: "UInt128", package: "UInt128"),
+				.product(name: "UInt128", package: "UInt128"),
 			],
 			swiftSettings: swiftSettings
 		),
@@ -172,7 +172,7 @@ let package = Package(
 		.executableTarget(
 			name: "TestCode",
 			dependencies: [
-			  .target(name: "PaicordLib")
+				.target(name: "PaicordLib")
 			],
 			swiftSettings: swiftSettings
 		),
@@ -237,7 +237,7 @@ var experimentalFeatureFlags: [SwiftSetting] {
 		/// `DiscordBM` passes the `complete` level.
 		///
 		/// `minimal` / `targeted` / `complete`
-		.enableExperimentalFeature("StrictConcurrency=complete")
+		//.enableExperimentalFeature("StrictConcurrency=complete")
 	]
 }
 

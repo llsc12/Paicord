@@ -53,6 +53,7 @@ extension Gateway {
       public var os: String
       public var browser: String
       public var device: String?
+      public var distro: String?
 
       public var release_channel: String?
       public var client_version: String?
@@ -72,6 +73,7 @@ extension Gateway {
       public var native_build_number: Int?
       public var design_id: Int?  // ui on mobile
       public var client_heartbeat_session_id: String?
+      public var window_manager: String?
 
       public var client_event_source: String? = nil
 
@@ -91,7 +93,7 @@ extension Gateway {
           device_vendor_id,
           browser_user_agent, browser_version, os_sdk_version,
           client_build_number, client_app_state, native_build_number,
-          client_event_source, design_id
+          client_event_source, design_id, distro, window_manager
       }
 
       public init(from decoder: any Decoder) throws {
@@ -102,6 +104,7 @@ extension Gateway {
           String.self,
           forKey: .device
         )
+        self.distro = try container.decode(String.self, forKey: .distro)
         self.release_channel = try container.decodeIfPresent(
           String.self,
           forKey: .release_channel
@@ -170,6 +173,10 @@ extension Gateway {
           Int.self,
           forKey: .design_id
         )
+        self.window_manager = try container.decodeIfPresent(
+          String.self,
+          forKey: .window_manager
+        )
       }
 
       // encode manually to ensure null values are encoded as null
@@ -189,6 +196,14 @@ extension Gateway {
         try container.encodeIfPresent(
           self.device_vendor_id,
           forKey: .device_vendor_id
+        )
+        try container.encodeIfPresent(
+          self.distro,
+          forKey: .distro
+        )
+        try container.encodeIfPresent(
+          self.window_manager,
+          forKey: .window_manager
         )
         try container.encodeIfPresent(self.design_id, forKey: .design_id)
         try container.encode(
@@ -427,8 +442,7 @@ extension Gateway {
 
     // user only
     public var sessions: [Session]
-    public var user_settings_proto:
-      DiscordProtos_DiscordUsers_V1_PreloadedUserSettings?
+    public var user_settings_proto: DiscordProtos_DiscordUsers_V1_PreloadedUserSettings?
     public var connected_accounts: [DiscordUser.Connection]
     public var user_guild_settings: [Guild.UserGuildSettings]
     //		public var guild_join_requests
@@ -539,8 +553,7 @@ extension Gateway {
     public var widget_enabled: Bool?
     public var widget_channel_id: ChannelSnowflake?
     public var verification_level: Guild.VerificationLevel
-    public var default_message_notifications:
-      Guild.DefaultMessageNotificationLevel
+    public var default_message_notifications: Guild.DefaultMessageNotificationLevel
     public var explicit_content_filter: Guild.ExplicitContentFilterLevel
     public var roles: [Role]
     public var emojis: [Emoji]

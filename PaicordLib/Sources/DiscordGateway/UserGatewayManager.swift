@@ -176,7 +176,6 @@ public actor UserGatewayManager: GatewayManager {
       presence: presence,
       capabilities: capabilities
     )
-
     var logger = DiscordGlobalConfiguration.makeLogger("GatewayManager")
     logger[metadataKey: "gateway-id"] = .string("\(self.id)")
     self.logger = logger

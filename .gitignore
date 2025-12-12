@@ -1,7 +1,11 @@
 .DS_Store
-/build-mac
-/build-ios
 .build
 .vscode
+.qtcreator
+/build-mac
+/build-ios
+build
 target
 Package.resolved
+paicord-rs/PaicordLibBridge/Sources/generated
+test_token.txt
