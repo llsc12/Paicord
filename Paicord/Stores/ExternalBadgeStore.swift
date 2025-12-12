@@ -52,7 +52,7 @@ class ExternalBadgeStore {
       }
       
       let paicordBadgesURL = URL(
-        string: "https://paicord.llsc12.me/badges.json"
+        string: "https://paicord.llsc12.me/api/badges.json"
       )!
       let pdata = try? await URLSession.shared.data(from: paicordBadgesURL)
       if let data = pdata?.0, let decoded = try? JSONDecoder().decode(
