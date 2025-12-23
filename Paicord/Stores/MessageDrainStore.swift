@@ -66,11 +66,10 @@ class MessageDrainStore: DiscordDataStore {
 
   var messageSendQueueTask: Task<Void, Never>?
   var messageTasks: [MessageSnowflake: @Sendable () async throws -> Void] = [:]
-  {
-    didSet {
-      guard messageSendQueueTask == nil else { return }
-      setupQueueTask()
-    }
+
+  func startQueueIfNeeded() {
+    guard messageSendQueueTask == nil else { return }
+    setupQueueTask()
   }
 
   func setupQueueTask() {
@@ -89,6 +88,10 @@ class MessageDrainStore: DiscordDataStore {
         self.setupQueueTask()
       } catch {
         // halt the queue on first failure.
+        print(
+          "[MessageDrainStore Queue] Halting queue due to failure on nonce:",
+          id
+        )
         return
       }
     }
@@ -109,165 +112,207 @@ class MessageDrainStore: DiscordDataStore {
     let task: @Sendable () async throws -> Void = { [weak self] in
       guard let self else { return }
       do {
+        print("[SendTask] Starting send for nonce:", nonce)
+        print("[SendTask] Channel:", channel)
+
         var message = self.pendingMessages[channel, default: [:]][nonce]!
         message.attachments = []  // nil by default, allows appends
+
+        print("[SendTask] Initial content:", message.content ?? "<nil>")
+        print("[SendTask] Upload item count:", vm.uploadItems.count)
+
         if !vm.uploadItems.isEmpty {
+          print("[SendTask Attachments] Preparing upload attachment metadata")
+
           let uploadAttachments = try await withThrowingTaskGroup(
             of: Payloads.CreateAttachments.UploadAttachment.self,
             returning: [Payloads.CreateAttachments.UploadAttachment].self
           ) { group in
-            for item in vm.uploadItems {
+            for (index, item) in vm.uploadItems.enumerated() {
               group.addTask {
-                // get local url
+                let idString = String(index)
+
                 switch item {
-                case .pickerItem(let id, let pickerItem):
+                case .pickerItem(_, let pickerItem):
+                  let fileExt =
+                    pickerItem.supportedContentTypes.first?
+                    .preferredFilenameExtension ?? "png"
                   let filename =
-                    "\(pickerItem.itemIdentifier ?? UUID().uuidString).png"
+                    "\(pickerItem.itemIdentifier ?? UUID().uuidString).\(fileExt)"
                   let filesize = await item.filesize() ?? 0
-                  return Payloads.CreateAttachments.UploadAttachment.init(
-                    id: id.uuidString,
+
+                  return .init(
+                    id: .init(idString),
                     filename: filename,
                     file_size: filesize
                   )
-                case .file(let id, let url, let size):
-                  let filename = url.lastPathComponent
-                  let filesize = size
-                  return Payloads.CreateAttachments.UploadAttachment.init(
-                    id: id.uuidString,
-                    filename: filename,
-                    file_size: Int(filesize)
+
+                case .file(_, let url, let size):
+                  return .init(
+                    id: .init(idString),
+                    filename: url.lastPathComponent,
+                    file_size: Int(size)
                   )
-                case .cameraPhoto(let id, _):
-                  let filename = "\(UUID().uuidString).png"
+
+                case .cameraPhoto:
                   let filesize = await item.filesize() ?? 0
-                  return Payloads.CreateAttachments.UploadAttachment.init(
-                    id: id.uuidString,
-                    filename: filename,
+                  return .init(
+                    id: .init(idString),
+                    filename: "\(UUID().uuidString).png",
                     file_size: filesize
                   )
-                case .cameraVideo(let id, let url):
-                  let filename = url.lastPathComponent
+
+                case .cameraVideo(_, let url):
                   let filesize = await item.filesize() ?? 0
-                  return Payloads.CreateAttachments.UploadAttachment.init(
-                    id: id.uuidString,
-                    filename: filename,
+                  return .init(
+                    id: .init(idString),
+                    filename: url.lastPathComponent,
                     file_size: filesize
                   )
                 }
               }
             }
+
             var results: [Payloads.CreateAttachments.UploadAttachment] = []
-            for try await attachments in group {
-              results.append(attachments)
+            for try await attachment in group {
+              results.append(attachment)
             }
+
+            print(
+              "[SendTask Attachments] Prepared \(results.count) upload attachment descriptors"
+            )
             return results
           }
-          // make attachments specifying filename and size to discord, the returned urls will be used to upload the files via HTTP PUT
+
+          print("[SendTask Attachments] Creating attachments via Discord API")
+
           let createdAttachmentsReq = try await self
             .gateway!.client
             .createAttachments(
               channelID: channel,
               payload: .init(files: uploadAttachments)
             )
+
           try createdAttachmentsReq.guardSuccess()
-          let createdAttachments: [UUID: Gateway.CloudAttachment] =
+
+          let createdAttachments: [Int: Gateway.CloudAttachment] =
             try createdAttachmentsReq.decode()
+            .attachments
             .reduce(into: [:]) { partialResult, attachment in
-              let id: UUID = UUID(uuidString: attachment.id!)!
-              partialResult[id] = attachment
+              let index = Int(attachment.id!.rawValue)!
+              partialResult[index] = attachment
             }
 
-          // upload files
+          print(
+            "[SendTask Attachments] Discord returned \(createdAttachments.count) upload URLs"
+          )
+
           await withThrowingTaskGroup { group in
-            for (id, attachment) in createdAttachments {
-              let item = vm.uploadItems.first(where: {
-                $0.id == id
-              })!
-              let index = vm.uploadItems.firstIndex(where: {
-                $0.id == id
-              })!
+            for (index, attachment) in createdAttachments {
+              let item = vm.uploadItems[index]
+
               group.addTask {
-                // upload to url
+                print(
+                  "[SendTask Upload] Uploading attachment id=\(index) to:",
+                  attachment.upload_url
+                )
+
                 switch item {
                 case .pickerItem(_, let pickerItem):
                   let data = try await pickerItem.loadTransferable(
                     type: Data.self
                   )
                   guard let data else {
-                    throw "Failed to load attachment data."
+                    throw "Failed to load picker item data."
                   }
-                  var req = URLRequest(
-                    url: .init(string: attachment.upload_url)!
-                  )
+
+                  var req = URLRequest(url: URL(string: attachment.upload_url)!)
                   req.httpMethod = "PUT"
                   let (_, res) = try await URLSession.shared.upload(
                     for: req,
                     from: data
                   )
-                  guard (res as? HTTPURLResponse)?.statusCode == 200 else {
-                    throw "Failed to upload attachment."
-                  }
-                case .file(_, let fileURL, _):
-                  var req = URLRequest(
-                    url: .init(string: attachment.upload_url)!
+                  print(
+                    "[SendTask Upload] pickerItem status:",
+                    (res as? HTTPURLResponse)?.statusCode ?? -1
                   )
+
+                case .file(_, let fileURL, _):
+                  let access = fileURL.startAccessingSecurityScopedResource()
+                  var req = URLRequest(url: URL(string: attachment.upload_url)!)
                   req.httpMethod = "PUT"
                   let (_, res) = try await URLSession.shared.upload(
                     for: req,
                     fromFile: fileURL
                   )
-                  guard (res as? HTTPURLResponse)?.statusCode == 200 else {
-                    throw "Failed to upload attachment."
+                  print(
+                    "[SendTask Upload] file status:",
+                    (res as? HTTPURLResponse)?.statusCode ?? -1
+                  )
+                  if access {
+                    fileURL.stopAccessingSecurityScopedResource()
                   }
                 case .cameraPhoto(_, let image):
                   let data = image.pngData()!
-                  var req = URLRequest(
-                    url: .init(string: attachment.upload_url)!
-                  )
+                  var req = URLRequest(url: URL(string: attachment.upload_url)!)
                   req.httpMethod = "PUT"
                   let (_, res) = try await URLSession.shared.upload(
                     for: req,
                     from: data
                   )
-                  guard (res as? HTTPURLResponse)?.statusCode == 200 else {
-                    throw "Failed to upload attachment."
-                  }
-                case .cameraVideo(_, let videoURL):
-                  var req = URLRequest(
-                    url: .init(string: attachment.upload_url)!
+                  print(
+                    "[SendTask Upload] cameraPhoto status:",
+                    (res as? HTTPURLResponse)?.statusCode ?? -1
                   )
+
+                case .cameraVideo(_, let videoURL):
+                  var req = URLRequest(url: URL(string: attachment.upload_url)!)
                   req.httpMethod = "PUT"
                   let (_, res) = try await URLSession.shared.upload(
                     for: req,
                     fromFile: videoURL
                   )
-                  guard (res as? HTTPURLResponse)?.statusCode == 200 else {
-                    throw "Failed to upload attachment."
-                  }
+                  print(
+                    "[SendTask Upload] cameraVideo status:",
+                    (res as? HTTPURLResponse)?.statusCode ?? -1
+                  )
                 }
-                // add attachment to message payload
+
                 message.attachments?.append(
                   .init(
                     index: index,
-                    filename: URL(string: createdAttachments[id]!.upload_url)!
+                    filename: URL(string: attachment.upload_url)!
                       .lastPathComponent,
-                    uploaded_filename: createdAttachments[id]!.upload_filename
+                    uploaded_filename: attachment.upload_filename
                   )
                 )
 
+                print(
+                  "[SendTask Attachments] Added attachment to payload index=\(index)"
+                )
               }
             }
           }
+
+          print(
+            "[SendTask Attachments] Final attachment payload count:",
+            message.attachments?.count ?? 0
+          )
         }
+
+        print("[SendTask] Sending message payload")
+        print("[SendTask] Attachments:", message.attachments ?? [])
 
         try await gateway.client.createMessage(
           channelId: channel,
           payload: message
-        )
-        .guardSuccess()
+        ).guardSuccess()
+
+        print("[SendTask] Message send SUCCESS nonce:", nonce)
+
       } catch {
-        // mark as failed
-        print("[MessageDrainStore] Message send failed \(nonce): \(error)")
+        print("[SendTask] Message send FAILED nonce:", nonce)
+        print("[SendTask] Error:", error)
         self.failedMessages[nonce] = error
         throw error
       }
@@ -284,6 +329,8 @@ class MessageDrainStore: DiscordDataStore {
     )
     // store task
     messageTasks[nonce] = task
+
+    startQueueIfNeeded()
   }
 
   /// Removes an enqueued message from all tracking dictionaries, usually used to give up on a message.
