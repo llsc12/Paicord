@@ -593,4 +593,25 @@ extension DiscordClient {
     )
     return try await self.send(request: .init(to: endpoint))
   }
+
+  /// https://docs.discord.food/resources/message#create-attachments
+  @inlinable
+  public func createAttachments(
+    channelID: ChannelSnowflake,
+    payload: Payloads.CreateAttachments
+  ) async throws -> DiscordClientResponse<[Gateway.CloudAttachment]> {
+    let endpoint = UserAPIEndpoint.createAttachments(channelId: channelID)
+    return try await self.send(request: .init(to: endpoint), payload: payload)
+  }
+
+  /// https://docs.discord.food/resources/message#delete-attachment
+  @inlinable
+  public func deleteAttachment(
+    uploadFilename: String,
+  ) async throws -> DiscordHTTPResponse {
+    let endpoint = UserAPIEndpoint.deleteAttachment(
+      uploadFilename: uploadFilename
+    )
+    return try await self.send(request: .init(to: endpoint))
+  }
 }

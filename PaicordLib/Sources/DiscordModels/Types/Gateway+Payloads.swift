@@ -2003,4 +2003,11 @@ extension Gateway {
     public var flags: IntBitField<ReadState.Flags>?
     public var last_viewed: Int?
   }
+  
+  /// https://docs.discord.food/resources/message#cloud-attachment-structure
+  public struct CloudAttachment: Sendable, Codable {
+    public var id: String?
+    public var upload_url: String
+    public var upload_filename: String
+  }
 }

@@ -125,10 +125,12 @@ public enum Payloads {
 
   /// An attachment object, but for sending.
   /// https://discord.com/developers/docs/resources/channel#attachment-object
+  /// https://docs.discord.food/resources/message#attachment-structure
   public struct Attachment: Sendable, Encodable, ValidatablePayload {
     /// When sending, `id` is the index of this attachment in the `files` you provide.
     public var id: String
     public var filename: String?
+    public var uploaded_filename: String?
     public var description: String?
     public var content_type: String?
     public var size: Int?
@@ -142,6 +144,7 @@ public enum Payloads {
     public init(
       index: Int,
       filename: String? = nil,
+      uploaded_filename: String? = nil,
       description: String? = nil,
       content_type: String? = nil,
       size: Int? = nil,
@@ -153,6 +156,7 @@ public enum Payloads {
     ) {
       self.id = "\(index)"
       self.filename = filename
+      self.uploaded_filename = uploaded_filename
       self.description = description
       self.content_type = content_type
       self.size = size
@@ -3057,4 +3061,28 @@ public enum Payloads {
       }
     }
   }
+  
+  /// https://docs.discord.food/resources/message#create-attachments
+  public struct CreateAttachments: Sendable, Encodable, ValidatablePayload {
+    public var files: [UploadAttachment]
+    
+    public init(files: [UploadAttachment]) {
+      self.files = files
+    }
+    
+    public func validate() -> [ValidationFailure] {}
+    
+    public struct UploadAttachment: Sendable, Encodable {
+      public var id: String?
+      public var filename: String
+      public var file_size: Int
+      
+      public init(id: String? = nil, filename: String, file_size: Int) {
+        self.id = id
+        self.filename = filename
+        self.file_size = file_size
+      }
+    }
+  }
+
 }

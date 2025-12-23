@@ -66,6 +66,8 @@ public enum UserAPIEndpoint: Endpoint {
   // MARK: - Lobbies
 
   // MARK: - Messages
+  case createAttachments(channelId: ChannelSnowflake)
+  case deleteAttachment(uploadFilename: String)
 
   // MARK: - Payments
 
@@ -191,6 +193,12 @@ public enum UserAPIEndpoint: Endpoint {
       .createUserInvite,
       .revokeUserInvites:
       suffix = "users/@me/invites"
+      
+    // MARK: - Messages
+    case .createAttachments(let channelId):
+      suffix = "channels/\(channelId.rawValue)/attachments"
+    case .deleteAttachment(let filename):
+      suffix = "attachments/\(filename)"
 
     // MARK: - Relationships
     case .getRelationships:
@@ -328,6 +336,10 @@ public enum UserAPIEndpoint: Endpoint {
       .createUserInvite,
       .revokeUserInvites:
       suffix = "users/@me/invites"
+    case .createAttachments(let channelId):
+      suffix = "channels/\(channelId.rawValue)/attachments"
+    case .deleteAttachment(let filename):
+      suffix = "attachments/\(filename)"
     case .getRelationships:
       suffix = "users/@me/relationships"
     case .sendFriendRequest:
@@ -431,6 +443,8 @@ public enum UserAPIEndpoint: Endpoint {
     case .getUserInvites: return .GET
     case .createUserInvite: return .POST
     case .revokeUserInvites: return .DELETE
+    case .createAttachments: return .POST
+    case .deleteAttachment: return .DELETE
     case .getRelationships: return .GET
     case .sendFriendRequest: return .POST
     case .createRelationship: return .PUT
@@ -484,6 +498,8 @@ public enum UserAPIEndpoint: Endpoint {
     case .getUserInvites: return true
     case .createUserInvite: return true
     case .revokeUserInvites: return true
+    case .createAttachments: return true
+    case .deleteAttachment: return true
     case .getRelationships: return true
     case .sendFriendRequest: return true
     case .createRelationship: return true
@@ -537,6 +553,8 @@ public enum UserAPIEndpoint: Endpoint {
     case .getUserInvites: return true
     case .createUserInvite: return true
     case .revokeUserInvites: return true
+    case .createAttachments: return true
+    case .deleteAttachment: return true
     case .getRelationships: return true
     case .sendFriendRequest: return true
     case .createRelationship: return true
@@ -591,6 +609,8 @@ public enum UserAPIEndpoint: Endpoint {
     case .getUserInvites: return []
     case .createUserInvite: return []
     case .revokeUserInvites: return []
+    case .createAttachments(let channelId): return [channelId.rawValue]
+    case .deleteAttachment(let uploadFilename): return [uploadFilename]
     case .getRelationships: return []
     case .sendFriendRequest: return []
     case .createRelationship(let userId): return [userId.rawValue]
@@ -669,6 +689,8 @@ public enum UserAPIEndpoint: Endpoint {
     case .getUserInvites: return 52
     case .createUserInvite: return 53
     case .revokeUserInvites: return 54
+    case .createAttachments: return  50
+    case .deleteAttachment: return  51
     case .getRelationships: return 55
     case .sendFriendRequest: return 56
     case .createRelationship: return 57
@@ -737,6 +759,10 @@ public enum UserAPIEndpoint: Endpoint {
     case .getUserInvites: return "getUserInvites"
     case .createUserInvite: return "createUserInvite"
     case .revokeUserInvites: return "revokeUserInvites"
+    case .createAttachments(let channelId):
+      return "createAttachments(channelId: \(channelId.rawValue))"
+    case .deleteAttachment(let filename):
+      return "deleteAttachment(filename: \(filename))"
     case .getRelationships: return "getRelationships"
     case .sendFriendRequest: return "sendFriendRequest"
     case .createRelationship(let userId):
