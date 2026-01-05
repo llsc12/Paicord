@@ -582,13 +582,15 @@ extension DiscordClient {
     channelId: ChannelSnowflake,
     messageId: MessageSnowflake,
     emoji: Reaction,
-    userId: UserSnowflake
+    userId: UserSnowflake,
+    type: Gateway.ReactionKind = .normal
   ) async throws -> DiscordHTTPResponse {
     let endpoint = APIEndpoint.deleteUserMessageReaction(
       channelId: channelId,
       messageId: messageId,
       emojiName: emoji.urlPathDescription,
-      userId: userId
+      userId: userId,
+      type: type
     )
     return try await self.send(request: .init(to: endpoint))
   }

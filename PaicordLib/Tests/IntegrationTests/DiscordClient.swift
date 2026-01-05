@@ -168,7 +168,8 @@ class DiscordClientTests: XCTestCase {
       channelId: Constants.Channels.general.id,
       messageId: message.id,
       emoji: .unicodeEmoji(reactions[1]),
-      userId: Snowflake(Constants.botId)
+      userId: Snowflake(Constants.botId),
+      type: .normal
     ).guardSuccess()
 
     let listMessageReactionsByEmojiResponseNormal = try await client.listMessageReactionsByEmoji(

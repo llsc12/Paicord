@@ -295,7 +295,8 @@ public enum APIEndpoint: Endpoint {
     channelId: ChannelSnowflake,
     messageId: MessageSnowflake,
     emojiName: String,
-    userId: UserSnowflake
+    userId: UserSnowflake,
+    type: Gateway.ReactionKind
   )
 
   // MARK: OAuth
@@ -869,7 +870,7 @@ public enum APIEndpoint: Endpoint {
       let channelId,
       let messageId,
       let emojiName,
-      
+
     ):
       let channelId = channelId.rawValue
       let messageId = messageId.rawValue
@@ -931,19 +932,20 @@ public enum APIEndpoint: Endpoint {
       let messageId = messageId.rawValue
       let emojiName = emojiName.urlPathEncoded()
       suffix =
-      "channels/\(channelId)/messages/\(messageId)/reactions/\(emojiName)/\(type.rawValue)/@me"
+        "channels/\(channelId)/messages/\(messageId)/reactions/\(emojiName)/\(type.rawValue)/@me"
     case .deleteUserMessageReaction(
       let channelId,
       let messageId,
       let emojiName,
-      let userId
+      let userId,
+      let type
     ):
       let channelId = channelId.rawValue
       let messageId = messageId.rawValue
       let emojiName = emojiName.urlPathEncoded()
       let userId = userId.rawValue
       suffix =
-        "channels/\(channelId)/messages/\(messageId)/reactions/\(emojiName)/\(userId)"
+        "channels/\(channelId)/messages/\(messageId)/\(type)/reactions/\(emojiName)/\(userId)"
     case .getOwnOauth2Application:
       suffix = "oauth2/applications/@me"
     case .listGuildRoles(let guildId):
@@ -1638,19 +1640,20 @@ public enum APIEndpoint: Endpoint {
       let messageId = messageId.rawValue
       let emojiName = emojiName.urlPathEncoded()
       suffix =
-      "channels/\(channelId)/messages/\(messageId)/reactions/\(emojiName)/\(type.rawValue)/@me"
+        "channels/\(channelId)/messages/\(messageId)/reactions/\(emojiName)/\(type.rawValue)/@me"
     case .deleteUserMessageReaction(
       let channelId,
       let messageId,
       let emojiName,
-      let userId
+      let userId,
+      let type
     ):
       let channelId = channelId.rawValue
       let messageId = messageId.rawValue
       let emojiName = emojiName.urlPathEncoded()
       let userId = userId.rawValue
       suffix =
-        "channels/\(channelId)/messages/\(messageId)/reactions/\(emojiName)/\(userId)"
+        "channels/\(channelId)/messages/\(messageId)/\(type)/reactions/\(emojiName)/\(userId)"
     case .getOwnOauth2Application:
       suffix = "oauth2/applications/@me"
     case .listGuildRoles(let guildId):
@@ -2749,16 +2752,18 @@ public enum APIEndpoint: Endpoint {
       let type
     ):
       return [
-        channelId.rawValue, messageId.rawValue, emojiName, type.rawValue.description
+        channelId.rawValue, messageId.rawValue, emojiName,
+        type.rawValue.description,
       ]
     case .deleteUserMessageReaction(
       let channelId,
       let messageId,
       let emojiName,
-      let userId
+      let userId,
+      let type
     ):
       return [
-        channelId.rawValue, messageId.rawValue, emojiName, userId.rawValue,
+        channelId.rawValue, messageId.rawValue, emojiName, userId.rawValue, type.rawValue.description,
       ]
     case .getOwnOauth2Application:
       return []
@@ -3452,10 +3457,11 @@ public enum APIEndpoint: Endpoint {
       let channelId,
       let messageId,
       let emojiName,
-      let userId
+      let userId,
+      let type
     ):
       return
-        "deleteUserMessageReaction(channelId.rawValue: \(channelId.rawValue), messageId.rawValue: \(messageId.rawValue), emojiName: \(emojiName), userId.rawValue: \(userId.rawValue))"
+        "deleteUserMessageReaction(channelId.rawValue: \(channelId.rawValue), messageId.rawValue: \(messageId.rawValue), emojiName: \(emojiName), userId.rawValue: \(userId.rawValue), type: \(type.rawValue.description))"
     case .getOwnOauth2Application:
       return "getOwnOauth2Application"
     case .listGuildRoles(let guildId):
