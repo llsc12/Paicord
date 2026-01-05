@@ -541,12 +541,14 @@ extension DiscordClient {
   public func addMessageReaction(
     channelId: ChannelSnowflake,
     messageId: MessageSnowflake,
-    emoji: Reaction
+    emoji: Reaction,
+    type: Reaction.Kind = .normal
   ) async throws -> DiscordHTTPResponse {
     let endpoint = APIEndpoint.addMessageReaction(
       channelId: channelId,
       messageId: messageId,
-      emojiName: emoji.urlPathDescription
+      emojiName: emoji.urlPathDescription,
+      type: type
     )
     return try await self.send(request: .init(to: endpoint))
   }
@@ -556,12 +558,14 @@ extension DiscordClient {
   public func deleteOwnMessageReaction(
     channelId: ChannelSnowflake,
     messageId: MessageSnowflake,
-    emoji: Reaction
+    emoji: Reaction,
+    type: Reaction.Kind
   ) async throws -> DiscordHTTPResponse {
     let endpoint = APIEndpoint.deleteOwnMessageReaction(
       channelId: channelId,
       messageId: messageId,
-      emojiName: emoji.urlPathDescription
+      emojiName: emoji.urlPathDescription,
+      type: type
     )
     return try await self.send(request: .init(to: endpoint))
   }
