@@ -211,7 +211,7 @@ struct GuildButton: View {
           animated: false
         )
       {
-        WebImage(url: url)
+        AnimatedImage(url: url)
           .resizable()
           .scaledToFill()
           .clipShape(.circle)

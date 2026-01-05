@@ -54,15 +54,19 @@ extension MessageCell {
     @ViewBuilder
     var reply: some View {
       if let ref = message.referenced_message {
-        HStack {
+        HStack(spacing: 0) {
           ReplyLine()
             .padding(.leading, avatarSize / 2)  // align with pfp
-
-          Text("\(ref.author?.username ?? "Unknown") • \(ref.content)")
-            .font(.caption2)
-            .foregroundStyle(.secondary)
-            .lineLimit(1)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.trailing, 6)
+          Group {
+            Text("\(ref.author?.username ?? "Unknown") • ")
+              .foregroundStyle(.secondary)
+              .lineLimit(1)
+            MarkdownText(content: ref.content, channelStore: channelStore)
+              .lineLimit(1)
+              .frame(maxWidth: .infinity, alignment: .leading)
+          }
+          .opacity(0.6)
         }
       }
     }

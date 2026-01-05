@@ -76,8 +76,10 @@ extension ChatView.InputBar {
           let fileSize: Int64
           do {
             let canAccess = fileURL.startAccessingSecurityScopedResource()
-            defer { if canAccess { fileURL.stopAccessingSecurityScopedResource() } }
-            
+            defer {
+              if canAccess { fileURL.stopAccessingSecurityScopedResource() }
+            }
+
             let fileAttributes = try FileManager.default.attributesOfItem(
               atPath: fileURL.path
             )
@@ -85,8 +87,12 @@ extension ChatView.InputBar {
           } catch {
             fileSize = 0
           }
-          
-          let uploadItem = UploadItem.file(id: UUID(), url: fileURL, size: fileSize)
+
+          let uploadItem = UploadItem.file(
+            id: UUID(),
+            url: fileURL,
+            size: fileSize
+          )
           uploadItems.append(uploadItem)
         }
         // used to clear the array here but that causes recursion until stack overflow oops
@@ -107,23 +113,32 @@ extension ChatView.InputBar {
 
       case pickerItem(id: UUID, item: PhotosPickerItem)
       case file(id: UUID, url: URL, size: Int64)
-      case cameraPhoto(id: UUID, image: UIImage)
-      case cameraVideo(id: UUID, url: URL)
+      #if os(iOS)
+        case cameraPhoto(id: UUID, image: UIImage)
+        case cameraVideo(id: UUID, url: URL)
+      #endif
 
       var id: UUID {
         switch self {
-        case .pickerItem(let id, _),
-          .file(let id, _, _),
-          .cameraPhoto(let id, _),
-          .cameraVideo(let id, _):
-          return id
+        #if os(iOS)
+          case .pickerItem(let id, _),
+            .file(let id, _, _),
+            .cameraPhoto(let id, _),
+            .cameraVideo(let id, _):
+            return id
+        #else
+          case .pickerItem(let id, _),
+            .file(let id, _, _):
+            return id
+        #endif
         }
       }
-      
-      func filesize() async ->  Int? {
+
+      func filesize() async -> Int? {
         switch self {
         case .pickerItem(_, let item):
-          let data = try? await item.loadTransferable(type: Data.self)?.count ?? 0
+          let data =
+            try? await item.loadTransferable(type: Data.self)?.count ?? 0
           if let data {
             return Int(data)
           } else {
@@ -131,22 +146,24 @@ extension ChatView.InputBar {
           }
         case .file(_, _, let size):
           return Int(size)
-        case .cameraPhoto(_, let image):
-          if let imageData = image.pngData() {
-            return Int(imageData.count)
-          } else {
-            return nil
-          }
-        case .cameraVideo(_, let url):
-          do {
-            let fileAttributes = try FileManager.default.attributesOfItem(
-              atPath: url.path
-            )
-            let fileSize = fileAttributes[.size] as? Int64 ?? 0
-            return Int(fileSize)
-          } catch {
-            return nil
-          }
+        #if os(iOS)
+          case .cameraPhoto(_, let image):
+            if let imageData = image.pngData() {
+              return Int(imageData.count)
+            } else {
+              return nil
+            }
+          case .cameraVideo(_, let url):
+            do {
+              let fileAttributes = try FileManager.default.attributesOfItem(
+                atPath: url.path
+              )
+              let fileSize = fileAttributes[.size] as? Int64 ?? 0
+              return Int(fileSize)
+            } catch {
+              return nil
+            }
+        #endif
         }
       }
     }
@@ -159,15 +176,17 @@ extension ChatView.InputBar {
         } else {
           return nil
         }
-      case .cameraPhoto(_, let image):
-        return Image(uiImage: image)
-      case .cameraVideo(_, let url):
-        return nil  // TODO: generate thumbnail from video
+      #if os(iOS)
+        case .cameraPhoto(_, let image):
+          return Image(uiImage: image)
+        case .cameraVideo(_, let url):
+          return nil  // TODO: generate thumbnail from video
+      #endif
       case .file(_, let url, _):
         return nil
       }
     }
-    
+
     private func loadTransferable(from imageSelection: PhotosPickerItem)
       async throws -> Thumbnail?
     {
@@ -199,7 +218,7 @@ extension ChatView.InputBar {
         #endif
       }
     }
-    
+
     func copy() -> InputVM {
       let vm = InputVM(channelStore: channelStore)
       vm.content = content
@@ -210,7 +229,7 @@ extension ChatView.InputBar {
       vm.uploadItems = uploadItems
       return vm
     }
-    
+
     func reset() {
       content = ""
       #if os(iOS)
@@ -237,7 +256,7 @@ struct Thumbnail: Transferable {
             ]
           )
         }
-      let image = Image(nsImage: nsImage)
+        let image = Image(nsImage: nsImage)
         return Thumbnail(image: image)
       #elseif canImport(UIKit)
         guard let uiImage = UIImage(data: data) else {

@@ -58,7 +58,10 @@ class Theming {
           queue: .main
         ) { _ in
           // update appearance
-          UIApplication.shared.windows.forEach { window in
+          UIApplication.shared.connectedScenes.map { $0 as? UIWindowScene }
+            .compactMap { $0 }
+            .flatMap { $0.windows }
+            .forEach { window in
             // set accent color
             window.tintColor = AppKitOrUIKitColor(
               self.currentTheme.common.accent
@@ -67,7 +70,10 @@ class Theming {
         }
       } else {
         // update appearance
-        UIApplication.shared.windows.forEach { window in
+        UIApplication.shared.connectedScenes.map { $0 as? UIWindowScene }
+          .compactMap { $0 }
+          .flatMap(\.windows)
+          .forEach { window in
           // set accent color
           window.tintColor = AppKitOrUIKitColor(
             self.currentTheme.common.accent

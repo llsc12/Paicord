@@ -32,7 +32,7 @@ extension MessageCell {
             .playing(loopMode: .loop)
             .frame(maxWidth: 160, maxHeight: 160)
           } else {
-            WebImage(url: url)
+            AnimatedImage(url: url)
               .resizable()
               .scaledToFit()
               .frame(maxWidth: 160, maxHeight: 160)

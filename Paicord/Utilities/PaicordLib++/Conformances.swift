@@ -59,3 +59,9 @@ extension DiscordChannel.Message.Attachment: DiscordMedia {
     self.proxy_url
   }
 }
+
+extension Payloads.CreateMessage: @retroactive Identifiable {
+  public var id: String {
+    self.nonce?.asString ?? "unknown"
+  }
+}

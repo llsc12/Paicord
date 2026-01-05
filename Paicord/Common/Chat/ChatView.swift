@@ -34,10 +34,10 @@ struct ChatView: View {
           LazyVStack(alignment: .leading, spacing: 0) {
             if !vm.messages.isEmpty {
               if vm.hasMoreHistory && vm.hasPermission(.readMessageHistory) {
-//                PlaceholderMessageSet()
-//                  .onAppear {
-//                    vm.tryFetchMoreMessageHistory()
-//                  }
+                //                PlaceholderMessageSet()
+                //                  .onAppear {
+                //                    vm.tryFetchMoreMessageHistory()
+                //                  }
               } else {
                 if vm.hasPermission(.readMessageHistory) {
                   ChatHeaders.WelcomeStartOfChannelHeader()
@@ -62,11 +62,6 @@ struct ChatView: View {
                   .onDisappear {
                     // if the message is among the last 15 messages in the list, consider us not near the bottom
                     // nvm this causes it to constantly set not near bottom when scrolling up or down as views
-                    //                    if let index = vm.messages.index(forKey: msg.id) {
-                    //                      if index >= vm.messages.count - 15 {
-                    //                        self.isNearBottom = false
-                    //                      }
-                    //                    }
                     // instead we check if the 15th last message is gone only.
                     if let index = vm.messages.index(forKey: msg.id) {
                       if index == vm.messages.count - 15 {
@@ -77,16 +72,18 @@ struct ChatView: View {
               }
             }
 
-//            if !vm.messages.isEmpty {
-//              if !vm.hasLatestMessages && vm.hasPermission(.readMessageHistory) {
-//                PlaceholderMessageSet()
-//                  .onAppear {
-//                    vm.tryFetchMoreMessageHistory()
-//                  }
-//              }
-//            }
+            //            if !vm.messages.isEmpty {
+            //              if !vm.hasLatestMessages && vm.hasPermission(.readMessageHistory) {
+            //                PlaceholderMessageSet()
+            //                  .onAppear {
+            //                    vm.tryFetchMoreMessageHistory()
+            //                  }
+            //              }
+            //            } else {
+            MessageDrainView()
+            //          }
 
-            // message drain here
+            // message drain view, represents messages being sent etc
           }
           .scrollTargetLayout()
         }
@@ -116,6 +113,13 @@ struct ChatView: View {
               )
             }
           }
+        }
+        // when sending a message, try scroll to bottom
+        .onChange(of: gw.messageDrain.pendingMessages.count) {
+          NotificationCenter.default.post(
+            name: .chatViewShouldScrollToBottom,
+            object: ["channelId": vm.channelId]
+          )
         }
         #if os(macOS)
           // when new messages come in, try scroll to bottom
@@ -153,7 +157,8 @@ struct ChatView: View {
             let unitPoint = info["alignment"] as? UnitPoint
           else { return }
           print(
-            "Scrolling to message ID \(messageId) in channel \(channelId), unitPoint: \(unitPoint)")
+            "Scrolling to message ID \(messageId) in channel \(channelId), unitPoint: \(unitPoint)"
+          )
           DispatchQueue.main.async {
             proxy.scrollTo(messageId, anchor: unitPoint)
           }

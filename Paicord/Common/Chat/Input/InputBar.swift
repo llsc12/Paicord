@@ -17,16 +17,16 @@ extension ChatView {
     @Environment(\.gateway) var gw
     @Environment(\.theme) var theme
     var vm: ChannelStore
-    @Bindable var inputVM: InputVM
+    @State var inputVM: InputVM
 
     init(vm: ChannelStore) {
       self.vm = vm
       if let existingVM = InputBar.inputVMs[vm.channelId] {
-        self._inputVM = .init(existingVM)
+        self._inputVM = .init(initialValue: existingVM)
       } else {
         let newVM = InputVM(channelStore: vm)
         InputBar.inputVMs[vm.channelId] = newVM
-        self._inputVM = .init(newVM)
+        self._inputVM = .init(initialValue: newVM)
       }
     }
 
@@ -74,7 +74,10 @@ extension ChatView {
         false, false
       )
       @State var cameraPickerPresented: Bool = false
+    #else
+    @State private var fileImporterPresented: Bool = false
     #endif
+    
     @FocusState private var isFocused: Bool
     @State var filesRemovedDuringSelection: Error? = nil
 
@@ -246,6 +249,49 @@ extension ChatView {
                   pickersClosedWhenChatClosed = (false, false)
                 }
               }  // dismiss pickers when chat is closed
+            #else
+              .fileImporter(isPresented: $fileImporterPresented, allowedContentTypes: [.content], allowsMultipleSelection: true) { result in
+                do {
+                  let urls = try result.get()
+                  inputVM.selectedFiles = urls.compactMap { url in
+                    var url: URL? = url
+                    let canAccess =
+                      url?.startAccessingSecurityScopedResource() ?? false
+                    defer {
+                      if canAccess {
+                        url?.stopAccessingSecurityScopedResource()
+                      }
+                    }
+                    // check filesize
+                    let fileSize =
+                      (try? url?.resourceValues(forKeys: [.fileSizeKey])
+                        .fileSize)
+                      ?? 0
+                    // discord wont let you upload empty files.
+                    if fileSize == 0 {
+                      url = nil
+                      self.filesRemovedDuringSelection =
+                        SelectionError.filesEmpty
+                    }
+                    let uploadMeta = gw.user.premiumKind.fileUpload(
+                      size: fileSize,
+                      to: vm
+                    )
+                    if uploadMeta.allowed == false {
+                      url = nil
+                      self.filesRemovedDuringSelection =
+                        SelectionError.filesPastLimit(
+                          limit: uploadMeta.limit
+                        )
+                    }
+
+                    return url
+                  }
+                } catch {
+                  print("Failed to pick files: \(error)")
+                }
+              }
+              .fileDialogImportsUnresolvedAliases(false)
             #endif
           }
 
@@ -268,6 +314,44 @@ extension ChatView {
         }
         .ignoresSafeArea(.container, edges: .horizontal)
       }
+      .onFileDrop(delegate: .init(onDrop: { droppedItems in
+          let files = droppedItems.compactMap(\.loadedURL)
+          // now do just like the file picker
+          inputVM.selectedFiles = files.compactMap { url in
+            var url: URL? = url
+            let canAccess =
+              url?.startAccessingSecurityScopedResource() ?? false
+            defer {
+              if canAccess {
+                url?.stopAccessingSecurityScopedResource()
+              }
+            }
+            // check filesize
+            let fileSize =
+              (try? url?.resourceValues(forKeys: [.fileSizeKey])
+                .fileSize)
+              ?? 0
+            // discord wont let you upload empty files.
+            if fileSize == 0 {
+              url = nil
+              self.filesRemovedDuringSelection =
+                SelectionError.filesEmpty
+            }
+            let uploadMeta = gw.user.premiumKind.fileUpload(
+              size: fileSize,
+              to: vm
+            )
+            if uploadMeta.allowed == false {
+              url = nil
+              self.filesRemovedDuringSelection =
+                SelectionError.filesPastLimit(
+                  limit: uploadMeta.limit
+                )
+            }
+
+            return url
+        }
+      }))
     }
 
     @ViewBuilder
@@ -285,12 +369,7 @@ extension ChatView {
               .clipShape(.circle)
               .rotationEffect(.degrees(45))
           }
-          #if os(macOS)
-            .menuStyle(.button)
-            .buttonStyle(.plain)
-          #else
-            .buttonStyle(.borderless)
-          #endif
+          .buttonStyle(.borderless)
           .tint(.primary)
         } else {
           Menu {
@@ -328,12 +407,7 @@ extension ChatView {
               .background(.regularMaterial)
               .clipShape(.circle)
           }
-          #if os(macOS)
-            .menuStyle(.button)
-            .buttonStyle(.plain)
-          #else
-            .buttonStyle(.borderless)
-          #endif
+          .buttonStyle(.borderless)
           .tint(.primary)
         }
       #else
@@ -348,7 +422,7 @@ extension ChatView {
           }
 
           Button {
-
+            self.fileImporterPresented = true
           } label: {
             Label("Upload Files", systemImage: "doc.on.doc")
           }
@@ -358,14 +432,16 @@ extension ChatView {
             .padding(7.5)
             .background(.regularMaterial)
             .clipShape(.circle)
-            .rotationEffect(.degrees(45))
         }
+        .menuStyle(.button)
+        .buttonStyle(.plain)
       #endif
     }
-
+    
     @ViewBuilder
     var textField: some View {
-      #if os(iOS)
+      HStack {
+#if os(iOS)
         TextField("Message", text: $inputVM.content, axis: .vertical)
           .textFieldStyle(.plain)
           .maxHeight(150)
@@ -373,18 +449,24 @@ extension ChatView {
           .disabled(appState.chatOpen == false)
           .padding(.vertical, 7)
           .padding(.horizontal, 12)
-          .background(.regularMaterial)
-          .clipShape(.rect(cornerRadius: 18))
           .focused($isFocused)
-      #else
+#else
         TextView("Message", text: $inputVM.content, submit: sendMessage)
           .padding(8)
-          .background(.regularMaterial)
-          .clipShape(.rect(cornerRadius: 18))
-      #endif
+#endif
+        Button {
+        } label: {
+          Image(systemName: "face.smiling")
+            .imageScale(.large)
+            .padding(8)
+        }
+        .buttonStyle(.borderless)
+      }
+      .background(.regularMaterial)
+      .clipShape(.rect(cornerRadius: 18))
 
       #if os(iOS)
-        if inputVM.content.isEmpty == false {
+        if inputVM.content.isEmpty == false || inputVM.uploadItems.isEmpty == false {
           Button(action: sendMessage) {
             Image(systemName: "paperplane.fill")
               .imageScale(.large)
@@ -411,7 +493,9 @@ extension ChatView {
 
     private func sendMessage() {
       let msg = inputVM.content.trimmingCharacters(in: .whitespacesAndNewlines)
-      guard !msg.isEmpty else { return }
+      guard !msg.isEmpty || inputVM.uploadItems.isEmpty == false else {
+        return
+      }
       guard let channelId = appState.selectedChannel else { return }
       // create a copy of the vm
       let toSend = inputVM.copy()
@@ -551,6 +635,15 @@ extension ChatView {
 
         class SubmissiveTextView: NSTextView {
           var onSubmit: (() -> Void)?
+          
+          override var acceptableDragTypes: [NSPasteboard.PasteboardType] {
+            [
+              NSPasteboard.PasteboardType.string,
+              NSPasteboard.PasteboardType.rtf,
+              NSPasteboard.PasteboardType.rtfd,
+              NSPasteboard.PasteboardType.html
+            ]
+          }
 
           override func keyDown(with event: NSEvent) {
             if event.keyCode == 36 {  // Return key

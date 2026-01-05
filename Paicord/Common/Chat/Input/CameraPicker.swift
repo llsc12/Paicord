@@ -6,6 +6,7 @@
 //  Copyright © 2025 Lakhan Lothiyi.
 //
 
+#if os(iOS)
 import MobileCoreServices
 import SwiftUI
 import UIKit
@@ -127,3 +128,4 @@ struct CameraPicker: UIViewControllerRepresentable {
     }
   }
 }
+#endif

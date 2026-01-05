@@ -80,7 +80,7 @@ extension MarkdownRendererVM {
 
       override func draw(withFrame cellFrame: NSRect, in controlView: NSView?) {
         if hostingView == nil {
-          let imageView = WebImage(url: url)
+          let imageView = AnimatedImage(url: url)
             .resizable()
             .scaledToFit()
             .frame(width: 15, height: 15)
@@ -106,7 +106,7 @@ extension MarkdownRendererVM {
           ) as URL?
         else { return }
 
-        let emojiView = WebImage(url: url)
+        let emojiView = AnimatedImage(url: url)
           .resizable()
           .scaledToFit()
           .frame(width: 15, height: 15)

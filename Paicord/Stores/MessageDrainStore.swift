@@ -153,7 +153,7 @@ class MessageDrainStore: DiscordDataStore {
                     filename: url.lastPathComponent,
                     file_size: Int(size)
                   )
-
+                  #if os(iOS)
                 case .cameraPhoto:
                   let filesize = await item.filesize() ?? 0
                   return .init(
@@ -169,6 +169,7 @@ class MessageDrainStore: DiscordDataStore {
                     filename: url.lastPathComponent,
                     file_size: filesize
                   )
+                  #endif
                 }
               }
             }
@@ -252,6 +253,7 @@ class MessageDrainStore: DiscordDataStore {
                   if access {
                     fileURL.stopAccessingSecurityScopedResource()
                   }
+                  #if os(iOS)
                 case .cameraPhoto(_, let image):
                   let data = image.pngData()!
                   var req = URLRequest(url: URL(string: attachment.upload_url)!)
@@ -276,6 +278,7 @@ class MessageDrainStore: DiscordDataStore {
                     "[SendTask Upload] cameraVideo status:",
                     (res as? HTTPURLResponse)?.statusCode ?? -1
                   )
+                  #endif
                 }
 
                 message.attachments?.append(

@@ -72,10 +72,12 @@ extension ChatView.InputBar {
                   .font(.caption)
                   .lineLimit(2)
                   .multilineTextAlignment(.leading)
-                Text(ByteCountFormatter.string(
-                  fromByteCount: size,
-                  countStyle: .file
-                ))
+                Text(
+                  ByteCountFormatter.string(
+                    fromByteCount: size,
+                    countStyle: .file
+                  )
+                )
                 .font(.caption2)
                 .foregroundStyle(.secondary)
               }
@@ -85,37 +87,39 @@ extension ChatView.InputBar {
               .maxWidth(120)
               .background(Color.black.opacity(0.3))
             }
-          case .cameraPhoto:
-            VStack {
-              if let image {
-                image
+          #if os(iOS)
+            case .cameraPhoto:
+              VStack {
+                if let image {
+                  image
+                    .resizable()
+                    .scaledToFit()
+                    .scaledToFill()
+                    .maxWidth(60)
+                    .maxHeight(60)
+                    .aspectRatio(1, contentMode: .fill)
+                    .clipped()
+                } else {
+                  Color.gray.opacity(0.3)
+                    .scaledToFill()
+                    .maxWidth(60)
+                    .maxHeight(60)
+                }
+              }
+              .task {
+                self.image = await inputVM.getThumbnail(for: attachment)
+              }
+            case .cameraVideo:
+              VStack {
+                Image(systemName: "video.fill")
                   .resizable()
                   .scaledToFit()
-                  .scaledToFill()
-                  .maxWidth(60)
-                  .maxHeight(60)
+                  .padding(20)
+                  .background(Color.gray.opacity(0.3))
                   .aspectRatio(1, contentMode: .fill)
-                  .clipped()
-              } else {
-                Color.gray.opacity(0.3)
-                  .scaledToFill()
-                  .maxWidth(60)
-                  .maxHeight(60)
+                // TODO: get this video preview working
               }
-            }
-            .task {
-              self.image = await inputVM.getThumbnail(for: attachment)
-            }
-          case .cameraVideo:
-            VStack {
-              Image(systemName: "video.fill")
-                .resizable()
-                .scaledToFit()
-                .padding(20)
-                .background(Color.gray.opacity(0.3))
-                .aspectRatio(1, contentMode: .fill)
-              // TODO: get this video preview working
-            }
+          #endif
           }
         }
         .clipShape(.rounded)

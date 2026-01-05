@@ -35,6 +35,7 @@
 		57F5AF532E7CBDD000AD5674 /* AccountPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57F5AF522E7CBDD000AD5674 /* AccountPicker.swift */; };
 		57F5AF552E7CBDF400AD5674 /* MFAView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57F5AF542E7CBDF400AD5674 /* MFAView.swift */; };
 		8702A5382EAA6753008DD55A /* MemberRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8702A5372EAA6751008DD55A /* MemberRowView.swift */; };
+		AA0624802F0A04DF007F28EB /* MessageDrainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA06247F2F0A04DA007F28EB /* MessageDrainView.swift */; };
 		AA078FC22EC8091000EDFFA8 /* DebugSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA078FC12EC8090E00EDFFA8 /* DebugSection.swift */; };
 		AA078FC42EC809D600EDFFA8 /* AccountSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA078FC32EC809D200EDFFA8 /* AccountSection.swift */; };
 		AA078FC72EC80D3C00EDFFA8 /* LocalConsoleManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA078FC62EC80D3A00EDFFA8 /* LocalConsoleManager.swift */; };
@@ -167,6 +168,7 @@
 		57F5AF522E7CBDD000AD5674 /* AccountPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountPicker.swift; sourceTree = "<group>"; };
 		57F5AF542E7CBDF400AD5674 /* MFAView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MFAView.swift; sourceTree = "<group>"; };
 		8702A5372EAA6751008DD55A /* MemberRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberRowView.swift; sourceTree = "<group>"; };
+		AA06247F2F0A04DA007F28EB /* MessageDrainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageDrainView.swift; sourceTree = "<group>"; };
 		AA078FC12EC8090E00EDFFA8 /* DebugSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugSection.swift; sourceTree = "<group>"; };
 		AA078FC32EC809D200EDFFA8 /* AccountSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSection.swift; sourceTree = "<group>"; };
 		AA078FC62EC80D3A00EDFFA8 /* LocalConsoleManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalConsoleManager.swift; sourceTree = "<group>"; };
@@ -505,6 +507,7 @@
 				AAB50A512E9AC9CB0048E8B0 /* ChannelHeader.swift */,
 				AA7B0B692EE5D804003F0CE9 /* ChatHeaders.swift */,
 				AA10971C2E64C189005BC3D2 /* ChatView.swift */,
+				AA06247F2F0A04DA007F28EB /* MessageDrainView.swift */,
 				AA13A1E22EA83766005A3613 /* TypingIndicatorBar.swift */,
 				AA36D5A52EB60F23006612F8 /* Input */,
 				AA5DC5582E9482E800D81EB5 /* Messages */,
@@ -1025,6 +1028,7 @@
 				AA2278C72EA448C7002C335F /* Profile.swift in Sources */,
 				AA70EFB12EA1B3BD00344D98 /* InputBar.swift in Sources */,
 				AADD58652E82A95B00CBC8B6 /* GuildScrollBar.swift in Sources */,
+				AA0624802F0A04DF007F28EB /* MessageDrainView.swift in Sources */,
 				AAB905302E82FD9200EA171B /* Conformances.swift in Sources */,
 				AA9C81832E6660BE0086B1DA /* GuildButton.swift in Sources */,
 				AA2F51C32EE4ABCE00F18DB7 /* Storage.swift in Sources */,

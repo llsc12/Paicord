@@ -126,7 +126,7 @@ public enum Payloads {
   /// An attachment object, but for sending.
   /// https://discord.com/developers/docs/resources/channel#attachment-object
   /// https://docs.discord.food/resources/message#attachment-structure
-  public struct Attachment: Sendable, Encodable, ValidatablePayload {
+  public struct Attachment: Sendable, Encodable, Hashable, ValidatablePayload {
     /// When sending, `id` is the index of this attachment in the `files` you provide.
     public var id: String
     public var filename: String?
@@ -178,7 +178,7 @@ public enum Payloads {
 
   /// A allowed-mentions object, but for sending.
   /// https://discord.com/developers/docs/resources/channel#allowed-mentions-object
-  public struct AllowedMentions: Sendable, Codable, ValidatablePayload {
+  public struct AllowedMentions: Sendable, Hashable, Codable, ValidatablePayload {
     public var parse: [DiscordChannel.AllowedMentions.Kind]?
     public var roles: [RoleSnowflake]?
     public var users: [UserSnowflake]?
@@ -556,7 +556,7 @@ public enum Payloads {
 
   /// https://discord.com/developers/docs/resources/channel#create-message-jsonform-params
   /// https://docs.discord.food/resources/message#create-message
-  public struct CreateMessage: Sendable, MultipartEncodable, ValidatablePayload {
+  public struct CreateMessage: Sendable, Hashable, MultipartEncodable, ValidatablePayload {
     public var content: String?
     public var nonce: StringOrInt?
     public var tts: Bool?
@@ -2835,7 +2835,7 @@ public enum Payloads {
   }
 
   /// https://discord.com/developers/docs/resources/poll#poll-create-request-object
-  public struct CreatePollRequest: Sendable, Codable, ValidatablePayload {
+  public struct CreatePollRequest: Sendable, Codable, Hashable, ValidatablePayload {
     public var question: Poll.Media
     public var answers: [Poll.Answer]
     /// "Number of hours the poll should be open for, up to 7 days"

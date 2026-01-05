@@ -23,7 +23,7 @@ extension MultipartEncodable {
 
 /// `RawFile` is _mostly_ copy-pasted from Vapor's `File` :)
 
-public struct RawFile: Sendable, Encodable, MultipartPartConvertible {
+public struct RawFile: Sendable, Encodable, MultipartPartConvertible, Hashable {
   /// Name of the file, including extension.
   public var filename: String
 

@@ -505,6 +505,7 @@ class ChannelStore: DiscordDataStore {
       let fetchingAfter = after != nil
       let initialLoad = (around == nil && before == nil && after == nil)
 
+      // fetch messages and populate storage in the right order
       if fetchingBefore {
         for message in fetched {
           self.messages.updateValue(
@@ -550,6 +551,17 @@ class ChannelStore: DiscordDataStore {
         }
 
         trimExtraMessagesIfNeeded(preferRemovingOldest: true)
+      }
+      
+      // delete pending messages if they're found in fetched messages
+      for message in fetched {
+        guard let nonceString = message.nonce?.asString else { continue }
+        let nonce: MessageSnowflake = .init(nonceString)
+        self.gateway?.messageDrain.pendingMessages[channelId, default: [:]].removeValue(
+          forKey: nonce
+        )
+        self.gateway?.messageDrain.failedMessages.removeValue(forKey: nonce)
+        self.gateway?.messageDrain.messageTasks.removeValue(forKey: nonce)
       }
 
       // populate reactions data
