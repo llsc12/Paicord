@@ -274,13 +274,6 @@ class ChannelStore: DiscordDataStore {
   private func handleMessageReactionAdd(
     _ reactionAdd: Gateway.MessageReactionAdd
   ) {
-    defer {
-      NotificationCenter.default.post(
-        name: .chatViewShouldScrollToBottom,
-        object: ["channelId": channelId]
-      )
-    }
-
     if let member = reactionAdd.member?.toPartialMember(), let guildStore,
       let userId = member.user?.id
     {
@@ -314,12 +307,6 @@ class ChannelStore: DiscordDataStore {
   private func handleMessageReactionAddMany(
     _ reactionAddMany: Gateway.MessageReactionAddMany
   ) {
-    defer {
-      NotificationCenter.default.post(
-        name: .chatViewShouldScrollToBottom,
-        object: ["channelId": channelId]
-      )
-    }
     // we may have to discard this if no matching reactions exist. we can't init new reactions with this data
     // nvm so any incoming reaction data can be init'd bc debounced reactions are specifically for normal reactions only, not burst
     // init new reactions if they don't exist
