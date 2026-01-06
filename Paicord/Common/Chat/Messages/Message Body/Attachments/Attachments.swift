@@ -116,13 +116,7 @@ extension MessageCell {
       struct ImageView: View {
         var attachment: DiscordMedia
         var body: some View {
-          WebImage(url: URL(string: attachment.proxyurl)) {
-            phase in
-            switch phase {
-            case .success(let image):
-              image
-                .resizable()
-            default:
+            AnimatedImage(url: URL(string: attachment.proxyurl)) {
               if let placeholder = attachment.placeholder,
                 let data = Data(base64Encoded: placeholder)
               {
@@ -130,18 +124,19 @@ extension MessageCell {
                 #if os(macOS)
                   Image(nsImage: img)
                     .resizable()
-                    .scaledToFill()
+                    .scaledToFit()
                 #else
                   Image(uiImage: img)
                     .resizable()
-                    .scaledToFill()
+                    .scaledToFit()
                 #endif
               } else {
                 Color.gray.opacity(0.2)
               }
+
             }
-          }
-          .scaledToFit()
+            .resizable()
+            .scaledToFit()
         }
       }
 

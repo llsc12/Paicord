@@ -54,7 +54,7 @@ struct ProfileBar: View {
               {
                 if let emoji = status.emoji {
                   if let url = emojiURL(for: emoji, animated: true) {
-                    WebImage(url: url)
+                    AnimatedImage(url: url)
                       .resizable()
                       .scaledToFit()
                       .frame(width: 16, height: 16)

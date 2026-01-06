@@ -467,7 +467,7 @@ extension ChatView {
             .imageScale(.large)
             .padding(.trailing, 6)
         }
-        .buttonStyle(.borderless)
+        .buttonStyle(.plain)
       }
       .background(.regularMaterial)
       .clipShape(.rect(cornerRadius: 18))

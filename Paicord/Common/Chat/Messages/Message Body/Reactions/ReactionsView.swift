@@ -90,18 +90,12 @@ struct ReactionsView: View {
       }()
       HStack(spacing: 2) {
         if let emojiURL = emojiURL(emoji: emoji.id, animated: emoji.animated) {
-          WebImage(url: emojiURL) { phase in
-            switch phase {
-            case .success(let image):
-              image
-                .resizable()
-                .scaledToFit()
-                .frame(width: 18, height: 18)
-            default:
-              Spacer()
-                .frame(width: 18, height: 18)
-            }
+          VStack {
+            AnimatedImage(url: emojiURL)
+              .resizable()
+              .scaledToFit()
           }
+          .frame(width: 18, height: 18)
           .padding(2)
         } else {
           Text(emoji.name ?? " ")

@@ -36,7 +36,7 @@ extension MessageCell {
                 return nil
               }
             }()
-            WebImage(url: url)
+            AnimatedImage(url: url)
               .resizable()
               .aspectRatio(aspectRatio, contentMode: .fit)
               .clipShape(.rounded)
@@ -88,20 +88,12 @@ extension MessageCell {
                   if let icon = author.proxy_icon_url,
                     let url = URL(string: icon)
                   {
-                    WebImage(url: url) {
-                      if case .success(let image) = $0 {
-                        image
-                          .resizable()
-                          .scaledToFit()
-                          .clipShape(.circle)
-                          .frame(width: 20, height: 20)
-                      } else {
-                        Circle()
-                          .fill(Color.gray.opacity(0.15))
-                          .frame(width: 20, height: 20)
-                      }
-                    }
-
+                    AnimatedImage(url: url)
+                      .resizable()
+                      .scaledToFit()
+                      .background(Color.gray.opacity(0.15))
+                      .clipShape(.circle)
+                      .frame(width: 20, height: 20)
                   }
                   Text(author.name)
                     .font(.caption)
@@ -135,7 +127,7 @@ extension MessageCell {
             if let thumb = embed.thumbnail?.proxy_url,
               let url = URL(string: thumb)
             {
-              WebImage(url: url)
+              AnimatedImage(url: url)
                 .resizable()
                 .scaledToFit()
                 .scaledToFill()
@@ -193,7 +185,7 @@ extension MessageCell {
                 return nil
               }
             }()
-            WebImage(url: url)
+            AnimatedImage(url: url)
               .resizable()
               .aspectRatio(aspectRatio, contentMode: .fit)
               .clipShape(.rounded)
@@ -214,7 +206,7 @@ extension MessageCell {
                   if let icon = footer.proxy_icon_url,
                     let url = URL(string: icon)
                   {
-                    WebImage(url: url)
+                    AnimatedImage(url: url)
                       .resizable()
                       .scaledToFit()
                       .clipShape(Circle())

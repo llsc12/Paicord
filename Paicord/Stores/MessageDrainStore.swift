@@ -34,13 +34,13 @@ class MessageDrainStore: DiscordDataStore {
             let messageNonceSnowflake = Optional(MessageSnowflake(nonce))
           {
             // remove from pending as its been sent successfully
-//            var transaction = Transaction()
-//            transaction.disablesAnimations = true
-//            _ = withTransaction(transaction) {
-              pendingMessages[message.channel_id, default: [:]].removeValue(
-                forKey: messageNonceSnowflake
-              )
-//            }
+            //            var transaction = Transaction()
+            //            transaction.disablesAnimations = true
+            //            _ = withTransaction(transaction) {
+            pendingMessages[message.channel_id, default: [:]].removeValue(
+              forKey: messageNonceSnowflake
+            )
+            //            }
             // also remove from failed messages if it was there
             failedMessages.removeValue(forKey: messageNonceSnowflake)
             // also remove from message tasks if it was there
@@ -157,23 +157,23 @@ class MessageDrainStore: DiscordDataStore {
                     filename: url.lastPathComponent,
                     file_size: Int(size)
                   )
-                  #if os(iOS)
-                case .cameraPhoto:
-                  let filesize = await item.filesize() ?? 0
-                  return .init(
-                    id: .init(idString),
-                    filename: "\(UUID().uuidString).png",
-                    file_size: filesize
-                  )
+                #if os(iOS)
+                  case .cameraPhoto:
+                    let filesize = await item.filesize() ?? 0
+                    return .init(
+                      id: .init(idString),
+                      filename: "\(UUID().uuidString).png",
+                      file_size: filesize
+                    )
 
-                case .cameraVideo(_, let url):
-                  let filesize = await item.filesize() ?? 0
-                  return .init(
-                    id: .init(idString),
-                    filename: url.lastPathComponent,
-                    file_size: filesize
-                  )
-                  #endif
+                  case .cameraVideo(_, let url):
+                    let filesize = await item.filesize() ?? 0
+                    return .init(
+                      id: .init(idString),
+                      filename: url.lastPathComponent,
+                      file_size: filesize
+                    )
+                #endif
                 }
               }
             }
@@ -257,32 +257,36 @@ class MessageDrainStore: DiscordDataStore {
                   if access {
                     fileURL.stopAccessingSecurityScopedResource()
                   }
-                  #if os(iOS)
-                case .cameraPhoto(_, let image):
-                  let data = image.pngData()!
-                  var req = URLRequest(url: URL(string: attachment.upload_url)!)
-                  req.httpMethod = "PUT"
-                  let (_, res) = try await URLSession.shared.upload(
-                    for: req,
-                    from: data
-                  )
-                  print(
-                    "[SendTask Upload] cameraPhoto status:",
-                    (res as? HTTPURLResponse)?.statusCode ?? -1
-                  )
+                #if os(iOS)
+                  case .cameraPhoto(_, let image):
+                    let data = image.pngData()!
+                    var req = URLRequest(
+                      url: URL(string: attachment.upload_url)!
+                    )
+                    req.httpMethod = "PUT"
+                    let (_, res) = try await URLSession.shared.upload(
+                      for: req,
+                      from: data
+                    )
+                    print(
+                      "[SendTask Upload] cameraPhoto status:",
+                      (res as? HTTPURLResponse)?.statusCode ?? -1
+                    )
 
-                case .cameraVideo(_, let videoURL):
-                  var req = URLRequest(url: URL(string: attachment.upload_url)!)
-                  req.httpMethod = "PUT"
-                  let (_, res) = try await URLSession.shared.upload(
-                    for: req,
-                    fromFile: videoURL
-                  )
-                  print(
-                    "[SendTask Upload] cameraVideo status:",
-                    (res as? HTTPURLResponse)?.statusCode ?? -1
-                  )
-                  #endif
+                  case .cameraVideo(_, let videoURL):
+                    var req = URLRequest(
+                      url: URL(string: attachment.upload_url)!
+                    )
+                    req.httpMethod = "PUT"
+                    let (_, res) = try await URLSession.shared.upload(
+                      for: req,
+                      fromFile: videoURL
+                    )
+                    print(
+                      "[SendTask Upload] cameraVideo status:",
+                      (res as? HTTPURLResponse)?.statusCode ?? -1
+                    )
+                #endif
                 }
 
                 message.attachments?.append(
@@ -316,13 +320,13 @@ class MessageDrainStore: DiscordDataStore {
         ).guardSuccess()
 
         print("[SendTask] Message send SUCCESS nonce:", nonce)
-        
+
         // remove from pending and failed
-//        var transaction = Transaction()
-//        transaction.disablesAnimations = true
-//        _ = withTransaction(transaction) {
-          self.pendingMessages[channel, default: [:]].removeValue(forKey: nonce)
-//        }
+        //        var transaction = Transaction()
+        //        transaction.disablesAnimations = true
+        //        _ = withTransaction(transaction) {
+        self.pendingMessages[channel, default: [:]].removeValue(forKey: nonce)
+        //        }
         self.failedMessages.removeValue(forKey: nonce)
         self.messageTasks.removeValue(forKey: nonce)
       } catch {
@@ -353,11 +357,11 @@ class MessageDrainStore: DiscordDataStore {
     in channel: ChannelSnowflake
   ) {
     // remove from all dicts
-//    var transaction = Transaction()
-//    transaction.disablesAnimations = true
-//    _ = withTransaction(transaction) {
-      pendingMessages[channel]?.removeValue(forKey: nonce)
-//    }
+    //    var transaction = Transaction()
+    //    transaction.disablesAnimations = true
+    //    _ = withTransaction(transaction) {
+    pendingMessages[channel]?.removeValue(forKey: nonce)
+    //    }
     failedMessages.removeValue(forKey: nonce)
     messageTasks.removeValue(forKey: nonce)
   }
