@@ -124,11 +124,11 @@ extension MessageCell {
                 #if os(macOS)
                   Image(nsImage: img)
                     .resizable()
-                    .scaledToFit()
+                    .scaledToFill()
                 #else
                   Image(uiImage: img)
                     .resizable()
-                    .scaledToFit()
+                    .scaledToFill()
                 #endif
               } else {
                 Color.gray.opacity(0.2)

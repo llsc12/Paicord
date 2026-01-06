@@ -21,8 +21,9 @@ struct ChatView: View {
   @Environment(\.userInterfaceIdiom) var idiom
   @Environment(\.theme) var theme
   var drain: MessageDrainStore { gw.messageDrain }
-  
-  @AppStorage("Paicord.Appearance.ChatMessagesAnimated") var chatAnimatesMessages: Bool = false
+
+  @AppStorage("Paicord.Appearance.ChatMessagesAnimated")
+  var chatAnimatesMessages: Bool = false
 
   @ViewStorage private var isNearBottom = true  // used to track if we are near the bottom, if so scroll.
   @ViewStorage private var pendingScrollWorkItem: DispatchWorkItem?
@@ -143,21 +144,21 @@ struct ChatView: View {
             }
           }
         }
-        // when sending a message, try scroll to bottom
-        //        .onChange(of: gw.messageDrain.pendingMessages) { _, newValue in
-        //          let pending: MessageSnowflake? =
-        //            newValue[vm.channelId, default: [:]].keys.first
-        //          NotificationCenter.default.post(
-        //            name: .chatViewShouldScrollToBottom,
-        //            object: ["channelId": vm.channelId, "id": pending as Any]
-        //          )
-        //        }
         #if os(macOS)
           // when new messages come in, try scroll to bottom
           .onChange(of: vm.messages) {
             NotificationCenter.default.post(
               name: .chatViewShouldScrollToBottom,
               object: ["channelId": vm.channelId]
+            )
+          }
+          // when sending a message, try scroll to bottom
+          .onChange(of: gw.messageDrain.pendingMessages) { _, newValue in
+            let pending: MessageSnowflake? =
+              newValue[vm.channelId, default: [:]].keys.first
+            NotificationCenter.default.post(
+              name: .chatViewShouldScrollToBottom,
+              object: ["channelId": vm.channelId, "id": pending as Any]
             )
           }
         #endif
@@ -197,7 +198,10 @@ struct ChatView: View {
         }
       }
     }
-    .animation(shouldAnimate && chatAnimatesMessages ? .default : nil, value: orderedMessages)
+    .animation(
+      shouldAnimate && chatAnimatesMessages ? .default : nil,
+      value: orderedMessages
+    )
     .animation(chatAnimatesMessages ? .default : nil, value: pendingMessages)
     .scrollDismissesKeyboard(.interactively)
     .safeAreaInset(edge: .bottom, spacing: 10) {

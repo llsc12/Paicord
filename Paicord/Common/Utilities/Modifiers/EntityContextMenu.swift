@@ -10,11 +10,6 @@ import PaicordLib
 import SDWebImageSwiftUI
 import SwiftUIX
 
-// Menu
-protocol MenuEntity: Identifiable {
-  associatedtype UseCase
-}
-
 extension View {
   func entityContextMenu<Entity>(
     for entity: Entity,

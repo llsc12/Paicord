@@ -123,7 +123,9 @@ class MessageDrainStore: DiscordDataStore {
         message.attachments = []  // nil by default, allows appends
 
         print("[SendTask] Initial content:", message.content ?? "<nil>")
-        print("[SendTask] Upload item count:", vm.uploadItems.count)
+        if vm.uploadItems.isEmpty == false {
+          print("[SendTask] Upload item count:", vm.uploadItems.count)
+        }
 
         if !vm.uploadItems.isEmpty {
           print("[SendTask Attachments] Preparing upload attachment metadata")
@@ -312,7 +314,9 @@ class MessageDrainStore: DiscordDataStore {
         }
 
         print("[SendTask] Sending message payload")
-        print("[SendTask] Attachments:", message.attachments ?? [])
+        if vm.uploadItems.isEmpty == false {
+          print("[SendTask] Attachments:", message.attachments ?? [])
+        }
 
         try await gateway.client.createMessage(
           channelId: channel,
