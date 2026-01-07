@@ -257,17 +257,27 @@ extension DiscordChannel {
 
     /// https://discord.com/developers/docs/resources/channel#message-reference-object-message-reference-structure
     public struct MessageReference: Sendable, Codable, Equatable, Hashable {
+      @UnstableEnum<Int>
+      public enum Kind: Sendable, Codable {
+        case reply  // 0
+        case forward  // 1
+        case __undocumented(Int)
+      }
+      
+      public var type: Kind
       public var message_id: MessageSnowflake?
       public var channel_id: ChannelSnowflake?
       public var guild_id: GuildSnowflake?
       public var fail_if_not_exists: Bool?
 
       public init(
+        type: Kind,
         message_id: MessageSnowflake? = nil,
         channel_id: ChannelSnowflake? = nil,
         guild_id: GuildSnowflake? = nil,
         fail_if_not_exists: Bool? = nil
       ) {
+        self.type = type
         self.message_id = message_id
         self.channel_id = channel_id
         self.guild_id = guild_id
