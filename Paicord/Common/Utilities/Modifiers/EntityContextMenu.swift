@@ -119,6 +119,9 @@ struct EntityContextMenu<Entity>: ViewModifier {
       }
       if hasPermission(.sendMessages) {
         Button {
+          guard let channel else { return }
+          let vm = ChatView.InputBar.vm(for: channel)
+          vm.messageAction = .reply(message: message, mention: true)
         } label: {
           Label("Reply", systemImage: "arrowshape.turn.up.left.fill")
         }

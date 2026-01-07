@@ -104,96 +104,24 @@ extension ChatView.InputBar {
         }
       }
     }
-
-    enum UploadItem: Identifiable, Equatable {
-      static func == (lhs: InputVM.UploadItem, rhs: InputVM.UploadItem) -> Bool
-      {
-        return lhs.id == rhs.id
-      }
-
-      case pickerItem(id: UUID, item: PhotosPickerItem)
-      case file(id: UUID, url: URL, size: Int64)
-      #if os(iOS)
-        case cameraPhoto(id: UUID, image: UIImage)
-        case cameraVideo(id: UUID, url: URL)
-      #endif
-
-      var id: UUID {
-        switch self {
-        #if os(iOS)
-          case .pickerItem(let id, _),
-            .file(let id, _, _),
-            .cameraPhoto(let id, _),
-            .cameraVideo(let id, _):
-            return id
-        #else
-          case .pickerItem(let id, _),
-            .file(let id, _, _):
-            return id
-        #endif
-        }
-      }
-
-      func filesize() async -> Int? {
-        switch self {
-        case .pickerItem(_, let item):
-          let data =
-            try? await item.loadTransferable(type: Data.self)?.count ?? 0
-          if let data {
-            return Int(data)
-          } else {
-            return nil
+    
+    /// Contains a reference to the message being replied to or edited, if any, inside of an action enum
+    var messageAction: MessageAction? = nil {
+      didSet {
+        // when this is set to edit, set content to the message content
+        if let action = messageAction {
+          switch action {
+          case .edit(let message):
+            content = message.content
+            uploadItems = [] // cant do anything other than edit text when editing a message
+          case .reply(_):
+            break
           }
-        case .file(_, _, let size):
-          return Int(size)
-        #if os(iOS)
-          case .cameraPhoto(_, let image):
-            if let imageData = image.pngData() {
-              return Int(imageData.count)
-            } else {
-              return nil
-            }
-          case .cameraVideo(_, let url):
-            do {
-              let fileAttributes = try FileManager.default.attributesOfItem(
-                atPath: url.path
-              )
-              let fileSize = fileAttributes[.size] as? Int64 ?? 0
-              return Int(fileSize)
-            } catch {
-              return nil
-            }
-        #endif
         }
       }
     }
 
-    func getThumbnail(for item: UploadItem) async -> Image? {
-      switch item {
-      case .pickerItem(_, let photoItem):
-        if let thumbnail = try? await loadTransferable(from: photoItem) {
-          return thumbnail.image
-        } else {
-          return nil
-        }
-      #if os(iOS)
-        case .cameraPhoto(_, let image):
-          return Image(uiImage: image)
-        case .cameraVideo(_, let url):
-          return nil  // TODO: generate thumbnail from video
-      #endif
-      case .file(_, let url, _):
-        return nil
-      }
-    }
-
-    private func loadTransferable(from imageSelection: PhotosPickerItem)
-      async throws -> Thumbnail?
-    {
-      try await imageSelection.loadTransferable(type: Thumbnail.self)
-    }
-
-    /// The inpu bar displays items from this.
+    /// The input bar displays items from this.
     var uploadItems: [UploadItem] = [] {
       didSet {
         // remove any selectedPhotos that are no longer in uploadItems
@@ -227,6 +155,7 @@ extension ChatView.InputBar {
       #endif
       vm.selectedFiles = selectedFiles
       vm.uploadItems = uploadItems
+      vm.messageAction = messageAction
       return vm
     }
 
@@ -237,7 +166,103 @@ extension ChatView.InputBar {
       #endif
       selectedFiles = []
       uploadItems = []
+      messageAction = nil
     }
+  }
+}
+
+extension ChatView.InputBar.InputVM {
+  enum MessageAction {
+    case reply(message: DiscordChannel.Message, mention: Bool)
+    case edit(message: DiscordChannel.Message)
+  }
+  
+  enum UploadItem: Identifiable, Equatable {
+    static func == (lhs: ChatView.InputBar.InputVM.UploadItem, rhs: ChatView.InputBar.InputVM.UploadItem) -> Bool
+    {
+      return lhs.id == rhs.id
+    }
+
+    case pickerItem(id: UUID, item: PhotosPickerItem)
+    case file(id: UUID, url: URL, size: Int64)
+    #if os(iOS)
+      case cameraPhoto(id: UUID, image: UIImage)
+      case cameraVideo(id: UUID, url: URL)
+    #endif
+
+    var id: UUID {
+      switch self {
+      #if os(iOS)
+        case .pickerItem(let id, _),
+          .file(let id, _, _),
+          .cameraPhoto(let id, _),
+          .cameraVideo(let id, _):
+          return id
+      #else
+        case .pickerItem(let id, _),
+          .file(let id, _, _):
+          return id
+      #endif
+      }
+    }
+
+    func filesize() async -> Int? {
+      switch self {
+      case .pickerItem(_, let item):
+        let data =
+          try? await item.loadTransferable(type: Data.self)?.count ?? 0
+        if let data {
+          return Int(data)
+        } else {
+          return nil
+        }
+      case .file(_, _, let size):
+        return Int(size)
+      #if os(iOS)
+        case .cameraPhoto(_, let image):
+          if let imageData = image.pngData() {
+            return Int(imageData.count)
+          } else {
+            return nil
+          }
+        case .cameraVideo(_, let url):
+          do {
+            let fileAttributes = try FileManager.default.attributesOfItem(
+              atPath: url.path
+            )
+            let fileSize = fileAttributes[.size] as? Int64 ?? 0
+            return Int(fileSize)
+          } catch {
+            return nil
+          }
+      #endif
+      }
+    }
+  }
+
+  func getThumbnail(for item: UploadItem) async -> Image? {
+    switch item {
+    case .pickerItem(_, let photoItem):
+      if let thumbnail = try? await loadTransferable(from: photoItem) {
+        return thumbnail.image
+      } else {
+        return nil
+      }
+    #if os(iOS)
+      case .cameraPhoto(_, let image):
+        return Image(uiImage: image)
+      case .cameraVideo(_, let url):
+        return nil  // TODO: generate thumbnail from video
+    #endif
+    case .file(_, let url, _):
+      return nil
+    }
+  }
+
+  private func loadTransferable(from imageSelection: PhotosPickerItem)
+    async throws -> Thumbnail?
+  {
+    try await imageSelection.loadTransferable(type: Thumbnail.self)
   }
 }
 

@@ -109,10 +109,21 @@ class MessageDrainStore: DiscordDataStore {
     // the swiftui side inits the message with a nonce already btw
     // set our message up
     let nonce: MessageSnowflake = try! .makeFake(date: .now)
-    let message = Payloads.CreateMessage(
+    var message = Payloads.CreateMessage(
       content: vm.content,
       nonce: .string(nonce.rawValue)
     )
+    if case .reply(let replyMsg, let mention) = vm.messageAction {
+      message.message_reference = .init(
+        type: .reply,
+        message_id: replyMsg.id,
+        channel_id: replyMsg.channel_id,
+        guild_id: replyMsg.guild_id
+      )
+      if !mention {
+        message.allowed_mentions = .init(replied_user: false)
+      }
+    }
     let task: @Sendable () async throws -> Void = { [weak self] in
       guard let self else { return }
       do {

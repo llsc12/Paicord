@@ -111,193 +111,17 @@ extension ChatView {
               AttachmentPreviewBar(inputVM: inputVM)
                 .frame(height: 60)
             }
-
-            HStack(alignment: .bottom, spacing: 8) {
-              mediaPickerButton
-
-              textField
+            
+            if inputVM.messageAction != nil {
+              messageActionBar
+                .padding(.bottom, -4)
+                .transition(
+                  .offset(y: 25)
+                  .combined(with: .opacity)
+                )
             }
-            .padding([.horizontal, .bottom], 8)
-            .padding(.top, 4)
-            .geometryGroup()
-            #if os(iOS)
-              .padding(.bottom, animatedKeyboardHeight)
-              .animation(properties.animation, value: animatedKeyboardHeight)
-              .animation(properties.animation, value: inputVM.content.isEmpty)
-              .animation(properties.animation, value: inputVM.uploadItems.isEmpty)
-              .onReceive(
-                NotificationCenter.default.publisher(
-                  for: UIResponder.keyboardWillChangeFrameNotification
-                )
-              ) { userInfo in
-                if let keyboardFrame = userInfo.userInfo?[
-                  UIResponder.keyboardFrameEndUserInfoKey
-                ] as? NSValue {
-                  let height = keyboardFrame.cgRectValue.height
-                  if properties.storedKeyboardHeight == 0 {
-                    properties.storedKeyboardHeight = max(
-                      height - properties.safeArea.bottom,
-                      0
-                    )
-                  }
-                }
-              }  // get kb height
-              .sheet(isPresented: $properties.showPhotosPicker) {
-                PhotosPicker(
-                  "",
-                  selection: $inputVM.selectedPhotos,
-                  maxSelectionCount: 10,
-                  selectionBehavior: .continuous,
-                  preferredItemEncoding: .compatible
-                )
-                .photosPickerStyle(.inline)
-                .photosPickerDisabledCapabilities([
-                  .stagingArea, .sensitivityAnalysisIntervention,
-                ])
-                .presentationDetents([
-                  .height(properties.keyboardHeight), .large,
-                ])
-                .presentationBackgroundInteraction(
-                  .enabled(upThrough: .height(properties.keyboardHeight))
-                )  // allow whilst not expanded
-              }
-              .sheet(isPresented: $properties.showFilePicker) {
-                DocumentPickerViewController { urls in
-                  inputVM.selectedFiles = urls.compactMap { url in
-                    var url: URL? = url
-                    let canAccess =
-                      url?.startAccessingSecurityScopedResource() ?? false
-                    defer {
-                      if canAccess {
-                        url?.stopAccessingSecurityScopedResource()
-                      }
-                    }
-                    // check filesize
-                    let fileSize =
-                      (try? url?.resourceValues(forKeys: [.fileSizeKey])
-                        .fileSize)
-                      ?? 0
-                    // discord wont let you upload empty files.
-                    if fileSize == 0 {
-                      url = nil
-                      self.filesRemovedDuringSelection =
-                        SelectionError.filesEmpty
-                    }
-                    let uploadMeta = gw.user.premiumKind.fileUpload(
-                      size: fileSize,
-                      to: vm
-                    )
-                    if uploadMeta.allowed == false {
-                      url = nil
-                      self.filesRemovedDuringSelection =
-                        SelectionError.filesPastLimit(
-                          limit: uploadMeta.limit
-                        )
-                    }
 
-                    return url
-                  }
-                }
-                .presentationBackground(.clear)
-                .presentationDetents([
-                  .height(properties.keyboardHeight), .large,
-                ])
-                .presentationBackgroundInteraction(
-                  .enabled(upThrough: .height(properties.keyboardHeight))
-                )
-              }
-              .alert(
-                "Some files were not added",
-                isPresented: Binding(
-                  get: { self.filesRemovedDuringSelection != nil },
-                  set: { newValue in
-                    if newValue == false {
-                      self.filesRemovedDuringSelection = nil
-                    }
-                  }
-                )
-              ) {
-                Button("OK", role: .cancel) {}
-              } message: {
-                if let error = filesRemovedDuringSelection {
-                  Text(error.localizedDescription)
-                } else {
-                  Text("idk bro ur files cooked")
-                }
-              }  // show errors for removed files
-              .onChange(of: isFocused) {
-                if isFocused {
-                  properties.showPhotosPicker = false
-                  properties.showFilePicker = false
-                }
-              }  // dismiss picker when keyboard is activated
-              .onChange(of: properties.pickerShown) {
-                if properties.pickerShown {
-                  isFocused = false
-                }
-              }  // dismiss keyboard when picker is activated
-              .onChange(of: appState.chatOpen) {
-                if appState.chatOpen == false {
-                  pickersClosedWhenChatClosed.photos =
-                    properties.showPhotosPicker
-                  pickersClosedWhenChatClosed.files = properties.showFilePicker
-                  properties.showPhotosPicker = false
-                  properties.showFilePicker = false
-                } else {
-                  // restore pickers if they were open before chat closed
-                  if pickersClosedWhenChatClosed.photos {
-                    properties.showPhotosPicker = true
-                  }
-                  if pickersClosedWhenChatClosed.files {
-                    properties.showFilePicker = true
-                  }
-                  pickersClosedWhenChatClosed = (false, false)
-                }
-              }  // dismiss pickers when chat is closed
-            #else
-              .fileImporter(isPresented: $fileImporterPresented, allowedContentTypes: [.content], allowsMultipleSelection: true) { result in
-                do {
-                  let urls = try result.get()
-                  inputVM.selectedFiles = urls.compactMap { url in
-                    var url: URL? = url
-                    let canAccess =
-                      url?.startAccessingSecurityScopedResource() ?? false
-                    defer {
-                      if canAccess {
-                        url?.stopAccessingSecurityScopedResource()
-                      }
-                    }
-                    // check filesize
-                    let fileSize =
-                      (try? url?.resourceValues(forKeys: [.fileSizeKey])
-                        .fileSize)
-                      ?? 0
-                    // discord wont let you upload empty files.
-                    if fileSize == 0 {
-                      url = nil
-                      self.filesRemovedDuringSelection =
-                        SelectionError.filesEmpty
-                    }
-                    let uploadMeta = gw.user.premiumKind.fileUpload(
-                      size: fileSize,
-                      to: vm
-                    )
-                    if uploadMeta.allowed == false {
-                      url = nil
-                      self.filesRemovedDuringSelection =
-                        SelectionError.filesPastLimit(
-                          limit: uploadMeta.limit
-                        )
-                    }
-
-                    return url
-                  }
-                } catch {
-                  print("Failed to pick files: \(error)")
-                }
-              }
-              .fileDialogImportsUnresolvedAliases(false)
-            #endif
+            messageInputBar
           }
 
           TypingIndicatorBar(vm: vm)
@@ -319,6 +143,7 @@ extension ChatView {
         }
         .ignoresSafeArea(.container, edges: .horizontal)
       }
+      .animation(.default, value: inputVM.messageAction.debugDescription)
       .onFileDrop(
         delegate: .init(onDrop: { droppedItems in
           let files = droppedItems.compactMap(\.loadedURL)
@@ -359,6 +184,196 @@ extension ChatView {
           }
         })
       )
+    }
+    
+    @ViewBuilder
+    var messageInputBar: some View {
+      HStack(alignment: .bottom, spacing: 8) {
+        mediaPickerButton
+
+        textField
+      }
+      .padding([.horizontal, .bottom], 8)
+      .padding(.top, 4)
+      .geometryGroup()
+      #if os(iOS)
+        .padding(.bottom, animatedKeyboardHeight)
+        .animation(properties.animation, value: animatedKeyboardHeight)
+        .animation(properties.animation, value: inputVM.content.isEmpty)
+        .animation(properties.animation, value: inputVM.uploadItems.isEmpty)
+        .onReceive(
+          NotificationCenter.default.publisher(
+            for: UIResponder.keyboardWillChangeFrameNotification
+          )
+        ) { userInfo in
+          if let keyboardFrame = userInfo.userInfo?[
+            UIResponder.keyboardFrameEndUserInfoKey
+          ] as? NSValue {
+            let height = keyboardFrame.cgRectValue.height
+            if properties.storedKeyboardHeight == 0 {
+              properties.storedKeyboardHeight = max(
+                height - properties.safeArea.bottom,
+                0
+              )
+            }
+          }
+        }  // get kb height
+        .sheet(isPresented: $properties.showPhotosPicker) {
+          PhotosPicker(
+            "",
+            selection: $inputVM.selectedPhotos,
+            maxSelectionCount: 10,
+            selectionBehavior: .continuous,
+            preferredItemEncoding: .compatible
+          )
+          .photosPickerStyle(.inline)
+          .photosPickerDisabledCapabilities([
+            .stagingArea, .sensitivityAnalysisIntervention,
+          ])
+          .presentationDetents([
+            .height(properties.keyboardHeight), .large,
+          ])
+          .presentationBackgroundInteraction(
+            .enabled(upThrough: .height(properties.keyboardHeight))
+          )  // allow whilst not expanded
+        }
+        .sheet(isPresented: $properties.showFilePicker) {
+          DocumentPickerViewController { urls in
+            inputVM.selectedFiles = urls.compactMap { url in
+              var url: URL? = url
+              let canAccess =
+                url?.startAccessingSecurityScopedResource() ?? false
+              defer {
+                if canAccess {
+                  url?.stopAccessingSecurityScopedResource()
+                }
+              }
+              // check filesize
+              let fileSize =
+                (try? url?.resourceValues(forKeys: [.fileSizeKey])
+                  .fileSize)
+                ?? 0
+              // discord wont let you upload empty files.
+              if fileSize == 0 {
+                url = nil
+                self.filesRemovedDuringSelection =
+                  SelectionError.filesEmpty
+              }
+              let uploadMeta = gw.user.premiumKind.fileUpload(
+                size: fileSize,
+                to: vm
+              )
+              if uploadMeta.allowed == false {
+                url = nil
+                self.filesRemovedDuringSelection =
+                  SelectionError.filesPastLimit(
+                    limit: uploadMeta.limit
+                  )
+              }
+
+              return url
+            }
+          }
+          .presentationBackground(.clear)
+          .presentationDetents([
+            .height(properties.keyboardHeight), .large,
+          ])
+          .presentationBackgroundInteraction(
+            .enabled(upThrough: .height(properties.keyboardHeight))
+          )
+        }
+        .alert(
+          "Some files were not added",
+          isPresented: Binding(
+            get: { self.filesRemovedDuringSelection != nil },
+            set: { newValue in
+              if newValue == false {
+                self.filesRemovedDuringSelection = nil
+              }
+            }
+          )
+        ) {
+          Button("OK", role: .cancel) {}
+        } message: {
+          if let error = filesRemovedDuringSelection {
+            Text(error.localizedDescription)
+          } else {
+            Text("idk bro ur files cooked")
+          }
+        }  // show errors for removed files
+        .onChange(of: isFocused) {
+          if isFocused {
+            properties.showPhotosPicker = false
+            properties.showFilePicker = false
+          }
+        }  // dismiss picker when keyboard is activated
+        .onChange(of: properties.pickerShown) {
+          if properties.pickerShown {
+            isFocused = false
+          }
+        }  // dismiss keyboard when picker is activated
+        .onChange(of: appState.chatOpen) {
+          if appState.chatOpen == false {
+            pickersClosedWhenChatClosed.photos =
+              properties.showPhotosPicker
+            pickersClosedWhenChatClosed.files = properties.showFilePicker
+            properties.showPhotosPicker = false
+            properties.showFilePicker = false
+          } else {
+            // restore pickers if they were open before chat closed
+            if pickersClosedWhenChatClosed.photos {
+              properties.showPhotosPicker = true
+            }
+            if pickersClosedWhenChatClosed.files {
+              properties.showFilePicker = true
+            }
+            pickersClosedWhenChatClosed = (false, false)
+          }
+        }  // dismiss pickers when chat is closed
+      #else
+        .fileImporter(isPresented: $fileImporterPresented, allowedContentTypes: [.content], allowsMultipleSelection: true) { result in
+          do {
+            let urls = try result.get()
+            inputVM.selectedFiles = urls.compactMap { url in
+              var url: URL? = url
+              let canAccess =
+                url?.startAccessingSecurityScopedResource() ?? false
+              defer {
+                if canAccess {
+                  url?.stopAccessingSecurityScopedResource()
+                }
+              }
+              // check filesize
+              let fileSize =
+                (try? url?.resourceValues(forKeys: [.fileSizeKey])
+                  .fileSize)
+                ?? 0
+              // discord wont let you upload empty files.
+              if fileSize == 0 {
+                url = nil
+                self.filesRemovedDuringSelection =
+                  SelectionError.filesEmpty
+              }
+              let uploadMeta = gw.user.premiumKind.fileUpload(
+                size: fileSize,
+                to: vm
+              )
+              if uploadMeta.allowed == false {
+                url = nil
+                self.filesRemovedDuringSelection =
+                  SelectionError.filesPastLimit(
+                    limit: uploadMeta.limit
+                  )
+              }
+
+              return url
+            }
+          } catch {
+            print("Failed to pick files: \(error)")
+          }
+        }
+        .fileDialogImportsUnresolvedAliases(false)
+      #endif
     }
 
     @ViewBuilder
@@ -467,7 +482,8 @@ extension ChatView {
             .imageScale(.large)
             .padding(.trailing, 6)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.borderless)
+        .tint(.secondary)
       }
       .background(.regularMaterial)
       .clipShape(.rect(cornerRadius: 18))
@@ -497,6 +513,61 @@ extension ChatView {
           ? properties.keyboardHeight : 0
       }
     #endif
+    
+    @ViewBuilder
+    var messageActionBar: some View {
+      HStack {
+        if let action = inputVM.messageAction {
+          switch action {
+          case .reply(let message, _):
+            let author: Text = {
+              guard let author = message.author else { return Text("Unknown User").bold() }
+              if let member = vm.guildStore?.members[author.id] ?? message.member {
+                return Text(member.nick ?? author.global_name ?? author.username).bold()
+              } else {
+                return Text(author.global_name ?? author.username).bold()
+              }
+            }()
+            Text("Replying to \(author)")
+              .font(.subheadline)
+              .foregroundStyle(.secondary)
+          case .edit(_):
+            Text("Editing Message")
+              .font(.subheadline)
+              .foregroundStyle(.secondary)
+          }
+          Spacer()
+          if case .reply(let message, let mention) = action {
+            Button {
+              inputVM.messageAction = .reply(message: message, mention: !mention)
+            } label: {
+              HStack(spacing: 2) {
+                Image(systemName: "at")
+                Text(mention ? "ON" : "OFF")
+              }
+              .font(.headline.bold())
+            }
+            .buttonStyle(.borderless)
+            .tint(mention ? nil : .secondary)
+          }
+            
+          Button {
+            inputVM.messageAction = nil
+          } label: {
+            Image(systemName: "xmark.circle.fill")
+              .imageScale(.large)
+          }
+          .buttonStyle(.borderless)
+          .tint(.secondary)
+        }
+      }
+      .padding(.horizontal, 6)
+      .padding(.leading, 4)
+      .padding(.vertical, 4)
+      .background(.thinMaterial)
+      .clipShape(.capsule)
+      .padding(.horizontal, 8)
+    }
 
     private func sendMessage() {
       let msg = inputVM.content.trimmingCharacters(in: .whitespacesAndNewlines)
