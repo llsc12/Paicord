@@ -454,7 +454,6 @@ class ChannelStore: DiscordDataStore {
       hasLatestMessages = false
     }
     while messages.count > Self.LoadedMessageLimit {
-      print(messages.count)
       if preferRemovingOldest {
         // keep newest messages -> drop oldest entries
         messages.removeFirst()
@@ -494,12 +493,16 @@ class ChannelStore: DiscordDataStore {
 
       // fetch messages and populate storage in the right order
       if fetchingBefore {
-        for message in fetched {
-          self.messages.updateValue(
-            message,
-            forKey: message.id,
-            insertingAt: 0
-          )
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction) {
+          for message in fetched {
+            self.messages.updateValue(
+              message,
+              forKey: message.id,
+              insertingAt: 0
+            )
+          }
         }
 
         if fetched.count < requestedLimit {
