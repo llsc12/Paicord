@@ -166,7 +166,10 @@ extension ChatView {
             .padding(.trailing, 6)
 
           Group {
-            Text("\(msg.author?.username ?? "Unknown") • ")
+            let mention =
+              msg.mentions.map(\.id).contains(msg.author?.id) ? "@" : ""
+            let name = msg.member?.nick ?? msg.author?.global_name ?? msg.author?.username ?? "Unknown"
+            Text("\(mention)\(name) • ")
               .foregroundStyle(.secondary)
               .lineLimit(1)
             MarkdownText(content: msg.content, channelStore: channelStore)

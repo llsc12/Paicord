@@ -59,13 +59,17 @@ extension MessageCell {
             .padding(.leading, avatarSize / 2)  // align with pfp
             .padding(.trailing, 6)
           Group {
-            Text("\(ref.author?.username ?? "Unknown") • ")
+            let mention =
+              ref.mentions.map(\.id).contains(ref.author?.id) ? "@" : ""
+            let name = ref.member?.nick ?? ref.author?.global_name ?? ref.author?.username ?? "Unknown"
+            Text("\(mention)\(name) • ")
               .foregroundStyle(.secondary)
               .lineLimit(1)
             MarkdownText(content: ref.content, channelStore: channelStore)
               .lineLimit(1)
               .frame(maxWidth: .infinity, alignment: .leading)
           }
+          .font(.caption2)
           .opacity(0.6)
         }
       }
