@@ -17,7 +17,8 @@ This list is not exhaustive but the goal for Paicord is to have parity with the 
 ## Installing
 
 There are currently no releases of Paicord, you can download builds built from Actions.
-| iOS                                                          | macOS                                                        |
+
+| iOS (17.4+)                                                  | macOS (14.2+)                                                |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | [Download iOS Artifact](https://nightly.link/llsc12/Paicord/workflows/build/main/Paicord-iOS) | [Download macOS Artifact](https://nightly.link/llsc12/Paicord/workflows/build/main/Paicord-macOS) |
 
