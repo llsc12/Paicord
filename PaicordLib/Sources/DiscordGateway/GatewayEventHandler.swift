@@ -97,6 +97,10 @@ public protocol GatewayEventHandler: Sendable {
   func onMessageUpdate(_ payload: DiscordChannel.PartialMessage) async throws
   func onMessageDelete(_ payload: Gateway.MessageDelete) async throws
   func onMessageAcknowledge(_ payload: Gateway.MessageAcknowledge) async throws
+  func onChannelPinsAcknowledge(_ payload: Gateway.ChannelPinsAcknowledge)
+    async throws
+  func onUserNonChannelAcknowledge(_ payload: Gateway.UserNonChannelAcknowledge)
+    async throws
   func onMessageDeleteBulk(_ payload: Gateway.MessageDeleteBulk) async throws
   func onMessageReactionAdd(_ payload: Gateway.MessageReactionAdd) async throws
   func onMessageReactionRemove(_ payload: Gateway.MessageReactionRemove)
@@ -256,14 +260,16 @@ extension GatewayEventHandler {
   public func onEntitlementCreate(_: Entitlement) async throws {}
   public func onEntitlementUpdate(_: Entitlement) async throws {}
   public func onEntitlementDelete(_: Entitlement) async throws {}
-  public func onThreadMembersUpdate(_: Gateway.ThreadMembersUpdate) async throws {}
+  public func onThreadMembersUpdate(_: Gateway.ThreadMembersUpdate) async throws
+  {}
   public func onGuildCreate(_: Gateway.GuildCreate) async throws {}
   public func onGuildUpdate(_: Guild) async throws {}
   public func onGuildDelete(_: UnavailableGuild) async throws {}
   public func onGuildBanAdd(_: Gateway.GuildBan) async throws {}
   public func onGuildBanRemove(_: Gateway.GuildBan) async throws {}
   public func onGuildEmojisUpdate(_: Gateway.GuildEmojisUpdate) async throws {}
-  public func onGuildStickersUpdate(_: Gateway.GuildStickersUpdate) async throws {}
+  public func onGuildStickersUpdate(_: Gateway.GuildStickersUpdate) async throws
+  {}
   public func onGuildIntegrationsUpdate(_: Gateway.GuildIntegrationsUpdate)
     async throws
   {}
@@ -271,7 +277,8 @@ extension GatewayEventHandler {
   public func onGuildMemberRemove(_: Gateway.GuildMemberRemove) async throws {}
   public func onGuildMemberUpdate(_: Gateway.GuildMemberAdd) async throws {}
   public func onGuildMembersChunk(_: Gateway.GuildMembersChunk) async throws {}
-  public func onRequestGuildMembers(_: Gateway.RequestGuildMembers) async throws {}
+  public func onRequestGuildMembers(_: Gateway.RequestGuildMembers) async throws
+  {}
   public func onGuildRoleCreate(_: Gateway.GuildRole) async throws {}
   public func onGuildRoleUpdate(_: Gateway.GuildRole) async throws {}
   public func onGuildRoleDelete(_: Gateway.GuildRoleDelete) async throws {}
@@ -297,7 +304,15 @@ extension GatewayEventHandler {
   public func onMessageCreate(_: Gateway.MessageCreate) async throws {}
   public func onMessageUpdate(_: DiscordChannel.PartialMessage) async throws {}
   public func onMessageDelete(_: Gateway.MessageDelete) async throws {}
-  public func onMessageAcknowledge(_ payload: Gateway.MessageAcknowledge) async throws {}
+  public func onMessageAcknowledge(_ payload: Gateway.MessageAcknowledge)
+    async throws
+  {}
+  public func onChannelPinsAcknowledge(
+    _ payload: Gateway.ChannelPinsAcknowledge
+  ) async throws {}
+  public func onUserNonChannelAcknowledge(
+    _ payload: Gateway.UserNonChannelAcknowledge
+  ) async throws {}
   public func onMessageDeleteBulk(_: Gateway.MessageDeleteBulk) async throws {}
   public func onMessageReactionAdd(_: Gateway.MessageReactionAdd) async throws {
   }
@@ -311,7 +326,8 @@ extension GatewayEventHandler {
     _: Gateway.MessageReactionRemoveEmoji
   ) async throws {}
   public func onPresenceUpdate(_: Gateway.PresenceUpdate) async throws {}
-  public func onRequestPresenceUpdate(_: Gateway.Identify.Presence) async throws {}
+  public func onRequestPresenceUpdate(_: Gateway.Identify.Presence) async throws
+  {}
   public func onStageInstanceCreate(_: StageInstance) async throws {}
   public func onStageInstanceDelete(_: StageInstance) async throws {}
   public func onStageInstanceUpdate(_: StageInstance) async throws {}
@@ -436,7 +452,8 @@ extension GatewayEventHandler {
   public func onVoiceChannelStatusUpdate(
     _ payload: Gateway.VoiceChannelStatusUpdate
   ) async throws {}
-  public func onSessionsReplace(_ payload: Gateway.SessionsReplace) async throws {
+  public func onSessionsReplace(_ payload: Gateway.SessionsReplace) async throws
+  {
   }
   public func onUserApplicationUpdate(_ payload: Gateway.UserApplicationUpdate)
     async throws
@@ -483,7 +500,8 @@ extension GatewayEventHandler {
     }
 
     switch event.data {
-    case .none, .resume, .identify, .updateGuildSubscriptions, .qosHeartbeat, .heartbeat,
+    case .none, .resume, .identify, .updateGuildSubscriptions, .qosHeartbeat,
+      .heartbeat,
       .updateTimeSpentSessionId:
       /// Only sent, never received.
       break
@@ -682,6 +700,14 @@ extension GatewayEventHandler {
     case .messageAcknowledge(let payload):
       await withLogging(for: "onMessageAcknowledge") {
         try await onMessageAcknowledge(payload)
+      }
+    case .channelPinsAcknowledge(let payload):
+      await withLogging(for: "onChannelPinsAcknowledge") {
+        try await onChannelPinsAcknowledge(payload)
+      }
+    case .userNonChannelAcknowledge(let payload):
+      await withLogging(for: "onUserNonChannelAcknowledge") {
+        try await onUserNonChannelAcknowledge(payload)
       }
     case .messageDeleteBulk(let payload):
       await withLogging(for: "onMessageDeleteBulk") {

@@ -1968,6 +1968,7 @@ extension Gateway {
     // last msg and last acked are mutually exclusive
     public var last_message_id: MessageSnowflake?
     public var last_acked_id: AnySnowflake?
+    // mention count and badge count are mutually exclusive
     public var mention_count: Int?
     public var badge_count: Int?
     public var last_pin_timestamp: DiscordTimestamp?
@@ -2004,6 +2005,23 @@ extension Gateway {
     public var last_viewed: Int?
   }
   
+  /// https://docs.discord.food/topics/gateway-events#channel-pins-ack
+  public struct ChannelPinsAcknowledge: Sendable, Codable {
+    public var channel_id: ChannelSnowflake
+    public var timestamp: DiscordTimestamp
+    public var version: Int
+  }
+  
+  /// https://docs.discord.food/topics/gateway-events#user-non-channel-ack-structure
+  public struct UserNonChannelAcknowledge: Sendable, Codable {
+    public var ack_type: ReadState.Kind
+    public var resource_id: UserSnowflake
+    public var entity_id: AnySnowflake
+    public var version: Int
+  }
+  
+  /// https://docs.discord.food/resources/message#create-attachments
+  /// Note that this is the response payload when creating attachments, not the upload payload.
   public struct CreateAttachments: Sendable, Codable {
     public var attachments: [CloudAttachment]
   }

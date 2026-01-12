@@ -243,6 +243,8 @@ public struct Gateway: Sendable, Codable {
       case messageDeleteBulk(MessageDeleteBulk)
 
       case messageAcknowledge(MessageAcknowledge)
+      case channelPinsAcknowledge(ChannelPinsAcknowledge)
+      case userNonChannelAcknowledge(UserNonChannelAcknowledge)
 
       case messagePollVoteAdd(MessagePollVote)
       case messagePollVoteRemove(MessagePollVote)
@@ -590,6 +592,13 @@ public struct Gateway: Sendable, Codable {
           self.data = try .messageDelete(decodeData())
         case "MESSAGE_ACK":
           self.data = try .messageAcknowledge(decodeData())
+        case "CHANNEL_PINS_ACK":
+          self.data = try .channelPinsAcknowledge(decodeData())
+        case "GUILD_FEATURE_ACK":
+          // Not implemented yet
+          throw GatewayDecodingError.unhandledDispatchEvent(type: self.type)
+        case "USER_NON_CHANNEL_ACK":
+          self.data = try .userNonChannelAcknowledge(decodeData())
         case "MESSAGE_DELETE_BULK":
           self.data = try .messageDeleteBulk(decodeData())
         case "MESSAGE_REACTION_ADD":
