@@ -12,7 +12,6 @@ import SwiftUIX
 
 struct SettingsView: SettingsContainer {
   @Environment(\.gateway) var gw
-  @Environment(\.appState) var appState
 
   @Environment(\.openURL) var openURL
   
