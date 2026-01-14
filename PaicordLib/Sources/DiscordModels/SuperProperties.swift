@@ -50,7 +50,8 @@ extension Gateway.Identify.ConnectionProperties {
     self.device_vendor_id = SuperProperties.device_vendor_id()
     self.client_app_state = SuperProperties.client_app_state()
     self.design_id = SuperProperties.design_id()
-    self.client_heartbeat_session_id = SuperProperties.client_heartbeat_session_id()
+    self.client_heartbeat_session_id =
+      SuperProperties.client_heartbeat_session_id()
     self.client_event_source = nil
   }
 
@@ -95,9 +96,11 @@ public enum SuperProperties {
   static let _launch_signature = UUID.generateLaunchSignature()
 
   // this needs to be regenerated every 30 minutes
-  nonisolated(unsafe) private static var _client_heartbeat_session_id_last_generated: Date = Date
-    .distantPast
-  nonisolated(unsafe) private static var _client_heartbeat_session_id_cached: UUID? = nil
+  nonisolated(unsafe) private static
+    var _client_heartbeat_session_id_last_generated: Date = Date
+      .distantPast
+  nonisolated(unsafe) private static var _client_heartbeat_session_id_cached:
+    UUID? = nil
   static var _client_heartbeat_session_id: UUID {
     let now = Date.now
     if now.timeIntervalSince(_client_heartbeat_session_id_last_generated)
@@ -158,12 +161,20 @@ public enum SuperProperties {
         "Discord/\(Self.client_build_number()!) CFNetwork/\(Self.cfnetwork_version()) Darwin/\(Self.kernel_version())"
     case "Mac OS X":
       return
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) discord/\(Self.client_version()) Chrome/134.0.6998.205 Electron/\(Self.browser_version()) Safari/537.36"
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/\(Self.webkitVer()) (KHTML, like Gecko) discord/\(Self.client_version()) Chrome/\(Self.chromeVer()) Electron/\(Self.browser_version()) Safari/\(Self.webkitVer())"
     default:
       // TODO: do something better for other OSes
       return
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Safari/605.1.15"
     }
+  }
+
+  public static func chromeVer() -> String {
+    "138.0.7204.251"
+  }
+
+  public static func webkitVer() -> String {
+    "537.36"
   }
 
   public static func device() -> String? {
@@ -182,6 +193,9 @@ public enum SuperProperties {
         return identifier + String(UnicodeScalar(UInt8(value)))
       }
       return identifier
+    #elseif os(watchOS)
+    // no good way to handle this. just return hardcoded value for now.
+      return "iPhone13,3"
     #elseif os(macOS)
       return nil
     #else
@@ -190,52 +204,54 @@ public enum SuperProperties {
   }
 
   public static func os_version() -> String? {
-#if os(macOS)
-    // get the kernel version on macos (idk why discord uses this)
-    return Self.kernel_version()
-#elseif os(iOS)
-    // avoids uikit, bc uikit is mainactor isolated
-    var size: Int = 0
-    // need buffer size
-    if sysctlbyname("kern.osproductversion", nil, &size, nil, 0) != 0 {
-      return nil
-    }
-    var buffer = [CChar](repeating: 0, count: size)
-    if sysctlbyname("kern.osproductversion", &buffer, &size, nil, 0) != 0 {
-      return nil
-    }
-    return String(cString: buffer)
-#elseif os(watchOS)
-    // only watchos 26 and above can be returned safely.
-    var size: Int = 0
-    // need buffer size
-    if sysctlbyname("kern.osproductversion", nil, &size, nil, 0) != 0 {
-      return nil
-    }
-    var buffer = [CChar](repeating: 0, count: size)
-    if sysctlbyname("kern.osproductversion", &buffer, &size, nil, 0) != 0 {
-      return nil
-    }
-    let version = String(cString: buffer)
-    let majorVersion = (version.split(separator: ".").first ?? "0").flatMap { Int($0) } ?? 0
-    if majorVersion >= 26 {
-      return version
-    } else {
-      // for watchos versions below 26, we buff the major version count to align with ios versions
-      let components = version.split(separator: ".")
-      // drop the major version
-      let minorAndPatch = components.dropFirst()
-      // last ios version before 26 was ios 18, but before watchos 26 was watchos 11.
-      // we add 7 to the major version to align it with ios versions.
-      return (majorVersion + 7).description + "." + minorAndPatch.joined(separator: ".")
-    }
+    #if os(macOS)
+      // get the kernel version on macos (idk why discord uses this)
+      return Self.kernel_version()
+    #elseif os(iOS)
+      // avoids uikit, bc uikit is mainactor isolated
+      var size: Int = 0
+      // need buffer size
+      if sysctlbyname("kern.osproductversion", nil, &size, nil, 0) != 0 {
+        return nil
+      }
+      var buffer = [CChar](repeating: 0, count: size)
+      if sysctlbyname("kern.osproductversion", &buffer, &size, nil, 0) != 0 {
+        return nil
+      }
+      return String(cString: buffer)
+    #elseif os(watchOS)
+      // only watchos 26 and above can be returned safely.
+      var size: Int = 0
+      // need buffer size
+      if sysctlbyname("kern.osproductversion", nil, &size, nil, 0) != 0 {
+        return nil
+      }
+      var buffer = [CChar](repeating: 0, count: size)
+      if sysctlbyname("kern.osproductversion", &buffer, &size, nil, 0) != 0 {
+        return nil
+      }
+      let version = String(cString: buffer)
+      let majorVersion =
+        (version.split(separator: ".").first ?? "0").flatMap { Int($0) } ?? 0
+      if majorVersion >= 26 {
+        return version
+      } else {
+        // for watchos versions below 26, we buff the major version count to align with ios versions
+        let components = version.split(separator: ".")
+        // drop the major version
+        let minorAndPatch = components.dropFirst()
+        // last ios version before 26 was ios 18, but before watchos 26 was watchos 11.
+        // we add 7 to the major version to align it with ios versions.
+        return (majorVersion + 7).description + "."
+          + minorAndPatch.joined(separator: ".")
+      }
     #else
       return nil
     #endif
   }
 
   public static func os_arch() -> String? {
-    #if os(macOS)  // discord only wants to see what arch mac their client is running on
+    #if os(macOS)  // discord only wants to see what arch their mac client is running on
       #if arch(x86_64)
         return "x64"
       #elseif arch(arm64)
@@ -264,7 +280,7 @@ public enum SuperProperties {
     case "iOS", "watchOS":
       return ""
     case "Mac OS X":
-      return "35.3.0"
+      return "37.6.0"
     default:
       return ""
     }
@@ -273,20 +289,20 @@ public enum SuperProperties {
   public static func client_version() -> String {
     switch Gateway.Identify.ConnectionProperties.__defaultOS {
     case "iOS", "watchOS":
-      return "300.0"
+      return "310.3"
     case "Mac OS X":
-      return "0.0.364"
+      return "0.0.372"
     default:
-      return "18.5"
+      return "0.0.372"
     }
   }
 
   public static func client_build_number() -> Int? {
     switch Gateway.Identify.ConnectionProperties.__defaultOS {
     case "iOS", "watchOS":
-      return 86251
+      return 91102
     case "Mac OS X":
-      return 459631
+      return 485097
     default:
       return nil
     }
