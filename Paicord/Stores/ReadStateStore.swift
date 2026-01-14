@@ -32,7 +32,6 @@ class ReadStateStore: DiscordDataStore {
           handleReady(readyData)
         case .messageAcknowledge(let ackData):
           handleMessageAcknowledge(ackData)
-        case .messageAcknowledge(<#T##Gateway.MessageAcknowledge#>)
         default:
           break
         }
