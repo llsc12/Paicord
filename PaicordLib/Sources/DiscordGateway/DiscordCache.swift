@@ -980,7 +980,20 @@ public actor DiscordCache {
     /// Nothing to do?
     case .userUpdate(let user):
       self.botUser = user
-ç
+    case .voiceStateUpdate(let state):
+      if let guildId = state.guild_id {
+        if let idx = self.guilds[guildId]?.voice_states
+          .firstIndex(where: { $0.session_id == state.session_id })
+        {
+          self.guilds[guildId]?.voice_states[idx] = .init(
+            voiceState: state
+          )
+        } else {
+          self.guilds[guildId]?.voice_states.append(
+            .init(voiceState: state)
+          )
+        }
+      }
     case .voiceServerUpdate: break
     /// Nothing to do?
     case .webhooksUpdate: break

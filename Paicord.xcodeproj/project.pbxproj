@@ -94,6 +94,7 @@
 		AA63EB762EA712D900A5F21D /* ReactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA63EB752EA712D500A5F21D /* ReactionsView.swift */; };
 		AA67FD132EF4A792004676A1 /* InputVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA67FD122EF4A792004676A1 /* InputVM.swift */; };
 		AA67FD152EF4A7F4004676A1 /* CameraPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA67FD142EF4A7F4004676A1 /* CameraPicker.swift */; };
+		AA6C77472F1A6B9E006BF281 /* AttachmentViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA6C77462F1A6B95006BF281 /* AttachmentViewer.swift */; };
 		AA70EFB12EA1B3BD00344D98 /* InputBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA70EFB02EA1B3BA00344D98 /* InputBar.swift */; };
 		AA74E4392EBC411C0031B285 /* EntityContextMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA74E4382EBC410B0031B285 /* EntityContextMenu.swift */; };
 		AA74E43B2EBCA9010031B285 /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA74E43A2EBCA8FD0031B285 /* Environment.swift */; };
@@ -223,6 +224,7 @@
 		AA63EB752EA712D500A5F21D /* ReactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReactionsView.swift; sourceTree = "<group>"; };
 		AA67FD122EF4A792004676A1 /* InputVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputVM.swift; sourceTree = "<group>"; };
 		AA67FD142EF4A7F4004676A1 /* CameraPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPicker.swift; sourceTree = "<group>"; };
+		AA6C77462F1A6B95006BF281 /* AttachmentViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentViewer.swift; sourceTree = "<group>"; };
 		AA70EFB02EA1B3BA00344D98 /* InputBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputBar.swift; sourceTree = "<group>"; };
 		AA74E4382EBC410B0031B285 /* EntityContextMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityContextMenu.swift; sourceTree = "<group>"; };
 		AA74E43A2EBCA8FD0031B285 /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
@@ -789,6 +791,7 @@
 		AA74E4372EBC40F40031B285 /* Modifiers */ = {
 			isa = PBXGroup;
 			children = (
+				AA6C77462F1A6B95006BF281 /* AttachmentViewer.swift */,
 				AA74E43A2EBCA8FD0031B285 /* Environment.swift */,
 				AA74E4382EBC410B0031B285 /* EntityContextMenu.swift */,
 			);
@@ -1050,6 +1053,7 @@
 				AABED5A62E7F514B005BDD63 /* SettingsStore.swift in Sources */,
 				8702A5382EAA6753008DD55A /* MemberRowView.swift in Sources */,
 				AA49F5172EF2CF7200C46339 /* NitroHelper.swift in Sources */,
+				AA6C77472F1A6B9E006BF281 /* AttachmentViewer.swift in Sources */,
 				AA47AF322EDEF1D5008A50C9 /* KeybindsSection.swift in Sources */,
 				AABED5A02E7F48FD005BDD63 /* CurrentUserStore.swift in Sources */,
 				AA74E43D2EBD0DFE0031B285 /* BitField.swift in Sources */,
