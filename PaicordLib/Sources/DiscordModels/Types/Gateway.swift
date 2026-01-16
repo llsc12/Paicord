@@ -595,7 +595,7 @@ public struct Gateway: Sendable, Codable {
         case "CHANNEL_PINS_ACK":
           self.data = try .channelPinsAcknowledge(decodeData())
         case "GUILD_FEATURE_ACK":
-          // Not implemented yet
+          // TODO: impl
           throw GatewayDecodingError.unhandledDispatchEvent(type: self.type)
         case "USER_NON_CHANNEL_ACK":
           self.data = try .userNonChannelAcknowledge(decodeData())

@@ -1,6 +1,6 @@
 /// https://discord.com/developers/docs/resources/voice#voice-state-object-voice-state-structure
 public struct VoiceState: Sendable, Codable {
-  public var guild_id: GuildSnowflake
+  public var guild_id: GuildSnowflake?
   public var channel_id: ChannelSnowflake?
   public var user_id: UserSnowflake
   public var member: Guild.PartialMember?

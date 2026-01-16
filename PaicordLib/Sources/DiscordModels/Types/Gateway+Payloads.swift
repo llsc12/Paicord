@@ -1506,7 +1506,7 @@ extension Gateway {
     public var message_id: MessageSnowflake
     public var region: String
     public var ringing: [UserSnowflake]
-    public var voice_states: [VoiceState]
+    public var voice_states: [VoiceState]?
   }
 
   /// https://docs.discord.food/topics/gateway-events#call-delete
