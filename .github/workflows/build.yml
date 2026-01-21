@@ -73,12 +73,17 @@ jobs:
 
       - name: Build macOS .app
         run: |
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          BUILD_NUMBER=$(git rev-list --count HEAD)
+
           xcodebuild -workspace Paicord.xcworkspace \
             -scheme Paicord \
             -configuration Release \
             -destination "platform=macOS" \
             -derivedDataPath build \
-            CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+            CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO \
+            CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
+            MARKETING_VERSION="${SHORT_VERSION}"
 
           mkdir -p dist/dmg
           cp -R build/Build/Products/Release/Paicord.app dist/dmg/Paicord.app
@@ -219,6 +224,9 @@ jobs:
 
       - name: Build iOS .ipa
         run: |
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          BUILD_NUMBER=$(git rev-list --count HEAD)
+
           xcodebuild -workspace Paicord.xcworkspace \
             -scheme Paicord \
             -configuration Release \
@@ -227,7 +235,9 @@ jobs:
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY=""
+            CODE_SIGN_IDENTITY="" \
+            CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
+            MARKETING_VERSION="${SHORT_VERSION}"
 
       - name: Archive .ipa
         run: |
