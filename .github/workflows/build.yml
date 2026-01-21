@@ -28,7 +28,6 @@ jobs:
         run: |
           brew install create-dmg
 
-
       - name: Disable Swift macro plugin consent prompt
         run: |
           defaults write com.apple.dt.Xcode IDESkipMacroFingerprintValidation -bool YES
@@ -45,11 +44,12 @@ jobs:
       - name: Build macOS .app
         run: |
           xcodebuild -workspace Paicord.xcworkspace \
-            -scheme "Paicord Release" \
+            -scheme Paicord \
             -configuration Release \
             -destination "platform=macOS" \
             -derivedDataPath build \
             CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+          mkdir -p dist/dmg
           cp -R build/Build/Products/Release/Paicord.app dist/dmg/Paicord.app
 
       - name: Sign macOS .app
