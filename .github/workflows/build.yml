@@ -405,6 +405,8 @@ jobs:
     name: Publish updates, release
     runs-on: macos-26
     needs: [build-macos, build-ios]
+    permissions:
+      contents: write
     env:
       REPO: ${{ github.repository }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
