@@ -83,7 +83,7 @@ jobs:
           mkdir -p dist/dmg
           cp -R build/Build/Products/Release/Paicord.app dist/dmg/Paicord.app
 
-      - name: Decode Sparkle private key (raw or base64)
+      - name: Decode Sparkle private key
         env:
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
         run: |
@@ -258,8 +258,151 @@ jobs:
           name: Paicord-iOS
           path: output/Paicord.ipa
 
+  notify:
+    name: Notify Discord
+    runs-on: ubuntu-latest
+    needs: [build-macos, build-ios]
+    env:
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      NIGHTLY_LINK_TOKEN: ${{ secrets.NIGHTLY_LINK_TOKEN }}
+      REPO: ${{ github.repository }}
+    steps:
+      - name: Checkout (for git info)
+        uses: actions/checkout@v4
+
+      - name: Download macOS artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: Paicord-macOS
+          path: output
+
+      - name: Download iOS artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: Paicord-iOS
+          path: output
+
+      - name: Gather Info and notify Discord
+        id: notify
+        run: |
+          set -euo pipefail
+
+          # Ensure webhook is present
+          if [ -z "${DISCORD_WEBHOOK_URL:-}" ]; then
+            echo "ERROR: DISCORD_WEBHOOK_URL is not set. Add it to repository secrets." >&2
+            exit 1
+          fi
+
+          # Show downloaded artifacts for debugging
+          echo "Contents of output directory:"
+          ls -al output || true
+          echo "Recursive listing:"
+          ls -alR output || true
+
+          # Commit info
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          COMMIT_TITLE=$(git log -1 --pretty=%s)
+          COMMIT_DESC=$(git log -1 --pretty=%b)
+          COMMIT_AUTHOR=$(git log -1 --pretty=%an)
+          COMMIT_AUTHOR_LOGIN=${{ github.actor }}
+
+          # Artifact sizes (download-artifact)
+          # Find the DMG and IPA files under the output directory and report human-readable sizes
+          MACOS_FILE=$(find output -type f -iname "*.dmg" -print -quit || true)
+          if [ -n "${MACOS_FILE:-}" ]; then
+            echo "Found macOS file: $MACOS_FILE"
+            MACOS_SIZE=$(du -h "$MACOS_FILE" | cut -f1)
+          else
+            # fallback: try to find any file whose name contains Paicord-macOS or the artifact zip
+            MACOS_FILE_ALT=$(find output -type f -iname "Paicord-macOS*" -print -quit || true)
+            if [ -n "${MACOS_FILE_ALT:-}" ]; then
+              echo "Found macOS alternate file: $MACOS_FILE_ALT"
+              MACOS_SIZE=$(du -h "$MACOS_FILE_ALT" | cut -f1)
+            else
+              MACOS_SIZE="unknown"
+            fi
+          fi
+
+          IOS_FILE=$(find output -type f -iname "*.ipa" -print -quit || true)
+          if [ -n "${IOS_FILE:-}" ]; then
+            echo "Found iOS file: $IOS_FILE"
+            IOS_SIZE=$(du -h "$IOS_FILE" | cut -f1)
+          else
+            IOS_FILE_ALT=$(find output -type f -iname "Paicord-iOS*" -print -quit || true)
+            if [ -n "${IOS_FILE_ALT:-}" ]; then
+              echo "Found iOS alternate file: $IOS_FILE_ALT"
+              IOS_SIZE=$(du -h "$IOS_FILE_ALT" | cut -f1)
+            else
+              IOS_SIZE="unknown"
+            fi
+          fi
+
+          # Nightly.link URLs
+          NIGHTLY_MAC_URL="https://nightly.link/llsc12/Paicord/actions/runs/${GITHUB_RUN_ID}/Paicord-macOS.zip?h=${NIGHTLY_LINK_TOKEN}"
+          NIGHTLY_IOS_URL="https://nightly.link/llsc12/Paicord/actions/runs/${GITHUB_RUN_ID}/Paicord-iOS.zip?h=${NIGHTLY_LINK_TOKEN}"
+
+          # Get commit author avatar
+          author_api="https://api.github.com/users/$COMMIT_AUTHOR_LOGIN"
+          author_icon=$(curl -s "$author_api" | awk -F'"' '/"avatar_url"/ {print $4; exit}' || echo "")
+
+          # Compose payload
+          cat > payload.json <<EOF
+          {
+            "content": null,
+            "embeds": [
+              {
+                "title": "Paicord Build",
+                "description": "Commit ${COMMIT_HASH}\n\n${COMMIT_TITLE}\n${COMMIT_DESC}",
+                "url": "https://github.com/${REPO}/commit/${COMMIT_HASH}",
+                "color": 4063045,
+                "fields": [
+                  {
+                    "name": "macOS",
+                    "value": "[Download (${MACOS_SIZE})](${NIGHTLY_MAC_URL})",
+                    "inline": true
+                  },
+                  {
+                    "name": "iOS",
+                    "value": "[Download (${IOS_SIZE})](${NIGHTLY_IOS_URL})",
+                    "inline": true
+                  }
+                ],
+                "author": {
+                  "name": "${COMMIT_AUTHOR}",
+                  "url": "https://github.com/${COMMIT_AUTHOR_LOGIN}",
+                  "icon_url": "${author_icon}"
+                }
+              }
+            ],
+            "username": "Paicord Builds",
+            "attachments": []
+          }
+          EOF
+
+          # Send and capture response
+          RESPONSE_FILE=response.json
+          HTTP_STATUS=$(curl -sS -o "$RESPONSE_FILE" -w "%{http_code}" -H "Content-Type: application/json" -X POST -d @payload.json "$DISCORD_WEBHOOK_URL" || echo "000")
+
+          echo "HTTP status: $HTTP_STATUS"
+          echo "Response body:"
+          cat "$RESPONSE_FILE" || true
+
+          case "$HTTP_STATUS" in
+            2*)
+              echo "Discord webhook POST succeeded."
+              ;;
+            000)
+              echo "ERROR: curl failed to execute." >&2
+              exit 1
+              ;;
+            *)
+              echo "ERROR: Discord webhook POST failed with status $HTTP_STATUS" >&2
+              exit 1
+              ;;
+          esac
+
   publish-updates:
-    name: Publish updates (use Sparkle tools, create GitHub Release)
+    name: Publish updates, release
     runs-on: macos-26
     needs: [build-macos, build-ios]
     env:
@@ -326,6 +469,15 @@ jobs:
           printf '%s' "$SPARKLE_PRIVATE_KEY" > sparkle_private.key
           chmod 600 sparkle_private.key
           ls -al sparkle_private.key
+
+      - name: Make Sparkle tools executable
+        run: |
+          chmod +x \
+            sparklebins/generate_appcast \
+            sparklebins/generate_keys \
+            sparklebins/sign_update \
+            sparklebins/BinaryDelta
+
 
       - name: Generate appcast
         run: |
