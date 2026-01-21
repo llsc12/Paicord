@@ -194,6 +194,8 @@ jobs:
           # Show downloaded artifacts for debugging
           echo "Contents of output directory:"
           ls -al output || true
+          echo "Recursive listing:"
+          ls -alR output || true
 
           # Commit info
           COMMIT_HASH=$(git rev-parse --short HEAD)
@@ -203,8 +205,35 @@ jobs:
           COMMIT_AUTHOR_LOGIN=${{ github.actor }}
 
           # Artifact sizes (download-artifact)
-          MACOS_SIZE=$(ls -lh output | awk '/Paicord-macOS/ {print $5; exit}' || echo "unknown")
-          IOS_SIZE=$(ls -lh output | awk '/Paicord-iOS/ {print $5; exit}' || echo "unknown")
+          # Find the DMG and IPA files under the output directory and report human-readable sizes
+          MACOS_FILE=$(find output -type f -iname "*.dmg" -print -quit || true)
+          if [ -n "${MACOS_FILE:-}" ]; then
+            echo "Found macOS file: $MACOS_FILE"
+            MACOS_SIZE=$(du -h "$MACOS_FILE" | cut -f1)
+          else
+            # fallback: try to find any file whose name contains Paicord-macOS or the artifact zip
+            MACOS_FILE_ALT=$(find output -type f -iname "Paicord-macOS*" -print -quit || true)
+            if [ -n "${MACOS_FILE_ALT:-}" ]; then
+              echo "Found macOS alternate file: $MACOS_FILE_ALT"
+              MACOS_SIZE=$(du -h "$MACOS_FILE_ALT" | cut -f1)
+            else
+              MACOS_SIZE="unknown"
+            fi
+          fi
+
+          IOS_FILE=$(find output -type f -iname "*.ipa" -print -quit || true)
+          if [ -n "${IOS_FILE:-}" ]; then
+            echo "Found iOS file: $IOS_FILE"
+            IOS_SIZE=$(du -h "$IOS_FILE" | cut -f1)
+          else
+            IOS_FILE_ALT=$(find output -type f -iname "Paicord-iOS*" -print -quit || true)
+            if [ -n "${IOS_FILE_ALT:-}" ]; then
+              echo "Found iOS alternate file: $IOS_FILE_ALT"
+              IOS_SIZE=$(du -h "$IOS_FILE_ALT" | cut -f1)
+            else
+              IOS_SIZE="unknown"
+            fi
+          fi
 
           # Nightly.link URLs
           NIGHTLY_MAC_URL="https://nightly.link/llsc12/Paicord/actions/runs/${GITHUB_RUN_ID}/Paicord-macOS.zip?h=${NIGHTLY_LINK_TOKEN}"
