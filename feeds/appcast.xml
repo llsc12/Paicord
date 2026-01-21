@@ -1,0 +1,14 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Paicord</title>
+        <item>
+            <title>0.1.0</title>
+            <pubDate>Wed, 21 Jan 2026 19:31:54 +0000</pubDate>
+            <sparkle:version>1</sparkle:version>
+            <sparkle:shortVersionString>0.1.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.4</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/llsc12/Paicord/releases/download/Paicord-macOS-cafb165.dmg" length="43225307" type="application/octet-stream" sparkle:edSignature="3wGz6F6qDdnR9ZuiCEMJN3gaCL6Li+DmeqQ0JK+GYTObv4mNJmMjPNOT3B4KJ2qfWCWPFIY56sc6OBDtYzq4Bg=="/>
+        </item>
+    </channel>
+</rss>
