@@ -10,8 +10,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # fallback value. just in case.
-  SHORT_VERSION: "0.1.0"
   UPDATES_BRANCH: "updates"
 
 jobs:
@@ -56,9 +54,6 @@ jobs:
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$INFO_PLIST_PATH" || \
             /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $BUILD_NUMBER" "$INFO_PLIST_PATH"
 
-          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString ${SHORT_VERSION}" "$INFO_PLIST_PATH" || \
-            /usr/libexec/PlistBuddy -c "Add :CFBundleShortVersionString string ${SHORT_VERSION}" "$INFO_PLIST_PATH"
-
           /usr/libexec/PlistBuddy -c "Set :GitCommit $COMMIT_HASH" "$INFO_PLIST_PATH" || \
             /usr/libexec/PlistBuddy -c "Add :GitCommit string $COMMIT_HASH" "$INFO_PLIST_PATH"
 
@@ -83,7 +78,6 @@ jobs:
             -derivedDataPath build \
             CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO \
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
-            MARKETING_VERSION="${SHORT_VERSION}"
 
           mkdir -p dist/dmg
           cp -R build/Build/Products/Release/Paicord.app dist/dmg/Paicord.app
@@ -194,9 +188,6 @@ jobs:
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$IOS_INFO_PLIST" || \
             /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $BUILD_NUMBER" "$IOS_INFO_PLIST"
 
-          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString ${SHORT_VERSION}" "$IOS_INFO_PLIST" || \
-            /usr/libexec/PlistBuddy -c "Add :CFBundleShortVersionString string ${SHORT_VERSION}" "$IOS_INFO_PLIST"
-
           /usr/libexec/PlistBuddy -c "Set :GitCommit $COMMIT_HASH" "$IOS_INFO_PLIST" || \
             /usr/libexec/PlistBuddy -c "Add :GitCommit string $COMMIT_HASH" "$IOS_INFO_PLIST"
 
@@ -237,7 +228,6 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
-            MARKETING_VERSION="${SHORT_VERSION}"
 
       - name: Archive .ipa
         run: |
@@ -582,13 +572,11 @@ jobs:
             "commit": "${COMMIT_HASH}",
             "published_at": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
             "mac": {
-              "version": "${GITHUB_RUN_NUMBER:-0}",
-              "short_version": "${SHORT_VERSION}",
+              "version": "${BUILD_NUMBER}",
               "url": "${MAC_URL}"
             },
             "ios": {
-              "version": "${GITHUB_RUN_NUMBER:-0}",
-              "short_version": "${SHORT_VERSION}",
+              "version": "${BUILD_NUMBER}",
               "url": "${IOS_URL}"
             }
           }
