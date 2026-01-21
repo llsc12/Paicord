@@ -10,9 +10,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-macos:
+    name: Build macOS
     runs-on: macos-26
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -21,28 +21,14 @@ jobs:
         run: |
           defaults write com.apple.dt.Xcode IDESkipMacroFingerprintValidation -bool YES
 
-      - name: Install ldid
-        run: |
-          # Only install ldid if it's not already available
-          if command -v ldid >/dev/null 2>&1; then
-            echo "ldid already installed at: $(command -v ldid)"
-            ldid --version || true
-          else
-            echo "ldid not found — downloading and installing"
-            curl -LO https://github.com/ProcursusTeam/ldid/releases/latest/download/ldid_macosx_x86_64
-            sudo install -m755 ldid_macosx_x86_64 /usr/local/bin/ldid
-            rm -f ldid_macosx_x86_64
-            echo "ldid installed at: $(command -v ldid)"
-          fi
-
-      - name: Cache Xcode DerivedData
+      - name: Cache Xcode DerivedData (macOS)
         uses: actions/cache@v4
         with:
           path: |
             build
-          key: deriveddata-${{ hashFiles('.github/workflows/build.yml') }}
+          key: deriveddata-macos-${{ hashFiles('.github/workflows/build.yml') }}
           restore-keys: |
-            deriveddata
+            deriveddata-macos
 
       - name: Build macOS .app
         run: |
@@ -62,7 +48,45 @@ jobs:
           rm -rf Paicord.app
           cd ..
 
-      # iOS build (.ipa)
+      - name: Upload macOS Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Paicord-macOS
+          path: output/Paicord-macOS.zip
+
+  build-ios:
+    name: Build iOS
+    runs-on: macos-26
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Disable Swift macro plugin consent prompt
+        run: |
+          defaults write com.apple.dt.Xcode IDESkipMacroFingerprintValidation -bool YES
+
+      - name: Install ldid
+        run: |
+          if command -v ldid >/dev/null 2>&1; then
+            echo "ldid already installed at: $(command -v ldid)"
+            ldid --version || true
+          else
+            echo "ldid not found — downloading and installing"
+            curl -LO https://github.com/ProcursusTeam/ldid/releases/latest/download/ldid_macosx_x86_64
+            sudo install -m755 ldid_macosx_x86_64 /usr/local/bin/ldid
+            rm -f ldid_macosx_x86_64
+            echo "ldid installed at: $(command -v ldid)"
+          fi
+
+      - name: Cache Xcode DerivedData (iOS)
+        uses: actions/cache@v4
+        with:
+          path: |
+            build
+          key: deriveddata-ios-${{ hashFiles('.github/workflows/build.yml') }}
+          restore-keys: |
+            deriveddata-ios
+
       - name: Build iOS .ipa
         run: |
           xcodebuild -workspace Paicord.xcworkspace \
@@ -83,126 +107,105 @@ jobs:
           rm -rf Payload "$STAGE_DIR"
           mkdir -p "$STAGE_DIR/Payload"
           cp -R "$APP_PATH" "$STAGE_DIR/Payload/Paicord.app"
-          # Strip binary
           if command -v strip; then
             strip "$STAGE_DIR/Payload/Paicord.app/Paicord" || true
           fi
-          # Entitlements (if present)
           if [ -f Paicord/Paicord.entitlements ]; then
             ldid -SPaicord/Paicord.entitlements "$STAGE_DIR/Payload/Paicord.app/"
           else
             ldid -S"$STAGE_DIR/Payload/Paicord.app/"
           fi
-          # Remove possible _CodeSignature
           rm -rf "$STAGE_DIR/Payload/Paicord.app/_CodeSignature"
-          # Zip as IPA
           cd "$STAGE_DIR"
           zip -r9 ../Paicord.ipa Payload
           cd ..
           mkdir -p output
           mv Paicord.ipa output/Paicord-iOS.ipa
 
-      - name: Upload macOS Artifact
-        id: upload-macos
-        uses: actions/upload-artifact@v4
-        with:
-          name: Paicord-macOS
-          path: output/Paicord-macOS.zip
-
       - name: Upload iOS Artifact
-        id: upload-ios
         uses: actions/upload-artifact@v4
         with:
           name: Paicord-iOS
           path: output/Paicord-iOS.ipa
 
-      # Gather commit info and artifact sizes
-      - name: Gather Info for Discord Embed
-        env:
-          NIGHTLY_LINK_TOKEN: ${{ secrets.NIGHTLY_LINK_TOKEN }}
-        id: info
+  notify:
+    name: Notify Discord
+    runs-on: ubuntu-latest
+    needs: [build-macos, build-ios]
+    env:
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      NIGHTLY_LINK_TOKEN: ${{ secrets.NIGHTLY_LINK_TOKEN }}
+      REPO: ${{ github.repository }}
+    steps:
+      - name: Checkout (for git info)
+        uses: actions/checkout@v4
+
+      - name: Download macOS artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: Paicord-macOS
+          path: output
+
+      - name: Download iOS artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: Paicord-iOS
+          path: output
+
+      - name: Gather Info and notify Discord
+        id: notify
         run: |
+          set -e
           # Commit info
-          echo "commit_hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-          echo "commit_title=$(git log -1 --pretty=%s)" >> $GITHUB_OUTPUT
-          echo "commit_desc=$(git log -1 --pretty=%b)" >> $GITHUB_OUTPUT
-          echo "commit_author=$(git log -1 --pretty=%an)" >> $GITHUB_OUTPUT
-          echo "commit_author_login=${{ github.actor }}" >> $GITHUB_OUTPUT
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          COMMIT_TITLE=$(git log -1 --pretty=%s)
+          COMMIT_DESC=$(git log -1 --pretty=%b)
+          COMMIT_AUTHOR=$(git log -1 --pretty=%an)
+          COMMIT_AUTHOR_LOGIN=${{ github.actor }}
 
-          # Artifact sizes
-          macos_size=$(ls -lh output/Paicord-macOS.zip | awk '{print $5}')
-          echo "macos_size=$macos_size" >> $GITHUB_OUTPUT
-          ios_size=$(ls -lh output/Paicord-iOS.ipa | awk '{print $5}')
-          echo "ios_size=$ios_size" >> $GITHUB_OUTPUT
+          # Artifact sizes (downloaded by download-artifact)
+          MACOS_SIZE=$(ls -lh output | awk '/Paicord-macOS/ {print $5; exit}')
+          IOS_SIZE=$(ls -lh output | awk '/Paicord-iOS/ {print $5; exit}')
 
-          # Nightly.link URLs for artifacts
+          # Nightly.link URLs (same pattern as before)
           nightly_mac_url="https://nightly.link/llsc12/Paicord/actions/runs/${GITHUB_RUN_ID}/Paicord-macOS.zip?h=${NIGHTLY_LINK_TOKEN}"
           nightly_ios_url="https://nightly.link/llsc12/Paicord/actions/runs/${GITHUB_RUN_ID}/Paicord-iOS.zip?h=${NIGHTLY_LINK_TOKEN}"
-          echo "nightly_mac_url=$nightly_mac_url" >> $GITHUB_OUTPUT
-          echo "nightly_ios_url=$nightly_ios_url" >> $GITHUB_OUTPUT
 
-      # Send to Discord
-      - name: Notify Discord Webhook
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          NIGHTLY_MAC_URL: ${{ steps.info.outputs.nightly_mac_url }}
-          NIGHTLY_IOS_URL: ${{ steps.info.outputs.nightly_ios_url }}
-          MACOS_SIZE: ${{ steps.info.outputs.macos_size }}
-          IOS_SIZE: ${{ steps.info.outputs.ios_size }}
-          COMMIT_HASH: ${{ steps.info.outputs.commit_hash }}
-          COMMIT_TITLE: ${{ steps.info.outputs.commit_title }}
-          COMMIT_DESC: ${{ steps.info.outputs.commit_desc }}
-          COMMIT_AUTHOR: ${{ steps.info.outputs.commit_author }}
-          COMMIT_AUTHOR_LOGIN: ${{ steps.info.outputs.commit_author_login }}
-          REPO: ${{ github.repository }}
-        run: |
-          # Get commit author avatar
+          # Get commit author avatar (use GitHub API)
           author_api="https://api.github.com/users/$COMMIT_AUTHOR_LOGIN"
-          author_icon=$(curl -s $author_api | grep '"avatar_url"' | head -1 | cut -d '"' -f4)
+          author_icon=$(curl -s "$author_api" | grep '"avatar_url"' | head -1 | cut -d '"' -f4 || echo "")
 
-          # Compose Discord embed JSON
-          cat <<'EOF' > payload.json
-          {
-            "content": null,
-            "embeds": [
-              {
-                "title": "Paicord Build",
-                "description": "Commit ${COMMIT_HASH}\n\n${COMMIT_TITLE}\n${COMMIT_DESC}",
-                "url": "https://github.com/${REPO}/commit/${COMMIT_HASH}",
-                "color": 4063045,
-                "fields": [
-                  {
-                    "name": "macOS",
-                    "value": "[Download (${MACOS_SIZE})](${NIGHTLY_MAC_URL})",
-                    "inline": true
-                  },
-                  {
-                    "name": "iOS",
-                    "value": "[Download (${IOS_SIZE})](${NIGHTLY_IOS_URL})",
-                    "inline": true
+          # Compose and send Discord payload (use unquoted heredoc so variables expand)
+          cat > payload.json <<EOF
+            {
+              "content": null,
+              "embeds": [
+                {
+                  "title": "Paicord Build",
+                  "description": "Commit ${COMMIT_HASH}\n\n${COMMIT_TITLE}\n${COMMIT_DESC}",
+                  "url": "https://github.com/${REPO}/commit/${COMMIT_HASH}",
+                  "color": 4063045,
+                  "fields": [
+                    {
+                      "name": "macOS",
+                      "value": "[Download (${MACOS_SIZE})](${nightly_mac_url})",
+                      "inline": true
+                    },
+                    {
+                      "name": "iOS",
+                      "value": "[Download (${IOS_SIZE})](${nightly_ios_url})",
+                      "inline": true
+                    }
+                  ],
+                  "author": {
+                    "name": "${COMMIT_AUTHOR}",
+                    "url": "https://github.com/${COMMIT_AUTHOR_LOGIN}",
+                    "icon_url": "${author_icon}"
                   }
-                ],
-                "author": {
-                  "name": "${COMMIT_AUTHOR}",
-                  "url": "https://github.com/${COMMIT_AUTHOR_LOGIN}",
-                  "icon_url": "${author_icon}"
                 }
-              }
-            ],
-            "username": "Paicord Builds",
-            "attachments": []
-          }
-          EOF
-          # Now replace placeholders in the JSON (since heredoc is single quoted)
-          sed -i '' "s|\${COMMIT_HASH}|$COMMIT_HASH|g" payload.json
-          sed -i '' "s|\${COMMIT_TITLE}|$COMMIT_TITLE|g" payload.json
-          sed -i '' "s|\${COMMIT_DESC}|$COMMIT_DESC|g" payload.json
-          sed -i '' "s|\${REPO}|$REPO|g" payload.json
-          sed -i '' "s|\${MACOS_SIZE}|$MACOS_SIZE|g" payload.json
-          sed -i '' "s|\${IOS_SIZE}|$IOS_SIZE|g" payload.json
-          sed -i '' "s|\${COMMIT_AUTHOR}|$COMMIT_AUTHOR|g" payload.json
-          sed -i '' "s|\${COMMIT_AUTHOR_LOGIN}|$COMMIT_AUTHOR_LOGIN|g" payload.json
-          sed -i '' "s|\${author_icon}|$author_icon|g" payload.json
-          sed -i '' "s|\${NIGHTLY_MAC_URL}|$NIGHTLY_MAC_URL|g" payload.json
-          sed -i '' "s|\${NIGHTLY_IOS_URL}|$NIGHTLY_IOS_URL|g" payload.json
+              ],
+              "username": "Paicord Builds",
+              "attachments": []
+            }
+            EOF
           curl -H "Content-Type: application/json" -X POST -d @payload.json "$DISCORD_WEBHOOK_URL"
