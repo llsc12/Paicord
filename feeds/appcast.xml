@@ -4,11 +4,11 @@
         <title>Paicord</title>
         <item>
             <title>0.1.0</title>
-            <pubDate>Wed, 21 Jan 2026 23:54:00 +0000</pubDate>
-            <sparkle:version>255</sparkle:version>
+            <pubDate>Thu, 22 Jan 2026 00:18:37 +0000</pubDate>
+            <sparkle:version>256</sparkle:version>
             <sparkle:shortVersionString>0.1.0</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.4</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/llsc12/Paicord/releases/download/Paicord-macOS-0cb0e06.dmg" length="43225327" type="application/octet-stream" sparkle:edSignature="THBVlfKSmVrXZwhKCUHfad65Ja3U1l9VcZU06HKctdFz8Zfo63NpVpwyYEJ5ehMOB4+yAwJDeX6nvzKokhJbDw=="/>
+            <enclosure url="https://test.com/llsc12/Paicord/releases/download/Paicord-macOS-632130f.dmg" length="43225298" type="application/octet-stream" sparkle:edSignature="y94FP2e0q18QRQxi88NemUev4szDYUnqwFyD2NE7Ftm5WX0n3jRaBlXPdigoTMTLMPLotmYhZohqe5ukGF9WBQ=="/>
         </item>
     </channel>
 </rss>
