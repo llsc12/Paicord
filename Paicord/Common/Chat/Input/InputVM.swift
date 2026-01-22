@@ -127,7 +127,7 @@ extension ChatView.InputBar {
           case .edit(let message):
             content = message.content
             uploadItems = [] // cant do anything other than edit text when editing a message
-          case .reply(_):
+          case .reply:
             break
           }
         }

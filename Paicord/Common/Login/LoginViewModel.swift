@@ -31,7 +31,8 @@ final class LoginViewModel {
           guard let ticket = event.ticket else { break }
           do {
             let token = try await remoteAuthGatewayManager.exchange(
-              ticket: ticket
+              ticket: ticket,
+              client: loginClient
             )
             let user = try await TokenStore.getSelf(token: token)
             gw.accounts.addAccount(token: token, user: user)

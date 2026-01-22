@@ -145,10 +145,15 @@ class PresenceStore: DiscordDataStore {
   }
 
   func setPresence(
-    status: Gateway.Status,
-    activities: [Gateway.Activity] = [],
+    status: Gateway.Status? = nil,
+    activities: [Gateway.Activity]? = nil,
   ) async {
     guard let gateway = gateway?.gateway else { return }
+    if status == nil && activities == nil {
+      return
+    }
+    let status = status ?? currentClientStatus
+    let activities = activities ?? self.currentClientStatusActivity.map { [$0] } ?? []
     await gateway.updatePresence(
       payload: .init(
         activities: activities,

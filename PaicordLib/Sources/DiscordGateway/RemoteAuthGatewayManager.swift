@@ -846,8 +846,7 @@ extension RemoteAuthGatewayManager {
   /// Use this to exchange a remote auth ticket for a Discord auth token.
   /// - Parameter ticket: The remote auth ticket received from the gateway.
   /// - Returns: A token.
-  public func exchange(ticket: String) async throws -> Secret {
-    let client = await DefaultDiscordClient(authentication: .userNone)
+  public func exchange(ticket: String, client: DiscordClient) async throws -> Secret {
     let req = try await client.exchangeRemoteAuthTicket(
       payload: .init(ticket: ticket)
     )
