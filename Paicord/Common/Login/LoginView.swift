@@ -6,8 +6,10 @@
 //  Copyright © 2025 Lakhan Lothiyi.
 //
 
+import CoreImage
+import CoreImage.CIFilterBuiltins
 import PaicordLib
-import SwiftUI
+import SwiftUIX
 
 struct LoginView: View {
   @Environment(\.gateway) var gw
@@ -34,73 +36,78 @@ struct LoginView: View {
     }
   }
   var body: some View {
-    ZStack {
-      MeshGradientBackground()
-        .ignoresSafeArea()
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    IntrinsicSizeReader { size in
+      ZStack {
+        MeshGradientBackground()
+          .ignoresSafeArea()
+          .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-      if viewModel.gw != nil {
-        VStack {
-          if viewModel.gw.accounts.accounts.isEmpty
-            || viewModel.addingNewAccount
-          {
-            if let mfa = viewModel.handleMFA,
-              let fingerprint = viewModel.fingerprint
+        if viewModel.gw != nil {
+          VStack {
+            if viewModel.gw.accounts.accounts.isEmpty
+              || viewModel.addingNewAccount
             {
-              MFAView(
-                authentication: mfa,
-                fingerprint: fingerprint,
-                loginClient: viewModel.loginClient,
-                chosenMethod: $chosenMFAMethod,
-                onFinish: viewModel.finishMFA(token:)
-              )
-            } else {
-              LoginForm(
-                viewModel: viewModel,
-                loginFocused: $loginFocused,
-                passwordFocused: $passwordFocused
-              )
-              .overlay(alignment: .topLeading) {
-                if !viewModel.gw.accounts.accounts.isEmpty {
-                  Button {
-                    withAnimation {
-                      viewModel.addingNewAccount = false
+              if let mfa = viewModel.handleMFA,
+                let fingerprint = viewModel.fingerprint
+              {
+                MFAView(
+                  authentication: mfa,
+                  fingerprint: fingerprint,
+                  loginClient: viewModel.loginClient,
+                  chosenMethod: $chosenMFAMethod,
+                  onFinish: viewModel.finishMFA(token:)
+                )
+              } else {
+                LoginForm(
+                  viewModel: viewModel,
+                  loginFocused: $loginFocused,
+                  passwordFocused: $passwordFocused,
+                  size: size
+                )
+                .overlay(alignment: .topLeading) {
+                  if !viewModel.gw.accounts.accounts.isEmpty {
+                    Button {
+                      withAnimation {
+                        viewModel.addingNewAccount = false
+                      }
+                    } label: {
+                      Image(systemName: "chevron.left")
+                        .imageScale(.large)
+                        .padding(8)
+                        .background(theme.common.primaryButtonBackground)
+                        .clipShape(.circle)
                     }
-                  } label: {
-                    Image(systemName: "chevron.left")
-                      .imageScale(.large)
-                      .padding(8)
-                      .background(theme.common.primaryButtonBackground)
-                      .clipShape(.circle)
+                    .buttonStyle(.borderless)
                   }
-                  .buttonStyle(.borderless)
                 }
               }
+            } else {
+              AccountPicker(
+                accounts: viewModel.gw.accounts.accounts,
+                onSelect: { viewModel.gw.accounts.currentAccountID = $0 },
+                onAdd: { withAnimation { viewModel.addingNewAccount = true } }
+              )
             }
-          } else {
-            AccountPicker(
-              accounts: viewModel.gw.accounts.accounts,
-              onSelect: { viewModel.gw.accounts.currentAccountID = $0 },
-              onAdd: { withAnimation { viewModel.addingNewAccount = true } }
-            )
           }
+          .padding(20)
+          .background(theme.common.tertiaryBackground.opacity(0.75))
+          .clipShape(.rounded)
+          .shadow(radius: 10)
+          .padding(5)
+          .transition(.scale(scale: 0.8).combined(with: .opacity))
+        } else {
+          ProgressView()
         }
-        .padding(20)
-        .frame(maxWidth: 400)
-        .background(theme.common.tertiaryBackground.opacity(0.75))
-        .clipShape(.rounded)
-        .shadow(radius: 10)
-        .padding(5)
-        .transition(.scale(scale: 0.8).combined(with: .opacity))
-      } else {
-        ProgressView()
       }
+      .animation(.default, value: viewModel.gw == nil)
+      .animation(.default, value: viewModel.handleMFA == nil)
+      .animation(.default, value: viewModel.gw?.accounts.accounts.isEmpty)
+      .animation(.default, value: viewModel.addingNewAccount)
+      .animation(.default, value: viewModel.raUser)
+      .animation(.default, value: viewModel.raFingerprint)
+      .animation(.default, value: chosenMFAMethod)
+      .animation(.default, value: size)
     }
-    .animation(.default, value: viewModel.gw == nil)
-    .animation(.default, value: viewModel.handleMFA == nil)
-    .animation(.default, value: viewModel.gw?.accounts.accounts.isEmpty)
-    .animation(.default, value: viewModel.addingNewAccount)
-    .animation(.default, value: chosenMFAMethod)
   }
 }
 
@@ -108,60 +115,167 @@ struct LoginView: View {
 
 struct LoginForm: View {
   @Environment(\.theme) var theme
+  @Environment(\.horizontalSizeClass) var horizontalSizeClass
+  var viewWidthValidForQRCode: Bool {
+    (self.size?.width ?? .infinity) > 600
+  }
   @Bindable var viewModel: LoginViewModel
   @FocusState.Binding var loginFocused: Bool
   @FocusState.Binding var passwordFocused: Bool
+  var size: CGSize?
 
   var body: some View {
-    VStack {
-      Text("Welcome Back!")
-        .font(.largeTitle)
-        .padding(.bottom, 4)
-      Text("We're so excited to see you again!")
-        .padding(.bottom)
+    HStack(spacing: 20) {
+      VStack {
+        Text("Welcome Back!")
+          .font(.largeTitle)
+          .padding(.bottom, 4)
+        Text("We're so excited to see you again!")
+          .padding(.bottom)
 
-      VStack(alignment: .leading, spacing: 5) {
-        Text("Email or Phone Number")
-        TextField("", text: $viewModel.login)
-          .textFieldStyle(.plain)
-          .padding(10)
-          .frame(maxWidth: .infinity)
-          .focused($loginFocused)
-          .background(theme.common.primaryBackground.opacity(0.75))
-          .clipShape(.rounded)
-          .overlay {
-            RoundedRectangle()
-              .stroke(
-                loginFocused ? theme.common.primaryButton : Color.clear,
-                lineWidth: 1
-              )
-              .fill(.clear)
-          }
-          .padding(.bottom, 10)
+        VStack(alignment: .leading, spacing: 5) {
+          Text("Email or Phone Number")
+          TextField("", text: $viewModel.login)
+            .textFieldStyle(.plain)
+            .padding(10)
+            .frame(maxWidth: .infinity)
+            .focused($loginFocused)
+            .background(theme.common.primaryBackground.opacity(0.75))
+            .clipShape(.rounded)
+            .overlay {
+              RoundedRectangle()
+                .stroke(
+                  loginFocused ? theme.common.primaryButton : Color.clear,
+                  lineWidth: 1
+                )
+                .fill(.clear)
+            }
+            .padding(.bottom, 10)
 
-        Text("Password")
-        SecureField("", text: $viewModel.password)
-          .textFieldStyle(.plain)
-          .padding(10)
-          .frame(maxWidth: .infinity)
-          .focused($passwordFocused)
-          .background(theme.common.primaryBackground.opacity(0.75))
-          .clipShape(.rect(cornerSize: .init(10)))
-          .overlay {
-            RoundedRectangle()
-              .stroke(
-                passwordFocused
-                  ? theme.common.primaryButton : Color.clear,
-                lineWidth: 1
-              )
-              .fill(.clear)
-          }
+          Text("Password")
+          SecureField("", text: $viewModel.password)
+            .textFieldStyle(.plain)
+            .padding(10)
+            .frame(maxWidth: .infinity)
+            .focused($passwordFocused)
+            .background(theme.common.primaryBackground.opacity(0.75))
+            .clipShape(.rect(cornerSize: .init(10)))
+            .overlay {
+              RoundedRectangle()
+                .stroke(
+                  passwordFocused
+                    ? theme.common.primaryButton : Color.clear,
+                  lineWidth: 1
+                )
+                .fill(.clear)
+            }
 
-        ForgotPasswordButton(viewModel: viewModel)
-          .padding(.bottom, 10)
+          ForgotPasswordButton(viewModel: viewModel)
+            .padding(.bottom, 10)
+        }
+
+        LoginButton(viewModel: viewModel)
       }
+      .maxWidth(360)
 
-      LoginButton(viewModel: viewModel)
+      if horizontalSizeClass == .regular, self.viewWidthValidForQRCode {
+        // qr code login
+        VStack {
+          // qr code url
+          if let user = viewModel.raUser {
+            VStack(spacing: 15) {
+              Profile.Avatar(member: nil, user: user)
+                .frame(maxWidth: 100)
+
+              Text("Check your phone!")
+                .font(.title2.weight(.semibold))
+
+              Text("Logging in as \(user.username ?? "Unknown")")
+
+              AsyncButton("Not me, start over") {
+                viewModel.raUser = nil
+                viewModel.raFingerprint = nil
+                await viewModel.remoteAuthGatewayManager.disconnect()
+                await viewModel.remoteAuthGatewayManager.connect()
+              } catch: { error in
+                viewModel.appState.error = error
+              }
+            }
+            .padding(.horizontal)
+            .transition(.blurReplace)
+          } else if let fingerprint = viewModel.raFingerprint {
+            let url = "https://discord.com/ra/" + fingerprint
+            VStack(spacing: 15) {
+              QRCodeView(data: url)
+                .clipShape(.rect(cornerSize: .init(4), style: .continuous))
+                .frame(width: 150, height: 150)
+
+              Text("Log in with QR Code")
+                .font(.title.weight(.semibold))
+
+              Text(
+                "Scan this with the Paicord or Discord mobile app to log in instantly."
+              )
+              .multilineTextAlignment(.center)
+            }
+            .padding(.horizontal)
+            .transition(.blurReplace)
+          } else {
+            ProgressView()
+              .frame(width: 150, height: 150)
+          }
+        }
+        .maxWidth(280)
+        .transition(.blurReplace)
+      }
+    }
+  }
+
+  struct QRCodeView: View {
+    let data: String
+    @State var image: CGImage? = nil
+
+    var body: some View {
+      VStack {
+        if let image {
+          Image(cgImage: image)
+            .resizable()
+            .interpolation(.none)
+            .scaledToFit()
+        } else {
+          ProgressView()
+        }
+      }
+      .task(id: data) {
+        var filter: CIFilter
+        if #available(iOS 26.0, macOS 26.0, *) {
+          let rfilter = CIFilter.roundedQRCodeGenerator()
+          rfilter.roundedData = true
+          rfilter.roundedMarkers = 2
+          rfilter.message = data.data(using: .ascii) ?? Data()
+          rfilter.correctionLevel = "L"
+          filter = rfilter
+        } else {
+          let nfilter = CIFilter.qrCodeGenerator()
+          nfilter.message = data.data(using: .ascii) ?? Data()
+          nfilter.correctionLevel = "L"
+          filter = nfilter
+        }
+
+        if let outputImage = filter.outputImage {
+          let context = CIContext()
+          if let cgImage = context.createCGImage(
+            outputImage,
+            from: outputImage.extent
+          ) {
+            self.image = cgImage
+          } else {
+            self.image = nil
+          }
+        } else {
+          self.image = nil
+        }
+      }
     }
   }
 }

@@ -14,6 +14,44 @@ final class LoginViewModel {
   init() {
 
     Task { await fingerprintSetup() }
+
+    Task {
+      await remoteAuthGatewayManager.connect()
+
+      for await event in await remoteAuthGatewayManager.events {
+        switch event.op {
+        case .pending_remote_init:
+          // remote auth started
+          self.raFingerprint = event.fingerprint
+        case .pending_ticket:
+          // qr code was scanned
+          self.raUser = event.user_payload?.toPartialUser()
+        case .pending_login:
+          // login completed
+          guard let ticket = event.ticket else { break }
+          do {
+            let token = try await remoteAuthGatewayManager.exchange(
+              ticket: ticket
+            )
+            let user = try await TokenStore.getSelf(token: token)
+            gw.accounts.addAccount(token: token, user: user)
+            
+            self.raUser = nil
+            self.raFingerprint = nil
+            await remoteAuthGatewayManager.disconnect()
+          } catch {
+            self.appState.error = error
+          }
+        case .cancel:
+          // login cancelled, restart the process
+          self.raUser = nil
+          self.raFingerprint = nil
+          await remoteAuthGatewayManager.disconnect()
+          await remoteAuthGatewayManager.connect()
+        default: break
+        }
+      }
+    }
   }
 
   // Necessary stuff
@@ -37,8 +75,12 @@ final class LoginViewModel {
 
   var gw: GatewayStore! = nil  // need to set this in an onAppear
   var appState: PaicordAppState! = nil  // need to set this in an onAppear
-  
-  let remoteAuthGatewayManager
+
+  /// qr code login fingerprint
+  var raUser: PartialUser? = nil
+  var raFingerprint: String? = nil
+
+  let remoteAuthGatewayManager: RemoteAuthGatewayManager = .init()
 
   @MainActor
   func fingerprintSetup() async {

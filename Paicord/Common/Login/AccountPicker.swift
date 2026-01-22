@@ -63,5 +63,6 @@ struct AccountPicker: View {
         .padding(.top, 10)
       }
     }
+    .maxWidth(360)
   }
 }

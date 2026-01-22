@@ -7,7 +7,7 @@
 //
 
 import PaicordLib
-import SwiftUI
+import SwiftUIX
 
 struct MFAView: View {
   let authentication: UserAuthentication
@@ -96,6 +96,7 @@ struct MFAView: View {
       .buttonStyle(.borderless)
     }
     .animation(.default, value: chosenMethod == nil)
+    .maxWidth(360)
   }
 
   func userFriendlyName(for type: Payloads.MFASubmitData.MFAKind) -> some View {

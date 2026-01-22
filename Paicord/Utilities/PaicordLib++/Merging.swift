@@ -505,3 +505,14 @@ extension DiscordChannel.PartialMessage {
     )
   }
 }
+
+extension RemoteAuthGatewayManager.RemoteAuthPayload.UserPayload {
+  func toPartialUser() -> PartialUser {
+    .init(
+      id: .init(self.id),
+      username: self.username,
+      discriminator: self.discriminator,
+      avatar: self.avatar
+    )
+  }
+}
