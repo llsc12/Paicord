@@ -64,7 +64,9 @@ struct PaicordApp: App {
     #endif
   }
 
+  #if canImport(Sparkle)
     private let updaterController: SPUStandardUpdaterController
+  #endif
 
   @Environment(\.openWindow) var openWindow
   @Environment(\.theme) var theme

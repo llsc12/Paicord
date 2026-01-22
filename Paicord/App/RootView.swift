@@ -56,6 +56,7 @@ struct RootView: View {
           }
         }
         .sponsorSheet()
+        .updateSheet()
         .task {
           appState.loadPrevGuild()
           #if os(iOS)
