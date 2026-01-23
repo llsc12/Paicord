@@ -8,6 +8,7 @@
 
 import PaicordLib
 import SwiftUIX
+@_spi(Advanced) import SwiftUIIntrospect
 
 @available(macOS, unavailable)
 struct SmallBaseplate: View {
@@ -22,6 +23,8 @@ struct SmallBaseplate: View {
   var disableSlideover: Bool {
     self.currentTab != .home
   }
+
+  @State private var showSheet = false
 
   var body: some View {
     SlideoverDoubleView(swap: $appState.chatOpen) {
@@ -51,7 +54,25 @@ struct SmallBaseplate: View {
             .tag(CurrentTab.profile)
             .tint(nil)
         }
+        .introspect(.tabView, on: .iOS(.v17...)) { tabBarController in
+          addLongPress(to: tabBarController)
+        }
         .tint(theme.common.tertiaryButton)
+        .onReceive(
+          NotificationCenter.default.publisher(for: .tabBarLongPressed)
+        ) { notification in
+          if let index = notification.object as? Int {
+            // Only profile tab
+            if index == 2 {
+              ImpactGenerator.impact(style: .light)
+              showSheet = true
+            }
+          }
+        }
+        .sheet(isPresented: $showSheet) {
+          ProfileBar.ProfileButtonPopout()
+            .presentationDetents([.medium])
+        }
       }
       .environment(\.guildStore, currentGuildStore)
       .environment(\.channelStore, currentChannelStore)
@@ -113,4 +134,79 @@ struct SmallBaseplate: View {
   enum CurrentTab {
     case home, notifications, profile
   }
+
+  #if os(iOS)
+    func addLongPress(to tabBarController: UITabBarController) {
+      let tabBar = tabBarController.tabBar
+      tabBar.layoutIfNeeded()
+
+      let buttons = tabBar.subviews
+        .compactMap { $0 as? UIControl }
+        .sorted { $0.frame.minX < $1.frame.minX }
+
+      for (index, button) in buttons.enumerated() {
+        guard
+          button.gestureRecognizers?
+            .contains(where: { $0 is TabBarLongPressGestureRecognizer }) != true
+        else { continue }
+
+        let recognizer = TabBarLongPressGestureRecognizer(
+          target: LongPressHandler.shared,
+          action: #selector(LongPressHandler.shared.handle(_:))
+        )
+
+        recognizer.minimumPressDuration = 0.2
+
+        button.tag = index
+        button.addGestureRecognizer(recognizer)
+        
+        for existing in button.gestureRecognizers ?? [] {
+          if existing !== recognizer {
+            existing.require(toFail: recognizer)
+          }
+        }
+      }
+    }
+
+    final class TabBarLongPressGestureRecognizer: UILongPressGestureRecognizer {
+
+      override init(target: Any?, action: Selector?) {
+        super.init(target: target, action: action)
+
+        delaysTouchesBegan = true
+        cancelsTouchesInView = true
+      }
+
+      override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent) {
+        if state == .began || state == .changed {
+          state = .ended
+          return
+        }
+
+        super.touchesEnded(touches, with: event)
+      }
+    }
+
+    final class LongPressHandler: NSObject {
+      static let shared = LongPressHandler()
+
+      @objc func handle(_ gesture: UILongPressGestureRecognizer) {
+        guard gesture.state == .began,
+          let view = gesture.view
+        else { return }
+
+        NotificationCenter.default.post(
+          name: .tabBarLongPressed,
+          object: view.tag
+        )
+      }
+    }
+
+  #endif
 }
+
+#if os(iOS)
+  extension Notification.Name {
+    static let tabBarLongPressed = Notification.Name("tabBarLongPressed")
+  }
+#endif
