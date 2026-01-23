@@ -6,6 +6,10 @@ A new Discord client written in SwiftUI, with a goal of feature parity with cust
 >
 > Paicord is still in development! Expect a number of issues or unimplemented features. If you encounter a bug, please create an issue! Additionally, MFA is supported for login, however only TOTP codes are implemented currently. This will be finished soon.
 
+<img width="371" height="298" alt="screenshot of Paicord" src="https://github.com/user-attachments/assets/d6b73ecb-c008-412e-9715-5817954f93f2" />
+
+---
+
 Paicord currently supports sending messages, replying to messages, uploading files and photos, it has partial Discord-flavoured markdown support, partial reactions support, partial embeds support etc.
 
 This list is not exhaustive but the goal for Paicord is to have parity with the official Discord client, excluding unfavourable things like upselling of services. A real feature/todo list will be made eventually. 
