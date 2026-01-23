@@ -32,6 +32,7 @@ struct SettingsView: SettingsContainer {
       devicesSection
       connectionsSection
       clipsSection
+      scanQRSection
     }
 
     SettingsGroup("App Settings", .inline) {

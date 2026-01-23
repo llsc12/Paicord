@@ -83,11 +83,6 @@ struct RootView: View {
     .onDisappear {
       PaicordAppState.instances.removeValue(forKey: appState.id)
     }
-    .onChange(of: gatewayStore.accounts.currentAccountID) {
-      if gatewayStore.accounts.currentAccountID == nil {
-        self.hasLaunchedAlready = false // when logged out, allow connection screen. else connection wont be attempted.
-      }
-    }
     #if os(macOS)
       .introspect(.window, on: .macOS(.v14...)) { window in
         self.window = window
@@ -103,6 +98,12 @@ struct RootView: View {
       .onChange(of: gatewayStore.accounts.currentAccountID) {
         DispatchQueue.main.async {
           updateWindow(window)
+        }
+      }
+    #else
+      .onChange(of: gatewayStore.accounts.currentAccountID) {
+        if gatewayStore.accounts.currentAccountID == nil {
+          self.hasLaunchedAlready = false  // when logged out, allow connection screen. else connection wont be attempted.
         }
       }
     #endif

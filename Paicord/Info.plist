@@ -2,13 +2,13 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>UIDesignRequiresCompatibility</key>
-	<true/>
 	<key>SUEnableAutomaticChecks</key>
 	<true/>
-	<key>SUScheduledCheckInterval</key>
-	<integer>43200</integer>
 	<key>SUFeedURL</key>
 	<string>https://raw.githubusercontent.com/llsc12/Paicord/refs/heads/updates/feeds/appcast.xml</string>
+	<key>SUScheduledCheckInterval</key>
+	<integer>43200</integer>
+	<key>UIDesignRequiresCompatibility</key>
+	<true/>
 </dict>
 </plist>

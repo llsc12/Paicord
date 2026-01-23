@@ -35,6 +35,7 @@ struct AccountPicker: View {
                     .maxHeight(35)
                   Text(account.user.username)
                     .font(.title3)
+                    .lineSpacing(1)
                   Spacer()
                 }
                 .padding(10)

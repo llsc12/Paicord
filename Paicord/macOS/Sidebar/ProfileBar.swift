@@ -213,8 +213,10 @@ struct ProfileBar: View {
                     account.user.global_name
                       ?? account.user.username
                   )
+                  .lineSpacing(1)
                   .bold()
                   Text("@\(account.user.username)")
+                    .lineSpacing(1)
                 }
 
                 Spacer()

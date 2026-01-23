@@ -54,10 +54,11 @@ struct SmallBaseplate: View {
             .tag(CurrentTab.profile)
             .tint(nil)
         }
+        .tint(theme.common.tertiaryButton)
+        #if os(iOS)
         .introspect(.tabView, on: .iOS(.v17...)) { tabBarController in
           addLongPress(to: tabBarController)
         }
-        .tint(theme.common.tertiaryButton)
         .onReceive(
           NotificationCenter.default.publisher(for: .tabBarLongPressed)
         ) { notification in
@@ -73,6 +74,7 @@ struct SmallBaseplate: View {
           ProfileBar.ProfileButtonPopout()
             .presentationDetents([.medium])
         }
+        #endif
       }
       .environment(\.guildStore, currentGuildStore)
       .environment(\.channelStore, currentChannelStore)
