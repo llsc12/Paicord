@@ -116,9 +116,10 @@ struct ChatView: View {
             // message drain view, represents messages being sent etc
           }
           .scrollTargetLayout()
+          Spacer()
+            .frame(height: 15)
         }
         .maxHeight(.infinity)
-        .safeAreaPadding(.bottom, 15)
         .bottomAnchored()
         .onAppear {
           NotificationCenter.default.post(

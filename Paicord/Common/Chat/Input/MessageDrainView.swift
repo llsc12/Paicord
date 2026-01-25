@@ -136,6 +136,9 @@ extension ChatView {
       if inline {
         HStack(alignment: .top) {
           MessageCell.AvatarBalancing()
+            #if os(macOS)
+              .padding(.trailing, 4)  // balancing
+            #endif
 
           content
         }
@@ -147,6 +150,7 @@ extension ChatView {
               #if os(macOS)
                 .padding(.trailing, 4)  // balancing
               #endif
+
             userAndMessage
           }
           .fixedSize(horizontal: false, vertical: true)
@@ -168,7 +172,9 @@ extension ChatView {
           Group {
             let mention =
               msg.mentions.map(\.id).contains(msg.author?.id) ? "@" : ""
-            let name = msg.member?.nick ?? msg.author?.global_name ?? msg.author?.username ?? "Unknown"
+            let name =
+              msg.member?.nick ?? msg.author?.global_name ?? msg.author?
+              .username ?? "Unknown"
             Text("\(mention)\(name) • ")
               .foregroundStyle(.secondary)
               .lineLimit(1)
@@ -293,17 +299,26 @@ extension ChatView {
     @ViewBuilder var content: some View {
       VStack(alignment: .leading, spacing: 4) {
         #if os(iOS)
-          let attr: [NSAttributedString.Key: Any] = [
+          let attr: [NSAttributedString.Key: Any?] = [
             .foregroundColor: error != nil ? UIColor.red : nil
           ]
         #else
-          let attr: [NSAttributedString.Key: Any] = [
+          let attr: [NSAttributedString.Key: Any?] = [
             .foregroundColor: error != nil ? NSColor.red : nil
           ]
         #endif
+        let hash = {
+          var hasher = Hasher()
+          hasher.combine(message.content)
+          if let error {
+            hasher.combine(String(describing: error))
+          }
+          return hasher.finalize()
+        }()
         MarkdownText(content: message.content ?? "", channelStore: channelStore)
-          .baseAttributes(attr)
-          .equatable(by: message.content)
+          .baseAttributes(attr as [NSAttributedString.Key: Any])
+          .frame(maxWidth: .infinity, alignment: .leading)
+          .equatable(by: hash)
       }
       .opacity(0.6)  // indicate pending state
     }

@@ -15,105 +15,133 @@ extension MessageCell {
     let message: DiscordChannel.Message
     let channelStore: ChannelStore
 
-    @State var profileOpen = false
-    @State var editedPopover = false
-    @State var avatarAnimated = false
+    @State private var editedPopover = false
+    @State private var profileOpen = false
+
+    private var timestampText: String {
+      let date = message.timestamp.date
+      if Calendar.current.isDateInToday(date) {
+        return Self.timeFormatter.string(from: date)
+      } else if Calendar.current.isDateInYesterday(date) {
+        return "Yesterday at " + Self.timeFormatter.string(from: date)
+      } else {
+        return Self.fullDateFormatter.string(from: date)
+      }
+    }
+
+    private var editedText: String? {
+      guard let edited = message.edited_timestamp?.date else { return nil }
+      return Self.fullDateTimeFormatter.string(from: edited)
+    }
+
+    private var replyPreview: (name: String, content: String)? {
+      guard let ref = message.referenced_message else { return nil }
+      let mention = ref.mentions.map(\.id).contains(ref.author?.id) ? "@" : ""
+      let name = ref.member?.nick ?? ref.author?.global_name ?? ref.author?.username ?? "Unknown"
+      let content = ref.content
+      return (name: "\(mention)\(name)", content: content)
+    }
+
+    private static let timeFormatter: DateFormatter = {
+      let f = DateFormatter()
+      f.timeStyle = .short
+      f.dateStyle = .none
+      return f
+    }()
+
+    private static let fullDateFormatter: DateFormatter = {
+      let f = DateFormatter()
+      f.dateStyle = .medium
+      f.timeStyle = .none
+      return f
+    }()
+
+    private static let fullDateTimeFormatter: DateFormatter = {
+      let f = DateFormatter()
+      f.dateStyle = .medium
+      f.timeStyle = .short
+      return f
+    }()
+
+    static func == (lhs: ChatInputCommandMessage, rhs: ChatInputCommandMessage) -> Bool {
+      lhs.message.id == rhs.message.id &&
+      lhs.message.edited_timestamp == rhs.message.edited_timestamp &&
+      lhs.message.embeds == rhs.message.embeds
+    }
 
     var body: some View {
-      VStack {
-        reply
-        HStack(alignment: .bottom) {
+      VStack(alignment: .leading, spacing: 4) {
+        replyView
+        HStack(alignment: .bottom, spacing: 8) {
           MessageAuthor.Avatar(
-            message: message,
-            guildStore: channelStore.guildStore,
-            profileOpen: $profileOpen,
-            animated: avatarAnimated
-          )
-          #if os(macOS)
-            .padding(.trailing, 4)  // balancing
-          #endif
-          userAndMessage
-
-        }
-        .fixedSize(horizontal: false, vertical: true)
-      }
-      .onHover { self.avatarAnimated = $0 }
-    }
-
-    @ViewBuilder
-    var reply: some View {
-      if let ref = message.referenced_message {
-        HStack {
-          ReplyLine()
-            .padding(.leading, avatarSize / 2)  // align with pfp
-
-          Text("\(ref.author?.username ?? "Unknown") • \(ref.content)")
-            .font(.caption)
-            .foregroundStyle(.secondary)
-            .lineLimit(1)
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
-      }
-    }
-
-    @ViewBuilder
-    var userAndMessage: some View {
-      VStack(spacing: 2) {
-        HStack(alignment: .center) {
-          MessageAuthor.Username(  // username line
             message: message,
             guildStore: channelStore.guildStore,
             profileOpen: $profileOpen
           )
-          Date(for: message.timestamp.date)  // message date
-          if let edit = message.edited_timestamp {  // edited notice
-            EditStamp(edited: edit)
-          }
+          #if os(macOS)
+          .padding(.trailing, 4) // balancing
+          #endif
+          userAndMessage
         }
-        .frame(
-          maxWidth: .infinity,
-          maxHeight: .infinity,
-          alignment: .bottomLeading
-        )
-        .fixedSize(horizontal: false, vertical: true)
-
-        MessageBody(
-          message: message,
-          channelStore: channelStore
-        )  // content
       }
-      .frame(maxHeight: .infinity, alignment: .bottom)  // align text to bottom of cell
     }
 
     @ViewBuilder
-    func Date(for date: Date) -> some View {
-      Group {
-        if Calendar.current.isDateInToday(date) {
-          Text(message.timestamp.date, style: .time)
-        } else if Calendar.current.isDateInYesterday(date) {
-          Text("Yesterday at ") + Text(message.timestamp.date, style: .time)
-        } else {
-          Text(date, format: .dateTime.month().day().year())
+    private var replyView: some View {
+      if let preview = replyPreview {
+        HStack(spacing: 6) {
+          ReplyLine()
+            .padding(.leading, avatarSize / 2)
+          Text(preview.name)
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+            .font(.caption2)
+          Text("•")
+            .foregroundStyle(.secondary)
+            .font(.caption2)
+          Text(markdown: preview.content)
+            .lineLimit(1)
+            .foregroundStyle(.secondary)
+            .font(.caption2)
         }
+        .opacity(0.7)
       }
-      .font(.caption2)
-      .foregroundStyle(.secondary)
+    }
+
+    @ViewBuilder
+    private var userAndMessage: some View {
+      VStack(alignment: .leading, spacing: 2) {
+        HStack(alignment: .center, spacing: 6) {
+          MessageAuthor.Username(
+            message: message,
+            guildStore: channelStore.guildStore,
+            profileOpen: $profileOpen
+          )
+          Text(timestampText)
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+          if let editedText {
+            EditStamp(editedText: editedText)
+          }
+        }
+        MessageBody(message: message, channelStore: channelStore)
+      }
     }
 
     struct EditStamp: View {
-      var edited: DiscordTimestamp
+      var editedText: String
       @State private var editedPopover = false
       var body: some View {
         Text("(edited)")
           .font(.caption)
           .foregroundStyle(.secondary)
           .popover(isPresented: $editedPopover) {
-            Text(
-              "Edited at \(edited.date.formatted(date: .abbreviated, time: .standard))"
-            )
-            .padding()
+            Text("Edited at \(editedText)")
+              .padding()
           }
-          .onHover { self.editedPopover = $0 }
+          .onHover { isHovering in
+            if editedPopover != isHovering { editedPopover = isHovering }
+          }
       }
     }
   }

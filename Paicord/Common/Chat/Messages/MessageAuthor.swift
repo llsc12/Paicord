@@ -16,7 +16,6 @@ extension MessageCell {
       var message: DiscordChannel.Message
       var guildStore: GuildStore?
       @Binding var profileOpen: Bool
-      var animated: Bool
       var body: some View {
         Button {
           guard message.author != nil else { return }
@@ -30,7 +29,6 @@ extension MessageCell {
             member: guildstoremember ?? message.member,
             user: message.author?.toPartialUser()
           )
-          .profileAnimated(animated)
           .profileShowsAvatarDecoration()
           .frame(width: avatarSize, height: avatarSize)
         }

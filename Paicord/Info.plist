@@ -6,6 +6,8 @@
 	<true/>
 	<key>SUFeedURL</key>
 	<string>https://raw.githubusercontent.com/llsc12/Paicord/refs/heads/updates/feeds/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>jm4wGX1iAP7kwHkRWm82RYspd2WIXp+g4lISBqE73W0=</string>
 	<key>SUScheduledCheckInterval</key>
 	<integer>43200</integer>
 	<key>UIDesignRequiresCompatibility</key>

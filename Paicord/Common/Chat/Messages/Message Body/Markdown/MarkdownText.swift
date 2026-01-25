@@ -302,12 +302,12 @@ class MarkdownRendererVM {
   //      self.document = document
   //    }
   //  }
-//  class CachedDocumentBlocks: NSObject {
-//    let blocks: [BlockElement]
-//    init(blocks: [BlockElement]) {
-//      self.blocks = blocks
-//    }
-//  }
+  //  class CachedDocumentBlocks: NSObject {
+  //    let blocks: [BlockElement]
+  //    init(blocks: [BlockElement]) {
+  //      self.blocks = blocks
+  //    }
+  //  }
 
   var blocks: [BlockElement] = []
 
@@ -318,7 +318,6 @@ class MarkdownRendererVM {
     baseAttributesOverrides: [NSAttributedString.Key: Any] = [:]
   ) {
     self.baseAttributesOverrides = baseAttributesOverrides
-    guard let content else { return }
   }
 
   var gw: GatewayStore!
@@ -352,6 +351,17 @@ class MarkdownRendererVM {
   var rawContent: String = ""
 
   private enum BaseInlineStyle { case body, footnote }
+  
+  enum EmojiSize: Int {
+    case normal = 18
+    case large = 44
+    var size: CGFloat {
+      switch self {
+      case .normal: return 96
+      case .large: return 192
+      }
+    }
+  }
 
   // Walk top-level AST nodes and convert to BlockElement models.
   func buildBlocks(from document: AST.DocumentNode) -> [BlockElement] {
@@ -750,7 +760,10 @@ class MarkdownRendererVM {
               + (ce.isAnimated ? ".gif" : ".png") + "?size=44"
           )
         else { return }
-        let s = self.makeEmojiAttachment(url: url, copyText: copyText)
+        let s = self.makeEmojiAttachment(
+          emoji: .init(url: url, size: 18),
+          copyText: copyText
+        )
         container.append(s)
       }
 
@@ -1258,6 +1271,7 @@ enum PaicordChatLink {
   case userMention(UserSnowflake)
   case roleMention(RoleSnowflake)
   case channelMention(ChannelSnowflake)
+  case emoji(EmojiSnowflake)
   case invite(String)  // invite code
   case everyoneMention
   case hereMention

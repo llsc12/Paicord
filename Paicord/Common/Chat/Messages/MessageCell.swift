@@ -60,18 +60,8 @@ struct MessageCell: View {
       priorMessage?.author?.id == message.author?.id
       && message.timestamp.date.timeIntervalSince(
         priorMessage?.timestamp.date ?? .distantPast
-      ) < 300 && message.referenced_message == nil && message.type == .default
-
-    let cellHash: Int = {
-      var hasher = Hasher()
-      hasher.combine(message.id)
-      hasher.combine(message.edited_timestamp)
-      if let priorMessage = priorMessage {
-        hasher.combine(priorMessage.id)
-        hasher.combine(priorMessage.edited_timestamp)
-      }
-      return hasher.finalize()
-    }()
+      ) < 300 && message.referenced_message == nil
+      && message.type == .default
 
     Group {
       // Content
@@ -82,8 +72,8 @@ struct MessageCell: View {
           channelStore: channelStore,
           inline: inline
         )
-      case .chatInputCommand:
-        ChatInputCommandMessage(message: message, channelStore: channelStore)
+            case .chatInputCommand:
+              ChatInputCommandMessage(message: message, channelStore: channelStore)
       default:
         HStack {
           AvatarBalancing()
@@ -93,8 +83,6 @@ struct MessageCell: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
       }
-//      MarkdownText(content: message.content)
-//        .frame(maxWidth: .infinity, alignment: .leading)
     }
     .background(Color.almostClear)
     .padding(.horizontal, 10)
@@ -104,10 +92,6 @@ struct MessageCell: View {
       Color(hexadecimal6: 0xce9c5c).opacity(userMentioned ? 1 : 0)
         .maxWidth(2)
     }
-    .equatable(by: cellHash)
-    /// stop updates to messages unless messages change.
-    /// prevent updates to messages unless they change
-    /// avoid re-render on message cell highlight
     #if os(macOS)
       .onHover { self.cellHighlighted = $0 }
       .background(
@@ -115,7 +99,7 @@ struct MessageCell: View {
           ? Color(NSColor.secondaryLabelColor).opacity(0.1) : .clear
       )
     #endif
-//    .entityContextMenu(for: message)
+    .entityContextMenu(for: message)
     .padding(.top, inline ? 0 : 15)  // adds space between message groups
 
   }

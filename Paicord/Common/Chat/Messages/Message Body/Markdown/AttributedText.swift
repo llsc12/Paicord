@@ -37,7 +37,25 @@ struct AttributedText: View {
     }
 
     func makeNSView(context: Context) -> ModifiedCopyingTextView {
-      let tv = ModifiedCopyingTextView()
+      // register emoji type to view providers
+      NSTextAttachment.registerViewProviderClass(
+        MarkdownRendererVM.CrossPlatformEmojiAttachmentViewProvider.self,
+        forFileType: "public.item"
+      )
+
+      let textStorage = NSTextStorage()
+      let layoutManager = NSLayoutManager()
+      let textContainer = NSTextContainer()
+      textContainer.maximumNumberOfLines = lineLimit ?? 0
+
+      textStorage.addLayoutManager(layoutManager)
+      layoutManager.addTextContainer(textContainer)
+
+      let tv = ModifiedCopyingTextView(
+        frame: .zero,
+        textContainer: textContainer
+      )
+
       tv.isEditable = false
       tv.isSelectable = true
       tv.drawsBackground = false
@@ -51,16 +69,20 @@ struct AttributedText: View {
       tv.textStorage?.setAttributedString(attributedString)
       tv.textContainer?.maximumNumberOfLines = lineLimit ?? 0
       tv.usesAdaptiveColorMappingForDarkAppearance = true
+
       return tv
     }
 
     func updateNSView(_ nsView: ModifiedCopyingTextView, context: Context) {
       nsView.customCoordinator = context.coordinator
-      if !context.coordinator.isSame(as: attributedString) {
+
+      if nsView.attributedString() != attributedString {
         nsView.textStorage?.setAttributedString(attributedString)
-        context.coordinator.remember(attributedString: attributedString)
       }
-      nsView.textContainer?.maximumNumberOfLines = lineLimit ?? 0
+
+      if nsView.textContainer?.maximumNumberOfLines != (lineLimit ?? 0) {
+        nsView.textContainer?.maximumNumberOfLines = lineLimit ?? 0
+      }
     }
 
     func sizeThatFits(
@@ -72,34 +94,22 @@ struct AttributedText: View {
       guard let layoutManager = nsView.layoutManager,
         let textContainer = nsView.textContainer
       else { return nil }
+
+      // Set size for calculation
       textContainer.containerSize = CGSize(
         width: targetWidth,
         height: .greatestFiniteMagnitude
       )
       layoutManager.ensureLayout(for: textContainer)
-      let used = layoutManager.usedRect(for: textContainer)
-      return CGSize(width: targetWidth, height: used.height)
+
+      let usedRect = layoutManager.usedRect(for: textContainer)
+
+      return CGSize(width: targetWidth, height: ceil(usedRect.height))
     }
 
     final class Coordinator: NSObject, NSTextViewDelegate {
       let openURL: OpenURLAction
-      private var lastHash: Int = 0
-
       init(openURL: OpenURLAction) { self.openURL = openURL }
-
-      func isSame(as attributed: NSAttributedString) -> Bool {
-        var h = Hasher()
-        h.combine(attributed.string)
-        h.combine(attributed.length)
-        return h.finalize() == lastHash
-      }
-
-      func remember(attributedString: NSAttributedString) {
-        var h = Hasher()
-        h.combine(attributedString.string)
-        h.combine(attributedString.length)
-        lastHash = h.finalize()
-      }
 
       func textView(
         _ textView: NSTextView,
@@ -174,32 +184,46 @@ struct AttributedText: View {
     }
 
     func makeUIView(context: Context) -> ModifiedCopyingTextView {
-      let tv = ModifiedCopyingTextView()
+      // register emoji type to view providers
+      NSTextAttachment.registerViewProviderClass(
+        MarkdownRendererVM.CrossPlatformEmojiAttachmentViewProvider.self,
+        forFileType: "public.item"
+      )
+      let textStorage = NSTextStorage()
+      let layoutManager = NSLayoutManager()
+      let textContainer = NSTextContainer()
+
+      textContainer.maximumNumberOfLines = lineLimit ?? 0
+      textStorage.addLayoutManager(layoutManager)
+      layoutManager.addTextContainer(textContainer)
+
+      let tv = ModifiedCopyingTextView(
+        frame: .zero,
+        textContainer: textContainer
+      )
+
       tv.isEditable = false
       tv.isSelectable = true
       tv.isScrollEnabled = false
       tv.backgroundColor = .clear
       tv.textContainerInset = .zero
       tv.textContainer.lineFragmentPadding = 0
-      tv.textContainer.maximumNumberOfLines = lineLimit ?? 0
       tv.delegate = context.coordinator
       tv.dataDetectorTypes = []
       tv.linkTextAttributes = [:]
-      //
-      // Force TextKit 1 compatibility for attachment view providers
-      _ = tv.layoutManager
 
-      tv.attributedText = attributedString
+      tv.setAttributedTextPreservingSelection(attributedString)
+
       return tv
     }
 
     func updateUIView(_ uiView: ModifiedCopyingTextView, context: Context) {
-      if !context.coordinator.isSame(as: attributedString) {
-        uiView.attributedText = attributedString
-        context.coordinator.remember(attributedString: attributedString)
+      // Simplified update logic: NSAttributedString equality check is more robust than length hashing
+      if uiView.attributedText != attributedString {
+        uiView.setAttributedTextPreservingSelection(attributedString)
+        // Ensure the line limit is updated if it changed via Environment
+        uiView.textContainer.maximumNumberOfLines = lineLimit ?? 0
       }
-      uiView.textContainer.maximumNumberOfLines = lineLimit ?? 0
-      uiView.delegate = context.coordinator
     }
 
     func sizeThatFits(
@@ -207,30 +231,16 @@ struct AttributedText: View {
       uiView: ModifiedCopyingTextView,
       context: Context
     ) -> CGSize? {
-      let targetWidth = proposal.width ?? UIScreen.main.bounds.width
-      let fitting = CGSize(width: targetWidth, height: .greatestFiniteMagnitude)
-      let size = uiView.sizeThatFits(fitting)
+      let targetWidth = proposal.width ?? 400
+      let size = uiView.sizeThatFits(
+        CGSize(width: targetWidth, height: .greatestFiniteMagnitude)
+      )
       return CGSize(width: targetWidth, height: size.height)
     }
 
     final class Coordinator: NSObject, UITextViewDelegate {
       let openURL: OpenURLAction
-      private var lastHash: Int = 0
       init(openURL: OpenURLAction) { self.openURL = openURL }
-
-      func isSame(as attributed: NSAttributedString) -> Bool {
-        var h = Hasher()
-        h.combine(attributed.string)
-        h.combine(attributed.length)
-        return h.finalize() == lastHash
-      }
-
-      func remember(attributedString: NSAttributedString) {
-        var h = Hasher()
-        h.combine(attributedString.string)
-        h.combine(attributedString.length)
-        lastHash = h.finalize()
-      }
 
       func textView(
         _ textView: UITextView,
@@ -277,6 +287,12 @@ struct AttributedText: View {
       super.copy(sender)
       UIPasteboard.general.string = mutable.string
     }
-  }
 
+    /// Convenience to avoid clearing selection/caret flicker when resetting text.
+    func setAttributedTextPreservingSelection(_ text: NSAttributedString) {
+      let sel = selectedRange
+      attributedText = text
+      selectedRange = sel
+    }
+  }
 #endif

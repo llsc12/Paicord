@@ -19,9 +19,6 @@ extension MessageCell {
       .buttonStyle(.borderless)
       .height(1)
       .disabled(true)  // btn used for spacing only
-      #if os(macOS)
-        .padding(.trailing, 4)  // balancing
-      #endif
     }
   }
 
