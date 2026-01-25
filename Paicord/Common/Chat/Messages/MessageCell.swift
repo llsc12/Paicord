@@ -62,12 +62,13 @@ struct MessageCell: View {
         priorMessage?.timestamp.date ?? .distantPast
       ) < 300 && message.referenced_message == nil && message.type == .default
 
-    // adding them together can cause arithmetic overflow, so hash instead
     let cellHash: Int = {
       var hasher = Hasher()
-      hasher.combine(message)
+      hasher.combine(message.id)
+      hasher.combine(message.edited_timestamp)
       if let priorMessage = priorMessage {
-        hasher.combine(priorMessage)
+        hasher.combine(priorMessage.id)
+        hasher.combine(priorMessage.edited_timestamp)
       }
       return hasher.finalize()
     }()
@@ -92,6 +93,8 @@ struct MessageCell: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
       }
+//      MarkdownText(content: message.content)
+//        .frame(maxWidth: .infinity, alignment: .leading)
     }
     .background(Color.almostClear)
     .padding(.horizontal, 10)
@@ -112,7 +115,7 @@ struct MessageCell: View {
           ? Color(NSColor.secondaryLabelColor).opacity(0.1) : .clear
       )
     #endif
-    .entityContextMenu(for: message)
+//    .entityContextMenu(for: message)
     .padding(.top, inline ? 0 : 15)  // adds space between message groups
 
   }

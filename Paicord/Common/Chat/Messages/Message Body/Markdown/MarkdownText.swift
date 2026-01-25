@@ -18,20 +18,27 @@ struct MarkdownText: View {
   @Environment(\.dynamicTypeSize) var dynamicType
   @Environment(\.theme) var theme
 
-  var renderer: MarkdownRendererVM
-  
+  @State var renderer: MarkdownRendererVM
+
   var baseAttributesOverrides: [NSAttributedString.Key: Any] = [:]
-  
+
   init(
     content: String,
     channelStore: ChannelStore? = nil
   ) {
     self.content = content
     self.channelStore = channelStore
-    self.renderer = MarkdownRendererVM(content, baseAttributesOverrides: baseAttributesOverrides)
+    self._renderer = .init(
+      initialValue: MarkdownRendererVM(
+        content,
+        baseAttributesOverrides: baseAttributesOverrides
+      )
+    )
   }
-  
-  func baseAttributes(_ attributes: [NSAttributedString.Key: Any]) -> MarkdownText {
+
+  func baseAttributes(_ attributes: [NSAttributedString.Key: Any])
+    -> MarkdownText
+  {
     var copy = self
     copy.baseAttributesOverrides = attributes
     copy.renderer.baseAttributesOverrides = attributes
@@ -285,7 +292,7 @@ class MarkdownRendererVM {
 
   // document cache is redundant if we have block cache
   //  static let documentCache: NSCache<NSString, CachedDocument> = .init()
-  static let blockCache: NSCache<NSString, CachedDocumentBlocks> = .init()
+  //  static let blockCache: NSCache<NSString, CachedDocumentBlocks> = .init()
 
   let theme = Theming.shared.currentTheme
 
@@ -295,25 +302,23 @@ class MarkdownRendererVM {
   //      self.document = document
   //    }
   //  }
-  class CachedDocumentBlocks: NSObject {
-    let blocks: [BlockElement]
-    init(blocks: [BlockElement]) {
-      self.blocks = blocks
-    }
-  }
+//  class CachedDocumentBlocks: NSObject {
+//    let blocks: [BlockElement]
+//    init(blocks: [BlockElement]) {
+//      self.blocks = blocks
+//    }
+//  }
 
   var blocks: [BlockElement] = []
 
   var baseAttributesOverrides: [NSAttributedString.Key: Any] = [:]
 
-  init(_ content: String? = nil, baseAttributesOverrides: [NSAttributedString.Key: Any] = [:]) {
+  init(
+    _ content: String? = nil,
+    baseAttributesOverrides: [NSAttributedString.Key: Any] = [:]
+  ) {
     self.baseAttributesOverrides = baseAttributesOverrides
     guard let content else { return }
-    // try cache check. do not parse if cache fail.
-    if let cached = Self.blockCache.object(forKey: content as NSString) {
-      self.rawContent = content
-      self.blocks = cached.blocks
-    }
   }
 
   var gw: GatewayStore!
@@ -331,23 +336,9 @@ class MarkdownRendererVM {
   func update(_ rawContent: String) async {
     self.rawContent = rawContent
     do {
-      let ast: AST.DocumentNode = try await Task.detached {
+      let blocks = try await Task.detached {
         let ast = try await Self.parser.parseToAST(rawContent)
-        return ast
-      }.value
-      let blocks = await Task.detached {
-        // ignore cache check, we avoid unnecessary updates already.
-        //        if let cached = Self.blockCache.object(forKey: rawContent as NSString) {
-        //          return cached.blocks
-        //        }
-        //        let emojisOnly = ast.isEmojisOnly()
-        //        await MainActor.run {
-        //          self.isEmojisOnly = emojisOnly
-        //        }
-        let blocks = self.buildBlocks(from: ast)
-        let cached = CachedDocumentBlocks(blocks: blocks)
-        Self.blockCache.setObject(cached, forKey: rawContent as NSString)
-        return blocks
+        return self.buildBlocks(from: ast)
       }.value
       await MainActor.run {
         self.blocks = blocks
@@ -852,7 +843,8 @@ class MarkdownRendererVM {
             attrs[.font] = FontHelpers.makeFontBold(font)
           }
           attrs[.rawContent] = "<#\(c.id.rawValue)>"
-          if let url = URL(string: "paicord://mention/channel/\(c.id.rawValue)") {
+          if let url = URL(string: "paicord://mention/channel/\(c.id.rawValue)")
+          {
             attrs[.link] = url
           }
           attrs[.backgroundColor] = AppKitOrUIKitColor(
@@ -869,7 +861,8 @@ class MarkdownRendererVM {
           container.append(s)
         } else {
           var attrs = baseAttributes
-          if let url = URL(string: "paicord://mention/channel/\(c.id.rawValue)") {
+          if let url = URL(string: "paicord://mention/channel/\(c.id.rawValue)")
+          {
             attrs[.link] = url
           }
           let s = NSAttributedString(
@@ -1272,7 +1265,11 @@ enum PaicordChatLink {
   // if guild id is nil, channel should probably exist
   // if guild id is nil, it's a DM channel, possibly with message
   // if guild id is not nil, it could be a guild only, or a guild and channel, or even a guild and channel and message
-  case discordNavigationLink(GuildSnowflake?, ChannelSnowflake?, MessageSnowflake?)
+  case discordNavigationLink(
+    GuildSnowflake?,
+    ChannelSnowflake?,
+    MessageSnowflake?
+  )
 
   init?(url: URL) {
     guard
