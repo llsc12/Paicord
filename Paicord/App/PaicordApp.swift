@@ -62,6 +62,11 @@ struct PaicordApp: App {
         userDriverDelegate: nil
       )
     #endif
+
+    NSTextAttachment.registerViewProviderClass(
+      EmojiAttachmentViewProvider.self,
+      forFileType: "public.item"
+    )
   }
 
   #if canImport(Sparkle)

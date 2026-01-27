@@ -181,7 +181,7 @@ struct ProfilePopoutView: View {
         : profileMeta?.bio ?? profile?.user_profile?.bio
       {
         MarkdownText(content: bio, channelStore: channel)
-
+          .equatable()
       }
     }
   }

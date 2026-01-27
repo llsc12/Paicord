@@ -6,31 +6,36 @@
 //
 
 import DiscordMarkdownParser
-import Foundation
 import HighlightSwift
 import PaicordLib
+import SDWebImageSwiftUI
 import SwiftUIX
 
-struct MarkdownText: View {
-  var content: String
+struct MarkdownText: View, Equatable {
+  let content: String
+  let channelStore: ChannelStore?
+  let baseAttributesOverrides: [NSAttributedString.Key: Any]
+
   @Environment(\.gateway) var gw
-  var channelStore: ChannelStore?
   @Environment(\.dynamicTypeSize) var dynamicType
   @Environment(\.theme) var theme
 
-  @State var renderer: MarkdownRendererVM
+  @State private var renderer: MarkdownRendererVM
+  @State private var userPopover: PartialUser?
 
-  var baseAttributesOverrides: [NSAttributedString.Key: Any] = [:]
+  // Track the last render signature to avoid redundant async work
+  @ViewStorage private var lastRenderSignature: RenderSignature?
 
   init(
     content: String,
-    channelStore: ChannelStore? = nil
+    channelStore: ChannelStore? = nil,
+    baseAttributesOverrides: [NSAttributedString.Key: Any] = [:]
   ) {
     self.content = content
     self.channelStore = channelStore
-    self._renderer = .init(
+    self.baseAttributesOverrides = baseAttributesOverrides
+    _renderer = State(
       initialValue: MarkdownRendererVM(
-        content,
         baseAttributesOverrides: baseAttributesOverrides
       )
     )
@@ -39,40 +44,39 @@ struct MarkdownText: View {
   func baseAttributes(_ attributes: [NSAttributedString.Key: Any])
     -> MarkdownText
   {
-    var copy = self
-    copy.baseAttributesOverrides = attributes
-    copy.renderer.baseAttributesOverrides = attributes
-    return copy
+    MarkdownText(
+      content: content,
+      channelStore: channelStore,
+      baseAttributesOverrides: attributes
+    )
   }
 
-  @State var userPopover: PartialUser?
-
-  @State var lastHash: Int = 0
+  static func == (lhs: MarkdownText, rhs: MarkdownText) -> Bool {
+    lhs.content == rhs.content
+      && lhs.channelStore?.channelId == rhs.channelStore?.channelId
+      && lhs.baseAttributesOverrides.count == rhs.baseAttributesOverrides.count
+  }
 
   var body: some View {
     VStack(alignment: .leading, spacing: 4) {
-      ForEach(renderer.blocks) { block in
-        BlockView(block: block)
-      }
 
-      // simple fallback while parsing
       if renderer.blocks.isEmpty {
-        Text(markdown: content)  // apple's markdown
+        Text(markdown: content)  // Apple’s markdown fallback
           .opacity(0.6)
+      } else {
+        ForEach(renderer.blocks) { block in
+          BlockView(block: block)
+        }
       }
     }
-    .task(id: content, render)
-    .task(id: channelStore?.guildStore?.members.count, render)
-    .task(id: dynamicType, render)
-    .task(id: theme, render)
+    .task(id: renderSignature, renderIfNeeded)
     .environment(
       \.openURL,
       OpenURLAction { url in
         return handleURL(url)
       }
     )
-    .popover(item: $userPopover) {
-      user in
+    .popover(item: $userPopover) { user in
       ProfilePopoutView(
         guild: channelStore?.guildStore,
         member: channelStore?.guildStore?.members[user.id],
@@ -81,36 +85,32 @@ struct MarkdownText: View {
     }
   }
 
-  func getHash() -> Int {
-    // hash these values and see if the hash changed and update if hash is different.
-    var hasher = Hasher()
-    hasher.combine(content)
-    hasher.combine(gw.user.users.count)
-    if let memberCount = channelStore?.guildStore?.members.count {
-      hasher.combine(memberCount)
-    }
-    hasher.combine(dynamicType)
-    hasher.combine(theme)
-    return hasher.finalize()
+  private var renderSignature: RenderSignature {
+    RenderSignature(
+      content: content,
+      userCount: gw.user.users.count,
+      memberCount: channelStore?.guildStore?.members.count,
+      roleCount: channelStore?.guildStore?.roles.count,
+      channelCount: channelStore?.guildStore?.channels.count,
+      dynamicType: dynamicType,
+      themeID: ObjectIdentifier(theme as AnyObject)
+    )
   }
 
   @Sendable
-  func render() async {
-    let newHash = getHash()
-    guard lastHash != newHash else {
-      return
-    }
-    lastHash = newHash
+  private func renderIfNeeded() async {
+    let sig = renderSignature
+    guard lastRenderSignature != sig else { return }
+    lastRenderSignature = sig
 
-    renderer.passRefs(
-      gw: gw,
-      channelStore: channelStore
-    )  // it isnt expensive to call this, its just refs.
-    await renderer.update(content)
+    renderer.passRefs(gw: gw, channelStore: channelStore)
+    await renderer.update(
+      content: content,
+      signature: sig
+    )
   }
 
   func handleURL(_ url: URL) -> OpenURLAction.Result {
-    // Handle paicord mention links
     guard let cmd = PaicordChatLink(url: url) else {
       return .systemAction
     }
@@ -123,17 +123,17 @@ struct MarkdownText: View {
       }
     default:
       print("[MarkdownText] Unhandled special link: \(cmd)")
-      return .discarded  // other paicord links not handled yet, todo.
+      return .discarded
     }
 
     return .handled
   }
 
-  struct BlockView: View {
+  private struct BlockView: View {
     var block: BlockElement
     var body: some View {
       switch block.nodeType {
-      case .paragraph, .heading, .footnote:
+      case .paragraph, .heading, .footnote, .thematicBreak:
         if let attr = block.attributedContent {
           AttributedText(attributedString: attr)
         } else {
@@ -165,8 +165,7 @@ struct MarkdownText: View {
       case .list:
         if let children = block.children {
           VStack(alignment: .leading, spacing: 4) {
-            ForEach(Array(children.enumerated()), id: \.element.id) {
-              (index, child) in
+            ForEach(children) { child in
               HStack(alignment: .top, spacing: 8) {
                 Text("•").font(.body)
                 BlockView(block: child)
@@ -174,6 +173,7 @@ struct MarkdownText: View {
             }
           }
         }
+
       case .listItem:
         if let attr = block.attributedContent {
           let converted = AttributedString(attr)
@@ -216,7 +216,7 @@ struct MarkdownText: View {
               )
               .font(.footnote.monospaced())
           } else {
-            Text(code)  // no highlighting
+            Text(code)
               .font(.footnote.monospaced())
           }
         }
@@ -251,8 +251,6 @@ struct MarkdownText: View {
         }
         .onHover { self.isHovered = $0 }
 
-        // instead of resizing the codeblock, we use a spacer that fills the smaller area.
-        // fixes codeblocks leaving blockquotes, and fixes codeblocks inside embeds.
         Spacer()
           .containerRelativeFrame(.horizontal, alignment: .leading) {
             length,
@@ -269,52 +267,50 @@ struct MarkdownText: View {
   }
 }
 
-struct BlockElement: Identifiable {
-  let id = UUID()
+// MARK: - Models
+
+private struct BlockElement: Identifiable, Equatable {
+  let id: Int
   let nodeType: ASTNodeType
   let attributedContent: NSAttributedString?
-  // For lists
   let isOrdered: Bool?
   let startingNumber: Int?
-  // For code blocks and other block-level metadata:
   let codeContent: String?
   let language: String?
-  let level: Int?  // heading level
-  let children: [BlockElement]?  // for nested blocks (lists, codeblocks etc, but not blockquotes.)
+  let level: Int?
+  let children: [BlockElement]?
   let sourceLocation: SourceLocation?
 }
 
+// Stable render signature used to avoid redundant parsing
+private struct RenderSignature: Equatable {
+  let content: String
+  let userCount: Int
+  let memberCount: Int?
+  let roleCount: Int?
+  let channelCount: Int?
+  let dynamicType: DynamicTypeSize
+  let themeID: ObjectIdentifier
+}
+
+// MARK: - Renderer
+
 @Observable
 class MarkdownRendererVM {
-  static var parser: DiscordMarkdownParser = {
-    .init()
+  static var parser: DiscordMarkdownParser = { .init() }()
+
+  // Shared cache (renderer instances)
+  static let cache: NSCache<NSString, MarkdownRendererVM> = {
+    let c = NSCache<NSString, MarkdownRendererVM>()
+    c.countLimit = 512
+    return c
   }()
 
-  // document cache is redundant if we have block cache
-  //  static let documentCache: NSCache<NSString, CachedDocument> = .init()
-  //  static let blockCache: NSCache<NSString, CachedDocumentBlocks> = .init()
-
   let theme = Theming.shared.currentTheme
-
-  //  class CachedDocument: NSObject {
-  //    let document: AST.DocumentNode
-  //    init(document: AST.DocumentNode) {
-  //      self.document = document
-  //    }
-  //  }
-  //  class CachedDocumentBlocks: NSObject {
-  //    let blocks: [BlockElement]
-  //    init(blocks: [BlockElement]) {
-  //      self.blocks = blocks
-  //    }
-  //  }
-
-  var blocks: [BlockElement] = []
-
+  fileprivate var blocks: [BlockElement] = []
   var baseAttributesOverrides: [NSAttributedString.Key: Any] = [:]
 
   init(
-    _ content: String? = nil,
     baseAttributesOverrides: [NSAttributedString.Key: Any] = [:]
   ) {
     self.baseAttributesOverrides = baseAttributesOverrides
@@ -332,28 +328,71 @@ class MarkdownRendererVM {
     self.channelStore = channelStore
   }
 
-  func update(_ rawContent: String) async {
-    self.rawContent = rawContent
+  var emojiSize: EmojiSize = .normal
+
+  fileprivate func update(content: String, signature: RenderSignature) async {
+    // If a cached renderer exists for this signature, adopt its blocks immediately.
+    let cacheKey = Self.makeCacheKey(
+      content: signature.content,
+      userCount: signature.userCount,
+      memberCount: signature.memberCount,
+      roleCount: signature.roleCount,
+      channelCount: signature.channelCount,
+      dynamicType: signature.dynamicType,
+      themeID: signature.themeID
+    )
+
+    if let cached = Self.cache.object(forKey: cacheKey as NSString) {
+      await MainActor.run {
+        self.blocks = cached.blocks
+        self.emojiSize = cached.emojiSize
+      }
+      return
+    }
+
+    // Parse and then cache
     do {
-      let blocks = try await Task.detached {
-        let ast = try await Self.parser.parseToAST(rawContent)
+      let blocks = try await Task.detached(priority: .low) {
+        let ast = try await Self.parser.parseToAST(content)
         return self.buildBlocks(from: ast)
       }.value
       await MainActor.run {
         self.blocks = blocks
       }
+      // store self (with current blocks) in cache
+      Self.cache.setObject(self, forKey: cacheKey as NSString)
+
+      // check if the ast only contains emojis, either unicode or custom.
+      #warning("large emojis support not implemented yet")
     } catch {
-      // parsing failed, keep previous content but log
       print("Markdown parse failed: \(error)")
     }
   }
 
-  var rawContent: String = ""
+  static func makeCacheKey(
+    content: String,
+    userCount: Int?,
+    memberCount: Int?,
+    roleCount: Int?,
+    channelCount: Int?,
+    dynamicType: DynamicTypeSize?,
+    themeID: ObjectIdentifier?
+  ) -> String {
+    var h = Hasher()
+    h.combine(content)
+    if let userCount { h.combine(userCount) }
+    if let memberCount { h.combine(memberCount) }
+    if let roleCount { h.combine(roleCount) }
+    if let channelCount { h.combine(channelCount) }
+    if let dynamicType { h.combine(dynamicType) }
+    if let themeID { h.combine(themeID) }
+    return String(h.finalize())
+  }
 
   private enum BaseInlineStyle { case body, footnote }
-  
+
   enum EmojiSize: Int {
-    case normal = 18
+    case normal = 15
     case large = 44
     var size: CGFloat {
       switch self {
@@ -364,7 +403,9 @@ class MarkdownRendererVM {
   }
 
   // Walk top-level AST nodes and convert to BlockElement models.
-  func buildBlocks(from document: AST.DocumentNode) -> [BlockElement] {
+  fileprivate func buildBlocks(from document: AST.DocumentNode)
+    -> [BlockElement]
+  {
     var result: [BlockElement] = []
     for child in document.children {
       if let block = makeBlock(from: child) {
@@ -376,6 +417,7 @@ class MarkdownRendererVM {
 
   // Create a BlockElement from an ASTNode if it is a block-level node.
   private func makeBlock(from node: ASTNode) -> BlockElement? {
+    let baseIDSeed = sourceID(for: node)
     switch node.nodeType {
     case .paragraph:
       let attributed = renderInlinesToNSAttributedString(
@@ -383,6 +425,7 @@ class MarkdownRendererVM {
         baseStyle: .body
       )
       return BlockElement(
+        id: makeID(base: baseIDSeed, content: attributed.string),
         nodeType: .paragraph,
         attributedContent: attributed,
         isOrdered: nil,
@@ -402,6 +445,7 @@ class MarkdownRendererVM {
           baseStyle: .body
         )
         return BlockElement(
+          id: makeID(base: baseIDSeed, content: attributed.string),
           nodeType: .heading,
           attributedContent: attributed,
           isOrdered: nil,
@@ -414,12 +458,14 @@ class MarkdownRendererVM {
         )
       }
       return nil
+
     case .footnote:
       let attributed = renderInlinesToNSAttributedString(
         nodes: node.children,
         baseStyle: .footnote
       )
       return BlockElement(
+        id: makeID(base: baseIDSeed, content: attributed.string),
         nodeType: .footnote,
         attributedContent: attributed,
         isOrdered: nil,
@@ -430,9 +476,11 @@ class MarkdownRendererVM {
         children: nil,
         sourceLocation: node.sourceLocation
       )
+
     case .codeBlock:
       if let code = node as? AST.CodeBlockNode {
         return BlockElement(
+          id: makeID(base: baseIDSeed, content: code.content),
           nodeType: .codeBlock,
           attributedContent: nil,
           isOrdered: nil,
@@ -454,6 +502,7 @@ class MarkdownRendererVM {
         }
       }
       return BlockElement(
+        id: makeID(base: baseIDSeed, content: nested.map(\.id).description),
         nodeType: .blockQuote,
         attributedContent: nil,
         isOrdered: nil,
@@ -469,7 +518,6 @@ class MarkdownRendererVM {
       if let list = node as? AST.ListNode {
         var items: [BlockElement] = []
         for item in list.items {
-          // List items contain block children themselves. We'll turn each item into a block (with children).
           if let listItem = item as? AST.ListItemNode {
             var listItemChildren: [BlockElement] = []
             for c in listItem.children {
@@ -478,6 +526,10 @@ class MarkdownRendererVM {
               }
             }
             let itemBlock = BlockElement(
+              id: makeID(
+                base: sourceID(for: listItem),
+                content: listItemChildren.map(\.id).description
+              ),
               nodeType: .listItem,
               attributedContent: nil,
               isOrdered: nil,
@@ -490,12 +542,12 @@ class MarkdownRendererVM {
             )
             items.append(itemBlock)
           } else {
-            // fallback: try to convert inline children to a paragraph inside list item
             let attr = renderInlinesToNSAttributedString(
               nodes: item.children,
               baseStyle: .body
             )
             let itemBlock = BlockElement(
+              id: makeID(base: sourceID(for: item), content: attr.string),
               nodeType: .listItem,
               attributedContent: attr,
               isOrdered: nil,
@@ -510,6 +562,7 @@ class MarkdownRendererVM {
           }
         }
         return BlockElement(
+          id: makeID(base: baseIDSeed, content: items.map(\.id).description),
           nodeType: .list,
           attributedContent: nil,
           isOrdered: nil,
@@ -524,9 +577,9 @@ class MarkdownRendererVM {
       return nil
 
     case .thematicBreak:
-      // Not much to render; give a thin line fallback handled in view
       let attr = NSAttributedString(string: "—")
       return BlockElement(
+        id: makeID(base: baseIDSeed, content: attr.string),
         nodeType: .thematicBreak,
         attributedContent: attr,
         isOrdered: nil,
@@ -545,6 +598,7 @@ class MarkdownRendererVM {
         baseStyle: .body
       )
       return BlockElement(
+        id: makeID(base: baseIDSeed, content: attr.string),
         nodeType: node.nodeType,
         attributedContent: attr,
         isOrdered: nil,
@@ -558,9 +612,21 @@ class MarkdownRendererVM {
     }
   }
 
-  // Render inline AST nodes to an NSAttributedString by walking the inline subtree.
-  // This is the core of the inline renderer. It produces an attributed string applying basic
-  // typographic styles for bold/italic/underline/strikethrough/monospace & links.
+  // for inline content
+  private func makeID(base: Int, content: String?) -> Int {
+    var h = Hasher()
+    h.combine(base)
+    if let content { h.combine(content) }
+    return h.finalize()
+  }
+
+  private func sourceID(for node: ASTNode) -> Int {
+    var h = Hasher()
+    h.combine(node.nodeType)
+    h.combine(node.sourceLocation)
+    return h.finalize()
+  }
+
   private func renderInlinesToNSAttributedString(
     nodes: [ASTNode],
     headingLevel: Int? = nil,
@@ -976,7 +1042,6 @@ class MarkdownRendererVM {
         container.append(s)
       }
     default:
-      // Generic recursion for unknown inline nodes
       for child in node.children {
         append(
           node: child,
@@ -1326,7 +1391,7 @@ enum PaicordChatLink {
       default:
         return nil
       }
-      #warning("impl any other discord links")
+    // put more discord links here if needed
 
     case "mention":
       let pathComponents = url.pathComponents.filter { $0 != "/" }
@@ -1364,4 +1429,216 @@ enum PaicordChatLink {
 extension NSAttributedString.Key {
   static let rawContent =
     NSAttributedString.Key("PaicordRawTextContentKey")
+}
+
+private enum EmojiLog {
+  static var enabled = true
+  static func log(_ message: @autoclosure () -> String) {
+    guard enabled else { return }
+    print("[EmojiAttachment] \(message())")
+  }
+}
+
+private enum EmojiImageCache {
+  static let cache = NSCache<NSString, AppKitOrUIKitImage>()
+
+  static func key(_ url: URL, size: CGFloat) -> NSString {
+    "\(url.absoluteString)#\(Int(size))" as NSString
+  }
+
+  static func get(_ url: URL, size: CGFloat) -> AppKitOrUIKitImage? {
+    cache.object(forKey: key(url, size: size))
+  }
+
+  static func set(_ image: AppKitOrUIKitImage, url: URL, size: CGFloat) {
+    cache.setObject(image, forKey: key(url, size: size))
+  }
+}
+
+class EmojiData: NSObject, NSSecureCoding {
+  var url: URL
+  var size: CGFloat
+
+  init(url: URL, size: CGFloat) {
+    self.url = url
+    self.size = size
+  }
+
+  required convenience init?(coder: NSCoder) {
+    guard let url = coder.decodeObject(of: NSURL.self, forKey: "url") as URL?
+    else { return nil }
+    let size =
+      coder.decodeObject(of: NSNumber.self, forKey: "size")?.doubleValue ?? 18.0
+    self.init(url: url, size: CGFloat(size))
+  }
+
+  func encode(with coder: NSCoder) {
+    coder.encode(url, forKey: "url")
+    coder.encode(size, forKey: "size")
+  }
+
+  static var supportsSecureCoding: Bool { true }
+}
+
+final class EmojiTextAttachment: NSTextAttachment {
+  let emojiURL: URL
+  let emojiSize: CGFloat
+
+  init(url: URL, size: CGFloat) {
+    self.emojiURL = url
+    self.emojiSize = size
+    super.init(data: nil, ofType: "public.item")
+    self.bounds = CGRect(x: 0, y: 0, width: size, height: size)
+    EmojiLog.log("init attachment url=\(url) size=\(size)")
+  }
+
+  required init?(coder: NSCoder) {
+    guard
+      let url = coder.decodeObject(of: NSURL.self, forKey: "emojiURL") as URL?
+    else { return nil }
+    let size =
+      coder.decodeObject(of: NSNumber.self, forKey: "emojiSize")?.doubleValue
+      ?? 18
+    self.emojiURL = url
+    self.emojiSize = CGFloat(size)
+    super.init(coder: coder)
+    self.bounds = CGRect(x: 0, y: 0, width: emojiSize, height: emojiSize)
+    EmojiLog.log("init coder attachment url=\(url) size=\(emojiSize)")
+  }
+
+  override func encode(with coder: NSCoder) {
+    super.encode(with: coder)
+    coder.encode(emojiURL, forKey: "emojiURL")
+    coder.encode(emojiSize, forKey: "emojiSize")
+  }
+}
+
+extension MarkdownRendererVM {
+  func makeEmojiAttachment(emoji: EmojiData, copyText: String)
+    -> NSAttributedString
+  {
+    let attachment = EmojiTextAttachment(url: emoji.url, size: emoji.size)
+    let mutable = NSMutableAttributedString(attachment: attachment)
+    mutable.addAttribute(
+      .rawContent,
+      value: copyText,
+      range: NSRange(location: 0, length: mutable.length)
+    )
+    EmojiLog.log(
+      "makeEmojiAttachment copyText=\(copyText) url=\(emoji.url) size=\(emoji.size)"
+    )
+    return mutable
+  }
+}
+
+final class EmojiAttachmentViewProvider: NSTextAttachmentViewProvider {
+  private var animatedImageView: SDAnimatedImageView?
+  private var container: AppKitOrUIKitView?
+  private var didInvalidate = false
+
+  private func invalidateDisplayForThisAttachment() {
+    guard
+      let lm = textLayoutManager?.textContainer?.layoutManager,
+      let storage = textLayoutManager?.textContainer?.layoutManager?.textStorage
+    else { return }
+
+    let full = NSRange(location: 0, length: storage.length)
+    storage.enumerateAttribute(.attachment, in: full) { value, range, stop in
+      if (value as? NSTextAttachment) == self.textAttachment {
+        lm.invalidateDisplay(forCharacterRange: range)
+        stop.pointee = true
+      }
+    }
+  }
+
+  override init(
+    textAttachment: NSTextAttachment,
+    parentView: AppKitOrUIKitView?,
+    textLayoutManager: NSTextLayoutManager?,
+    location: NSTextLocation
+  ) {
+    super.init(
+      textAttachment: textAttachment,
+      parentView: parentView,
+      textLayoutManager: textLayoutManager,
+      location: location
+    )
+    self.tracksTextAttachmentViewBounds = true
+  }
+
+  override func loadView() {
+    guard let attachment = textAttachment as? EmojiTextAttachment else {
+      return
+    }
+    let size = attachment.emojiSize
+    let bounds = CGRect(x: 0, y: 0, width: size, height: size)
+
+    let host = AppKitOrUIKitView(frame: bounds)
+    #if os(iOS)
+      host.backgroundColor = .clear
+    #else
+      host.wantsLayer = false
+    #endif
+
+    let imageView = SDAnimatedImageView(frame: bounds)
+    #if os(iOS)
+      imageView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+      imageView.contentMode = .scaleAspectFit
+    #else
+      imageView.autoresizingMask = [.width, .height]
+      imageView.imageScaling = .scaleProportionallyUpOrDown
+    #endif
+    imageView.clipsToBounds = true
+
+    let url = attachment.emojiURL
+    if let cached = EmojiImageCache.get(url, size: size) {
+      imageView.image = cached
+      if !self.didInvalidate {
+        self.didInvalidate = true
+        self.invalidateDisplayForThisAttachment()
+      }
+    } else {
+      SDWebImageManager.shared.loadImage(
+        with: url,
+        options: [.scaleDownLargeImages],
+        progress: nil
+      ) { image, _, _, _, _, _ in
+        guard let img = image else { return }
+        EmojiImageCache.set(img, url: url, size: size)
+        DispatchQueue.main.async {
+          imageView.image = img
+          if !self.didInvalidate {
+            self.didInvalidate = true
+            self.invalidateDisplayForThisAttachment()
+          }
+        }
+      }
+    }
+
+    host.addSubview(imageView)
+    self.view = host
+    self.container = host
+    self.animatedImageView = imageView
+  }
+
+  override func attachmentBounds(
+    for attributes: [NSAttributedString.Key: Any],
+    location: NSTextLocation,
+    textContainer: NSTextContainer?,
+    proposedLineFragment: CGRect,
+    position: CGPoint
+  ) -> CGRect {
+    if let b = (textAttachment as? EmojiTextAttachment)?.bounds { return b }
+    return CGRect(
+      x: 0,
+      y: 0,
+      width: proposedLineFragment.height,
+      height: proposedLineFragment.height
+    )
+  }
+
+  deinit {
+    animatedImageView = nil
+    container = nil
+  }
 }

@@ -72,8 +72,10 @@ struct MessageCell: View {
           channelStore: channelStore,
           inline: inline
         )
-            case .chatInputCommand:
-              ChatInputCommandMessage(message: message, channelStore: channelStore)
+        .equatable()
+      case .chatInputCommand:
+        ChatInputCommandMessage(message: message, channelStore: channelStore)
+          .equatable()
       default:
         HStack {
           AvatarBalancing()

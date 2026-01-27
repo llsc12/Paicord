@@ -42,7 +42,7 @@ extension MessageCell {
                 .equatable(by: message.components)
             } else if !content.isEmpty {
               MarkdownText(content: content, channelStore: channelStore)
-                .equatable(by: message.content)
+                .equatable()
             }
           }
         }

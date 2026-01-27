@@ -11,7 +11,7 @@ import SDWebImageSwiftUI
 import SwiftUIX
 
 extension MessageCell {
-  struct ChatInputCommandMessage: View {
+  struct ChatInputCommandMessage: View, Equatable {
     let message: DiscordChannel.Message
     let channelStore: ChannelStore
 

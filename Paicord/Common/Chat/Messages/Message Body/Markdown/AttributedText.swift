@@ -37,12 +37,6 @@ struct AttributedText: View {
     }
 
     func makeNSView(context: Context) -> ModifiedCopyingTextView {
-      // register emoji type to view providers
-      NSTextAttachment.registerViewProviderClass(
-        MarkdownRendererVM.CrossPlatformEmojiAttachmentViewProvider.self,
-        forFileType: "public.item"
-      )
-
       let textStorage = NSTextStorage()
       let layoutManager = NSLayoutManager()
       let textContainer = NSTextContainer()
@@ -184,11 +178,6 @@ struct AttributedText: View {
     }
 
     func makeUIView(context: Context) -> ModifiedCopyingTextView {
-      // register emoji type to view providers
-      NSTextAttachment.registerViewProviderClass(
-        MarkdownRendererVM.CrossPlatformEmojiAttachmentViewProvider.self,
-        forFileType: "public.item"
-      )
       let textStorage = NSTextStorage()
       let layoutManager = NSLayoutManager()
       let textContainer = NSTextContainer()
@@ -231,11 +220,26 @@ struct AttributedText: View {
       uiView: ModifiedCopyingTextView,
       context: Context
     ) -> CGSize? {
+//      let targetWidth = proposal.width ?? 400
+//      let size = uiView.sizeThatFits(
+//        CGSize(width: targetWidth, height: .greatestFiniteMagnitude)
+//      )
+//      return CGSize(width: targetWidth, height: size.height)
+      
       let targetWidth = proposal.width ?? 400
-      let size = uiView.sizeThatFits(
-        CGSize(width: targetWidth, height: .greatestFiniteMagnitude)
+      let layoutManager = uiView.layoutManager
+      let textContainer = uiView.textContainer
+
+      // Set size for calculation
+      textContainer.containerSize = CGSize(
+        width: targetWidth,
+        height: .greatestFiniteMagnitude
       )
-      return CGSize(width: targetWidth, height: size.height)
+      layoutManager.ensureLayout(for: textContainer)
+
+      let usedRect = layoutManager.usedRect(for: textContainer)
+
+      return CGSize(width: targetWidth, height: ceil(usedRect.height))
     }
 
     final class Coordinator: NSObject, UITextViewDelegate {

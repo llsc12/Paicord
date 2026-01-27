@@ -179,6 +179,7 @@ extension ChatView {
               .foregroundStyle(.secondary)
               .lineLimit(1)
             MarkdownText(content: msg.content, channelStore: channelStore)
+              .equatable()
               .lineLimit(1)
               .frame(maxWidth: .infinity, alignment: .leading)
           }
@@ -307,18 +308,10 @@ extension ChatView {
             .foregroundColor: error != nil ? NSColor.red : nil
           ]
         #endif
-        let hash = {
-          var hasher = Hasher()
-          hasher.combine(message.content)
-          if let error {
-            hasher.combine(String(describing: error))
-          }
-          return hasher.finalize()
-        }()
         MarkdownText(content: message.content ?? "", channelStore: channelStore)
           .baseAttributes(attr as [NSAttributedString.Key: Any])
+          .equatable()
           .frame(maxWidth: .infinity, alignment: .leading)
-          .equatable(by: hash)
       }
       .opacity(0.6)  // indicate pending state
     }
