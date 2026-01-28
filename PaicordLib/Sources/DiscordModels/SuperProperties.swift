@@ -194,7 +194,7 @@ public enum SuperProperties {
       }
       return identifier
     #elseif os(watchOS)
-    // no good way to handle this. just return hardcoded value for now.
+      // no good way to handle this. just return hardcoded value for now.
       return "iPhone13,3"
     #elseif os(macOS)
       return nil
@@ -218,7 +218,9 @@ public enum SuperProperties {
       if sysctlbyname("kern.osproductversion", &buffer, &size, nil, 0) != 0 {
         return nil
       }
-      return String(cString: buffer)
+      let convertedBuffer = buffer.map { UInt8($0) }
+      let string = String(decoding: convertedBuffer.dropLast(), as: UTF8.self)
+      return string
     #elseif os(watchOS)
       // only watchos 26 and above can be returned safely.
       var size: Int = 0
@@ -230,7 +232,8 @@ public enum SuperProperties {
       if sysctlbyname("kern.osproductversion", &buffer, &size, nil, 0) != 0 {
         return nil
       }
-      let version = String(cString: buffer)
+      let convertedBuffer = buffer.map { UInt8($0) }
+      let version = String(decoding: convertedBuffer.dropLast(), as: UTF8.self)
       let majorVersion =
         (version.split(separator: ".").first ?? "0").flatMap { Int($0) } ?? 0
       if majorVersion >= 26 {

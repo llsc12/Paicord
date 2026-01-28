@@ -69,7 +69,8 @@ struct PlatformImageRepresentation: Codable, Hashable, Equatable, Sendable {
   func encode(to encoder: any Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
     #if canImport(UIKit)
-      guard let uiImageLight = self.light as? UIImage,
+      let uiImageLight = self.light
+      guard
         let imageDataLight = uiImageLight.pngData()
       else {
         throw EncodingError.invalidValue(
@@ -81,7 +82,8 @@ struct PlatformImageRepresentation: Codable, Hashable, Equatable, Sendable {
         )
       }
       try container.encode(imageDataLight, forKey: .light)
-      guard let uiImageDark = self.dark as? UIImage,
+      let uiImageDark = self.dark
+      guard
         let imageDataDark = uiImageDark.pngData()
       else {
         throw EncodingError.invalidValue(

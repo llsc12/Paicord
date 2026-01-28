@@ -21,7 +21,6 @@ struct MessageCell: View {
   var message: DiscordChannel.Message
   var priorMessage: DiscordChannel.Message?
   var channelStore: ChannelStore
-  @Environment(\.gateway) var gw
   @State var cellHighlighted = false
 
   init(
@@ -35,6 +34,7 @@ struct MessageCell: View {
   }
 
   var userMentioned: Bool {
+    let gw = GatewayStore.shared
     guard let currentUserID = gw.user.currentUser?.id else {
       return false
     }

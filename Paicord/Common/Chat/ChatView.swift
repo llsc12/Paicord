@@ -94,10 +94,8 @@ struct ChatView: View {
           // message drain view, represents messages being sent etc
         }
         .scrollTargetLayout()
-        
-        Spacer()
-          .frame(height: 10)
       }
+      .safeAreaPadding(.bottom, 10)
       .scrollPosition(id: $currentScrollPosition, anchor: .bottom)
       .bottomAnchored()
       .maxHeight(.infinity)

@@ -27,6 +27,7 @@ public struct UnstableEnum: MemberMacro {
   public static func expansion(
     of node: AttributeSyntax,
     providingMembersOf declaration: some DeclGroupSyntax,
+    conformingTo protocols: [TypeSyntax],
     in context: some MacroExpansionContext
   ) throws -> [DeclSyntax] {
     if declaration.hasError { return [] }
@@ -55,7 +56,9 @@ public struct UnstableEnum: MemberMacro {
     let elements = caseDecls.flatMap { $0.elements }
 
     let (cases, hasError) = elements.makeCases(
-      rawType: rawType, context: context)
+      rawType: rawType,
+      context: context
+    )
 
     if hasError { return [] }
 

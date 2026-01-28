@@ -263,10 +263,10 @@ extension ChatView.InputBar.InputVM {
     #if os(iOS)
       case .cameraPhoto(_, let image):
         return Image(uiImage: image)
-      case .cameraVideo(_, let url):
+      case .cameraVideo(_, _):
         return nil  // TODO: generate thumbnail from video
     #endif
-    case .file(_, let url, _):
+    case .file(_, _, _): // TODO: add file thumbnail support
       return nil
     }
   }

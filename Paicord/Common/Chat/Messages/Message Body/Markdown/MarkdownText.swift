@@ -7,6 +7,7 @@
 
 import DiscordMarkdownParser
 import HighlightSwift
+import Loupe
 import PaicordLib
 import SDWebImageSwiftUI
 import SwiftUIX
@@ -16,7 +17,6 @@ struct MarkdownText: View, Equatable {
   let channelStore: ChannelStore?
   let baseAttributesOverrides: [NSAttributedString.Key: Any]
 
-  @Environment(\.gateway) var gw
   @Environment(\.dynamicTypeSize) var dynamicType
   @Environment(\.theme) var theme
 
@@ -59,17 +59,18 @@ struct MarkdownText: View, Equatable {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 4) {
-
       if renderer.blocks.isEmpty {
         Text(markdown: content)  // Apple’s markdown fallback
           .opacity(0.6)
       } else {
         ForEach(renderer.blocks) { block in
           BlockView(block: block)
+            .equatable()
+            .debugRender()
+            .debugCompute()
         }
       }
     }
-    .task(id: renderSignature, renderIfNeeded)
     .environment(
       \.openURL,
       OpenURLAction { url in
@@ -83,26 +84,42 @@ struct MarkdownText: View, Equatable {
         user: user
       )
     }
+    .equatable(by: renderSignature)
+    .task(id: renderSignature, renderIfNeeded)
   }
 
   private var renderSignature: RenderSignature {
-    RenderSignature(
+    let gw = GatewayStore.shared
+    print(
+      content,
+      renderer.blocks,
+      gw.user.users.count,
+      channelStore?.guildStore?.members.count as Any,
+      channelStore?.guildStore?.roles.count as Any,
+      channelStore?.guildStore?.channels.count as Any,
+      dynamicType,
+      theme.id
+    )
+    let sig = RenderSignature(
       content: content,
+      blocks: renderer.blocks,
       userCount: gw.user.users.count,
       memberCount: channelStore?.guildStore?.members.count,
       roleCount: channelStore?.guildStore?.roles.count,
       channelCount: channelStore?.guildStore?.channels.count,
       dynamicType: dynamicType,
-      themeID: ObjectIdentifier(theme as AnyObject)
+      themeID: theme.id
     )
+    print(sig, "\n")
+    return sig
   }
 
   @Sendable
   private func renderIfNeeded() async {
     let sig = renderSignature
+    let gw = GatewayStore.shared
     guard lastRenderSignature != sig else { return }
     lastRenderSignature = sig
-
     renderer.passRefs(gw: gw, channelStore: channelStore)
     await renderer.update(
       content: content,
@@ -114,6 +131,7 @@ struct MarkdownText: View, Equatable {
     guard let cmd = PaicordChatLink(url: url) else {
       return .systemAction
     }
+    let gw = GatewayStore.shared
 
     switch cmd {
     case .userMention(let userID):
@@ -129,13 +147,19 @@ struct MarkdownText: View, Equatable {
     return .handled
   }
 
-  private struct BlockView: View {
+  private struct BlockView: View, Equatable {
     var block: BlockElement
+
+    static func == (lhs: BlockView, rhs: BlockView) -> Bool {
+      lhs.block == rhs.block
+    }
+
     var body: some View {
       switch block.nodeType {
       case .paragraph, .heading, .footnote, .thematicBreak:
         if let attr = block.attributedContent {
           AttributedText(attributedString: attr)
+            .equatable(by: attr)
         } else {
           Text("")
         }
@@ -150,6 +174,7 @@ struct MarkdownText: View, Equatable {
           if let children = block.children {
             ForEach(children) { nested in
               BlockView(block: nested)
+                .equatable()
             }
           }
         }
@@ -169,6 +194,7 @@ struct MarkdownText: View, Equatable {
               HStack(alignment: .top, spacing: 8) {
                 Text("•").font(.body)
                 BlockView(block: child)
+                  .equatable()
               }
             }
           }
@@ -182,6 +208,7 @@ struct MarkdownText: View, Equatable {
           VStack(alignment: .leading, spacing: 4) {
             ForEach(children) { nested in
               BlockView(block: nested)
+                .equatable()
             }
           }
         } else {
@@ -269,7 +296,7 @@ struct MarkdownText: View, Equatable {
 
 // MARK: - Models
 
-private struct BlockElement: Identifiable, Equatable {
+private struct BlockElement: Identifiable, Equatable, Hashable {
   let id: Int
   let nodeType: ASTNodeType
   let attributedContent: NSAttributedString?
@@ -284,13 +311,29 @@ private struct BlockElement: Identifiable, Equatable {
 
 // Stable render signature used to avoid redundant parsing
 private struct RenderSignature: Equatable {
-  let content: String
-  let userCount: Int
-  let memberCount: Int?
-  let roleCount: Int?
-  let channelCount: Int?
-  let dynamicType: DynamicTypeSize
-  let themeID: ObjectIdentifier
+  init(
+    content: String,
+    blocks: [BlockElement],
+    userCount: Int?,
+    memberCount: Int?,
+    roleCount: Int?,
+    channelCount: Int?,
+    dynamicType: DynamicTypeSize,
+    themeID: String?
+  ) {
+    var h = Hasher()
+    h.combine(content)
+    h.combine(blocks)
+    if let userCount { h.combine(userCount) }
+    if let memberCount { h.combine(memberCount) }
+    if let roleCount { h.combine(roleCount) }
+    if let channelCount { h.combine(channelCount) }
+    h.combine(dynamicType)
+    h.combine(themeID)
+    self.hash = h.finalize()
+  }
+
+  let hash: Int
 }
 
 // MARK: - Renderer
@@ -332,15 +375,7 @@ class MarkdownRendererVM {
 
   fileprivate func update(content: String, signature: RenderSignature) async {
     // If a cached renderer exists for this signature, adopt its blocks immediately.
-    let cacheKey = Self.makeCacheKey(
-      content: signature.content,
-      userCount: signature.userCount,
-      memberCount: signature.memberCount,
-      roleCount: signature.roleCount,
-      channelCount: signature.channelCount,
-      dynamicType: signature.dynamicType,
-      themeID: signature.themeID
-    )
+    let cacheKey = Self.makeCacheKey(hash: signature.hash)
 
     if let cached = Self.cache.object(forKey: cacheKey as NSString) {
       await MainActor.run {
@@ -370,23 +405,9 @@ class MarkdownRendererVM {
   }
 
   static func makeCacheKey(
-    content: String,
-    userCount: Int?,
-    memberCount: Int?,
-    roleCount: Int?,
-    channelCount: Int?,
-    dynamicType: DynamicTypeSize?,
-    themeID: ObjectIdentifier?
+    hash: Int
   ) -> String {
-    var h = Hasher()
-    h.combine(content)
-    if let userCount { h.combine(userCount) }
-    if let memberCount { h.combine(memberCount) }
-    if let roleCount { h.combine(roleCount) }
-    if let channelCount { h.combine(channelCount) }
-    if let dynamicType { h.combine(dynamicType) }
-    if let themeID { h.combine(themeID) }
-    return String(h.finalize())
+    String(hash)
   }
 
   private enum BaseInlineStyle { case body, footnote }
@@ -1631,7 +1652,7 @@ final class EmojiAttachmentViewProvider: NSTextAttachmentViewProvider {
     if let b = (textAttachment as? EmojiTextAttachment)?.bounds { return b }
     return CGRect(
       x: 0,
-      y: 0,
+      y: -3,
       width: proposedLineFragment.height,
       height: proposedLineFragment.height
     )

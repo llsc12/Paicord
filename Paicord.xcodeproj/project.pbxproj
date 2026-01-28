@@ -107,7 +107,7 @@
 		AA8ABACA2F2A794E00557278 /* SwiftEmoji in Frameworks */ = {isa = PBXBuildFile; productRef = AA8ABAC92F2A794E00557278 /* SwiftEmoji */; };
 		AA8ABACC2F2A794E00557278 /* SwiftEmojiIndex in Frameworks */ = {isa = PBXBuildFile; productRef = AA8ABACB2F2A794E00557278 /* SwiftEmojiIndex */; };
 		AA8ABACF2F2A79B500557278 /* Loupe in Frameworks */ = {isa = PBXBuildFile; productRef = AA8ABACE2F2A79B500557278 /* Loupe */; };
-		AA8ABAD22F2A7A0800557278 /* MijickCamera in Frameworks */ = {isa = PBXBuildFile; productRef = AA8ABAD12F2A7A0800557278 /* MijickCamera */; };
+		AA8ABAD22F2A7A0800557278 /* MijickCamera in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = AA8ABAD12F2A7A0800557278 /* MijickCamera */; };
 		AA9C81832E6660BE0086B1DA /* GuildButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9C81822E6660BE0086B1DA /* GuildButton.swift */; };
 		AA9C81862E66670E0086B1DA /* CornerRadius.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9C81852E66670E0086B1DA /* CornerRadius.swift */; };
 		AA9C818C2E6702930086B1DA /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = AA9C818B2E6702930086B1DA /* SwiftUIIntrospect */; };
