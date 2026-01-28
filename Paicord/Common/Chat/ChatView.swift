@@ -46,6 +46,7 @@ struct ChatView: View {
               //                  }
             } else {
               if vm.hasPermission(.readMessageHistory) {
+                ChatHeaders.WelcomeStartOfChannelHeader()
               } else {
                 ChatHeaders.NoHistoryPermissionHeader()
               }
