@@ -54,10 +54,10 @@ extension MessageCell {
         }
 
         // Embeds
-//        let embeds = message.embeds ?? []
-//        if !embeds.isEmpty {
-//          EmbedsView(embeds: embeds)
-//        }
+        let embeds = message.embeds ?? []
+        if !embeds.isEmpty {
+          EmbedsView(embeds: embeds)
+        }
 
         // Stickers
         if let stickers = message.sticker_items, !stickers.isEmpty {
