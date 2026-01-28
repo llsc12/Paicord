@@ -126,13 +126,13 @@ extension ChatView {
 
           TypingIndicatorBar(vm: vm)
             .shadow(color: .black, radius: 10)
-            .padding(.top, -18)  // away from bar
+            .padding(.top, -13)  // away from bar
         }
         .background {
           VariableBlurView()
             .rotationEffect(.degrees(180))
             // extend upwards slightly
-            .padding(.top, -8 + (vm.typingTimeoutTokens.isEmpty ? 0 : -10))
+            .padding(.top, -8 + (vm.typingTimeoutTokens.isEmpty ? 0 : -5))
             #if os(iOS)
               .padding(
                 .bottom,

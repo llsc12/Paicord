@@ -54,6 +54,7 @@ struct LargeBaseplate: View {
       Group {
         if let currentChannelStore {
           ChatView(vm: currentChannelStore)
+            .id(currentChannelStore.channelId) // force view update
             .environment(\.guildStore, currentGuildStore)
             .environment(\.channelStore, currentChannelStore)
         } else {

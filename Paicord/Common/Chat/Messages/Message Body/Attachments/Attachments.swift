@@ -93,32 +93,14 @@ extension MessageCell {
       private let maxHeight: CGFloat = 300
 
       var body: some View {
-        let originalWidth = attachment.width?.toCGFloat ?? maxWidth
-        let originalHeight = attachment.height?.toCGFloat ?? maxHeight
-
-        let aspectRatio = originalWidth / originalHeight
-
-        let (width, height) = {
-          var width = min(originalWidth, maxWidth)
-          var height = width / aspectRatio
-
-          if height > maxHeight {
-            height = maxHeight
-            width = height * aspectRatio
-          }
-          return (width, height)
-        }()
-
         content
-          .frame(maxWidth: width, alignment: .leading)
-          .aspectRatio(aspectRatio, contentMode: .fit)
-          .frame(height: height)
+          .aspectRatio(attachment.aspectRatio, contentMode: .fit)
           .clipShape(.rounded)
+          .frame(maxWidth: maxWidth, maxHeight: maxHeight, alignment: .leading)
           .fixedSize(horizontal: false, vertical: true)
       }
     }
 
-    // MARK: - Helper views
 
     /// Handles images, videos
     struct AttachmentGridItemPreview: View {
@@ -156,11 +138,9 @@ extension MessageCell {
               #if os(macOS)
                 Image(nsImage: img)
                   .resizable()
-                  .scaledToFill()
               #else
                 Image(uiImage: img)
                   .resizable()
-                  .scaledToFill()
               #endif
             } else {
               Color.gray.opacity(0.2)
@@ -168,9 +148,6 @@ extension MessageCell {
 
           }
           .resizable()
-          .scaledToFill()
-          .frame(maxWidth: .infinity, maxHeight: .infinity)
-          .clipped()
         }
       }
 

@@ -62,7 +62,6 @@ extension ChatView {
           }
         }
       }
-
     }
   }
 

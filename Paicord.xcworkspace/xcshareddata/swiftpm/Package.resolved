@@ -1,5 +1,5 @@
 {
-  "originHash" : "9f4b1caaa6ca234164146a1ad4f7b09f49d861a21a408829d1aec81f2835c20f",
+  "originHash" : "a93622e22671438f42a166ab7a258adf68df6093e7afc92a9e1e5362e0d06f7c",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "254d34096123cd5da4f82e69f52f622ac7526d68",
         "version" : "1.27.0"
+      }
+    },
+    {
+      "identity" : "camera",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Mijick/Camera",
+      "state" : {
+        "revision" : "0f02348fcc8fbbc9224c7fbf444f182dc25d0b40",
+        "version" : "3.0.3"
       }
     },
     {
@@ -116,6 +125,15 @@
       "state" : {
         "revision" : "04f2fd18cc9404a0a0917265a449002674f24ec9",
         "version" : "4.5.2"
+      }
+    },
+    {
+      "identity" : "loupe",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Aeastr/Loupe",
+      "state" : {
+        "revision" : "eb0d2dc4fa053447b643ec7a2d62fc007432014b",
+        "version" : "3.0.0"
       }
     },
     {
@@ -371,6 +389,15 @@
       }
     },
     {
+      "identity" : "swiftemoji",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Aeastr/SwiftEmoji",
+      "state" : {
+        "revision" : "dd8adc55bb81177d3f55e97514ed793fb9cd8eb4",
+        "version" : "1.1.0"
+      }
+    },
+    {
       "identity" : "swiftparamtest",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/YusukeHosonuma/SwiftParamTest.git",
@@ -404,6 +431,15 @@
       "state" : {
         "branch" : "master",
         "revision" : "56175334751a03f80d3a650c497b8525237d4e43"
+      }
+    },
+    {
+      "identity" : "timer",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Mijick/Timer",
+      "state" : {
+        "revision" : "342371c33c3f084d82a4818447ba77d858064c85",
+        "version" : "2.0.0"
       }
     },
     {

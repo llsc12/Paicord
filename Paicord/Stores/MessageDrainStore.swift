@@ -114,7 +114,6 @@ class MessageDrainStore: DiscordDataStore {
   private func _editMessage(_ vm: ChatView.InputBar.InputVM, in channel: ChannelSnowflake) {
     guard let gateway = gateway?.gateway else { return }
     guard case .edit(let origMessage) = vm.messageAction else { return }
-    print(vm.content, vm.messageAction)
     let message = Payloads.EditMessage.init(content:  vm.content)
 
     Task {
@@ -382,6 +381,12 @@ class MessageDrainStore: DiscordDataStore {
       .updateValue(message, forKey: nonce)
     // store task
     messageTasks[nonce] = task
+    
+    // notify ui to scroll to the newly pending message
+    NotificationCenter.default.post(
+      name: .chatViewShouldScrollToBottom,
+      object: ["channelId": channel]
+    )
 
     startQueueIfNeeded()
   }

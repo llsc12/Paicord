@@ -103,7 +103,6 @@ struct MessageCell: View {
     #endif
     .entityContextMenu(for: message)
     .padding(.top, inline ? 0 : 15)  // adds space between message groups
-
   }
 }
 

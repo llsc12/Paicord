@@ -12,7 +12,7 @@ import PaicordLib
 @_spi(Advanced) import SwiftUIIntrospect
 import SwiftUIX
 
-#if canImport(Sparkle)
+#if canImport(Sparkle) && !DEBUG
   import Sparkle
 #endif
 
@@ -55,7 +55,7 @@ struct PaicordApp: App {
     //        return logger
     //      }
     //    #endif
-    #if os(macOS)
+    #if canImport(Sparkle) && !DEBUG
       updaterController = SPUStandardUpdaterController(
         startingUpdater: true,
         updaterDelegate: nil,
@@ -69,7 +69,7 @@ struct PaicordApp: App {
     )
   }
 
-  #if canImport(Sparkle)
+  #if canImport(Sparkle) && !DEBUG
     private let updaterController: SPUStandardUpdaterController
   #endif
 
@@ -88,13 +88,16 @@ struct PaicordApp: App {
         }
       #endif
     }
-    #if os(macOS)
-      .windowToolbarStyle(.unified)
-      .commands {
-        CommandGroup(after: .appInfo) {
-          CheckForUpdatesView(updater: updaterController.updater)
+    // if macos or ipados
+    #if os(macOS) || os(iOS)
+      #if canImport(Sparkle) && !DEBUG
+        .windowToolbarStyle(.unified)
+        .commands {
+          CommandGroup(after: .appInfo) {
+            CheckForUpdatesView(updater: updaterController.updater)
+          }
         }
-      }
+      #endif
       .commands {
         PaicordCommands()
         CommandGroup(replacing: .appSettings) {
@@ -121,7 +124,7 @@ struct PaicordApp: App {
 
 // https://sparkle-project.org/documentation/programmatic-setup/
 
-#if os(macOS)
+#if canImport(Sparkle) && !DEBUG
   final class CheckForUpdatesViewModel: ObservableObject {
     @Published var canCheckForUpdates = false
 

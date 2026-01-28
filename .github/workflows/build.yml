@@ -505,7 +505,8 @@ jobs:
             "$OUT_DIR/$IOS_ASSET" \
             --title "Paicord Nightly ${COMMIT_HASH}" \
             --notes "Automated build for commit ${COMMIT_HASH}" \
-            --target "${GITHUB_REF_NAME:-main}"
+            --target "${GITHUB_REF_NAME:-main}" \
+            --prerelease
 
           echo "Release created. Release assets uploaded."
 

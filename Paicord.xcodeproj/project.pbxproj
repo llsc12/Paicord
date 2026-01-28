@@ -104,6 +104,10 @@
 		AA7B0B6A2EE5D809003F0CE9 /* ChatHeaders.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7B0B692EE5D804003F0CE9 /* ChatHeaders.swift */; };
 		AA7B38F22EB37F9B00CA4A3C /* PermsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7B38F12EB37F9500CA4A3C /* PermsHelper.swift */; };
 		AA7B38F42EB50F0100CA4A3C /* MessageDrainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA7B38F32EB50EFD00CA4A3C /* MessageDrainStore.swift */; };
+		AA8ABACA2F2A794E00557278 /* SwiftEmoji in Frameworks */ = {isa = PBXBuildFile; productRef = AA8ABAC92F2A794E00557278 /* SwiftEmoji */; };
+		AA8ABACC2F2A794E00557278 /* SwiftEmojiIndex in Frameworks */ = {isa = PBXBuildFile; productRef = AA8ABACB2F2A794E00557278 /* SwiftEmojiIndex */; };
+		AA8ABACF2F2A79B500557278 /* Loupe in Frameworks */ = {isa = PBXBuildFile; productRef = AA8ABACE2F2A79B500557278 /* Loupe */; };
+		AA8ABAD22F2A7A0800557278 /* MijickCamera in Frameworks */ = {isa = PBXBuildFile; productRef = AA8ABAD12F2A7A0800557278 /* MijickCamera */; };
 		AA9C81832E6660BE0086B1DA /* GuildButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9C81822E6660BE0086B1DA /* GuildButton.swift */; };
 		AA9C81862E66670E0086B1DA /* CornerRadius.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9C81852E66670E0086B1DA /* CornerRadius.swift */; };
 		AA9C818C2E6702930086B1DA /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = AA9C818B2E6702930086B1DA /* SwiftUIIntrospect */; };
@@ -280,10 +284,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA8ABACF2F2A79B500557278 /* Loupe in Frameworks */,
 				AA5CA6602E9D435800C7C82A /* SDWebImageSwiftUI in Frameworks */,
+				AA8ABAD22F2A7A0800557278 /* MijickCamera in Frameworks */,
 				5783AA902E6B8F6500F73F6D /* MeshGradient in Frameworks */,
 				AA5CA6582E9D2CBA00C7C82A /* HighlightSwift in Frameworks */,
 				AA1878F92E81FC1A009C7E40 /* FLEX in Frameworks */,
+				AA8ABACC2F2A794E00557278 /* SwiftEmojiIndex in Frameworks */,
+				AA8ABACA2F2A794E00557278 /* SwiftEmoji in Frameworks */,
 				AAD446A22ED07916006CB07C /* SettingsKit in Frameworks */,
 				579DF34B2E6D9B9800BD8B97 /* SwiftUIX in Frameworks */,
 				AA47AF622EDF1FF7008A50C9 /* Conditionals in Frameworks */,
@@ -949,6 +957,10 @@
 				AAD446A12ED07916006CB07C /* SettingsKit */,
 				AA47AF612EDF1FF7008A50C9 /* Conditionals */,
 				AAA9EEFC2F23062B00770CAD /* CodeScanner */,
+				AA8ABAC92F2A794E00557278 /* SwiftEmoji */,
+				AA8ABACB2F2A794E00557278 /* SwiftEmojiIndex */,
+				AA8ABACE2F2A79B500557278 /* Loupe */,
+				AA8ABAD12F2A7A0800557278 /* MijickCamera */,
 			);
 			productName = PaiCord;
 			productReference = AA1096DB2E63BE84005BC3D2 /* Paicord.app */;
@@ -995,6 +1007,9 @@
 				AAD446A02ED07916006CB07C /* XCRemoteSwiftPackageReference "SettingsKit" */,
 				AA47AF602EDF1FF7008A50C9 /* XCRemoteSwiftPackageReference "Conditionals" */,
 				AAA9EEFB2F23062B00770CAD /* XCRemoteSwiftPackageReference "CodeScanner" */,
+				AA8ABAC82F2A794E00557278 /* XCRemoteSwiftPackageReference "SwiftEmoji" */,
+				AA8ABACD2F2A79B500557278 /* XCRemoteSwiftPackageReference "Loupe" */,
+				AA8ABAD02F2A7A0800557278 /* XCRemoteSwiftPackageReference "Camera" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = AA1096DC2E63BE84005BC3D2 /* Products */;
@@ -1280,8 +1295,21 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 566RT33SA2;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_FILE_ACCESS_DOWNLOADS_FOLDER = readwrite;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
+				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Paicord/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
@@ -1327,8 +1355,21 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 566RT33SA2;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_FILE_ACCESS_DOWNLOADS_FOLDER = readwrite;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
+				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Paicord/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
@@ -1457,6 +1498,30 @@
 				minimumVersion = 3.1.3;
 			};
 		};
+		AA8ABAC82F2A794E00557278 /* XCRemoteSwiftPackageReference "SwiftEmoji" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Aeastr/SwiftEmoji";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.0;
+			};
+		};
+		AA8ABACD2F2A79B500557278 /* XCRemoteSwiftPackageReference "Loupe" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Aeastr/Loupe";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
+		AA8ABAD02F2A7A0800557278 /* XCRemoteSwiftPackageReference "Camera" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Mijick/Camera";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.3;
+			};
+		};
 		AA9C818A2E6702930086B1DA /* XCRemoteSwiftPackageReference "swiftui-introspect" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/siteline/swiftui-introspect";
@@ -1565,6 +1630,26 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AA5CA65E2E9D435800C7C82A /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
 			productName = SDWebImageSwiftUI;
+		};
+		AA8ABAC92F2A794E00557278 /* SwiftEmoji */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AA8ABAC82F2A794E00557278 /* XCRemoteSwiftPackageReference "SwiftEmoji" */;
+			productName = SwiftEmoji;
+		};
+		AA8ABACB2F2A794E00557278 /* SwiftEmojiIndex */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AA8ABAC82F2A794E00557278 /* XCRemoteSwiftPackageReference "SwiftEmoji" */;
+			productName = SwiftEmojiIndex;
+		};
+		AA8ABACE2F2A79B500557278 /* Loupe */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AA8ABACD2F2A79B500557278 /* XCRemoteSwiftPackageReference "Loupe" */;
+			productName = Loupe;
+		};
+		AA8ABAD12F2A7A0800557278 /* MijickCamera */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AA8ABAD02F2A7A0800557278 /* XCRemoteSwiftPackageReference "Camera" */;
+			productName = MijickCamera;
 		};
 		AA9C818B2E6702930086B1DA /* SwiftUIIntrospect */ = {
 			isa = XCSwiftPackageProductDependency;
