@@ -9,7 +9,7 @@
 import PaicordLib
 import SwiftUIX
 
-#if os(iOS)
+#if os(iOS) && !DEBUG
 
   extension View {
     func updateSheet() -> some View {

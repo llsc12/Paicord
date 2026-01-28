@@ -75,6 +75,16 @@ final class TokenStore {
 
   init() {
     accounts = Self.load()
+    // safeguard against cases where keychain is empty but UserDefaults has an ID
+    // this would usually softlock people.
+    if accounts.count == 0 {
+      currentAccountID = nil
+    }
+    // this one should kick user back to fallback account picker if their current account doesnt exist
+    if let currentID = currentAccountID,
+       accounts.first(where: { $0.user.id == currentID }) == nil {
+      currentAccountID = nil
+    }
   }
 
   func addAccount(token: Secret, user: DiscordUser) {

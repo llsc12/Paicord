@@ -57,10 +57,6 @@ struct ChatView: View {
             let prior = vm.getMessage(before: msg)
             if messageAllowed(msg) {
               MessageCell(for: msg, prior: prior, channel: vm)
-                // if the scroll position is this message id, make bg blue
-                .background(
-                  currentScrollPosition == msg.id ? .blue.opacity(0.5) : .clear
-                )
             }
           }
 
