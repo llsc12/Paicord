@@ -12,6 +12,7 @@ import PaicordLib
 import SDWebImageSwiftUI
 import SwiftPrettyPrint
 import SwiftUIX
+import Loupe
 
 extension MessageCell {
   struct EmbedsView: View {
@@ -22,41 +23,45 @@ extension MessageCell {
         "redo this to support all embed types properly, eg gifs, embeds with multiple images."
       )
       ForEach(embeds) { embed in
-        switch embed.type {
-        case .rich, .article:
-          EmbedView(embed: embed)
-        case .image:
-          if let image = embed.image ?? embed.thumbnail,
-            let url = URL(string: image.proxyurl)
-          {
-            let aspectRatio: CGFloat? = {
-              if let width = image.width, let height = image.height {
-                return width.toCGFloat / height.toCGFloat
-              } else {
-                return nil
-              }
-            }()
-            AnimatedImage(url: url)
-              .resizable()
-              .aspectRatio(aspectRatio, contentMode: .fit)
-              .clipShape(.rounded)
-              .frame(
-                minWidth: 1,
-                maxWidth: min(image.width?.toCGFloat, 400),
-                minHeight: 1,
-                maxHeight: min(image.height?.toCGFloat, 300),
-                alignment: .leading
-              )
+        Group {
+          switch embed.type {
+          case .rich, .article:
+            EmbedView(embed: embed)
+          case .image:
+            if let image = embed.image ?? embed.thumbnail,
+              let url = URL(string: image.proxyurl)
+            {
+              let aspectRatio: CGFloat? = {
+                if let width = image.width, let height = image.height {
+                  return width.toCGFloat / height.toCGFloat
+                } else {
+                  return nil
+                }
+              }()
+              AnimatedImage(url: url)
+                .resizable()
+                .aspectRatio(aspectRatio, contentMode: .fit)
+                .clipShape(.rounded)
+                .frame(
+                  minWidth: 1,
+                  maxWidth: min(image.width?.toCGFloat, 400),
+                  minHeight: 1,
+                  maxHeight: min(image.height?.toCGFloat, 300),
+                  alignment: .leading
+                )
+            }
+          case .gifv:
+            if let video = embed.video {
+              GifvView(media: video, staticMedia: embed.image)
+            }
+          case .link:
+            LinkEmbedView(embed: embed)
+          default:
+            Text("Unsupported embed type: \(embed.type)")
           }
-        case .gifv:
-          if let video = embed.video {
-            GifvView(media: video, staticMedia: embed.image)
-          }
-        case .link:
-          LinkEmbedView(embed: embed)
-        default:
-          Text("Unsupported embed type: \(embed.type)")
         }
+        .debugRender()
+        .debugCompute()
       }
     }
 

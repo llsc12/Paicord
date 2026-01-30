@@ -134,7 +134,7 @@ struct MemberSidebarView: View {
 
     @ViewBuilder
     var profileBody: some View {
-      VStack(alignment: .leading, spacing: 4) {
+      LazyVStack(alignment: .leading, spacing: 4) {
         let profileMeta: DiscordUser.Profile.Metadata? = profile?.user_profile
         Text(
           user.global_name ?? user.username ?? "Unknown User"

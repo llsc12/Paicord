@@ -54,7 +54,7 @@ struct ProfilePopoutView: View {
 
   var body: some View {
     ScrollView {
-      VStack(alignment: .leading) {
+      LazyVStack(alignment: .leading) {
         bannerView
 
         profileBody
@@ -137,7 +137,7 @@ struct ProfilePopoutView: View {
 
   @ViewBuilder
   var profileBody: some View {
-    VStack(alignment: .leading, spacing: 4) {
+    LazyVStack(alignment: .leading, spacing: 4) {
       let profileMeta: DiscordUser.Profile.Metadata? = {
         if showMainProfile {
           return profile?.user_profile

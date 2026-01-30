@@ -29,13 +29,11 @@ struct ChatView: View {
 
   var body: some View {
     let orderedMessages = vm.messages.values
-    let pendingMessages:
-      OrderedDictionary<MessageSnowflake, Payloads.CreateMessage> =
-        drain.pendingMessages[vm.channelId, default: [:]]
+    let pendingMessages = drain.pendingMessages[vm.channelId, default: [:]]
 
     let shouldAnimate =
       orderedMessages.last?.author?.id != gw.user.currentUser?.id
-    VStack(spacing: 0) {
+    VStack(spacing: 15) {
       ScrollView {
         LazyVStack(alignment: .leading, spacing: 0) {
           if !vm.messages.isEmpty {
@@ -95,9 +93,11 @@ struct ChatView: View {
         }
         .scrollTargetLayout()
       }
-      .safeAreaPadding(.bottom, 10)
-      .scrollPosition(id: $currentScrollPosition, anchor: .bottom)
+      .scrollPosition(id: $currentScrollPosition, anchor: .bottom)  // causes issues with input bar height changes:
+      // currently, the input bar changing size can cause the scrollview position to jump unexpectedly.
+      // not sure how to fix.
       .bottomAnchored()
+      .scrollClipDisabled()
       .maxHeight(.infinity)
       .onReceive(
         NotificationCenter.default.publisher(
@@ -108,7 +108,7 @@ struct ChatView: View {
           let channelId = info["channelId"] as? ChannelSnowflake,
           channelId == vm.channelId
         else { return }
-        let isNearBottom = vm.messages.values.suffix(10).contains {
+        let isNearBottom = vm.messages.values.suffix(5).contains {
           $0.id == self.currentScrollPosition
         }
         guard isNearBottom || (info["immediate"] as? Bool == true) else {
@@ -117,7 +117,7 @@ struct ChatView: View {
         let pending: MessageSnowflake? = info["id"] as? MessageSnowflake
         self.currentScrollPosition =
           pending ?? vm.messages.values.last?.id ?? self.currentScrollPosition
-      }
+      }  // handle scroll to bottom event
       .onReceive(
         NotificationCenter.default.publisher(for: .chatViewShouldScrollToID)
       ) { object in
@@ -127,6 +127,11 @@ struct ChatView: View {
           let messageId = info["messageId"] as? MessageSnowflake
         else { return }
         self.currentScrollPosition = messageId
+      }  // handle scroll to ID event
+
+      if vm.hasPermission(.sendMessages) {
+        InputBar(vm: vm)
+          .id(vm.channelId)
       }
     }
     .animation(
@@ -135,12 +140,6 @@ struct ChatView: View {
     )
     .animation(chatAnimatesMessages ? .default : nil, value: pendingMessages)
     .scrollDismissesKeyboard(.interactively)
-    .safeAreaInset(edge: .bottom, spacing: 10) {
-      if vm.hasPermission(.sendMessages) {
-        InputBar(vm: vm)
-          .id(vm.channelId)
-      }
-    }
     .background(theme.common.secondaryBackground)
     .ignoresSafeArea(.keyboard, edges: .all)
     .toolbar {
@@ -204,7 +203,6 @@ extension View {
     if #available(iOS 18.0, macOS 15.0, *) {
       return
         self
-        .defaultScrollAnchor(.bottom)
         .defaultScrollAnchor(.bottom, for: .initialOffset)
         .defaultScrollAnchor(.bottom, for: .alignment)
         .defaultScrollAnchor(.bottom, for: .sizeChanges)

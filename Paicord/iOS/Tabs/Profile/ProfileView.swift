@@ -27,7 +27,7 @@ struct ProfileView: View {
   var body: some View {
     NavigationStack {
       ScrollView {
-        VStack(alignment: .leading) {
+        LazyVStack(alignment: .leading) {
           bannerView
             .overlay(alignment: .topTrailing) {
               HStack {
@@ -111,7 +111,7 @@ struct ProfileView: View {
 
   @ViewBuilder
   var profileBody: some View {
-    VStack(alignment: .leading, spacing: 4) {
+    LazyVStack(alignment: .leading, spacing: 4) {
       let profileMeta: DiscordUser.Profile.Metadata? = profile?.user_profile
       Text(
         user?.global_name ?? user?.username ?? "Unknown User"

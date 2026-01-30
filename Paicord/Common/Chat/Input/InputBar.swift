@@ -10,6 +10,10 @@ import PaicordLib
 import PhotosUI
 import SwiftUIX
 
+#if os(iOS)
+  import MijickCamera
+#endif
+
 extension ChatView {
   struct InputBar: View {
     static var inputVMs: [ChannelSnowflake: InputVM] = [:]
@@ -123,26 +127,19 @@ extension ChatView {
 
             messageInputBar
           }
+          .padding(.top, 4)
 
           TypingIndicatorBar(vm: vm)
-            .shadow(color: .black, radius: 10)
-            .padding(.top, -13)  // away from bar
+            .background(.bar)
+            .padding(.top, -18)  // away from bar
         }
-        .background {
-          VariableBlurView()
-            .rotationEffect(.degrees(180))
-            // extend upwards slightly
-            .padding(.top, -8 + (vm.typingTimeoutTokens.isEmpty ? 0 : -5))
-            #if os(iOS)
-              .padding(
-                .bottom,
-                isFocused ? 0 : (properties.safeArea.bottom * -1)
-              )
-              .animation(.default, value: isFocused)
-            #endif
-        }
-        .ignoresSafeArea(.container, edges: .horizontal)
+        .background(.bar)
       }
+      #if os(iOS)
+        .animation(properties.animation, value: animatedKeyboardHeight)
+        .animation(properties.animation, value: inputVM.content.isEmpty)
+        .animation(properties.animation, value: inputVM.uploadItems.isEmpty)
+      #endif
       .animation(.default, value: inputVM.messageAction.debugDescription)
       .animation(.default, value: inputVM.uploadItems)
       .onFileDrop(
@@ -207,9 +204,6 @@ extension ChatView {
       .geometryGroup()
       #if os(iOS)
         .padding(.bottom, animatedKeyboardHeight)
-        .animation(properties.animation, value: animatedKeyboardHeight)
-        .animation(properties.animation, value: inputVM.content.isEmpty)
-        .animation(properties.animation, value: inputVM.uploadItems.isEmpty)
         .onReceive(
           NotificationCenter.default.publisher(
             for: UIResponder.keyboardWillChangeFrameNotification
@@ -218,8 +212,8 @@ extension ChatView {
           if let keyboardFrame = userInfo.userInfo?[
             UIResponder.keyboardFrameEndUserInfoKey
           ] as? NSValue {
-            let height = keyboardFrame.cgRectValue.height
-            //            guard properties.storedKeyboardHeight == 0 else { return }
+            let height = max(290, keyboardFrame.cgRectValue.height)
+            //                        guard properties.storedKeyboardHeight == 0 else { return }
             properties.storedKeyboardHeight = max(
               height - properties.safeArea.bottom,
               0
@@ -289,6 +283,14 @@ extension ChatView {
           .presentationBackgroundInteraction(
             .enabled(upThrough: .height(properties.keyboardHeight))
           )
+        }
+        .fullScreenCover(isPresented: $cameraPickerPresented) {
+          MCamera()
+          .setCameraOutputType(.photo)
+          .setCloseMCameraAction(closeMCameraAction)
+          .onImageCaptured(onImageCaptured)
+          .onVideoCaptured(onVideoCaptured)
+          .startSession()
         }
         .alert(
           "Some files were not added",
@@ -395,11 +397,13 @@ extension ChatView {
           Button {
             properties.showFilePicker = false
             properties.showPhotosPicker = false
+            // refocus keyboard
+            isFocused = true
           } label: {
             Image(systemName: "plus")
               .imageScale(.large)
               .padding(7.5)
-              .background(.regularMaterial)
+              .background(.background.secondary.opacity(0.8))
               .clipShape(.circle)
               .rotationEffect(.degrees(45))
           }
@@ -410,7 +414,7 @@ extension ChatView {
             Button {
               properties.showPhotosPicker = false
               properties.showFilePicker = false
-
+              self.cameraPickerPresented = true
             } label: {
               Label("Camera", systemImage: "camera")
             }
@@ -432,13 +436,13 @@ extension ChatView {
                 Text("1")
               }
             } label: {
-              Label("Apps", systemImage: "puzzle.fill")
+              Label("Apps", systemImage: "puzzlepiece.fill")
             }
           } label: {
             Image(systemName: "plus")
               .imageScale(.large)
               .padding(7.5)
-              .background(.regularMaterial)
+              .background(.background.secondary.opacity(0.8))
               .clipShape(.circle)
           }
           .buttonStyle(.borderless)
@@ -452,7 +456,7 @@ extension ChatView {
               Text("1")
             }
           } label: {
-            Label("Apps", systemImage: "puzzle.fill")
+            Label("Apps", systemImage: "puzzlepiece.fill")
           }
 
           Button {
@@ -464,7 +468,7 @@ extension ChatView {
           Image(systemName: "plus")
             .imageScale(.large)
             .padding(7.5)
-            .background(.regularMaterial)
+            .background(.background.secondary.opacity(0.8))
             .clipShape(.circle)
         }
         .menuStyle(.button)
@@ -497,7 +501,7 @@ extension ChatView {
         .buttonStyle(.borderless)
         .tint(.secondary)
       }
-      .background(.regularMaterial)
+      .background(.background.secondary.opacity(0.8))
       .clipShape(.rect(cornerRadius: 18))
 
       #if os(iOS)
@@ -587,7 +591,7 @@ extension ChatView {
       .padding(.horizontal, 6)
       .padding(.leading, 4)
       .padding(.vertical, 4)
-      .background(.thinMaterial)
+      .background(.background.secondary.opacity(0.8))
       .clipShape(.capsule)
       .padding(.horizontal, 8)
     }
@@ -606,6 +610,43 @@ extension ChatView {
       }
     }
 
+    func closeMCameraAction() {
+      self.cameraPickerPresented = false
+    }
+    func onImageCaptured(_ image: UIImage, _ controller: MCamera.Controller) {
+      Task {
+        // save to temp directory
+        let tempDir = FileManager.default.temporaryDirectory
+        let fileURL = tempDir.appendingPathComponent(
+          UUID().uuidString + ".png"
+        )
+        if let imageData = image.pngData() {
+          do {
+            try imageData.write(to: fileURL)
+            inputVM.selectedFiles.append(fileURL)
+          } catch {
+            print("Failed to save captured image: \(error)")
+          }
+        }
+        controller.closeMCamera()
+      }
+    }
+    func onVideoCaptured(_ videoURL: URL, _ controller: MCamera.Controller) {
+      Task {
+        // unsure where this saves to, just moving it to temp directory bc why not
+        let newVideoURL = FileManager.default.temporaryDirectory
+          .appendingPathComponent(
+            UUID().uuidString + ".mov"
+          )
+        try? FileManager.default.moveItem(
+          at: videoURL,
+          to: newVideoURL
+        )
+        inputVM.selectedFiles.append(newVideoURL)
+        
+        controller.closeMCamera()
+      }
+    }
   }
 
   #if os(macOS)

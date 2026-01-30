@@ -10,6 +10,7 @@ import AVKit
 import PaicordLib
 import SDWebImageSwiftUI
 import SwiftUIX
+import Loupe
 
 extension MessageCell {
   struct AttachmentsView: View {
@@ -54,6 +55,8 @@ extension MessageCell {
         // files
         ForEach(fileAttachments) { file in
           FileAttachmentView(attachment: file)
+            .debugRender()
+            .debugCompute()
         }
       }
     }
@@ -73,6 +76,8 @@ extension MessageCell {
             attachment: attachment
           )
         }
+        .debugRender()
+        .debugCompute()
       }
     }
 
@@ -264,6 +269,7 @@ extension MessageCell {
         )
         .background(theme.common.primaryButtonBackground)
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .frame(maxWidth: 400, alignment: .leading)
       }
     }
   }

@@ -41,8 +41,12 @@ extension MessageCell {
               ComponentsV2View( /*components: message.components*/)
                 .equatable(by: message.components)
             } else if !content.isEmpty {
-              MarkdownText(content: content, channelStore: channelStore)
-                .equatable()
+              MarkdownText(
+                content: content,
+                meta: message,
+                channelStore: channelStore
+              )
+              .equatable()
             }
           }
         }

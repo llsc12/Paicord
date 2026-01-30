@@ -14,6 +14,7 @@ import SwiftUIX
 
 struct MarkdownText: View, Equatable {
   let content: String
+  let meta: DiscordChannel.PartialMessage?
   let channelStore: ChannelStore?
   let baseAttributesOverrides: [NSAttributedString.Key: Any]
 
@@ -28,10 +29,12 @@ struct MarkdownText: View, Equatable {
 
   init(
     content: String,
+    meta: DiscordChannel.PartialMessage? = nil,
     channelStore: ChannelStore? = nil,
     baseAttributesOverrides: [NSAttributedString.Key: Any] = [:]
   ) {
     self.content = content
+    self.meta = meta
     self.channelStore = channelStore
     self.baseAttributesOverrides = baseAttributesOverrides
     _renderer = State(
@@ -90,27 +93,41 @@ struct MarkdownText: View, Equatable {
 
   private var renderSignature: RenderSignature {
     let gw = GatewayStore.shared
-    print(
-      content,
-      renderer.blocks,
-      gw.user.users.count,
-      channelStore?.guildStore?.members.count as Any,
-      channelStore?.guildStore?.roles.count as Any,
-      channelStore?.guildStore?.channels.count as Any,
-      dynamicType,
-      theme.id
-    )
-    let sig = RenderSignature(
-      content: content,
-      blocks: renderer.blocks,
-      userCount: gw.user.users.count,
-      memberCount: channelStore?.guildStore?.members.count,
-      roleCount: channelStore?.guildStore?.roles.count,
-      channelCount: channelStore?.guildStore?.channels.count,
-      dynamicType: dynamicType,
-      themeID: theme.id
-    )
-    print(sig, "\n")
+//    print(
+//      content,
+//      renderer.blocks,
+//      gw.user.users.count,
+//      channelStore?.guildStore?.members.count as Any,
+//      channelStore?.guildStore?.roles.count as Any,
+//      channelStore?.guildStore?.channels.count as Any,
+//      dynamicType,
+//      theme.id
+//    )
+    let sig: RenderSignature
+    if let meta, meta.mentions?.isEmpty == false || meta.mention_roles?.isEmpty == false {
+      sig = RenderSignature(
+        content: content,
+        blocks: renderer.blocks,
+        userCount: gw.user.users.count,
+        memberCount: channelStore?.guildStore?.members.count,
+        roleCount: channelStore?.guildStore?.roles.count,
+        channelCount: channelStore?.guildStore?.channels.count,
+        dynamicType: dynamicType,
+        themeID: theme.id
+      )
+    } else {
+      sig = RenderSignature(
+        content: content,
+        blocks: renderer.blocks,
+        userCount: nil,
+        memberCount: nil,
+        roleCount: nil,
+        channelCount: nil,
+        dynamicType: dynamicType,
+        themeID: theme.id
+      )
+    }
+//    print(sig, "\n")
     return sig
   }
 
@@ -1452,14 +1469,6 @@ extension NSAttributedString.Key {
     NSAttributedString.Key("PaicordRawTextContentKey")
 }
 
-private enum EmojiLog {
-  static var enabled = true
-  static func log(_ message: @autoclosure () -> String) {
-    guard enabled else { return }
-    print("[EmojiAttachment] \(message())")
-  }
-}
-
 private enum EmojiImageCache {
   static let cache = NSCache<NSString, AppKitOrUIKitImage>()
 
@@ -1509,29 +1518,13 @@ final class EmojiTextAttachment: NSTextAttachment {
     self.emojiURL = url
     self.emojiSize = size
     super.init(data: nil, ofType: "public.item")
-    self.bounds = CGRect(x: 0, y: 0, width: size, height: size)
-    EmojiLog.log("init attachment url=\(url) size=\(size)")
+    self.bounds = CGRect(x: 0, y: 0, width: size, height: size) // only size is used, position is ignored.
   }
-
+  
   required init?(coder: NSCoder) {
-    guard
-      let url = coder.decodeObject(of: NSURL.self, forKey: "emojiURL") as URL?
-    else { return nil }
-    let size =
-      coder.decodeObject(of: NSNumber.self, forKey: "emojiSize")?.doubleValue
-      ?? 18
-    self.emojiURL = url
-    self.emojiSize = CGFloat(size)
-    super.init(coder: coder)
-    self.bounds = CGRect(x: 0, y: 0, width: emojiSize, height: emojiSize)
-    EmojiLog.log("init coder attachment url=\(url) size=\(emojiSize)")
+    fatalError("init(coder:) has not been implemented")
   }
-
-  override func encode(with coder: NSCoder) {
-    super.encode(with: coder)
-    coder.encode(emojiURL, forKey: "emojiURL")
-    coder.encode(emojiSize, forKey: "emojiSize")
-  }
+  
 }
 
 extension MarkdownRendererVM {
@@ -1544,9 +1537,6 @@ extension MarkdownRendererVM {
       .rawContent,
       value: copyText,
       range: NSRange(location: 0, length: mutable.length)
-    )
-    EmojiLog.log(
-      "makeEmojiAttachment copyText=\(copyText) url=\(emoji.url) size=\(emoji.size)"
     )
     return mutable
   }
@@ -1584,7 +1574,7 @@ final class EmojiAttachmentViewProvider: NSTextAttachmentViewProvider {
       textLayoutManager: textLayoutManager,
       location: location
     )
-    self.tracksTextAttachmentViewBounds = true
+    self.tracksTextAttachmentViewBounds = false
   }
 
   override func loadView() {
@@ -1592,16 +1582,15 @@ final class EmojiAttachmentViewProvider: NSTextAttachmentViewProvider {
       return
     }
     let size = attachment.emojiSize
-    let bounds = CGRect(x: 0, y: 0, width: size, height: size)
 
-    let host = AppKitOrUIKitView(frame: bounds)
+    let host = AppKitOrUIKitView(frame: .zero)
     #if os(iOS)
       host.backgroundColor = .clear
     #else
       host.wantsLayer = false
     #endif
 
-    let imageView = SDAnimatedImageView(frame: bounds)
+    let imageView = SDAnimatedImageView(frame: .zero)
     #if os(iOS)
       imageView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
       imageView.contentMode = .scaleAspectFit
@@ -1649,12 +1638,11 @@ final class EmojiAttachmentViewProvider: NSTextAttachmentViewProvider {
     proposedLineFragment: CGRect,
     position: CGPoint
   ) -> CGRect {
-    if let b = (textAttachment as? EmojiTextAttachment)?.bounds { return b }
     return CGRect(
       x: 0,
-      y: -3,
-      width: proposedLineFragment.height,
-      height: proposedLineFragment.height
+      y: proposedLineFragment.origin.y,
+      width: self.textAttachment?.bounds.width ?? 18.0,
+      height: self.textAttachment?.bounds.height ?? 18.0
     )
   }
 
