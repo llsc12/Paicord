@@ -610,43 +610,45 @@ extension ChatView {
       }
     }
 
-    func closeMCameraAction() {
-      self.cameraPickerPresented = false
-    }
-    func onImageCaptured(_ image: UIImage, _ controller: MCamera.Controller) {
-      Task {
-        // save to temp directory
-        let tempDir = FileManager.default.temporaryDirectory
-        let fileURL = tempDir.appendingPathComponent(
-          UUID().uuidString + ".png"
-        )
-        if let imageData = image.pngData() {
-          do {
-            try imageData.write(to: fileURL)
-            inputVM.selectedFiles.append(fileURL)
-          } catch {
-            print("Failed to save captured image: \(error)")
-          }
-        }
-        controller.closeMCamera()
+    #if os(iOS)
+      func closeMCameraAction() {
+        self.cameraPickerPresented = false
       }
-    }
-    func onVideoCaptured(_ videoURL: URL, _ controller: MCamera.Controller) {
-      Task {
-        // unsure where this saves to, just moving it to temp directory bc why not
-        let newVideoURL = FileManager.default.temporaryDirectory
-          .appendingPathComponent(
-            UUID().uuidString + ".mov"
+      func onImageCaptured(_ image: UIImage, _ controller: MCamera.Controller) {
+        Task {
+          // save to temp directory
+          let tempDir = FileManager.default.temporaryDirectory
+          let fileURL = tempDir.appendingPathComponent(
+            UUID().uuidString + ".png"
           )
-        try? FileManager.default.moveItem(
-          at: videoURL,
-          to: newVideoURL
-        )
-        inputVM.selectedFiles.append(newVideoURL)
-        
-        controller.closeMCamera()
+          if let imageData = image.pngData() {
+            do {
+              try imageData.write(to: fileURL)
+              inputVM.selectedFiles.append(fileURL)
+            } catch {
+              print("Failed to save captured image: \(error)")
+            }
+          }
+          controller.closeMCamera()
+        }
       }
-    }
+      func onVideoCaptured(_ videoURL: URL, _ controller: MCamera.Controller) {
+        Task {
+          // unsure where this saves to, just moving it to temp directory bc why not
+          let newVideoURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent(
+              UUID().uuidString + ".mov"
+            )
+          try? FileManager.default.moveItem(
+            at: videoURL,
+            to: newVideoURL
+          )
+          inputVM.selectedFiles.append(newVideoURL)
+
+          controller.closeMCamera()
+        }
+      }
+    #endif
   }
 
   #if os(macOS)
