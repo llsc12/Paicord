@@ -44,13 +44,14 @@ extension ChatView {
         var dragOffset: CGFloat = 0
         var showPhotosPicker: Bool = false
         var showFilePicker: Bool = false
+        var showEmojiPicker: Bool = false
 
         var keyboardHeight: CGFloat {
           storedKeyboardHeight == 0 ? 300 : storedKeyboardHeight
         }
 
         var pickerShown: Bool {
-          showPhotosPicker || showFilePicker
+          showPhotosPicker || showFilePicker || showEmojiPicker
         }
 
         var safeArea: UIEdgeInsets {
@@ -284,6 +285,15 @@ extension ChatView {
             .enabled(upThrough: .height(properties.keyboardHeight))
           )
         }
+        .sheet(isPresented: $properties.showEmojiPicker) {
+          EmojiPicker()
+          .presentationDetents([
+            .height(properties.keyboardHeight), .large,
+          ])
+          .presentationBackgroundInteraction(
+            .enabled(upThrough: .height(properties.keyboardHeight))
+          )
+        }
         .fullScreenCover(isPresented: $cameraPickerPresented) {
           MCamera()
           .setCameraOutputType(.photo)
@@ -389,6 +399,8 @@ extension ChatView {
         .fileDialogImportsUnresolvedAliases(false)
       #endif
     }
+    
+    @Namespace private var mediaPickerNamespace
 
     @ViewBuilder
     var mediaPickerButton: some View {
@@ -397,6 +409,7 @@ extension ChatView {
           Button {
             properties.showFilePicker = false
             properties.showPhotosPicker = false
+            properties.showEmojiPicker = false
             // refocus keyboard
             isFocused = true
           } label: {
@@ -414,18 +427,21 @@ extension ChatView {
             Button {
               properties.showPhotosPicker = false
               properties.showFilePicker = false
+              properties.showEmojiPicker = false
               self.cameraPickerPresented = true
             } label: {
               Label("Camera", systemImage: "camera")
             }
             Button {
               properties.showFilePicker = false
+              properties.showEmojiPicker = false
               properties.showPhotosPicker = true
             } label: {
               Label("Upload Photos", systemImage: "photo.on.rectangle")
             }
             Button {
               properties.showPhotosPicker = false
+              properties.showEmojiPicker = false
               properties.showFilePicker = true
             } label: {
               Label("Upload Files", systemImage: "doc.on.doc")
@@ -493,6 +509,17 @@ extension ChatView {
             .padding(8)
         #endif
         Button {
+          #if os(iOS)
+          if !properties.showEmojiPicker {
+            properties.showEmojiPicker = true
+            isFocused = false
+          } else {
+            properties.showEmojiPicker = false
+            properties.showFilePicker = false
+            properties.showPhotosPicker = false
+            isFocused = true
+          }
+          #endif
         } label: {
           Image(systemName: "face.smiling")
             .imageScale(.large)

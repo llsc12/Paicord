@@ -67,6 +67,7 @@
 		AA409ABC2EC6909800848045 /* Theming.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA409ABB2EC6909300848045 /* Theming.swift */; };
 		AA409ABF2EC74F5E00848045 /* ThemingSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA409ABE2EC74F5E00848045 /* ThemingSupport.swift */; };
 		AA418C842F21AAFB00B51C18 /* UpdateCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA418C832F21AAF300B51C18 /* UpdateCheck.swift */; };
+		AA4207CF2F2D1170006B8227 /* EmojiPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA4207CE2F2D116C006B8227 /* EmojiPicker.swift */; };
 		AA47AF192EDEEFC5008A50C9 /* ContentSocialSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA47AF182EDEEFC0008A50C9 /* ContentSocialSection.swift */; };
 		AA47AF1B2EDEEFF9008A50C9 /* DataPrivacySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA47AF1A2EDEEFF4008A50C9 /* DataPrivacySection.swift */; };
 		AA47AF1D2EDEF019008A50C9 /* FamilyCentreSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA47AF1C2EDEF014008A50C9 /* FamilyCentreSection.swift */; };
@@ -137,6 +138,7 @@
 		AABED5A42E7F4DAE005BDD63 /* GuildStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABED5A32E7F4DAE005BDD63 /* GuildStore.swift */; };
 		AABED5A62E7F514B005BDD63 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABED5A52E7F5148005BDD63 /* SettingsStore.swift */; };
 		AABED5A92E7FF982005BDD63 /* Merging.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABED5A82E7FF979005BDD63 /* Merging.swift */; };
+		AAC07FC32F2D9E460077B8FA /* DownloadButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC07FC22F2D9E460077B8FA /* DownloadButton.swift */; };
 		AAD4469D2ECFBC1A006CB07C /* UserGuildSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD4469C2ECFB915006CB07C /* UserGuildSettingsStore.swift */; };
 		AAD4469F2ECFD6D6006CB07C /* ReadStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD4469E2ECFD6D2006CB07C /* ReadStateStore.swift */; };
 		AAD446A22ED07916006CB07C /* SettingsKit in Frameworks */ = {isa = PBXBuildFile; productRef = AAD446A12ED07916006CB07C /* SettingsKit */; };
@@ -206,6 +208,7 @@
 		AA409ABB2EC6909300848045 /* Theming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theming.swift; sourceTree = "<group>"; };
 		AA409ABE2EC74F5E00848045 /* ThemingSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemingSupport.swift; sourceTree = "<group>"; };
 		AA418C832F21AAF300B51C18 /* UpdateCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCheck.swift; sourceTree = "<group>"; };
+		AA4207CE2F2D116C006B8227 /* EmojiPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiPicker.swift; sourceTree = "<group>"; };
 		AA47AF182EDEEFC0008A50C9 /* ContentSocialSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentSocialSection.swift; sourceTree = "<group>"; };
 		AA47AF1A2EDEEFF4008A50C9 /* DataPrivacySection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataPrivacySection.swift; sourceTree = "<group>"; };
 		AA47AF1C2EDEF014008A50C9 /* FamilyCentreSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyCentreSection.swift; sourceTree = "<group>"; };
@@ -266,6 +269,7 @@
 		AABED5A32E7F4DAE005BDD63 /* GuildStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuildStore.swift; sourceTree = "<group>"; };
 		AABED5A52E7F5148005BDD63 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
 		AABED5A82E7FF979005BDD63 /* Merging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Merging.swift; sourceTree = "<group>"; };
+		AAC07FC22F2D9E460077B8FA /* DownloadButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadButton.swift; sourceTree = "<group>"; };
 		AAD4469C2ECFB915006CB07C /* UserGuildSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserGuildSettingsStore.swift; sourceTree = "<group>"; };
 		AAD4469E2ECFD6D2006CB07C /* ReadStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadStateStore.swift; sourceTree = "<group>"; };
 		AAD446A32ED0B631006CB07C /* ShellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellView.swift; sourceTree = "<group>"; };
@@ -622,6 +626,14 @@
 			path = Theming;
 			sourceTree = "<group>";
 		};
+		AA4207CD2F2D1165006B8227 /* Emoji Picker */ = {
+			isa = PBXGroup;
+			children = (
+				AA4207CE2F2D116C006B8227 /* EmojiPicker.swift */,
+			);
+			path = "Emoji Picker";
+			sourceTree = "<group>";
+		};
 		AA47AF092EDEEB24008A50C9 /* ContentSocial */ = {
 			isa = PBXGroup;
 			children = (
@@ -822,6 +834,7 @@
 		AA9C81802E665E190086B1DA /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				AA4207CD2F2D1165006B8227 /* Emoji Picker */,
 				57A4E7092E6B315700470131 /* Login */,
 				57DA04282E79893B00DB4C7C /* Launch */,
 				57A55C552E7560BB005C8226 /* Guilds */,
@@ -838,6 +851,7 @@
 		AA9C81812E6660AB0086B1DA /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				AAC07FC22F2D9E460077B8FA /* DownloadButton.swift */,
 				AA9D26B02EC95EE3006071FE /* FlowLayout.swift */,
 				AAFC9DD92EB7DAE200BB8028 /* VariableBlurView.swift */,
 				57DA042B2E79B25F00DB4C7C /* AsyncButton.swift */,
@@ -1038,6 +1052,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA1378062E967A4A00100969 /* ProcessInfo+previews.swift in Sources */,
+				AAC07FC32F2D9E460077B8FA /* DownloadButton.swift in Sources */,
 				AA1097152E64C181005BC3D2 /* LargeBaseplate.swift in Sources */,
 				AAB50A562E9AD4680048E8B0 /* StickersView.swift in Sources */,
 				AA1097172E64C181005BC3D2 /* SmallBaseplate.swift in Sources */,
@@ -1067,6 +1082,7 @@
 				AA321F162F0E84B300D48332 /* SponsorSheet.swift in Sources */,
 				AAB905302E82FD9200EA171B /* Conformances.swift in Sources */,
 				AA9C81832E6660BE0086B1DA /* GuildButton.swift in Sources */,
+				AA4207CF2F2D1170006B8227 /* EmojiPicker.swift in Sources */,
 				AA2F51C32EE4ABCE00F18DB7 /* Storage.swift in Sources */,
 				57A55C572E7560CF005C8226 /* MarkdownText.swift in Sources */,
 				57DA042C2E79B26200DB4C7C /* AsyncButton.swift in Sources */,
@@ -1313,9 +1329,10 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Paicord/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
-				INFOPLIST_KEY_NSCameraUsageDescription = "";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = a;
-				INFOPLIST_KEY_NSMotionUsageDescription = a;
+				INFOPLIST_KEY_NSCameraUsageDescription = "le camera ykyk";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Taking videos with le camera";
+				INFOPLIST_KEY_NSMotionUsageDescription = "Camera autorotation";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Voice message transcriptions";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -1375,9 +1392,10 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Paicord/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
-				INFOPLIST_KEY_NSCameraUsageDescription = "";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = a;
-				INFOPLIST_KEY_NSMotionUsageDescription = a;
+				INFOPLIST_KEY_NSCameraUsageDescription = "le camera ykyk";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Taking videos with le camera";
+				INFOPLIST_KEY_NSMotionUsageDescription = "Camera autorotation";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Voice message transcriptions";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
