@@ -20,7 +20,23 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const run = context.payload.workflow_run;
-            const prs = run.pull_requests || [];
+            console.log("workflow_run id:", run.id);
+            console.log("workflow_run head_sha:", run.head_sha);
+            // Start with the pull_requests included in the payload (may be empty)
+            let prs = run.pull_requests || [];
+            console.log("pull_requests from payload length:", prs.length);
+
+            if (!prs.length && run.head_sha) {
+              console.log("No PRs in payload, trying to find PRs for commit:", run.head_sha);
+              const res = await github.repos.listPullRequestsAssociatedWithCommit({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                commit_sha: run.head_sha
+              });
+              prs = res.data || [];
+              console.log("pull requests found by commit:", prs.length);
+            }
+
             if (!prs.length) {
               console.log('No PR associated with this run; nothing to comment on.');
               return;
@@ -36,6 +52,7 @@ jobs:
               } else {
                 body = `## ❌ PR Build ${conclusion === 'failure' ? 'Failed' : conclusion}\n\nBuild: ${htmlUrl}\n\n(See the workflow run for logs and artifacts.)`;
               }
+              console.log(`Posting comment to PR #${prNumber}`);
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
