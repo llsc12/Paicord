@@ -54,9 +54,16 @@ struct LargeBaseplate: View {
       Group {
         if let currentChannelStore {
           ChatView(vm: currentChannelStore)
-            .id(currentChannelStore.channelId) // force view update
+            .id(currentChannelStore.channelId)  // force view update
             .environment(\.guildStore, currentGuildStore)
             .environment(\.channelStore, currentChannelStore)
+            .inspector(isPresented: $showingInspector) {
+              MemberSidebarView(
+                guildStore: currentGuildStore,
+                channelStore: currentChannelStore
+              )
+              .inspectorColumnWidth(min: 280, ideal: 300, max: 360)
+            }
         } else {
           // placeholder
           VStack {
@@ -83,13 +90,6 @@ struct LargeBaseplate: View {
           .tint(theme.common.tertiaryButton)
         }
       }
-    }
-    .inspector(isPresented: $showingInspector) {
-      MemberSidebarView(
-        guildStore: currentGuildStore,
-        channelStore: currentChannelStore
-      )
-      .inspectorColumnWidth(min: 280, ideal: 300, max: 360)
     }
     .toolbar {
       Button {
