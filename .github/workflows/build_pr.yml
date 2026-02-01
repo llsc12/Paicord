@@ -12,6 +12,9 @@ jobs:
   build-macos:
     name: Build macOS
     runs-on: macos-26
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -81,6 +84,9 @@ jobs:
   build-ios:
     name: Build iOS
     runs-on: macos-26
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
