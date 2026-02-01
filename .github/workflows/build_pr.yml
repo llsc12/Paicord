@@ -12,10 +12,6 @@ jobs:
   build-macos:
     name: Build macOS
     runs-on: macos-26
-    permissions:
-      contents: read
-      pull-requests: write
-      issues: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -54,43 +50,9 @@ jobs:
           path: build-macos.log
           retention-days: 7
 
-      - name: Comment on PR (Failure)
-        if: failure()
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const fs = require('fs');
-            const log = fs.readFileSync('build-macos.log', 'utf8');
-            const truncatedLog = log.length > 60000 ? log.slice(-60000) + '\n\n[Log truncated to last 60000 characters]' : log;
-            
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: `## ❌ macOS Build Failed\n\n<details>\n<summary>Build Logs</summary>\n\n\`\`\`\n${truncatedLog}\n\`\`\`\n\n</details>`
-            });
-
-      - name: Comment on PR (Success)
-        if: success()
-        uses: actions/github-script@v7
-        with:      
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: `## ✅ macOS Build Succeeded`
-            });
-
   build-ios:
     name: Build iOS
     runs-on: macos-26
-    permissions:
-      contents: read
-      pull-requests: write
-      issues: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -131,33 +93,3 @@ jobs:
           name: ios-build-logs
           path: build-ios.log
           retention-days: 7
-
-      - name: Comment on PR (Failure)
-        if: failure()
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const fs = require('fs');
-            const log = fs.readFileSync('build-ios.log', 'utf8');
-            const truncatedLog = log.length > 60000 ? log.slice(-60000) + '\n\n[Log truncated to last 60000 characters]' : log;
-            
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: `## ❌ iOS Build Failed\n\n<details>\n<summary>Build Logs</summary>\n\n\`\`\`\n${truncatedLog}\n\`\`\`\n\n</details>`
-            });
-
-      - name: Comment on PR (Success)
-        if: success()
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: `## ✅ iOS Build Succeeded`
-            });
