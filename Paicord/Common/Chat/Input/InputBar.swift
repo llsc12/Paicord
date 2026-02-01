@@ -720,7 +720,8 @@ extension ChatView {
 
           let textView = SubmissiveTextView(
             frame: .zero,
-            textContainer: textContainer
+            textContainer: textContainer,
+            undoManager: context.environment.undoManager
           )
           textView.isEditable = true
           textView.isRichText = false
@@ -806,6 +807,24 @@ extension ChatView {
 
         class SubmissiveTextView: NSTextView {
           var onSubmit: (() -> Void)?
+          weak var undoManagerRef: UndoManager?
+          
+          init(frame frameRect: NSRect, textContainer container: NSTextContainer?, undoManager: UndoManager? = nil) {
+            self.undoManagerRef = undoManager
+            super.init(frame: frameRect, textContainer: container)
+          }
+          
+          required init?(coder: NSCoder) {
+            super.init(coder: coder)
+          }
+          
+          override var undoManager: UndoManager? {
+            if let undoManagerRef {
+              return undoManagerRef
+            } else {
+              return super.undoManager
+            }
+          }
 
           override var acceptableDragTypes: [NSPasteboard.PasteboardType] {
             [

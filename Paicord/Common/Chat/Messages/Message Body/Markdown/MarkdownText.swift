@@ -93,18 +93,20 @@ struct MarkdownText: View, Equatable {
 
   private var renderSignature: RenderSignature {
     let gw = GatewayStore.shared
-//    print(
-//      content,
-//      renderer.blocks,
-//      gw.user.users.count,
-//      channelStore?.guildStore?.members.count as Any,
-//      channelStore?.guildStore?.roles.count as Any,
-//      channelStore?.guildStore?.channels.count as Any,
-//      dynamicType,
-//      theme.id
-//    )
+    //    print(
+    //      content,
+    //      renderer.blocks,
+    //      gw.user.users.count,
+    //      channelStore?.guildStore?.members.count as Any,
+    //      channelStore?.guildStore?.roles.count as Any,
+    //      channelStore?.guildStore?.channels.count as Any,
+    //      dynamicType,
+    //      theme.id
+    //    )
     let sig: RenderSignature
-    if let meta, meta.mentions?.isEmpty == false || meta.mention_roles?.isEmpty == false {
+    if let meta,
+      meta.mentions?.isEmpty == false || meta.mention_roles?.isEmpty == false
+    {
       sig = RenderSignature(
         content: content,
         blocks: renderer.blocks,
@@ -127,7 +129,7 @@ struct MarkdownText: View, Equatable {
         themeID: theme.id
       )
     }
-//    print(sig, "\n")
+    //    print(sig, "\n")
     return sig
   }
 
@@ -856,8 +858,10 @@ class MarkdownRendererVM {
 
     case .customEmoji:
       if let ce = node as? AST.CustomEmojiNode {
+        var attributes = baseAttributes
         let copyText =
           "<\(ce.isAnimated ? "a" : ""):\(ce.name):\(ce.identifier.rawValue)>"
+        attributes[.rawContent] = copyText
         guard
           let url = URL(
             string: CDNEndpoint.customEmoji(emojiId: ce.identifier).url
@@ -866,7 +870,7 @@ class MarkdownRendererVM {
         else { return }
         let s = self.makeEmojiAttachment(
           emoji: .init(url: url, size: 18),
-          copyText: copyText
+          attributes: attributes
         )
         container.append(s)
       }
@@ -1514,31 +1518,45 @@ final class EmojiTextAttachment: NSTextAttachment {
   let emojiURL: URL
   let emojiSize: CGFloat
 
-  init(url: URL, size: CGFloat) {
+  init(url: URL, size: CGFloat, font: AppKitOrUIKitFont) {
     self.emojiURL = url
     self.emojiSize = size
     super.init(data: nil, ofType: "public.item")
-    self.bounds = CGRect(x: 0, y: 0, width: size, height: size) // only size is used, position is ignored.
+
+    let yOffset =
+      (font.xHeight - size) / 2
+      - font.pointSize * -0.05
+
+    self.bounds = CGRect(
+      x: 0,
+      y: yOffset,
+      width: size,
+      height: size
+    )
   }
-  
+
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-  
+
 }
 
 extension MarkdownRendererVM {
-  func makeEmojiAttachment(emoji: EmojiData, copyText: String)
+  func makeEmojiAttachment(emoji: EmojiData, attributes: [NSAttributedString.Key: Any])
     -> NSAttributedString
   {
-    let attachment = EmojiTextAttachment(url: emoji.url, size: emoji.size)
-    let mutable = NSMutableAttributedString(attachment: attachment)
-    mutable.addAttribute(
-      .rawContent,
-      value: copyText,
-      range: NSRange(location: 0, length: mutable.length)
-    )
-    return mutable
+    let contextFont = attributes[.font] as! AppKitOrUIKitFont
+    let attachment = EmojiTextAttachment(url: emoji.url, size: emoji.size, font: contextFont)
+    let attachmentString = NSMutableAttributedString(attachment: attachment)
+    // set attributes from context
+    for (attrKey, attrValue) in attributes {
+      attachmentString.addAttribute(
+        attrKey,
+        value: attrValue,
+        range: NSRange(location: 0, length: attachmentString.length)
+      )
+    }
+    return attachmentString
   }
 }
 
@@ -1629,21 +1647,6 @@ final class EmojiAttachmentViewProvider: NSTextAttachmentViewProvider {
     self.view = host
     self.container = host
     self.animatedImageView = imageView
-  }
-
-  override func attachmentBounds(
-    for attributes: [NSAttributedString.Key: Any],
-    location: NSTextLocation,
-    textContainer: NSTextContainer?,
-    proposedLineFragment: CGRect,
-    position: CGPoint
-  ) -> CGRect {
-    return CGRect(
-      x: 0,
-      y: proposedLineFragment.origin.y,
-      width: self.textAttachment?.bounds.width ?? 18.0,
-      height: self.textAttachment?.bounds.height ?? 18.0
-    )
   }
 
   deinit {
