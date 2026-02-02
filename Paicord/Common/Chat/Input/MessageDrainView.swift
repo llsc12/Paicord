@@ -64,9 +64,9 @@ extension ChatView {
     var body: some View {
       let inline =
         (priorMessageExisting?.author?.id == gw.user.currentUser?.id
-          && priorMessageExisting?.timestamp.date.timeIntervalSince(
+          && Date.now.timeIntervalSince(
             priorMessageExisting?.timestamp.date ?? .distantPast
-          ) ?? 400 < 300 && message.message_reference == nil)
+          ) < 300 && message.message_reference == nil)
         || (priorMessageEnqueued != nil && message.message_reference == nil)
 
       let nonce =
