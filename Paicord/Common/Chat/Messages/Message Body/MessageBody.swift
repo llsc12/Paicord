@@ -34,24 +34,24 @@ extension MessageCell {
     var body: some View {
       VStack(alignment: .leading, spacing: 4) {
         // Content
-//        Group {
-//        totally breaks with Group idk why.
-          if !messageContentHidden {
-            let content = message.content ?? ""
-            if message.flags?.contains(.isComponentsV2) == true {
-              ComponentsV2View( /*components: message.components*/)
-                .equatable(by: message.components)
-            } else if !content.isEmpty {
-              MarkdownText(
-                content: content,
-                meta: message,
-                channelStore: channelStore
-              )
-              .equatable()
-              .enableCrossBlockTextSelection(true)
-            }
+        //        Group {
+        //        totally breaks with Group idk why.
+        if !messageContentHidden {
+          let content = message.content ?? ""
+          if message.flags?.contains(.isComponentsV2) == true {
+            ComponentsV2View( /*components: message.components*/)
+              .equatable(by: message.components)
+          } else if !content.isEmpty {
+            MarkdownText(
+              content: content,
+              meta: message,
+              channelStore: channelStore
+            )
+            .equatable()
+            .enableCrossBlockTextSelection(true)
           }
-//        }
+        }
+        //        }
 
         // Attachments
         let attachments = message.attachments ?? []

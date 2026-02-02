@@ -21,7 +21,8 @@ struct MarkdownText: View, Equatable {
   @Environment(\.dynamicTypeSize) var dynamicType
   @ViewStorage var dynamicTypeSizeStorage: DynamicTypeSize = .xSmall
   @Environment(\.theme) var theme
-  @Environment(\.enableCrossBlockTextSelection) var enableCrossBlockTextSelection
+  @Environment(\.enableCrossBlockTextSelection)
+  var enableCrossBlockTextSelection
 
   @State private var renderer: MarkdownRendererVM
   @State private var userPopover: PartialUser?
@@ -70,31 +71,31 @@ struct MarkdownText: View, Equatable {
           .opacity(0.6)
       } else {
         #if os(macOS)
-        if enableCrossBlockTextSelection {
-          SelectableMarkdownText(
-            blocks: renderer.blocks.compactMap { block in
-              guard let attr = block.attributedContent else { return nil }
-              return SelectableMarkdownText.BlockInfo(
-                id: String(block.id),
-                attributedString: attr
-              )
+          if enableCrossBlockTextSelection {
+            SelectableMarkdownText(
+              blocks: renderer.blocks.compactMap { block in
+                guard let attr = block.attributedContent else { return nil }
+                return SelectableMarkdownText.BlockInfo(
+                  id: String(block.id),
+                  attributedString: attr
+                )
+              }
+            )
+          } else {
+            ForEach(renderer.blocks) { block in
+              BlockView(block: block)
+                .equatable()
+                .debugRender()
+                .debugCompute()
             }
-          )
-        } else {
+          }
+        #else
           ForEach(renderer.blocks) { block in
             BlockView(block: block)
               .equatable()
               .debugRender()
               .debugCompute()
           }
-        }
-        #else
-        ForEach(renderer.blocks) { block in
-          BlockView(block: block)
-            .equatable()
-            .debugRender()
-            .debugCompute()
-        }
         #endif
       }
     }
@@ -1724,9 +1725,9 @@ extension View {
   ///         per-block rendering is used.
   func enableCrossBlockTextSelection(_ enabled: Bool = true) -> some View {
     #if os(macOS)
-    environment(\.enableCrossBlockTextSelection, enabled)
+      environment(\.enableCrossBlockTextSelection, enabled)
     #else
-    self  // No-op on iOS
+      self  // No-op on iOS
     #endif
   }
 }
