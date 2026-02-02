@@ -63,8 +63,12 @@ extension ChatView {
 
     var body: some View {
       let inline =
-        priorMessageExisting?.author?.id == gw.user.currentUser?.id
-        || priorMessageEnqueued != nil && message.message_reference == nil
+        (priorMessageExisting?.author?.id == gw.user.currentUser?.id
+          && priorMessageExisting?.timestamp.date.timeIntervalSince(
+            priorMessageExisting?.timestamp.date ?? .distantPast
+          ) ?? 400 < 300 && message.message_reference == nil)
+        || (priorMessageEnqueued != nil && message.message_reference == nil)
+
       let nonce =
         message.nonce?.asString != nil
         ? MessageSnowflake(message.nonce!.asString) : nil
