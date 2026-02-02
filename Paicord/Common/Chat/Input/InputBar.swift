@@ -399,7 +399,7 @@ extension ChatView {
         .fileDialogImportsUnresolvedAliases(false)
       #endif
     }
-    
+
     @Namespace private var mediaPickerNamespace
 
     @ViewBuilder
@@ -494,7 +494,7 @@ extension ChatView {
 
     @ViewBuilder
     var textField: some View {
-      HStack {
+      HStack(alignment: .bottom) {
         #if os(iOS)
           TextField("Message", text: $inputVM.content, axis: .vertical)
             .textFieldStyle(.plain)
@@ -510,15 +510,15 @@ extension ChatView {
         #endif
         Button {
           #if os(iOS)
-          if !properties.showEmojiPicker {
-            properties.showEmojiPicker = true
-            isFocused = false
-          } else {
-            properties.showEmojiPicker = false
-            properties.showFilePicker = false
-            properties.showPhotosPicker = false
-            isFocused = true
-          }
+            if !properties.showEmojiPicker {
+              properties.showEmojiPicker = true
+              isFocused = false
+            } else {
+              properties.showEmojiPicker = false
+              properties.showFilePicker = false
+              properties.showPhotosPicker = false
+              isFocused = true
+            }
           #endif
         } label: {
           Image(systemName: "face.smiling")
@@ -527,6 +527,7 @@ extension ChatView {
         }
         .buttonStyle(.borderless)
         .tint(.secondary)
+        .padding(.vertical, 6)
       }
       .background(.background.secondary.opacity(0.8))
       .clipShape(.rect(cornerRadius: 18))
@@ -808,16 +809,20 @@ extension ChatView {
         class SubmissiveTextView: NSTextView {
           var onSubmit: (() -> Void)?
           weak var undoManagerRef: UndoManager?
-          
-          init(frame frameRect: NSRect, textContainer container: NSTextContainer?, undoManager: UndoManager? = nil) {
+
+          init(
+            frame frameRect: NSRect,
+            textContainer container: NSTextContainer?,
+            undoManager: UndoManager? = nil
+          ) {
             self.undoManagerRef = undoManager
             super.init(frame: frameRect, textContainer: container)
           }
-          
+
           required init?(coder: NSCoder) {
             super.init(coder: coder)
           }
-          
+
           override var undoManager: UndoManager? {
             if let undoManagerRef {
               return undoManagerRef
