@@ -155,7 +155,8 @@ extension AnySnowflake: CodingKeyRepresentable {
   }
 }
 
-public func == (lhs: any SnowflakeProtocol, rhs: any SnowflakeProtocol) -> Bool {
+public func == (lhs: any SnowflakeProtocol, rhs: any SnowflakeProtocol) -> Bool
+{
   lhs.rawValue == rhs.rawValue
 }
 
@@ -313,7 +314,8 @@ public struct SnowflakeInfo: Sendable {
   }
 
   @inlinable
-  internal func toSnowflake<S: SnowflakeProtocol>(as type: S.Type = S.self) -> S {
+  internal func toSnowflake<S: SnowflakeProtocol>(as type: S.Type = S.self) -> S
+  {
     let timestamp = (self.timestamp - SnowflakeInfo.discordEpochConstant) << 22
     let workerId = UInt64(self.workerId) << 17
     let processId = UInt64(self.processId) << 12
@@ -419,3 +421,168 @@ public typealias SKUSnowflake = Snowflake<SKU>
 
 /// Convenience type-alias for `Snowflake<SoundboardSound>`
 public typealias SoundSnowflake = Snowflake<SoundboardSound>
+
+/// Convenience type-alias for `Snowflake<Gateway.GuildMemberListUpdate>`
+public typealias MemberListSnowflake = Snowflake<Gateway.GuildMemberListUpdate>
+
+// MARK: Convenience Extensions
+
+extension MemberListSnowflake {
+  public static let everyone: Self = .init("everyone")
+}
+
+extension DiscordChannel {
+  public func getMemberListID(with guild: Guild) -> MemberListSnowflake? {
+    //    @property
+    //    def member_list_id(self) -> Union[str, Literal['everyone']]:
+    //        """:class:`str`: The ID of the member list for this channel.
+    //
+    //        A member list ID of `​`everyone`​` indicates that everyone can view the channel.
+    //
+    //        .. versionadded:: 2.1
+    //        """
+    //        if self._is_everyone_member_list():
+    //            return 'everyone'
+    //
+    //        overwrites = []
+    //        for overwrite in self._overwrites:
+    //            allow, deny = Permissions(overwrite.allow), Permissions(overwrite.deny)
+    //            if allow.read_messages:
+    //                overwrites.append(f'allow:{overwrite.id}')
+    //            elif deny.read_messages:
+    //                overwrites.append(f'deny:{overwrite.id}')
+    //
+    //        return str(utils.murmurhash32(','.join(sorted(overwrites)), signed=False))
+
+    if self.isEveryoneMemberList(with: guild) {
+      return .everyone
+    }
+
+    var overwrites: [DiscordChannel.Overwrite] = []
+    for overwrite in self.permission_overwrites ?? [] {
+      if overwrite.allow.contains(.readMessageHistory) {
+        overwrites.append(overwrite)
+      } else if overwrite.deny.contains(.readMessageHistory) {
+        overwrites.append(overwrite)
+      }
+    }
+    
+    let sorted = overwrites.sorted { lhs, rhs in
+      lhs.id.rawValue < rhs.id.rawValue
+    }
+    
+    let overwriteStrings = sorted.map { overwrite -> String in
+      if overwrite.allow.contains(.readMessageHistory) {
+        return "allow:\(overwrite.id.rawValue)"
+      } else if overwrite.deny.contains(.readMessageHistory) {
+        return "deny:\(overwrite.id.rawValue)"
+      }
+      fatalError("This should not happen :c")
+    }
+    
+    let joined = overwriteStrings.joined(separator: ",")
+    return .init(
+      "\(murmurhash32(key: joined, signed: false))"
+    )
+  }
+
+  private func isEveryoneMemberList(with guild: Guild) -> Bool {
+    //    def _is_everyone_member_list(self) -> bool:
+    //        # This should use _can_everyone(Permissions.read_messages) but Discord's implementation is flawed
+    //        # so we must use the flawed implementation to be compatible
+    //        if not self.guild.default_role.permissions.read_messages:
+    //            return False
+    //        for overwrite in self._overwrites:
+    //            if overwrite.deny & Permissions.read_messages.flag == Permissions.read_messages.flag:
+    //                return False
+    //        return True
+
+    // get everyone role
+    guard let guildID = self.guild_id else {
+      return false
+    }
+    let everyoneRoleID: RoleSnowflake = .init(guildID.rawValue)
+
+    guard
+      let everyoneRole = guild.roles.first(where: { $0.id == everyoneRoleID })
+    else {
+      return false
+    }
+
+
+    if !everyoneRole.permissions.contains(.readMessageHistory) {
+      return false
+    }
+    for overwrite in self.permission_overwrites ?? [] {
+      if overwrite.deny.contains(.readMessageHistory) {
+        return false
+      }
+    }
+    return true
+  }
+}
+
+public func murmurhash32(
+  key: String,
+  seed: Int = 0,
+  signed: Bool = true
+) -> Int {
+  // port of https://github.com/dolfies/discord.py-self/blob/530e72e03eebb2dff6f31ea456c7379ae88272bf/discord/utils.py#L1675-L1725
+  // which is a modification of murmurhash3 function from https://github.com/wc-duck/pymmh3/blob/master/pymmh3.py
+
+  let keyData = Data(key.utf8)
+  let length = keyData.count
+  let nblocks = length / 4
+
+  var h1 = UInt32(seed)
+  let c1: UInt32 = 0xCC9E_2D51
+  let c2: UInt32 = 0x1B87_3593
+  
+  for block_start in 0..<nblocks {
+    let i = block_start * 4
+    var k1: UInt32 = 0
+    k1 |= UInt32(keyData[i + 0])
+    k1 |= UInt32(keyData[i + 1]) << 8
+    k1 |= UInt32(keyData[i + 2]) << 16
+    k1 |= UInt32(keyData[i + 3]) << 24
+
+    k1 = c1 &* k1
+    k1 = (k1 << 15) | (k1 >> (32 - 15))
+    k1 = c2 &* k1
+
+    h1 ^= k1
+    h1 = (h1 << 13) | (h1 >> (32 - 13))
+    h1 = h1 &* 5 &+ 0xE654_6B64
+  }
+  
+  let tailIndex = nblocks * 4
+  var k1: UInt32 = 0
+  let tailSize = length & 3
+  
+  if tailSize >= 3 {
+    k1 ^= UInt32(keyData[tailIndex + 2]) << 16
+  }
+  if tailSize >= 2 {
+    k1 ^= UInt32(keyData[tailIndex + 1]) << 8
+  }
+  if tailSize >= 1 {
+    k1 ^= UInt32(keyData[tailIndex + 0])
+  }
+  if tailSize > 0 {
+    k1 = c1 &* k1
+    k1 = (k1 << 15) | (k1 >> (32 - 15))
+    k1 = c2 &* k1
+    h1 ^= k1
+  }
+  var unsignedVal = h1 ^ UInt32(length)
+  unsignedVal ^= unsignedVal >> 16
+  unsignedVal = unsignedVal &* 0x85EB_CA6B
+  unsignedVal ^= unsignedVal >> 13
+  unsignedVal = unsignedVal &* 0xC2B2_AE35
+  unsignedVal ^= unsignedVal >> 16
+  if !signed || (unsignedVal & 0x8000_0000 == 0) {
+    return Int(unsignedVal)
+  } else {
+    return -Int((unsignedVal ^ 0xFFFF_FFFF) + 1)
+  }
+}

@@ -1556,78 +1556,6 @@ extension Gateway {
     public var guild_id: GuildSnowflake
   }
 
-  //	{
-  //		"op": 37,
-  //		"d": {
-  //			"subscriptions": {
-  //				"1214679871964450836": { // server id
-  //					"typing": true, // get typing events
-  //					"activities": true, // get activity events
-  //					"threads": true, // get thread events
-  //					"channels": { // channels to get member list chunks for
-  //            "1223399680101191792": [ // channel id for member list chunks
-  //							// arrays below are int pairs, for lower and upper bound chunks of member data from the channel
-  //              // each pair max 100 members, and you can only specify up to 5 pairs per channel
-  //							[
-  //								0,
-  //								99
-  //							],
-  //							[
-  //								100,
-  //								199
-  //							], // etc
-  //						]
-  //					},
-  //          "members": [ // members to get guild member events for
-  //            "1295541912010362932",
-  //          ],
-  //	      	"thread_member_lists": [ // member list chunks for threads?
-  //						"1295541912010362932"
-  //					]
-  //				}
-  //			}
-  //		}
-  //	}
-  /// Sadly there is no documentation for this payload, but I have made it as user friendly as I could
-  /// According to dolfies this is a very annoying and complex gateway op :c
-  ///
-  /// dpy-self actually has docs by dolfie on this: https://github.com/dolfies/discord.py-self/blob/600fd36dbf9175477a19cea8d394baf9fe7ef291/discord/state.py#L499-L543
-  ///
-  public struct UpdateGuildSubscriptions: Sendable, Codable {
-    public var subscriptions: [GuildSnowflake: GuildSubscription]
-
-    public init(subscriptions: [GuildSnowflake: GuildSubscription]) {
-      self.subscriptions = subscriptions
-    }
-
-    public struct GuildSubscription: Sendable, Codable {
-      // features you can choose to subscribe to
-      public var typing: Bool
-      public var activities: Bool
-      public var threads: Bool
-      public var member_updates: Bool
-
-      public var channels: [ChannelSnowflake: [IntPair]]
-      public var thread_member_lists: [ChannelSnowflake]?
-
-      public init(
-        typing: Bool,
-        activities: Bool,
-        threads: Bool,
-        member_updates: Bool,
-        channels: [ChannelSnowflake: [IntPair]],
-        thread_member_lists: [ChannelSnowflake]? = nil
-      ) {
-        self.typing = typing
-        self.activities = activities
-        self.threads = threads
-        self.channels = channels
-        self.member_updates = member_updates
-        self.thread_member_lists = thread_member_lists
-      }
-    }
-  }
-
   /// https://docs.discord.food/topics/gateway-events#guild-scheduled-event-exceptions-delete
   public struct GuildScheduledEventExceptionsDelete: Sendable, Codable {
     public var guild_id: GuildSnowflake
@@ -2041,4 +1969,173 @@ extension Gateway {
   public struct ExchangeRemoteAuthTicket: Sendable, Codable {
     public var encrypted_token: String
   }
+  
+  //  {
+  //    "op": 37,
+  //    "d": {
+  //      "subscriptions": {
+  //        "1214679871964450836": { // server id
+  //          "typing": true, // get typing events
+  //          "activities": true, // get activity events
+  //          "threads": true, // get thread events
+  //          "channels": { // channels to get member list chunks for
+  //            "1223399680101191792": [ // channel id for member list chunks
+  //              // arrays below are int pairs, for lower and upper bound chunks of member data from the channel
+  //              // each pair max 100 members, and you can only specify up to 5 pairs per channel
+  //              [
+  //                0,
+  //                99
+  //              ],
+  //              [
+  //                100,
+  //                199
+  //              ], // etc
+  //            ]
+  //          },
+  //          "members": [ // members to get guild member events for
+  //            "1295541912010362932",
+  //          ],
+  //          "thread_member_lists": [ // member list chunks for threads?
+  //            "1295541912010362932"
+  //          ]
+  //        }
+  //      }
+  //    }
+  //  }
+  /// Sadly there is no documentation for this payload, but I have made it as user friendly as I could
+  /// According to dolfies this is a very annoying and complex gateway op :c
+  ///
+  /// dpy-self actually has docs by dolfies on this: https://github.com/dolfies/discord.py-self/blob/600fd36dbf9175477a19cea8d394baf9fe7ef291/discord/state.py#L499-L543
+  ///
+  public struct UpdateGuildSubscriptions: Sendable, Codable {
+    public var subscriptions: [GuildSnowflake: GuildSubscription]
+
+    public init(subscriptions: [GuildSnowflake: GuildSubscription]) {
+      self.subscriptions = subscriptions
+    }
+
+    public struct GuildSubscription: Sendable, Codable {
+      // features you can choose to subscribe to
+      public var typing: Bool
+      public var activities: Bool
+      public var threads: Bool
+      public var member_updates: Bool
+
+      public var channels: [ChannelSnowflake: [IntPair]]
+      public var thread_member_lists: [ChannelSnowflake]?
+
+      public init(
+        typing: Bool,
+        activities: Bool,
+        threads: Bool,
+        member_updates: Bool,
+        channels: [ChannelSnowflake: [IntPair]],
+        thread_member_lists: [ChannelSnowflake]? = nil
+      ) {
+        self.typing = typing
+        self.activities = activities
+        self.threads = threads
+        self.channels = channels
+        self.member_updates = member_updates
+        self.thread_member_lists = thread_member_lists
+      }
+    }
+  }
+  
+  // {"t":"GUILD_MEMBER_LIST_UPDATE","s":10529,"op":0,"d":{"ops":[{"op":"UPDATE","item":{"member":{"user":{"username":"koifishxd","public_flags":256,"primary_guild":{"tag":"RESN","identity_guild_id":"1407192325943197706","identity_enabled":true,"badge":"681eca471aa735fe864068f9cc978760"},"id":"366321739787010059","global_name":"koi","display_name_styles":{"font_id":11,"effect_id":4,"colors":[16777215]},"display_name":"koi","discriminator":"0","collectibles":{"nameplate":{"sku_id":"1462116614131548265","palette":"white","label":"COLLECTIBLES_GOTHICA_NEVERMORE_NP_A11Y","expires_at":null,"asset":"nameplates/gothica/nevermore/"}},"bot":false,"avatar_decoration_data":{"sku_id":"1333866045236314327","expires_at":null,"asset":"a_c86b11a49bb8057ce9c974a6f7ad658a"},"avatar":"3f7db8acc85cb1486372354c131abf69"},"roles":["1166731270542340146","1166731273155379220","1166731271943237662"],"presence":{"user":{"id":"366321739787010059"},"status":"dnd","processed_at_timestamp":1769904353437,"game":{"type":2,"timestamps":{"start":1769904239618,"end":1769904406559},"sync_id":"0O4yYsvGWYhznwzgg4493X","state":"YungLex; Lil Boom; Ciscaux","session_id":"adc9fcb08fb034b7c583a3aa8537730d","party":{"id":"spotify:366321739787010059"},"name":"Spotify","id":"spotify:1","flags":48,"details":"Rose","created_at":1769904353437,"assets":{"large_text":"Rose","large_image":"spotify:ab67616d0000b27375bf186f00f7b0b88cf5c5b9"}},"client_status":{"mobile":"dnd","desktop":"dnd"},"activities":[{"type":2,"timestamps":{"start":1769904239618,"end":1769904406559},"sync_id":"0O4yYsvGWYhznwzgg4493X","state":"YungLex; Lil Boom; Ciscaux","session_id":"adc9fcb08fb034b7c583a3aa8537730d","party":{"id":"spotify:366321739787010059"},"name":"Spotify","id":"spotify:1","flags":48,"details":"Rose","created_at":1769904353437,"assets":{"large_text":"Rose","large_image":"spotify:ab67616d0000b27375bf186f00f7b0b88cf5c5b9"}},{"type":0,"timestamps":{"start":1769904111948},"session_id":"adc9fcb08fb034b7c583a3aa8537730d","name":"Arknights:Endfield","id":"ccee1fabaa8a355e","created_at":1769904114554,"application_id":"1461154307171811401"},{"type":3,"timestamps":{"start":1769897827000},"session_id":"h:abaabb202eccfc32ed3cf58e0823","platform":"desktop","name":"YouTube","id":"f7bc0b2997164dfd","flags":192,"details":"Viewing home page","created_at":1769899338296,"assets":{"large_image":"mp:external/rqJdUc_gEj_38ku0G14If-M0XfkyY0CSaGfaWRAydOU/https/cdn.rcd.gg/PreMiD/websites/Y/YouTube/assets/logo.png"},"application_id":"463097721130188830"}]},"premium_since":null,"pending":false,"nick":null,"mute":false,"joined_at":"2024-06-18T21:52:05.463000+00:00","flags":10,"deaf":false,"communication_disabled_until":null,"banner":null,"avatar":null}},"index":18488}],"online_count":50346,"member_count":132112,"id":"3991716185","guild_id":"1015060230222131221","groups":[{"id":"1133790270467604521","count":2},{"id":"1273266391449079858","count":12},{"id":"1244313853357981787","count":3},{"id":"1042507929485586532","count":822},{"id":"1026534353167208489","count":41},{"id":"1193372588819370156","count":1},{"id":"online","count":40693}]}}
+  /// Undocumented, member list. example above.
+  /// d.py-self types https://github.com/dolfies/discord.py-self/blob/master/discord/types/gateway.py#L700
+  /// d.py-self member list parsing code https://github.com/dolfies/discord.py-self/blob/530e72e03eebb2dff6f31ea456c7379ae88272bf/discord/state.py#L2696
+  /// dolfies notes (as much as i understood):
+  /// we request channels in the guild to get member lists for, discord sends us this payload containing groups of members and associated cell counts.
+  /// the requesting happens via the UpdateGuildSubscriptions payload above, with the channels field and intpairs for the ranges you require visible rows of.
+  /// 
+  public struct GuildMemberListUpdate: Sendable, Codable {
+    public var ops: [MemberListOp]
+    public var online_count: Int
+    public var member_count: Int
+    public var id: MemberListSnowflake // either member list id or "everyone".
+    public var guild_id: GuildSnowflake
+    public var groups: [GroupCount]
+    
+    public struct MemberListOp: Sendable, Codable {
+      @UnstableEnum<String>
+      public enum OpKind: Sendable, Codable {
+        case sync  // "SYNC"
+        case update  // "UPDATE"
+        case insert  // "INSERT"
+        case delete  // "DELETE"
+        case invalidate  // "INVALIDATE"
+        
+        case __undocumented(String)
+      }
+      
+      /// what fields in this payload are populated depend on the op, im too lazy to an enum for each op type and subfields.
+      public var op: OpKind
+      
+      /// present for UPDATE, INSERT, DELETE
+      public var index: Int?
+      
+      /// present for SYNC, INVALIDATE
+      public var range: IntPair?
+      
+      /// present for UPDATE, INSERT
+      public var item: Guild.Member?
+      
+      /// present for SYNC
+      public var items: [Guild.Member]?
+    }
+    
+    public struct GroupCount: Sendable, Codable {
+      public var id: RoleSnowflake // annoyingly this can also be "online" to represent unhoisted online members
+      public var count: Int
+    }
+  }
 }
+
+
+
+//class GuildMemberListSyncOP(TypedDict):
+//    op: Literal['SYNC']
+//    range: Tuple[int, int]
+//    items: List[GuildMemberListItem]
+//
+//
+//class GuildMemberListUpdateOP(TypedDict):
+//    op: Literal['UPDATE']
+//    index: int
+//    item: _GuildMemberListMemberItem
+//
+//
+//class GuildMemberListInsertOP(TypedDict):
+//    op: Literal['INSERT']
+//    index: int
+//    item: _GuildMemberListMemberItem
+//
+//
+//class GuildMemberListDeleteOP(TypedDict):
+//    op: Literal['DELETE']
+//    index: int
+//
+//
+//class GuildMemberListInvalidateOP(TypedDict):
+//    op: Literal['INVALIDATE']
+//    range: Tuple[int, int]
+//
+//
+//GuildMemberListOP = Union[
+//    GuildMemberListSyncOP,
+//    GuildMemberListUpdateOP,
+//    GuildMemberListInsertOP,
+//    GuildMemberListDeleteOP,
+//    GuildMemberListInvalidateOP,
+//]
+//
+//
+//class GuildMemberListUpdateEvent(TypedDict):
+//    id: Union[Snowflake, Literal['everyone']]
+//    guild_id: Snowflake
+//    member_count: int
+//    online_count: int
+//    groups: List[GuildMemberListGroup]
+//    ops: List[GuildMemberListOP]

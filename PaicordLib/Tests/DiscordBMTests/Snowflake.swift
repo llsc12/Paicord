@@ -1,5 +1,4 @@
-import DiscordModels
-import PaicordLib
+@testable import PaicordLib
 import XCTest
 
 class SnowflakeTests: XCTestCase {
@@ -145,5 +144,18 @@ class SnowflakeTests: XCTestCase {
     _ = try SnowflakeInfo(timestamp: 0, workerId: 0, processId: .min, sequenceNumber: 0)
 
     _ = try SnowflakeInfo(timestamp: 0, workerId: 0, processId: 0, sequenceNumber: .min)
+  }
+  
+  func testMemberListIDSnowflakes() throws {
+    let memberListSnowflake: MemberListSnowflake = .init("3991716185")
+    let everyoneListSnowflake: MemberListSnowflake = .init("everyone")
+    print(memberListSnowflake, everyoneListSnowflake)
+  }
+  
+  func testMurmurHash() {
+    let testString = "Hello, World!"
+    let hash = murmurhash32(key: testString)
+    print("\(testString) -> \(hash)")
+    XCTAssertEqual(hash, 592631239)
   }
 }

@@ -221,6 +221,8 @@ public protocol GatewayEventHandler: Sendable {
   func onSoundboardSounds(_ payload: Gateway.SoundboardSounds) async throws
   func onChannelUnreadUpdate(_ payload: Gateway.ChannelUnreadUpdate)
     async throws
+  func onGuildMemberListUpdate(_ payload: Gateway.GuildMemberListUpdate)
+    async throws
 }
 
 extension GatewayEventHandler {
@@ -483,7 +485,7 @@ extension GatewayEventHandler {
   public func onSoundboardSounds(_ payload: Gateway.SoundboardSounds)
     async throws
   {}
-  public func onChannelUnreadUpdate(_ payload: Gateway.ChannelUnreadUpdate)
+  public func onGuildMemberListUpdate(_ payload: Gateway.GuildMemberListUpdate)
     async throws
   {}
 }
@@ -1000,6 +1002,10 @@ extension GatewayEventHandler {
     case .channelUnreadUpdate(let payload):
       await withLogging(for: "onChannelUnreadUpdate") {
         try await onChannelUnreadUpdate(payload)
+      }
+    case .guildMemberListUpdate(let payload):
+      await withLogging(for: "guildMemberListUpdate") {
+        try await onGuildMemberListUpdate(payload)
       }
     case .__undocumented: break
     }

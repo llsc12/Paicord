@@ -224,9 +224,9 @@ final class GatewayStore {
     accounts.updateProfile(for: data.user.id, data.user)
 
     // if we have subscribed guilds, we need to clear out non-focused channel stores
-    //    guard self.subscribedGuilds.isEmpty == false else { return } // not needed, below logic wont do anything if empty
+    guard self.subscribedGuilds.isEmpty == false else { return }
     print(
-      "[GatewayStore] Reconnected, removing ChannelStore instances excluding focused channel."
+      "[GatewayStore] Reconnected, resubscribing to previously subscribed guilds."
     )
     let channelIds = PaicordAppState.instances.compactMap(
       \.value.selectedChannel
@@ -251,17 +251,24 @@ final class GatewayStore {
         }
       }
     }
-    print("[GatewayStore] Reconnected, guild subscriptions invalidated.")
+    var previousSubscribedGuilds = self.subscribedGuilds
+    // remove values from previousSubscribedGuilds that don't exist anymore
+    let existingGuildIds = Set(data.guilds.map(\.id))
+    previousSubscribedGuilds = previousSubscribedGuilds.filter { existingGuildIds.contains($0) }
+    
     self.subscribedGuilds = []
-    // get all active window states, and get their selected guilds to resubscribe to guilds that are open
-    PaicordAppState.instances.compactMap(\.value.selectedGuild).forEach {
-      guildId in
+    // dont subscribing only to focused guilds. resubscribe to all previous guilds
+    for guildId in previousSubscribedGuilds {
       _ = getGuildStore(for: guildId)
     }
+//    // get all active window states, and get their selected guilds to resubscribe to guilds that are open
+//    PaicordAppState.instances.compactMap(\.value.selectedGuild).forEach {
+//      guildId in
+//      _ = getGuildStore(for: guildId)
+//    }
 
     // Now that we've done that, we need to use this ready data to update any internal stores that need it
     // guilds need repopulating. also guilds could have been left during the client down time. remove guilds if they don't exist anymore then repopulate.
-    let existingGuildIds = Set(data.guilds.map(\.id))
     // remove guilds that don't exist anymore, also remove their guildstores and any of their channelstores
     for (guildId, guildStore) in guilds {
       if !existingGuildIds.contains(guildId) {
@@ -276,6 +283,7 @@ final class GatewayStore {
         guilds.removeValue(forKey: guildId)
       }
     }
+    
     // repopulate guildstores
     for guildStore in self.guilds.values {
       if let guild = data.guilds.first(where: { $0.id == guildStore.guildId }) {

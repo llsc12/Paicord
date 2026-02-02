@@ -189,6 +189,7 @@ public struct Gateway: Sendable, Codable {
       case requestGuildMembers(RequestGuildMembers)
 
       case updateGuildSubscriptions(UpdateGuildSubscriptions)
+      case guildMemberListUpdate(GuildMemberListUpdate)
 
       //			case guildPowerupEntitlementsCreate // TODO
       //			case guildPowerupEntitlementsDelete // TODO
@@ -352,7 +353,7 @@ public struct Gateway: Sendable, Codable {
           .entitlementCreate,
           .entitlementUpdate, .entitlementDelete,
           .applicationCommandPermissionsUpdate, .userUpdate,
-          .voiceServerUpdate, .updateGuildSubscriptions:
+          .voiceServerUpdate, .updateGuildSubscriptions, .guildMemberListUpdate:
           return []
         case .guildCreate, .guildUpdate, .guildDelete, .guildMembersChunk,
           .guildRoleCreate, .guildRoleUpdate,

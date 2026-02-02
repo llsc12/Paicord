@@ -25,7 +25,14 @@ class GuildStore: DiscordDataStore {
   var roles: OrderedDictionary<RoleSnowflake, Role> = [:]
   var presences: [UserSnowflake: Gateway.PresenceUpdate] = [:]
   var voiceStates: [UserSnowflake: VoiceState] = [:]
-
+  
+  // MARK: - Internal kinda stuff ykyk
+  
+  // Max of 5 subscribed member lists at a time per guild.
+  var subscribedMemberIDs: [MemberListSnowflake] = []
+  
+  // MARK: - Initializers, setup etc.
+  
   init(id: GuildSnowflake, from guild: Guild?) {
     self.guildId = id
     self.guild = guild
