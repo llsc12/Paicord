@@ -34,7 +34,8 @@ extension MessageCell {
     var body: some View {
       VStack(alignment: .leading, spacing: 4) {
         // Content
-        Group {
+//        Group {
+//        totally breaks with Group idk why.
           if !messageContentHidden {
             let content = message.content ?? ""
             if message.flags?.contains(.isComponentsV2) == true {
@@ -47,9 +48,10 @@ extension MessageCell {
                 channelStore: channelStore
               )
               .equatable()
+              .enableCrossBlockTextSelection(true)
             }
           }
-        }
+//        }
 
         // Attachments
         let attachments = message.attachments ?? []
