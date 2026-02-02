@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		391A9AD92F30311E00215754 /* SelectableMarkdownText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 391A9AD82F30311E00215754 /* SelectableMarkdownText.swift */; };
 		5724CD6F2E733D0E00931FEF /* MFASheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5724CD6E2E733D0900931FEF /* MFASheet.swift */; };
 		572B694C2E7079FB00BCED00 /* PaicordLib in Frameworks */ = {isa = PBXBuildFile; productRef = 572B694B2E7079FB00BCED00 /* PaicordLib */; };
 		5783AA902E6B8F6500F73F6D /* MeshGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 5783AA8F2E6B8F6500F73F6D /* MeshGradient */; };
@@ -155,6 +156,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		391A9AD82F30311E00215754 /* SelectableMarkdownText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectableMarkdownText.swift; sourceTree = "<group>"; };
 		5724CD6E2E733D0900931FEF /* MFASheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MFASheet.swift; sourceTree = "<group>"; };
 		5783AA932E6B8FCD00F73F6D /* MeshGradient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeshGradient.swift; sourceTree = "<group>"; };
 		578E1CE02E67780B00C6DEA3 /* GradientText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientText.swift; sourceTree = "<group>"; };
@@ -490,6 +492,7 @@
 		AA0C43D52E9EF91D000FA834 /* Markdown */ = {
 			isa = PBXGroup;
 			children = (
+				391A9AD82F30311E00215754 /* SelectableMarkdownText.swift */,
 				57A55C562E7560CC005C8226 /* MarkdownText.swift */,
 				AA0C43D62E9F18AD000FA834 /* AttributedText.swift */,
 			);
@@ -1131,6 +1134,7 @@
 				57F5AF472E7CAD2500AD5674 /* Challenges.swift in Sources */,
 				AA47AF242EDEF139008A50C9 /* ConnectionsSection.swift in Sources */,
 				AA418C842F21AAFB00B51C18 /* UpdateCheck.swift in Sources */,
+				391A9AD92F30311E00215754 /* SelectableMarkdownText.swift in Sources */,
 				AA409ABF2EC74F5E00848045 /* ThemingSupport.swift in Sources */,
 				AA13A1E32EA83766005A3613 /* TypingIndicatorBar.swift in Sources */,
 				AA9D26B12EC95EE4006071FE /* FlowLayout.swift in Sources */,
@@ -1307,10 +1311,11 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Paicord/Paicord.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = 566RT33SA2;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_FILE_ACCESS_DOWNLOADS_FOLDER = readwrite;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1370,10 +1375,11 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Paicord/Paicord.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = 566RT33SA2;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_FILE_ACCESS_DOWNLOADS_FOLDER = readwrite;
 				ENABLE_HARDENED_RUNTIME = YES;
