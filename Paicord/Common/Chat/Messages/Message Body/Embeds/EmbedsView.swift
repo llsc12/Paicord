@@ -8,16 +8,19 @@
 
 import AVKit
 import Foundation
+import Loupe
 import PaicordLib
 import SDWebImageSwiftUI
 import SwiftPrettyPrint
 import SwiftUIX
-import Loupe
 
 extension MessageCell {
   struct EmbedsView: View {
     var embeds: [Embed]
 
+    private let maxWidth: CGFloat = 500
+    private let maxHeight: CGFloat = 300
+    
     var body: some View {
       #warning(
         "redo this to support all embed types properly, eg gifs, embeds with multiple images."
@@ -31,24 +34,12 @@ extension MessageCell {
             if let image = embed.image ?? embed.thumbnail,
               let url = URL(string: image.proxyurl)
             {
-              let aspectRatio: CGFloat? = {
-                if let width = image.width, let height = image.height {
-                  return width.toCGFloat / height.toCGFloat
-                } else {
-                  return nil
-                }
-              }()
               AnimatedImage(url: url)
                 .resizable()
-                .aspectRatio(aspectRatio, contentMode: .fit)
+                .aspectRatio(image.aspectRatio, contentMode: .fit)
                 .clipShape(.rounded)
-                .frame(
-                  minWidth: 1,
-                  maxWidth: min(image.width?.toCGFloat, 400),
-                  minHeight: 1,
-                  maxHeight: min(image.height?.toCGFloat, 300),
-                  alignment: .leading
-                )
+                .frame(maxWidth: maxWidth, maxHeight: maxHeight, alignment: .leading)
+                .fixedSize(horizontal: false, vertical: true)
             }
           case .gifv:
             if let video = embed.video {
@@ -262,40 +253,41 @@ extension MessageCell {
     struct GifvView: View {
       var media: Embed.Media
       var staticMedia: Embed.Media? = nil  // soon, to use as poster
-      private var player: AVQueuePlayer
-      private var playerLooper: AVPlayerLooper
+      private var player: AVPlayer
 
+      private let maxWidth: CGFloat = 500
+      private let maxHeight: CGFloat = 300
+      
       init(media: Embed.Media, staticMedia: Embed.Media? = nil) {
         self.media = media
         self.staticMedia = staticMedia
         let sourceURL = URL(string: media.proxyurl)!
         let asset = AVAsset(url: sourceURL)
         let item: AVPlayerItem = .init(asset: asset)
-        self.player = .init(playerItem: item)
-        self.playerLooper = .init(player: player, templateItem: item)
+        let player: AVPlayer = .init(playerItem: item)
+        self.player = player
+        // avplayerlooper is unreliable on both iOS and macOS, so we use a notification observer to loop instead
+        // idk how this even happens bro
+        NotificationCenter.default.addObserver(
+          forName: .AVPlayerItemDidPlayToEndTime,
+          object: item,
+          queue: .main
+        ) { _ in
+          player.seek(to: .zero)
+          player.play()
+        }
       }
       var body: some View {
-        let aspectRatio: CGFloat? = {
-          if let width = media.width, let height = media.height {
-            return width.toCGFloat / height.toCGFloat
-          } else {
-            return nil
-          }
-        }()
         AVPlayerLayerContainer(player: player)
+          .aspectRatio(media.aspectRatio, contentMode: .fit)
           .clipShape(.rounded)
-          .aspectRatio(aspectRatio, contentMode: .fit)
-          .frame(
-            minWidth: 1,
-            maxWidth: min(media.width?.toCGFloat, 400),
-            minHeight: 1,
-            maxHeight: min(media.height?.toCGFloat, 300),
-            alignment: .leading
-          )
+          .frame(maxWidth: maxWidth, maxHeight: maxHeight, alignment: .leading)
+          .fixedSize(horizontal: false, vertical: true)
           .onAppear {
             player.play()
           }
           .onDisappear {
+            player.seek(to: .zero)
             player.pause()
           }
       }

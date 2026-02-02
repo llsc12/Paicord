@@ -19,6 +19,7 @@ struct MarkdownText: View, Equatable {
   let baseAttributesOverrides: [NSAttributedString.Key: Any]
 
   @Environment(\.dynamicTypeSize) var dynamicType
+  @ViewStorage var dynamicTypeSizeStorage: DynamicTypeSize = .xSmall
   @Environment(\.theme) var theme
 
   @State private var renderer: MarkdownRendererVM
@@ -58,6 +59,7 @@ struct MarkdownText: View, Equatable {
     lhs.content == rhs.content
       && lhs.channelStore?.channelId == rhs.channelStore?.channelId
       && lhs.baseAttributesOverrides.count == rhs.baseAttributesOverrides.count
+      && lhs.dynamicTypeSizeStorage == rhs.dynamicTypeSizeStorage
   }
 
   var body: some View {
@@ -88,6 +90,13 @@ struct MarkdownText: View, Equatable {
       )
     }
     .equatable(by: renderSignature)
+    .task(
+      id: dynamicType,
+      {
+        dynamicTypeSizeStorage = dynamicType
+        await renderIfNeeded()
+      }
+    )
     .task(id: renderSignature, renderIfNeeded)
   }
 
@@ -114,7 +123,7 @@ struct MarkdownText: View, Equatable {
         memberCount: channelStore?.guildStore?.members.count,
         roleCount: channelStore?.guildStore?.roles.count,
         channelCount: channelStore?.guildStore?.channels.count,
-        dynamicType: dynamicType,
+        dynamicType: dynamicTypeSizeStorage,
         themeID: theme.id
       )
     } else {
@@ -125,7 +134,7 @@ struct MarkdownText: View, Equatable {
         memberCount: nil,
         roleCount: nil,
         channelCount: nil,
-        dynamicType: dynamicType,
+        dynamicType: dynamicTypeSizeStorage,
         themeID: theme.id
       )
     }
@@ -362,11 +371,20 @@ class MarkdownRendererVM {
   static var parser: DiscordMarkdownParser = { .init() }()
 
   // Shared cache (renderer instances)
-  static let cache: NSCache<NSString, MarkdownRendererVM> = {
-    let c = NSCache<NSString, MarkdownRendererVM>()
+  fileprivate static let cache: NSCache<NSString, CachedRender> = {
+    let c = NSCache<NSString, CachedRender>()
     c.countLimit = 512
     return c
   }()
+  fileprivate class CachedRender: NSObject {
+    let blocks: [BlockElement]
+    let emojiSize: EmojiSize
+
+    init(blocks: [BlockElement], emojiSize: EmojiSize) {
+      self.blocks = blocks
+      self.emojiSize = emojiSize
+    }
+  }
 
   let theme = Theming.shared.currentTheme
   fileprivate var blocks: [BlockElement] = []
@@ -414,7 +432,10 @@ class MarkdownRendererVM {
         self.blocks = blocks
       }
       // store self (with current blocks) in cache
-      Self.cache.setObject(self, forKey: cacheKey as NSString)
+      Self.cache.setObject(
+        CachedRender(blocks: self.blocks, emojiSize: self.emojiSize),
+        forKey: cacheKey as NSString
+      )
 
       // check if the ast only contains emojis, either unicode or custom.
       #warning("large emojis support not implemented yet")
@@ -1542,11 +1563,18 @@ final class EmojiTextAttachment: NSTextAttachment {
 }
 
 extension MarkdownRendererVM {
-  func makeEmojiAttachment(emoji: EmojiData, attributes: [NSAttributedString.Key: Any])
+  func makeEmojiAttachment(
+    emoji: EmojiData,
+    attributes: [NSAttributedString.Key: Any]
+  )
     -> NSAttributedString
   {
     let contextFont = attributes[.font] as! AppKitOrUIKitFont
-    let attachment = EmojiTextAttachment(url: emoji.url, size: emoji.size, font: contextFont)
+    let attachment = EmojiTextAttachment(
+      url: emoji.url,
+      size: emoji.size,
+      font: contextFont
+    )
     let attachmentString = NSMutableAttributedString(attachment: attachment)
     // set attributes from context
     for (attrKey, attrValue) in attributes {
