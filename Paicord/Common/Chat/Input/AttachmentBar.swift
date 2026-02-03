@@ -58,24 +58,23 @@ extension ChatView.InputBar {
           switch attachment {
           case .pickerItem:
             thumbnailPreviewView
-              .task { self.image = await inputVM.getThumbnail(for: attachment) }
           case .file(_, let url, let size):
             if isMediaFile || image != nil {
               thumbnailPreviewView
-                .task { self.image = await inputVM.getThumbnail(for: attachment) }
             } else {
               filePreviewView(url: url, size: size)
-                .task { self.image = await inputVM.getThumbnail(for: attachment) }
             }
           #if os(iOS)
             case .cameraPhoto:
               thumbnailPreviewView
-                .task { self.image = await inputVM.getThumbnail(for: attachment) }
             case .cameraVideo:
               thumbnailPreviewView
-                .task { self.image = await inputVM.getThumbnail(for: attachment) }
           #endif
           }
+        }
+        .task(id: attachment.id) {
+          guard image == nil else { return }
+          self.image = await inputVM.getThumbnail(for: attachment)
         }
         .clipShape(.rounded)
         .overlay(alignment: .topTrailing) {

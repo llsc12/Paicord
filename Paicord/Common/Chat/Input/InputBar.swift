@@ -146,41 +146,7 @@ extension ChatView {
       .onFileDrop(
         delegate: .init(onDrop: { droppedItems in
           let files = droppedItems.compactMap(\.loadedURL)
-          // now do just like the file picker
-          inputVM.selectedFiles = files.compactMap { url in
-            var url: URL? = url
-            let canAccess =
-              url?.startAccessingSecurityScopedResource() ?? false
-            defer {
-              if canAccess {
-                url?.stopAccessingSecurityScopedResource()
-              }
-            }
-            // check filesize
-            let fileSize =
-              (try? url?.resourceValues(forKeys: [.fileSizeKey])
-                .fileSize)
-              ?? 0
-            // discord wont let you upload empty files.
-            if fileSize == 0 {
-              url = nil
-              self.filesRemovedDuringSelection =
-                InputBar.SelectionError.filesEmpty
-            }
-            let uploadMeta = gw.user.premiumKind.fileUpload(
-              size: fileSize,
-              to: vm
-            )
-            if uploadMeta.allowed == false {
-              url = nil
-              self.filesRemovedDuringSelection =
-                InputBar.SelectionError.filesPastLimit(
-                  limit: uploadMeta.limit
-                )
-            }
-
-            return url
-          }
+          inputVM.selectedFiles = filterUploadableURLs(files)
         })
       )
     }
@@ -242,40 +208,7 @@ extension ChatView {
         }
         .sheet(isPresented: $properties.showFilePicker) {
           DocumentPickerViewController { urls in
-            inputVM.selectedFiles = urls.compactMap { url in
-              var url: URL? = url
-              let canAccess =
-                url?.startAccessingSecurityScopedResource() ?? false
-              defer {
-                if canAccess {
-                  url?.stopAccessingSecurityScopedResource()
-                }
-              }
-              // check filesize
-              let fileSize =
-                (try? url?.resourceValues(forKeys: [.fileSizeKey])
-                  .fileSize)
-                ?? 0
-              // discord wont let you upload empty files.
-              if fileSize == 0 {
-                url = nil
-                self.filesRemovedDuringSelection =
-                  SelectionError.filesEmpty
-              }
-              let uploadMeta = gw.user.premiumKind.fileUpload(
-                size: fileSize,
-                to: vm
-              )
-              if uploadMeta.allowed == false {
-                url = nil
-                self.filesRemovedDuringSelection =
-                  SelectionError.filesPastLimit(
-                    limit: uploadMeta.limit
-                  )
-              }
-
-              return url
-            }
+            inputVM.selectedFiles = filterUploadableURLs(urls)
           }
           .presentationBackground(.clear)
           .presentationDetents([
@@ -358,40 +291,7 @@ extension ChatView {
         ) { result in
           do {
             let urls = try result.get()
-            inputVM.selectedFiles = urls.compactMap { url in
-              var url: URL? = url
-              let canAccess =
-                url?.startAccessingSecurityScopedResource() ?? false
-              defer {
-                if canAccess {
-                  url?.stopAccessingSecurityScopedResource()
-                }
-              }
-              // check filesize
-              let fileSize =
-                (try? url?.resourceValues(forKeys: [.fileSizeKey])
-                  .fileSize)
-                ?? 0
-              // discord wont let you upload empty files.
-              if fileSize == 0 {
-                url = nil
-                self.filesRemovedDuringSelection =
-                  SelectionError.filesEmpty
-              }
-              let uploadMeta = gw.user.premiumKind.fileUpload(
-                size: fileSize,
-                to: vm
-              )
-              if uploadMeta.allowed == false {
-                url = nil
-                self.filesRemovedDuringSelection =
-                  SelectionError.filesPastLimit(
-                    limit: uploadMeta.limit
-                  )
-              }
-
-              return url
-            }
+            inputVM.selectedFiles = filterUploadableURLs(urls)
           } catch {
             print("Failed to pick files: \(error)")
           }
@@ -499,6 +399,7 @@ extension ChatView {
           PastableTextField(
             placeholder: "Message",
             text: $inputVM.content,
+            isFocused: $isFocused,
             onPasteFiles: handlePastedFiles
           )
           .maxHeight(150)
@@ -506,7 +407,6 @@ extension ChatView {
           .disabled(appState.chatOpen == false)
           .padding(.vertical, 7)
           .padding(.horizontal, 12)
-          .focused($isFocused)
         #else
           TextView("Message", text: $inputVM.content, submit: sendMessage, onPasteFiles: handlePastedFiles)
             .padding(8)
@@ -641,27 +541,40 @@ extension ChatView {
       }
     }
 
-    private func handlePastedFiles(_ urls: [URL]) {
-      inputVM.selectedFiles = urls.compactMap { url in
-        var url: URL? = url
+    private func filterUploadableURLs(_ urls: [URL]) -> [URL] {
+      return urls.compactMap { originalURL in
+        var url: URL? = originalURL
         let canAccess = url?.startAccessingSecurityScopedResource() ?? false
         defer {
           if canAccess {
             url?.stopAccessingSecurityScopedResource()
           }
         }
+
         let fileSize = (try? url?.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
         if fileSize == 0 {
           url = nil
           self.filesRemovedDuringSelection = SelectionError.filesEmpty
         }
+
         let uploadMeta = gw.user.premiumKind.fileUpload(size: fileSize, to: vm)
         if uploadMeta.allowed == false {
           url = nil
           self.filesRemovedDuringSelection = SelectionError.filesPastLimit(limit: uploadMeta.limit)
         }
+
         return url
       }
+    }
+
+    private func handlePastedFiles(_ urls: [URL]) {
+      let tempDir = FileManager.default.temporaryDirectory
+      for url in urls {
+        if url.path.hasPrefix(tempDir.path) {
+          inputVM.trackTempFile(url)
+        }
+      }
+      inputVM.selectedFiles = filterUploadableURLs(urls)
     }
 
     #if os(iOS)
@@ -670,7 +583,6 @@ extension ChatView {
       }
       func onImageCaptured(_ image: UIImage, _ controller: MCamera.Controller) {
         Task {
-          // save to temp directory
           let tempDir = FileManager.default.temporaryDirectory
           let fileURL = tempDir.appendingPathComponent(
             UUID().uuidString + ".png"
@@ -678,6 +590,7 @@ extension ChatView {
           if let imageData = image.pngData() {
             do {
               try imageData.write(to: fileURL)
+              inputVM.trackTempFile(fileURL)
               inputVM.selectedFiles.append(fileURL)
             } catch {
               print("Failed to save captured image: \(error)")
@@ -688,7 +601,6 @@ extension ChatView {
       }
       func onVideoCaptured(_ videoURL: URL, _ controller: MCamera.Controller) {
         Task {
-          // unsure where this saves to, just moving it to temp directory bc why not
           let newVideoURL = FileManager.default.temporaryDirectory
             .appendingPathComponent(
               UUID().uuidString + ".mov"
@@ -697,6 +609,7 @@ extension ChatView {
             at: videoURL,
             to: newVideoURL
           )
+          inputVM.trackTempFile(newVideoURL)
           inputVM.selectedFiles.append(newVideoURL)
 
           controller.closeMCamera()
@@ -1038,6 +951,7 @@ extension ChatView {
   struct PastableTextField: UIViewRepresentable {
     var placeholder: String
     @Binding var text: String
+    @Binding var isFocused: Bool
     var onPasteFiles: (([URL]) -> Void)?
 
     func makeUIView(context: Context) -> PastableUITextView {
@@ -1058,6 +972,12 @@ extension ChatView {
       }
       textView.onPasteFiles = onPasteFiles
       context.coordinator.updatePlaceholder(textView, placeholder: placeholder, isEmpty: text.isEmpty)
+      
+      if isFocused && !textView.isFirstResponder {
+        textView.becomeFirstResponder()
+      } else if !isFocused && textView.isFirstResponder {
+        textView.resignFirstResponder()
+      }
     }
 
     func makeCoordinator() -> Coordinator {
@@ -1075,6 +995,18 @@ extension ChatView {
       func textViewDidChange(_ textView: UITextView) {
         parent.text = textView.text
         updatePlaceholder(textView, placeholder: parent.placeholder, isEmpty: textView.text.isEmpty)
+      }
+      
+      func textViewDidBeginEditing(_ textView: UITextView) {
+        DispatchQueue.main.async {
+          self.parent.isFocused = true
+        }
+      }
+      
+      func textViewDidEndEditing(_ textView: UITextView) {
+        DispatchQueue.main.async {
+          self.parent.isFocused = false
+        }
       }
 
       func updatePlaceholder(_ textView: UITextView, placeholder: String, isEmpty: Bool) {

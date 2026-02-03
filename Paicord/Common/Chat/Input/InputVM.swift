@@ -6,6 +6,7 @@
 //  Copyright © 2025 Lakhan Lothiyi.
 //
 
+import ImageIO
 import PaicordLib
 import PhotosUI
 import QuickLookThumbnailing
@@ -30,6 +31,26 @@ extension ChatView.InputBar {
 
     /// The text field content
     var content: String = ""
+    
+    private var appCreatedTempFiles: Set<URL> = []
+    
+    func trackTempFile(_ url: URL) {
+      appCreatedTempFiles.insert(url)
+    }
+    
+    private func cleanupTempFile(_ url: URL) {
+      guard appCreatedTempFiles.contains(url) else { return }
+      try? FileManager.default.removeItem(at: url)
+      appCreatedTempFiles.remove(url)
+    }
+    
+    private func cleanupAllTempFiles() {
+      for url in appCreatedTempFiles {
+        try? FileManager.default.removeItem(at: url)
+      }
+      appCreatedTempFiles.removeAll()
+    }
+    
     #if os(iOS)
       /// Photos selected from the system photo picker
       var selectedPhotos: [PhotosPickerItem] = [] {
@@ -147,7 +168,31 @@ extension ChatView.InputBar {
     /// The input bar displays items from this.
     var uploadItems: [UploadItem] = [] {
       didSet {
-        // remove any selectedPhotos that are no longer in uploadItems
+        let oldURLs = Set(oldValue.compactMap { item -> URL? in
+          switch item {
+          case .file(_, let url, _): return url
+          #if os(iOS)
+            case .cameraVideo(_, let url): return url
+          #endif
+          default: return nil
+          }
+        })
+        
+        let newURLs = Set(uploadItems.compactMap { item -> URL? in
+          switch item {
+          case .file(_, let url, _): return url
+          #if os(iOS)
+            case .cameraVideo(_, let url): return url
+          #endif
+          default: return nil
+          }
+        })
+        
+        let removedURLs = oldURLs.subtracting(newURLs)
+        for url in removedURLs {
+          cleanupTempFile(url)
+        }
+        
         #if os(iOS)
           let uploadItemsPhotoItems = uploadItems.compactMap {
             item -> PhotosPickerItem? in
@@ -182,6 +227,7 @@ extension ChatView.InputBar {
     }
 
     func reset() {
+      cleanupAllTempFiles()
       #if os(iOS)
         selectedPhotos = []
       #endif
@@ -274,7 +320,11 @@ extension ChatView.InputBar.InputVM {
       case .cameraPhoto(_, let image):
         return Image(uiImage: image)
       case .cameraVideo(_, let url):
-        return await generateVideoThumbnail(from: url)
+        #if canImport(AVFoundation)
+          return await generateVideoThumbnail(from: url)
+        #else
+          return await generateQuickLookThumbnail(from: url)
+        #endif
     #endif
     case .file(_, let url, _):
       return await generateFileThumbnail(from: url)
@@ -294,49 +344,46 @@ extension ChatView.InputBar.InputVM {
 
     let imageTypes: [UTType] = [.image, .png, .jpeg, .gif, .webP, .heic, .heif, .tiff, .bmp]
     if imageTypes.contains(where: { utType.conforms(to: $0) }) {
-      #if canImport(AppKit)
-        if let nsImage = NSImage(contentsOf: url) {
-          return Image(nsImage: nsImage)
-        }
-      #elseif canImport(UIKit)
-        if let data = try? Data(contentsOf: url),
-           let uiImage = UIImage(data: data) {
-          return Image(uiImage: uiImage)
-        }
-      #endif
-    }
-
-    let videoTypes: [UTType] = [.movie, .video, .mpeg4Movie, .quickTimeMovie, .avi]
-    if videoTypes.contains(where: { utType.conforms(to: $0) }) {
-      if let image = await generateVideoThumbnail(from: url) {
-        return image
+      if let thumbnail = generateDownsampledImageThumbnail(from: url) {
+        return thumbnail
       }
     }
+
+    #if canImport(AVFoundation)
+      let videoTypes: [UTType] = [.movie, .video, .mpeg4Movie, .quickTimeMovie, .avi]
+      if videoTypes.contains(where: { utType.conforms(to: $0) }) {
+        if let image = await generateVideoThumbnail(from: url) {
+          return image
+        }
+      }
+    #endif
 
     return await generateQuickLookThumbnail(from: url)
   }
 
-  private func generateVideoThumbnail(from url: URL) async -> Image? {
-    let asset = AVURLAsset(url: url)
-    let generator = AVAssetImageGenerator(asset: asset)
-    generator.appliesPreferredTrackTransform = true
-    generator.maximumSize = CGSize(width: 120, height: 120)
+  #if canImport(AVFoundation)
+    private func generateVideoThumbnail(from url: URL) async -> Image? {
+      let asset = AVURLAsset(url: url)
+      let generator = AVAssetImageGenerator(asset: asset)
+      generator.appliesPreferredTrackTransform = true
+      generator.maximumSize = CGSize(width: 120, height: 120)
 
-    do {
-      let (cgImage, _) = try await generator.image(at: .zero)
-      #if canImport(AppKit)
-        let nsImage = NSImage(cgImage: cgImage, size: NSSize(width: cgImage.width, height: cgImage.height))
-        return Image(nsImage: nsImage)
-      #elseif canImport(UIKit)
-        let uiImage = UIImage(cgImage: cgImage)
-        return Image(uiImage: uiImage)
-      #else
+      do {
+        let (cgImage, _) = try await generator.image(at: .zero)
+        #if canImport(AppKit)
+          let nsImage = NSImage(cgImage: cgImage, size: NSSize(width: cgImage.width, height: cgImage.height))
+          return Image(nsImage: nsImage)
+        #elseif canImport(UIKit)
+          let uiImage = UIImage(cgImage: cgImage)
+          return Image(uiImage: uiImage)
+        #else
+          return nil
+        #endif
+      } catch {
         return nil
-      #endif
-    } catch {
-      return nil
+      }
     }
-  }
+  #endif
 
   private func generateQuickLookThumbnail(from url: URL) async -> Image? {
     let size = CGSize(width: 120, height: 120)
@@ -366,6 +413,33 @@ extension ChatView.InputBar.InputVM {
     } catch {
       return nil
     }
+  }
+
+  private func generateDownsampledImageThumbnail(from url: URL) -> Image? {
+    let maxDimension: CGFloat = 120
+    guard let imageSource = CGImageSourceCreateWithURL(url as CFURL, nil) else {
+      return nil
+    }
+
+    let options: [CFString: Any] = [
+      kCGImageSourceThumbnailMaxPixelSize: maxDimension,
+      kCGImageSourceCreateThumbnailFromImageAlways: true,
+      kCGImageSourceCreateThumbnailWithTransform: true
+    ]
+
+    guard let cgImage = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, options as CFDictionary) else {
+      return nil
+    }
+
+    #if canImport(AppKit)
+      let nsImage = NSImage(cgImage: cgImage, size: NSSize(width: cgImage.width, height: cgImage.height))
+      return Image(nsImage: nsImage)
+    #elseif canImport(UIKit)
+      let uiImage = UIImage(cgImage: cgImage)
+      return Image(uiImage: uiImage)
+    #else
+      return nil
+    #endif
   }
 
   private func loadTransferable(from imageSelection: PhotosPickerItem)
