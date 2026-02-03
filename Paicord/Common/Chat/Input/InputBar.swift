@@ -951,7 +951,7 @@ extension ChatView {
   struct PastableTextField: UIViewRepresentable {
     var placeholder: String
     @Binding var text: String
-    @Binding var isFocused: Bool
+    var isFocused: FocusState<Bool>.Binding
     var onPasteFiles: (([URL]) -> Void)?
 
     func makeUIView(context: Context) -> PastableUITextView {
@@ -973,9 +973,9 @@ extension ChatView {
       textView.onPasteFiles = onPasteFiles
       context.coordinator.updatePlaceholder(textView, placeholder: placeholder, isEmpty: text.isEmpty)
       
-      if isFocused && !textView.isFirstResponder {
+      if isFocused.wrappedValue && !textView.isFirstResponder {
         textView.becomeFirstResponder()
-      } else if !isFocused && textView.isFirstResponder {
+      } else if !isFocused.wrappedValue && textView.isFirstResponder {
         textView.resignFirstResponder()
       }
     }
@@ -999,13 +999,13 @@ extension ChatView {
       
       func textViewDidBeginEditing(_ textView: UITextView) {
         DispatchQueue.main.async {
-          self.parent.isFocused = true
+          self.parent.isFocused.wrappedValue = true
         }
       }
       
       func textViewDidEndEditing(_ textView: UITextView) {
         DispatchQueue.main.async {
-          self.parent.isFocused = false
+          self.parent.isFocused.wrappedValue = false
         }
       }
 
