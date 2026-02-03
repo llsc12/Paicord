@@ -132,6 +132,8 @@ struct ChatView: View {
       if vm.hasPermission(.sendMessages) {
         InputBar(vm: vm)
           .id(vm.channelId)
+      } else {
+        Spacer().frame(height: 10)
       }
     }
     .animation(
