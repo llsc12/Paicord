@@ -135,25 +135,25 @@ struct LoginForm: View {
 
         VStack(alignment: .leading, spacing: 5) {
           Text("Email or Phone Number")
-          TextField("", text: $viewModel.login)
-            .textFieldStyle(.plain)
-            .padding(10)
-            .frame(maxWidth: .infinity)
-            .focused($loginFocused)
-            .background(theme.common.primaryBackground.opacity(0.75))
-            .clipShape(.rounded)
-            .overlay {
-              RoundedRectangle()
-                .stroke(
-                  loginFocused ? theme.common.primaryButton : Color.clear,
-                  lineWidth: 1
-                )
-                .fill(.clear)
-            }
-            .padding(.bottom, 10)
+          TextField(text: $viewModel.login)
+          .textFieldStyle(.plain)
+          .padding(10)
+          .frame(maxWidth: .infinity)
+          .focused($loginFocused)
+          .background(theme.common.primaryBackground.opacity(0.75))
+          .clipShape(.rounded)
+          .overlay {
+            RoundedRectangle()
+              .stroke(
+                loginFocused ? theme.common.primaryButton : Color.clear,
+                lineWidth: 1
+              )
+              .fill(.clear)
+          }
+          .padding(.bottom, 10)
 
           Text("Password")
-          SecureField("", text: $viewModel.password)
+          SecureField(text: $viewModel.password)
             .textFieldStyle(.plain)
             .padding(10)
             .frame(maxWidth: .infinity)

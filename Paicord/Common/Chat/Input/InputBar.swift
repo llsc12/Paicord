@@ -469,7 +469,7 @@ extension ChatView {
           Menu {
             Button {
             } label: {
-              Text("1")
+              Text(verbatim: "1")
             }
           } label: {
             Label("Apps", systemImage: "puzzlepiece.fill")

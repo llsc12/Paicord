@@ -42,7 +42,7 @@ struct ShellView: View {
                 }
             }
             // bottom anchor
-            Text("")
+            Text(verbatim: "")
               .id("bottom")
               .frame(height: 0)
               .background(

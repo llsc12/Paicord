@@ -189,7 +189,7 @@ struct MarkdownText: View, Equatable {
           AttributedText(attributedString: attr)
             .equatable(by: attr)
         } else {
-          Text("")
+          Text(verbatim: "")
         }
 
       case .codeBlock:
@@ -220,7 +220,7 @@ struct MarkdownText: View, Equatable {
           VStack(alignment: .leading, spacing: 4) {
             ForEach(children) { child in
               HStack(alignment: .top, spacing: 8) {
-                Text("•").font(.body)
+                Text(verbatim: "•").font(.body)
                 BlockView(block: child)
                   .equatable()
               }
@@ -240,7 +240,7 @@ struct MarkdownText: View, Equatable {
             }
           }
         } else {
-          Text("")
+          Text(verbatim: "")
         }
 
       default:

@@ -66,7 +66,7 @@ struct RootView: View {
       }
     }
     .environment(\.appState, appState)
-    .navigationTitle("")
+    .navigationTitle(Text(verbatim: ""))
     .animation(.default, value: gatewayStore.state.hashValue)
     .fontDesign(.rounded)
     .modifier(

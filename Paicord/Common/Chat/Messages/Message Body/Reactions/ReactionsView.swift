@@ -108,7 +108,7 @@ struct ReactionsView: View {
         }
         
         let count = reaction.count + (currentUserReacted ? 1 : 0)
-        Text("\(count)")
+        Text(verbatim: "\(count)")
           .contentTransition(.numericText(value: .init(count)))
           .padding(.horizontal, 2)
           .animation(.default, value: count)

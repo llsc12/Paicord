@@ -179,7 +179,7 @@ extension ChatView {
             let name =
               msg.member?.nick ?? msg.author?.global_name ?? msg.author?
               .username ?? "Unknown"
-            Text("\(mention)\(name) • ")
+            Text(verbatim: "\(mention)\(name) • ")
               .foregroundStyle(.secondary)
               .lineLimit(1)
             MarkdownText(content: msg.content, channelStore: channelStore)

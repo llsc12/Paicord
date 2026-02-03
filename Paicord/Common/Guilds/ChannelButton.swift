@@ -175,7 +175,7 @@ struct ChannelButton: View {
             .imageScale(.medium)
           VStack(alignment: .leading) {
             Text(channel.name ?? "unknown")
-            Text("\(channel.type!)")
+            Text(verbatim: "\(channel.type!)")
           }
         }
         .frame(maxWidth: .infinity, alignment: .leading)

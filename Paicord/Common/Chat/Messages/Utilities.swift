@@ -13,7 +13,7 @@ extension MessageCell {
     var body: some View {
       Button {
       } label: {
-        Text("")
+        Text(verbatim: "")
           .frame(width: avatarSize)
       }
       .buttonStyle(.borderless)

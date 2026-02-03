@@ -110,7 +110,7 @@ extension MessageCell {
             .foregroundStyle(.secondary)
             .lineLimit(1)
             .font(.caption2)
-          Text("•")
+          Text(verbatim: "•")
             .foregroundStyle(.secondary)
             .font(.caption2)
           Text(markdown: preview.content)

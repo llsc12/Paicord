@@ -54,6 +54,7 @@
 		AA1378092E969A9000100969 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = AA1378082E969A9000100969 /* Lottie */; };
 		AA13780B2E969D6100100969 /* DiscordMarkdownParser in Frameworks */ = {isa = PBXBuildFile; productRef = AA13780A2E969D6100100969 /* DiscordMarkdownParser */; };
 		AA13A1E32EA83766005A3613 /* TypingIndicatorBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA13A1E22EA83766005A3613 /* TypingIndicatorBar.swift */; };
+		AA1579362F3220D50097C0FA /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = AA1579352F3220D50097C0FA /* Localizable.xcstrings */; };
 		AA1878F32E81A30C009C7E40 /* GuildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1878F22E81A305009C7E40 /* GuildView.swift */; };
 		AA1878F92E81FC1A009C7E40 /* FLEX in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = AA1878F82E81FC1A009C7E40 /* FLEX */; };
 		AA21D27E2EA8ED4400C75093 /* ProfileFullSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA21D27D2EA8ED3E00C75093 /* ProfileFullSheetView.swift */; };
@@ -197,6 +198,7 @@
 		AA10971C2E64C189005BC3D2 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
 		AA1378042E96798000100969 /* ProcessInfo+previews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProcessInfo+previews.swift"; sourceTree = "<group>"; };
 		AA13A1E22EA83766005A3613 /* TypingIndicatorBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypingIndicatorBar.swift; sourceTree = "<group>"; };
+		AA1579352F3220D50097C0FA /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		AA1878F22E81A305009C7E40 /* GuildView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuildView.swift; sourceTree = "<group>"; };
 		AA21D27D2EA8ED3E00C75093 /* ProfileFullSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileFullSheetView.swift; sourceTree = "<group>"; };
 		AA21D27F2EAA220300C75093 /* MaskEdgesModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaskEdgesModifier.swift; sourceTree = "<group>"; };
@@ -581,10 +583,19 @@
 				578E1CDE2E6777DE00C6DEA3 /* macOS */,
 				AAEEC71D2E6511E700EB5FC9 /* Stores */,
 				57A4E7122E6B44B500470131 /* Utilities */,
-				AA1097102E64C181005BC3D2 /* Assets.xcassets */,
+				AA1579332F3220B20097C0FA /* Resources */,
 				AA1097112E64C181005BC3D2 /* Paicord.entitlements */,
 			);
 			path = Paicord;
+			sourceTree = "<group>";
+		};
+		AA1579332F3220B20097C0FA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				AA1097102E64C181005BC3D2 /* Assets.xcassets */,
+				AA1579352F3220D50097C0FA /* Localizable.xcstrings */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		AA21D2852EAB08E500C75093 /* Member Sidebar */ = {
@@ -1040,6 +1051,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA1579362F3220D50097C0FA /* Localizable.xcstrings in Resources */,
 				AA1097142E64C181005BC3D2 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1239,6 +1251,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -1296,6 +1309,7 @@
 				MTL_FAST_MATH = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 			};
 			name = Release;
 		};
