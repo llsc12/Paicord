@@ -26,6 +26,10 @@ struct ChatView: View {
   var chatAnimatesMessages: Bool = false
 
   init(vm: ChannelStore) { self._vm = .init(initialValue: vm) }
+  
+  #if os(macOS)
+  @FocusState private var isChatFocused: Bool
+  #endif
 
   var body: some View {
     let orderedMessages = vm.messages.values
@@ -93,6 +97,20 @@ struct ChatView: View {
         }
         .scrollTargetLayout()
       }
+      #if os(macOS)
+      // esc to scroll to bottom of chat, its a little jank
+      .focusable()
+      .focusEffectDisabled()
+      .onTapGesture { isChatFocused = true }
+      .focused($isChatFocused)
+      .onKeyPress(.escape, phases: .down) {_ in
+        NotificationCenter.default.post(
+          name: .chatViewShouldScrollToBottom,
+          object: ["channelId": vm.channelId, "immediate": true]
+        )
+        return .handled
+      }
+      #endif
       .scrollPosition(id: $currentScrollPosition, anchor: .bottom)  // causes issues with input bar height changes:
       // currently, the input bar changing size can cause the scrollview position to jump unexpectedly.
       // not sure how to fix.
