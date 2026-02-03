@@ -496,17 +496,25 @@ extension ChatView {
     var textField: some View {
       HStack(alignment: .bottom) {
         #if os(iOS)
-          TextField("Message", text: $inputVM.content, axis: .vertical)
-            .textFieldStyle(.plain)
-            .maxHeight(150)
-            .fixedSize(horizontal: false, vertical: true)
-            .disabled(appState.chatOpen == false)
-            .padding(.vertical, 7)
-            .padding(.horizontal, 12)
-            .focused($isFocused)
+          TextField(
+            "Message\(vm.channel?.name.map { " #\($0)" } ?? "")",
+            text: $inputVM.content,
+            axis: .vertical
+          )
+          .textFieldStyle(.plain)
+          .maxHeight(150)
+          .fixedSize(horizontal: false, vertical: true)
+          .disabled(appState.chatOpen == false)
+          .padding(.vertical, 7)
+          .padding(.horizontal, 12)
+          .focused($isFocused)
         #else
-          TextView("Message", text: $inputVM.content, submit: sendMessage)
-            .padding(8)
+          TextView(
+            "Message\(vm.channel?.name.map { " #\($0)" } ?? "")",
+            text: $inputVM.content,
+            submit: sendMessage
+          )
+          .padding(8)
         #endif
         Button {
           #if os(iOS)

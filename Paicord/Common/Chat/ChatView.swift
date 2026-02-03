@@ -33,7 +33,7 @@ struct ChatView: View {
 
     let shouldAnimate =
       orderedMessages.last?.author?.id != gw.user.currentUser?.id
-    VStack(spacing: 15) {
+    VStack(spacing: 20) {
       ScrollView {
         LazyVStack(alignment: .leading, spacing: 0) {
           if !vm.messages.isEmpty {

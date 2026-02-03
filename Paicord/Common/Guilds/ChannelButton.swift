@@ -305,7 +305,7 @@ struct ChannelButton: View {
       if !shouldHide {
         VStack(spacing: 1) {
           Button {
-            withAnimation {
+            withAnimation(.smooth(duration: 0.2)) {
               isExpanded.toggle()
             }
           } label: {
@@ -317,18 +317,22 @@ struct ChannelButton: View {
               }
               Text(channel.name ?? "Unknown Category")
                 .font(.subheadline)
+                .semibold()
+
+              Spacer()
 
               if idiom == .mac {
                 Image(systemName: "chevron.down")
                   .imageScale(.small)
+                  .fontWeight(.semibold)
                   .rotationEffect(.degrees(isExpanded ? 0 : -90))
               }
 
-              Spacer()
             }
             .foregroundStyle(.secondary)
             .lineLimit(1)
           }
+          .padding(.horizontal, 4)
           .buttonStyle(.borderless)
 
           if isExpanded {
@@ -336,11 +340,10 @@ struct ChannelButton: View {
               if let channel = channels[channelId] {
                 ChannelButton(channels: channels, channel: channel)
                   .frame(maxWidth: .infinity, alignment: .leading)
-                  .padding(.horizontal, -4)
               }
             }
           }
-        }
+        }.clipped()
       }
     }
   }
@@ -354,6 +357,5 @@ struct ChannelButton: View {
       channel: channel
     )
     .padding(.top, 10)
-    .padding(.horizontal, 4)
   }
 }
