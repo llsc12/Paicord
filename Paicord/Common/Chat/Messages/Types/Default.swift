@@ -117,6 +117,12 @@ extension MessageCell {
             .lineLimit(1)
             .foregroundStyle(.secondary)
             .font(.caption2)
+            .onTapGesture {
+              NotificationCenter.default.post(
+                name: .chatViewShouldScrollToID,
+                object: ["channelId": message.referenced_message?.channel_id ?? message.channel_id, "messageId": message.referenced_message?.id ?? message.id]
+              )
+            }
         }
         .opacity(0.7)
       }
