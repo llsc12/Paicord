@@ -8,7 +8,17 @@
 
 import PaicordLib
 import PhotosUI
+import QuickLookThumbnailing
 import SwiftUIX
+import UniformTypeIdentifiers
+
+#if canImport(AppKit)
+  import AppKit
+#endif
+
+#if canImport(AVFoundation)
+  import AVFoundation
+#endif
 
 extension ChatView.InputBar {
   @Observable
@@ -263,10 +273,97 @@ extension ChatView.InputBar.InputVM {
     #if os(iOS)
       case .cameraPhoto(_, let image):
         return Image(uiImage: image)
-      case .cameraVideo(_, _):
-        return nil  // TODO: generate thumbnail from video
+      case .cameraVideo(_, let url):
+        return await generateVideoThumbnail(from: url)
     #endif
-    case .file(_, _, _): // TODO: add file thumbnail support
+    case .file(_, let url, _):
+      return await generateFileThumbnail(from: url)
+    }
+  }
+
+  private func generateFileThumbnail(from url: URL) async -> Image? {
+    let canAccess = url.startAccessingSecurityScopedResource()
+    defer {
+      if canAccess { url.stopAccessingSecurityScopedResource() }
+    }
+
+    guard let typeIdentifier = try? url.resourceValues(forKeys: [.typeIdentifierKey]).typeIdentifier,
+          let utType = UTType(typeIdentifier) else {
+      return await generateQuickLookThumbnail(from: url)
+    }
+
+    let imageTypes: [UTType] = [.image, .png, .jpeg, .gif, .webP, .heic, .heif, .tiff, .bmp]
+    if imageTypes.contains(where: { utType.conforms(to: $0) }) {
+      #if canImport(AppKit)
+        if let nsImage = NSImage(contentsOf: url) {
+          return Image(nsImage: nsImage)
+        }
+      #elseif canImport(UIKit)
+        if let data = try? Data(contentsOf: url),
+           let uiImage = UIImage(data: data) {
+          return Image(uiImage: uiImage)
+        }
+      #endif
+    }
+
+    let videoTypes: [UTType] = [.movie, .video, .mpeg4Movie, .quickTimeMovie, .avi]
+    if videoTypes.contains(where: { utType.conforms(to: $0) }) {
+      if let image = await generateVideoThumbnail(from: url) {
+        return image
+      }
+    }
+
+    return await generateQuickLookThumbnail(from: url)
+  }
+
+  private func generateVideoThumbnail(from url: URL) async -> Image? {
+    let asset = AVURLAsset(url: url)
+    let generator = AVAssetImageGenerator(asset: asset)
+    generator.appliesPreferredTrackTransform = true
+    generator.maximumSize = CGSize(width: 120, height: 120)
+
+    do {
+      let (cgImage, _) = try await generator.image(at: .zero)
+      #if canImport(AppKit)
+        let nsImage = NSImage(cgImage: cgImage, size: NSSize(width: cgImage.width, height: cgImage.height))
+        return Image(nsImage: nsImage)
+      #elseif canImport(UIKit)
+        let uiImage = UIImage(cgImage: cgImage)
+        return Image(uiImage: uiImage)
+      #else
+        return nil
+      #endif
+    } catch {
+      return nil
+    }
+  }
+
+  private func generateQuickLookThumbnail(from url: URL) async -> Image? {
+    let size = CGSize(width: 120, height: 120)
+    let scale: CGFloat
+    #if canImport(AppKit)
+      scale = NSScreen.main?.backingScaleFactor ?? 2.0
+    #else
+      scale = UIScreen.main.scale
+    #endif
+
+    let request = QLThumbnailGenerator.Request(
+      fileAt: url,
+      size: size,
+      scale: scale,
+      representationTypes: .thumbnail
+    )
+
+    do {
+      let representation = try await QLThumbnailGenerator.shared.generateBestRepresentation(for: request)
+      #if canImport(AppKit)
+        return Image(nsImage: representation.nsImage)
+      #elseif canImport(UIKit)
+        return Image(uiImage: representation.uiImage)
+      #else
+        return nil
+      #endif
+    } catch {
       return nil
     }
   }

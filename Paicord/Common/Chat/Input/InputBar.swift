@@ -496,16 +496,19 @@ extension ChatView {
     var textField: some View {
       HStack(alignment: .bottom) {
         #if os(iOS)
-          TextField("Message", text: $inputVM.content, axis: .vertical)
-            .textFieldStyle(.plain)
-            .maxHeight(150)
-            .fixedSize(horizontal: false, vertical: true)
-            .disabled(appState.chatOpen == false)
-            .padding(.vertical, 7)
-            .padding(.horizontal, 12)
-            .focused($isFocused)
+          PastableTextField(
+            placeholder: "Message",
+            text: $inputVM.content,
+            onPasteFiles: handlePastedFiles
+          )
+          .maxHeight(150)
+          .fixedSize(horizontal: false, vertical: true)
+          .disabled(appState.chatOpen == false)
+          .padding(.vertical, 7)
+          .padding(.horizontal, 12)
+          .focused($isFocused)
         #else
-          TextView("Message", text: $inputVM.content, submit: sendMessage)
+          TextView("Message", text: $inputVM.content, submit: sendMessage, onPasteFiles: handlePastedFiles)
             .padding(8)
         #endif
         Button {
@@ -638,6 +641,29 @@ extension ChatView {
       }
     }
 
+    private func handlePastedFiles(_ urls: [URL]) {
+      inputVM.selectedFiles = urls.compactMap { url in
+        var url: URL? = url
+        let canAccess = url?.startAccessingSecurityScopedResource() ?? false
+        defer {
+          if canAccess {
+            url?.stopAccessingSecurityScopedResource()
+          }
+        }
+        let fileSize = (try? url?.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
+        if fileSize == 0 {
+          url = nil
+          self.filesRemovedDuringSelection = SelectionError.filesEmpty
+        }
+        let uploadMeta = gw.user.premiumKind.fileUpload(size: fileSize, to: vm)
+        if uploadMeta.allowed == false {
+          url = nil
+          self.filesRemovedDuringSelection = SelectionError.filesPastLimit(limit: uploadMeta.limit)
+        }
+        return url
+      }
+    }
+
     #if os(iOS)
       func closeMCameraAction() {
         self.cameraPickerPresented = false
@@ -684,19 +710,22 @@ extension ChatView {
       var prompt: String
       @Binding var text: String
       var submit: () -> Void
+      var onPasteFiles: (([URL]) -> Void)?
 
       init(
         _ prompt: String,
         text: Binding<String>,
-        submit: @escaping () -> Void = {}
+        submit: @escaping () -> Void = {},
+        onPasteFiles: (([URL]) -> Void)? = nil
       ) {
         self.prompt = prompt
         self._text = text
         self.submit = submit
+        self.onPasteFiles = onPasteFiles
       }
 
       var body: some View {
-        _TextView(text: $text, onSubmit: submit)
+        _TextView(text: $text, onSubmit: submit, onPasteFiles: onPasteFiles)
           .overlay(alignment: .leading) {
             if text.isEmpty {
               Text(prompt)
@@ -710,6 +739,7 @@ extension ChatView {
       private struct _TextView: NSViewRepresentable {
         @Binding var text: String
         var onSubmit: () -> Void
+        var onPasteFiles: (([URL]) -> Void)?
         var maxHeight: CGFloat = 150
 
         func makeNSView(context: Context) -> NSScrollView {
@@ -737,6 +767,7 @@ extension ChatView {
           ]
           textView.delegate = context.coordinator
           textView.onSubmit = onSubmit
+          textView.onPasteFiles = onPasteFiles
           textView.minSize = NSSize(width: 0, height: 0)
           textView.maxSize = NSSize(
             width: CGFloat.greatestFiniteMagnitude,
@@ -808,6 +839,7 @@ extension ChatView {
 
         class SubmissiveTextView: NSTextView {
           var onSubmit: (() -> Void)?
+          var onPasteFiles: (([URL]) -> Void)?
           weak var undoManagerRef: UndoManager?
 
           init(
@@ -838,6 +870,79 @@ extension ChatView {
               NSPasteboard.PasteboardType.rtfd,
               NSPasteboard.PasteboardType.html,
             ]
+          }
+
+          override func paste(_ sender: Any?) {
+            let pasteboard = NSPasteboard.general
+
+            if let urls = pasteboard.readObjects(forClasses: [NSURL.self], options: nil) as? [URL], !urls.isEmpty {
+              let validURLs = urls.filter { $0.isFileURL && FileManager.default.fileExists(atPath: $0.path) }
+              if !validURLs.isEmpty {
+                onPasteFiles?(validURLs)
+                return
+              }
+            }
+
+            if let fileURLs = pasteboard.propertyList(forType: .fileURL) as? String,
+               let url = URL(string: fileURLs),
+               FileManager.default.fileExists(atPath: url.path) {
+              onPasteFiles?([url])
+              return
+            }
+
+            if pasteboard.types?.contains(.png) == true,
+               let imageData = pasteboard.data(forType: .png),
+               let fileURL = saveImageToTemp(data: imageData, extension: "png") {
+              onPasteFiles?([fileURL])
+              return
+            }
+
+            let jpegType = NSPasteboard.PasteboardType(rawValue: "public.jpeg")
+            if pasteboard.types?.contains(jpegType) == true,
+               let imageData = pasteboard.data(forType: jpegType),
+               let fileURL = saveImageToTemp(data: imageData, extension: "jpg") {
+              onPasteFiles?([fileURL])
+              return
+            }
+
+            let heicType = NSPasteboard.PasteboardType(rawValue: "public.heic")
+            if pasteboard.types?.contains(heicType) == true,
+               let imageData = pasteboard.data(forType: heicType),
+               let fileURL = saveImageToTemp(data: imageData, extension: "heic") {
+              onPasteFiles?([fileURL])
+              return
+            }
+
+            if pasteboard.types?.contains(.tiff) == true,
+               let imageData = pasteboard.data(forType: .tiff),
+               let bitmapRep = NSBitmapImageRep(data: imageData),
+               let pngData = bitmapRep.representation(using: .png, properties: [:]),
+               let fileURL = saveImageToTemp(data: pngData, extension: "png") {
+              onPasteFiles?([fileURL])
+              return
+            }
+
+            if let image = NSImage(pasteboard: pasteboard), image.isValid,
+               let tiffData = image.tiffRepresentation,
+               let bitmapRep = NSBitmapImageRep(data: tiffData),
+               let pngData = bitmapRep.representation(using: .png, properties: [:]),
+               let fileURL = saveImageToTemp(data: pngData, extension: "png") {
+              onPasteFiles?([fileURL])
+              return
+            }
+
+            super.paste(sender)
+          }
+
+          private func saveImageToTemp(data: Data, extension ext: String) -> URL? {
+            let tempDir = FileManager.default.temporaryDirectory
+            let fileURL = tempDir.appendingPathComponent(UUID().uuidString + "." + ext)
+            do {
+              try data.write(to: fileURL)
+              return fileURL
+            } catch {
+              return nil
+            }
           }
 
           override func keyDown(with event: NSEvent) {
@@ -927,6 +1032,103 @@ extension ChatView {
       func documentPickerWasCancelled(
         _ controller: UIDocumentPickerViewController
       ) {}
+    }
+  }
+
+  struct PastableTextField: UIViewRepresentable {
+    var placeholder: String
+    @Binding var text: String
+    var onPasteFiles: (([URL]) -> Void)?
+
+    func makeUIView(context: Context) -> PastableUITextView {
+      let textView = PastableUITextView()
+      textView.delegate = context.coordinator
+      textView.onPasteFiles = onPasteFiles
+      textView.font = .preferredFont(forTextStyle: .body)
+      textView.backgroundColor = .clear
+      textView.isScrollEnabled = false
+      textView.textContainerInset = .zero
+      textView.textContainer.lineFragmentPadding = 0
+      return textView
+    }
+
+    func updateUIView(_ textView: PastableUITextView, context: Context) {
+      if textView.text != text {
+        textView.text = text
+      }
+      textView.onPasteFiles = onPasteFiles
+      context.coordinator.updatePlaceholder(textView, placeholder: placeholder, isEmpty: text.isEmpty)
+    }
+
+    func makeCoordinator() -> Coordinator {
+      Coordinator(self)
+    }
+
+    class Coordinator: NSObject, UITextViewDelegate {
+      var parent: PastableTextField
+      var placeholderLabel: UILabel?
+
+      init(_ parent: PastableTextField) {
+        self.parent = parent
+      }
+
+      func textViewDidChange(_ textView: UITextView) {
+        parent.text = textView.text
+        updatePlaceholder(textView, placeholder: parent.placeholder, isEmpty: textView.text.isEmpty)
+      }
+
+      func updatePlaceholder(_ textView: UITextView, placeholder: String, isEmpty: Bool) {
+        if placeholderLabel == nil {
+          let label = UILabel()
+          label.text = placeholder
+          label.font = textView.font
+          label.textColor = .placeholderText
+          label.translatesAutoresizingMaskIntoConstraints = false
+          textView.addSubview(label)
+          NSLayoutConstraint.activate([
+            label.leadingAnchor.constraint(equalTo: textView.leadingAnchor),
+            label.topAnchor.constraint(equalTo: textView.topAnchor)
+          ])
+          placeholderLabel = label
+        }
+        placeholderLabel?.isHidden = !isEmpty
+      }
+    }
+
+    class PastableUITextView: UITextView {
+      var onPasteFiles: (([URL]) -> Void)?
+
+      override func paste(_ sender: Any?) {
+        let pasteboard = UIPasteboard.general
+
+        if pasteboard.hasImages, let images = pasteboard.images, !images.isEmpty {
+          let urls = images.compactMap { image -> URL? in
+            let tempDir = FileManager.default.temporaryDirectory
+            let fileURL = tempDir.appendingPathComponent(UUID().uuidString + ".png")
+            guard let imageData = image.pngData() else { return nil }
+            do {
+              try imageData.write(to: fileURL)
+              return fileURL
+            } catch {
+              return nil
+            }
+          }
+          if !urls.isEmpty {
+            onPasteFiles?(urls)
+            return
+          }
+        }
+
+        if pasteboard.hasURLs, let pasteURLs = pasteboard.urls {
+          let fileURLs = pasteURLs.filter { $0.isFileURL && FileManager.default.fileExists(atPath: $0.path) }
+          if !fileURLs.isEmpty {
+            onPasteFiles?(fileURLs)
+            return
+          }
+        }
+
+        super.paste(sender)
+      }
     }
   }
 
