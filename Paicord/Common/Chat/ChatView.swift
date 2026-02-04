@@ -26,9 +26,9 @@ struct ChatView: View {
   var chatAnimatesMessages: Bool = false
 
   init(vm: ChannelStore) { self._vm = .init(initialValue: vm) }
-  
+
   #if os(macOS)
-  @FocusState private var isChatFocused: Bool
+    @FocusState private var isChatFocused: Bool
   #endif
 
   var body: some View {
@@ -80,7 +80,7 @@ struct ChatView: View {
             {
               let priorMessage = pendingMessages.values[messageIndex - 1]
               SendMessageCell(for: message, prior: priorMessage)
-            } else if let latestMessage = vm.messages.values.last {
+            } else if let latestMessage = orderedMessages.last {
               // if there is a prior message from the channel store, use that
               SendMessageCell(for: message, prior: latestMessage)
             } else {
@@ -98,18 +98,18 @@ struct ChatView: View {
         .scrollTargetLayout()
       }
       #if os(macOS)
-      // esc to scroll to bottom of chat, its a little jank
-      .focusable()
-      .focusEffectDisabled()
-      .onTapGesture { isChatFocused = true }
-      .focused($isChatFocused)
-      .onKeyPress(.escape, phases: .down) {_ in
-        NotificationCenter.default.post(
-          name: .chatViewShouldScrollToBottom,
-          object: ["channelId": vm.channelId, "immediate": true]
-        )
-        return .handled
-      }
+        // esc to scroll to bottom of chat, its a little jank
+        .focusable()
+        .focusEffectDisabled()
+        .onTapGesture { isChatFocused = true }
+        .focused($isChatFocused)
+        .onKeyPress(.escape, phases: .down) { _ in
+          NotificationCenter.default.post(
+            name: .chatViewShouldScrollToBottom,
+            object: ["channelId": vm.channelId, "immediate": true]
+          )
+          return .handled
+        }
       #endif
       .scrollPosition(id: $currentScrollPosition, anchor: .bottom)  // causes issues with input bar height changes:
       // currently, the input bar changing size can cause the scrollview position to jump unexpectedly.
@@ -117,35 +117,40 @@ struct ChatView: View {
       .bottomAnchored()
       .scrollClipDisabled()
       .maxHeight(.infinity)
-      .onReceive(
-        NotificationCenter.default.publisher(
-          for: .chatViewShouldScrollToBottom
-        )
-      ) { object in
-        guard let info = object.object as? [String: Any],
-          let channelId = info["channelId"] as? ChannelSnowflake,
-          channelId == vm.channelId
-        else { return }
-        let isNearBottom = vm.messages.values.suffix(5).contains {
-          $0.id == self.currentScrollPosition
+      .overlay(alignment: .bottomTrailing) {
+        let lastMessages = orderedMessages.suffix(10).map { $0.id }
+        if let current = currentScrollPosition,
+          !lastMessages.contains(current)
+        {
+          Button(action: {
+            NotificationCenter.default.post(
+              name: .chatViewShouldScrollToBottom,
+              object: ["channelId": vm.channelId, "immediate": true]
+            )
+          }) {
+            #if os(macOS)
+              Image(systemName: "arrow.down")
+                .imageScale(.large)
+                .padding(8)
+            #else
+              Image(systemName: "arrow.down")
+                .tint(.primary)
+                .imageScale(.large)
+                .padding(8)
+                .background(.ultraThinMaterial, in: .circle)
+            #endif
+          }
+          #if os(macOS)
+            .buttonStyle(.borderedProminent)
+            .buttonBorderShape(.circle)
+            .controlSize(.large)
+          #else
+            .buttonStyle(.borderless)
+          #endif
+          .padding()
+          .transition(.blurReplace.animation(.default))
         }
-        guard isNearBottom || (info["immediate"] as? Bool == true) else {
-          return
-        }
-        let pending: MessageSnowflake? = info["id"] as? MessageSnowflake
-        self.currentScrollPosition =
-          pending ?? vm.messages.values.last?.id ?? self.currentScrollPosition
-      }  // handle scroll to bottom event
-      .onReceive(
-        NotificationCenter.default.publisher(for: .chatViewShouldScrollToID)
-      ) { object in
-        guard let info = object.object as? [String: Any],
-          let channelId = info["channelId"] as? ChannelSnowflake,
-          channelId == vm.channelId,
-          let messageId = info["messageId"] as? MessageSnowflake
-        else { return }
-        self.currentScrollPosition = messageId
-      }  // handle scroll to ID event
+      }
 
       if vm.hasPermission(.sendMessages) {
         InputBar(vm: vm)
@@ -164,14 +169,39 @@ struct ChatView: View {
       ToolbarItem(placement: .navigation) {
         ChannelHeader(vm: vm)
       }
-      //			if let topic = vm.channel?.topic, !topic.isEmpty {
-      //				ToolbarItem(placement: .navigation) {
-      //					HStack {
-      //						ChannelTopic(topic: topic)
-      //					}
-      //				}
-      //			}
     }
+    .onReceive(
+      NotificationCenter.default.publisher(
+        for: .chatViewShouldScrollToBottom
+      )
+    ) { object in
+      guard let info = object.object as? [String: Any],
+        let channelId = info["channelId"] as? ChannelSnowflake,
+        channelId == vm.channelId
+      else { return }
+      let isNearBottom = orderedMessages.suffix(5).contains {
+        $0.id == self.currentScrollPosition
+      }
+      let immediate = (info["immediate"] as? Bool == true)
+      guard isNearBottom || immediate else {
+        return
+      }
+      let pending: MessageSnowflake? = info["id"] as? MessageSnowflake
+      withAnimation(immediate ? .default : nil) {
+        self.currentScrollPosition =
+          pending ?? orderedMessages.last?.id ?? self.currentScrollPosition
+      }
+    }  // handle scroll to bottom event
+    .onReceive(
+      NotificationCenter.default.publisher(for: .chatViewShouldScrollToID)
+    ) { object in
+      guard let info = object.object as? [String: Any],
+        let channelId = info["channelId"] as? ChannelSnowflake,
+        channelId == vm.channelId,
+        let messageId = info["messageId"] as? MessageSnowflake
+      else { return }
+      self.currentScrollPosition = messageId
+    }  // handle scroll to ID event
   }
 
   func messageAllowed(_ msg: DiscordChannel.Message) -> Bool {
