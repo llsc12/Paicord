@@ -61,6 +61,7 @@ extension MessageCell {
 
       @Environment(\.userInterfaceIdiom) var idiom
       @Environment(\.channelStore) var channelStore
+      @Environment(\.theme) var theme
 
       var embedWidth: CGFloat {
         switch idiom {
@@ -110,7 +111,7 @@ extension MessageCell {
                 } else {
                   Text(title)
                     .font(.headline)
-                    .foregroundColor(.white)
+                    .foregroundColor(theme.markdown.text)
                     .multilineTextAlignment(.leading)
                 }
               }
@@ -245,7 +246,7 @@ extension MessageCell {
               .frame(maxWidth: .infinity, alignment: .leading)
           }
         }
-        .background(Color(hexadecimal6: 0x2b2d31))
+        .background(theme.common.tertiaryBackground)
         .clipShape(.rect(cornerRadius: 5))
       }
     }
