@@ -21,6 +21,8 @@ struct MarkdownText: View, Equatable {
   @Environment(\.dynamicTypeSize) var dynamicType
   @ViewStorage var dynamicTypeSizeStorage: DynamicTypeSize = .xSmall
   @Environment(\.theme) var theme
+  @Environment(\.enableCrossBlockTextSelection)
+  var enableCrossBlockTextSelection
 
   @State private var renderer: MarkdownRendererVM
   @State private var userPopover: PartialUser?
@@ -68,12 +70,33 @@ struct MarkdownText: View, Equatable {
         Text(markdown: content)  // Apple’s markdown fallback
           .opacity(0.6)
       } else {
-        ForEach(renderer.blocks) { block in
-          BlockView(block: block)
-            .equatable()
-            .debugRender()
-            .debugCompute()
-        }
+        #if os(macOS)
+          if enableCrossBlockTextSelection {
+            SelectableMarkdownText(
+              blocks: renderer.blocks.compactMap { block in
+                guard let attr = block.attributedContent else { return nil }
+                return SelectableMarkdownText.BlockInfo(
+                  id: String(block.id),
+                  attributedString: attr
+                )
+              }
+            )
+          } else {
+            ForEach(renderer.blocks) { block in
+              BlockView(block: block)
+                .equatable()
+                .debugRender()
+                .debugCompute()
+            }
+          }
+        #else
+          ForEach(renderer.blocks) { block in
+            BlockView(block: block)
+              .equatable()
+              .debugRender()
+              .debugCompute()
+          }
+        #endif
       }
     }
     .environment(
@@ -1680,5 +1703,31 @@ final class EmojiAttachmentViewProvider: NSTextAttachmentViewProvider {
   deinit {
     animatedImageView = nil
     container = nil
+  }
+}
+
+// MARK: - Environment Key for Cross-Block Text Selection
+
+private struct CrossBlockTextSelectionKey: EnvironmentKey {
+  static let defaultValue: Bool = false
+}
+
+extension EnvironmentValues {
+  var enableCrossBlockTextSelection: Bool {
+    get { self[CrossBlockTextSelectionKey.self] }
+    set { self[CrossBlockTextSelectionKey.self] = newValue }
+  }
+}
+
+extension View {
+  /// Enables cross-block text selection for markdown text within this view
+  /// - Note: Only works on macOS. On iOS, this does nothing and the original
+  ///         per-block rendering is used.
+  func enableCrossBlockTextSelection(_ enabled: Bool = true) -> some View {
+    #if os(macOS)
+      environment(\.enableCrossBlockTextSelection, enabled)
+    #else
+      self  // No-op on iOS
+    #endif
   }
 }
