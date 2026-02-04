@@ -878,21 +878,29 @@ public struct DefaultDiscordClient: DiscordClient {
     headers.add(name: "Accept-Language", value: locale)
     headers.add(name: "Priority", value: "u=1, i")
 
-    #if os(macOS)
-      headers.add(name: "Sec-Fetch-Dest", value: "empty")
-      headers.add(name: "Sec-Fetch-Mode", value: "cors")
-      headers.add(name: "Sec-Fetch-Site", value: "same-origin")
-      headers.add(name: "Sec-CH-UA-Mobile", value: "?0")
-      headers.add(name: "Sec-CH-UA-Platform", value: "\"macOS\"")  // in speechmarks
-      headers.add(
-        name: "Sec-CH-UA",
-        value: "\"Not:A-Brand\";v=\"24\", \"Chromium\";v=\"134\"")  // in speechmarks
-      /// dolfies says this being static is ok, though im thinking about login flows bc it'd have like https://discord.com/login as referer
-      headers.add(name: "Referer", value: "https://discord.com/channels/@me")
-      headers.add(name: "Origin", value: "https://discord.com")
+		#if os(macOS) || os(Linux)
+			headers.add(name: "Sec-Fetch-Dest", value: "empty")
+			headers.add(name: "Sec-Fetch-Mode", value: "cors")
+			headers.add(name: "Sec-Fetch-Site", value: "same-origin")
+			headers.add(name: "Sec-CH-UA-Mobile", value: "?0")
+			
+			/// dolfies says this being static is ok, though im thinking about login flows bc it'd have like https://discord.com/login as referer
+			headers.add(name: "Referer", value: "https://discord.com/channels/@me")
+			headers.add(name: "Origin", value: "https://discord.com")
+		#elseif os(iOS)
+			// lol theres no special headers on ios, they all mirror the shared headers
+		#endif
 
-    #elseif os(iOS)
-      // lol theres no special headers on ios, they all mirror the shared headers
-    #endif
-  }
+		#if os(Linux)
+			headers.add(name: "Sec-CH-UA-Platform", value: "\"Linux\"")  // in speechmarks
+			headers.add(
+				name: "Sec-CH-UA",
+				value: "\"Not)A;Brand\";v=\"8\", \"Chromium\";v=\"138\"")  // in speechmarks
+		#elseif os(macOS)
+			headers.add(name: "Sec-CH-UA-Platform", value: "\"macOS\"")  // in speechmarks
+			headers.add(
+				name: "Sec-CH-UA",
+				value: "\"Not:A-Brand\";v=\"24\", \"Chromium\";v=\"134\"")  // in speechmarks
+		#endif
+	}
 }
