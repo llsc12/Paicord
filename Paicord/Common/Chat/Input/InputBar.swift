@@ -87,7 +87,7 @@ extension ChatView {
       @State private var fileImporterPresented: Bool = false
     #endif
 
-    @FocusState private var isFocused: Bool
+    @State private var isFocused: Bool = false
     @State var filesRemovedDuringSelection: Error? = nil
 
     enum SelectionError: LocalizedError {
@@ -176,11 +176,11 @@ extension ChatView {
             for: UIResponder.keyboardWillChangeFrameNotification
           )
         ) { userInfo in
+          guard isFocused else { return }
           if let keyboardFrame = userInfo.userInfo?[
             UIResponder.keyboardFrameEndUserInfoKey
           ] as? NSValue {
-            let height = max(290, keyboardFrame.cgRectValue.height)
-            //                        guard properties.storedKeyboardHeight == 0 else { return }
+            let height = keyboardFrame.cgRectValue.height
             properties.storedKeyboardHeight = max(
               height - properties.safeArea.bottom,
               0
@@ -408,8 +408,13 @@ extension ChatView {
           .padding(.vertical, 7)
           .padding(.horizontal, 12)
         #else
-          TextView("Message", text: $inputVM.content, submit: sendMessage, onPasteFiles: handlePastedFiles)
-            .padding(8)
+          TextView(
+            "Message",
+            text: $inputVM.content,
+            submit: sendMessage,
+            onPasteFiles: handlePastedFiles
+          )
+          .padding(8)
         #endif
         Button {
           #if os(iOS)
@@ -551,7 +556,8 @@ extension ChatView {
           }
         }
 
-        let fileSize = (try? url?.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
+        let fileSize =
+          (try? url?.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
         if fileSize == 0 {
           url = nil
           self.filesRemovedDuringSelection = SelectionError.filesEmpty
@@ -560,7 +566,9 @@ extension ChatView {
         let uploadMeta = gw.user.premiumKind.fileUpload(size: fileSize, to: vm)
         if uploadMeta.allowed == false {
           url = nil
-          self.filesRemovedDuringSelection = SelectionError.filesPastLimit(limit: uploadMeta.limit)
+          self.filesRemovedDuringSelection = SelectionError.filesPastLimit(
+            limit: uploadMeta.limit
+          )
         }
 
         return url
@@ -788,58 +796,76 @@ extension ChatView {
           override func paste(_ sender: Any?) {
             let pasteboard = NSPasteboard.general
 
-            if let urls = pasteboard.readObjects(forClasses: [NSURL.self], options: nil) as? [URL], !urls.isEmpty {
-              let validURLs = urls.filter { $0.isFileURL && FileManager.default.fileExists(atPath: $0.path) }
+            if let urls = pasteboard.readObjects(
+              forClasses: [NSURL.self],
+              options: nil
+            ) as? [URL], !urls.isEmpty {
+              let validURLs = urls.filter {
+                $0.isFileURL && FileManager.default.fileExists(atPath: $0.path)
+              }
               if !validURLs.isEmpty {
                 onPasteFiles?(validURLs)
                 return
               }
             }
 
-            if let fileURLs = pasteboard.propertyList(forType: .fileURL) as? String,
-               let url = URL(string: fileURLs),
-               FileManager.default.fileExists(atPath: url.path) {
+            if let fileURLs = pasteboard.propertyList(forType: .fileURL)
+              as? String,
+              let url = URL(string: fileURLs),
+              FileManager.default.fileExists(atPath: url.path)
+            {
               onPasteFiles?([url])
               return
             }
 
             if pasteboard.types?.contains(.png) == true,
-               let imageData = pasteboard.data(forType: .png),
-               let fileURL = saveImageToTemp(data: imageData, extension: "png") {
+              let imageData = pasteboard.data(forType: .png),
+              let fileURL = saveImageToTemp(data: imageData, extension: "png")
+            {
               onPasteFiles?([fileURL])
               return
             }
 
             let jpegType = NSPasteboard.PasteboardType(rawValue: "public.jpeg")
             if pasteboard.types?.contains(jpegType) == true,
-               let imageData = pasteboard.data(forType: jpegType),
-               let fileURL = saveImageToTemp(data: imageData, extension: "jpg") {
+              let imageData = pasteboard.data(forType: jpegType),
+              let fileURL = saveImageToTemp(data: imageData, extension: "jpg")
+            {
               onPasteFiles?([fileURL])
               return
             }
 
             let heicType = NSPasteboard.PasteboardType(rawValue: "public.heic")
             if pasteboard.types?.contains(heicType) == true,
-               let imageData = pasteboard.data(forType: heicType),
-               let fileURL = saveImageToTemp(data: imageData, extension: "heic") {
+              let imageData = pasteboard.data(forType: heicType),
+              let fileURL = saveImageToTemp(data: imageData, extension: "heic")
+            {
               onPasteFiles?([fileURL])
               return
             }
 
             if pasteboard.types?.contains(.tiff) == true,
-               let imageData = pasteboard.data(forType: .tiff),
-               let bitmapRep = NSBitmapImageRep(data: imageData),
-               let pngData = bitmapRep.representation(using: .png, properties: [:]),
-               let fileURL = saveImageToTemp(data: pngData, extension: "png") {
+              let imageData = pasteboard.data(forType: .tiff),
+              let bitmapRep = NSBitmapImageRep(data: imageData),
+              let pngData = bitmapRep.representation(
+                using: .png,
+                properties: [:]
+              ),
+              let fileURL = saveImageToTemp(data: pngData, extension: "png")
+            {
               onPasteFiles?([fileURL])
               return
             }
 
             if let image = NSImage(pasteboard: pasteboard), image.isValid,
-               let tiffData = image.tiffRepresentation,
-               let bitmapRep = NSBitmapImageRep(data: tiffData),
-               let pngData = bitmapRep.representation(using: .png, properties: [:]),
-               let fileURL = saveImageToTemp(data: pngData, extension: "png") {
+              let tiffData = image.tiffRepresentation,
+              let bitmapRep = NSBitmapImageRep(data: tiffData),
+              let pngData = bitmapRep.representation(
+                using: .png,
+                properties: [:]
+              ),
+              let fileURL = saveImageToTemp(data: pngData, extension: "png")
+            {
               onPasteFiles?([fileURL])
               return
             }
@@ -847,9 +873,13 @@ extension ChatView {
             super.paste(sender)
           }
 
-          private func saveImageToTemp(data: Data, extension ext: String) -> URL? {
+          private func saveImageToTemp(data: Data, extension ext: String)
+            -> URL?
+          {
             let tempDir = FileManager.default.temporaryDirectory
-            let fileURL = tempDir.appendingPathComponent(UUID().uuidString + "." + ext)
+            let fileURL = tempDir.appendingPathComponent(
+              UUID().uuidString + "." + ext
+            )
             do {
               try data.write(to: fileURL)
               return fileURL
@@ -948,10 +978,13 @@ extension ChatView {
     }
   }
 
+  import SwiftUI
+  import UIKit
+
   struct PastableTextField: UIViewRepresentable {
     var placeholder: String
     @Binding var text: String
-    var isFocused: FocusState<Bool>.Binding
+    @Binding var isFocused: Bool
     var onPasteFiles: (([URL]) -> Void)?
 
     func makeUIView(context: Context) -> PastableUITextView {
@@ -970,12 +1003,18 @@ extension ChatView {
       if textView.text != text {
         textView.text = text
       }
+
       textView.onPasteFiles = onPasteFiles
-      context.coordinator.updatePlaceholder(textView, placeholder: placeholder, isEmpty: text.isEmpty)
-      
-      if isFocused.wrappedValue && !textView.isFirstResponder {
+
+      context.coordinator.updatePlaceholder(
+        textView,
+        placeholder: placeholder,
+        isEmpty: text.isEmpty
+      )
+
+      if isFocused {
         textView.becomeFirstResponder()
-      } else if !isFocused.wrappedValue && textView.isFirstResponder {
+      } else {
         textView.resignFirstResponder()
       }
     }
@@ -994,22 +1033,30 @@ extension ChatView {
 
       func textViewDidChange(_ textView: UITextView) {
         parent.text = textView.text
-        updatePlaceholder(textView, placeholder: parent.placeholder, isEmpty: textView.text.isEmpty)
+        updatePlaceholder(
+          textView,
+          placeholder: parent.placeholder,
+          isEmpty: textView.text.isEmpty
+        )
       }
-      
+
       func textViewDidBeginEditing(_ textView: UITextView) {
-        DispatchQueue.main.async {
-          self.parent.isFocused.wrappedValue = true
-        }
-      }
-      
-      func textViewDidEndEditing(_ textView: UITextView) {
-        DispatchQueue.main.async {
-          self.parent.isFocused.wrappedValue = false
+        if parent.isFocused == false {
+          parent.isFocused = true
         }
       }
 
-      func updatePlaceholder(_ textView: UITextView, placeholder: String, isEmpty: Bool) {
+      func textViewDidEndEditing(_ textView: UITextView) {
+        if parent.isFocused == true {
+          parent.isFocused = false
+        }
+      }
+
+      func updatePlaceholder(
+        _ textView: UITextView,
+        placeholder: String,
+        isEmpty: Bool
+      ) {
         if placeholderLabel == nil {
           let label = UILabel()
           label.text = placeholder
@@ -1019,7 +1066,7 @@ extension ChatView {
           textView.addSubview(label)
           NSLayoutConstraint.activate([
             label.leadingAnchor.constraint(equalTo: textView.leadingAnchor),
-            label.topAnchor.constraint(equalTo: textView.topAnchor)
+            label.topAnchor.constraint(equalTo: textView.topAnchor),
           ])
           placeholderLabel = label
         }
@@ -1033,10 +1080,13 @@ extension ChatView {
       override func paste(_ sender: Any?) {
         let pasteboard = UIPasteboard.general
 
-        if pasteboard.hasImages, let images = pasteboard.images, !images.isEmpty {
+        if pasteboard.hasImages, let images = pasteboard.images, !images.isEmpty
+        {
           let urls = images.compactMap { image -> URL? in
             let tempDir = FileManager.default.temporaryDirectory
-            let fileURL = tempDir.appendingPathComponent(UUID().uuidString + ".png")
+            let fileURL = tempDir.appendingPathComponent(
+              UUID().uuidString + ".png"
+            )
             guard let imageData = image.pngData() else { return nil }
             do {
               try imageData.write(to: fileURL)
@@ -1052,7 +1102,9 @@ extension ChatView {
         }
 
         if pasteboard.hasURLs, let pasteURLs = pasteboard.urls {
-          let fileURLs = pasteURLs.filter { $0.isFileURL && FileManager.default.fileExists(atPath: $0.path) }
+          let fileURLs = pasteURLs.filter {
+            $0.isFileURL && FileManager.default.fileExists(atPath: $0.path)
+          }
           if !fileURLs.isEmpty {
             onPasteFiles?(fileURLs)
             return
@@ -1063,13 +1115,4 @@ extension ChatView {
       }
     }
   }
-
-//  import FLEX
-//
-//  #Preview {
-//    TestMessageView()
-//      .onAppear {
-//        FLEXManager.shared.showExplorer()
-//      }
-//  }
 #endif
