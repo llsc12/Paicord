@@ -60,6 +60,7 @@ import SwiftUIX
           )
           textView.isEditable = true
           textView.isRichText = false
+          textView.importsGraphics = true
           textView.isVerticallyResizable = true
           textView.isHorizontallyResizable = false
           textView.textContainer?.widthTracksTextView = true
@@ -72,7 +73,7 @@ import SwiftUIX
           textView.delegate = context.coordinator
           textView.onSubmit = onSubmit
           textView.onPasteFiles = onPasteFiles
-          textView.minSize = NSSize(width: 0, height: 0)
+          textView.minSize = .zero
           textView.maxSize = NSSize(
             width: CGFloat.greatestFiniteMagnitude,
             height: CGFloat.greatestFiniteMagnitude

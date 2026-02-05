@@ -35,7 +35,7 @@ extension ChatView.InputBar {
       var inputVM: ChatView.InputBar.InputVM
       var attachment: ChatView.InputBar.InputVM.UploadItem
       var onRemove: () -> Void
-      
+
       @State var image: Image? = nil
       @State var interval: TimeInterval? = nil
 
@@ -44,34 +44,16 @@ extension ChatView.InputBar {
         return (url, size)
       }
 
-      private var isMediaFile: Bool {
-        guard let (url, _) = fileInfo else { return false }
-        guard let typeIdentifier = try? url.resourceValues(forKeys: [.typeIdentifierKey]).typeIdentifier,
-              let utType = UTType(typeIdentifier) else { return false }
-        let mediaTypes: [UTType] = [
-          .image, .png, .jpeg, .gif, .webP, .heic, .heif, .tiff, .bmp,
-          .movie, .video, .mpeg4Movie, .quickTimeMovie, .avi
-        ]
-        return mediaTypes.contains { utType.conforms(to: $0) }
-      }
-
       var body: some View {
         Group {
-          switch attachment {
-          case .pickerItem:
+          if attachment.isMediaItem {
             thumbnailPreviewView
-          case .file(_, let url, let size):
-            if isMediaFile || image != nil {
-              thumbnailPreviewView
-            } else {
-              filePreviewView(url: url, size: size)
-            }
-          #if os(iOS)
-            case .cameraPhoto:
-              thumbnailPreviewView
-            case .cameraVideo:
-              thumbnailPreviewView
-          #endif
+          } else if let url = fileInfo?.url, let size = fileInfo?.size {
+            filePreviewView(
+              url: url,
+              size: size,
+              image: image
+            )
           }
         }
         .task(id: attachment.id) {
@@ -91,6 +73,7 @@ extension ChatView.InputBar {
               .foregroundStyle(.white)
               .background(.black.opacity(0.7), in: .circle)
           }
+          .buttonStyle(.borderless)
           .frame(width: 10, height: 10)
           .offset(x: 2.5, y: -2.5)
         }
@@ -127,17 +110,29 @@ extension ChatView.InputBar {
           }
         }
       }
-      
+
       @ViewBuilder
-      private func filePreviewView(url: URL, size: Int64) -> some View {
+      private func filePreviewView(url: URL, size: Int64, image: Image?)
+        -> some View
+      {
         HStack(spacing: 0) {
-          Image(systemName: "doc.fill")
+          if let image {
+            image
             .resizable()
             .scaledToFit()
-            .padding(20)
+            .padding(10)
             .height(60)
             .aspectRatio(1, contentMode: .fill)
             .background(Color.gray.opacity(0.3))
+          } else {
+            Image(systemName: "doc.fill")
+              .resizable()
+              .scaledToFit()
+              .padding(20)
+              .height(60)
+              .aspectRatio(1, contentMode: .fill)
+              .background(Color.gray.opacity(0.3))
+          }
 
           VStack(alignment: .leading) {
             Text(url.lastPathComponent)

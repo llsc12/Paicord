@@ -309,28 +309,30 @@ extension ChatView.InputBar.InputVM {
       #endif
       }
     }
-    
+
     func videoDuration() async -> TimeInterval? {
       switch self {
-#if os(iOS)
-      case .cameraVideo(_, let url):
-        let asset = AVURLAsset(url: url)
-        return try? await asset.load(.duration).seconds
-#endif
+      #if os(iOS)
+        case .cameraVideo(_, let url):
+          let asset = AVURLAsset(url: url)
+          return try? await asset.load(.duration).seconds
+      #endif
       case .file(_, let url, _):
         let canAccess = url.startAccessingSecurityScopedResource()
         defer {
           if canAccess { url.stopAccessingSecurityScopedResource() }
         }
-        
+
         guard
-          let typeIdentifier = try? url.resourceValues(forKeys: [.typeIdentifierKey]
+          let typeIdentifier = try? url.resourceValues(forKeys: [
+            .typeIdentifierKey
+          ]
           ).typeIdentifier,
           let utType = UTType(typeIdentifier)
         else {
           return nil
         }
-        
+
         let videoTypes: [UTType] = [
           .movie, .video, .mpeg4Movie, .quickTimeMovie, .avi,
         ]
@@ -344,10 +346,46 @@ extension ChatView.InputBar.InputVM {
         return nil
       }
     }
+
+    var isMediaItem: Bool {
+      switch self {
+      #if os(iOS)
+        case .cameraPhoto:
+          return true
+        case .cameraVideo:
+          return true
+      #endif
+      case .pickerItem:
+        return true
+      case .file(_, let url, _):
+        let canAccess = url.startAccessingSecurityScopedResource()
+        defer {
+          if canAccess { url.stopAccessingSecurityScopedResource() }
+        }
+        let imageTypes: [UTType] = [
+          .image, .png, .jpeg, .gif, .webP, .heic, .heif, .tiff, .bmp,
+        ]
+        let videoTypes: [UTType] = [
+          .movie, .video, .mpeg4Movie, .quickTimeMovie, .avi,
+        ]
+        let acceptedTypes = imageTypes + videoTypes
+
+        if let typeIdentifier = try? url.resourceValues(forKeys: [
+          .typeIdentifierKey
+        ]
+        ).typeIdentifier,
+          let utType = UTType(typeIdentifier),
+          acceptedTypes.contains(utType)
+        {
+          return true
+        }
+        return false
+      }
+    }
   }
 }
 
-fileprivate let maxDimension: CGFloat = 240
+private let maxDimension: CGFloat = 240
 extension ChatView.InputBar.InputVM {
   func getThumbnail(for item: UploadItem) async -> Image? {
     switch item {
@@ -378,33 +416,35 @@ extension ChatView.InputBar.InputVM {
       if canAccess { url.stopAccessingSecurityScopedResource() }
     }
 
-    guard
-      let typeIdentifier = try? url.resourceValues(forKeys: [.typeIdentifierKey]
-      ).typeIdentifier,
-      let utType = UTType(typeIdentifier)
-    else {
-      return await generateQuickLookThumbnail(from: url)
-    }
-
     let imageTypes: [UTType] = [
       .image, .png, .jpeg, .gif, .webP, .heic, .heif, .tiff, .bmp,
     ]
+    let videoTypes: [UTType] = [
+      .movie, .video, .mpeg4Movie, .quickTimeMovie, .avi,
+    ]
+    let acceptedTypes = imageTypes + videoTypes
+
+    guard
+      let typeIdentifier = try? url.resourceValues(forKeys: [.typeIdentifierKey]
+      ).typeIdentifier,
+      let utType = UTType(typeIdentifier),
+      acceptedTypes.contains(utType)
+    else {
+      return await generateQuickLookThumbnail(from: url, kind: .icon)
+    }
+
     if imageTypes.contains(where: { utType.conforms(to: $0) }) {
       if let thumbnail = generateDownsampledImageThumbnail(from: url) {
         return thumbnail
       }
     }
-
-      let videoTypes: [UTType] = [
-        .movie, .video, .mpeg4Movie, .quickTimeMovie, .avi,
-      ]
-      if videoTypes.contains(where: { utType.conforms(to: $0) }) {
-        if let image = await generateVideoThumbnail(from: url) {
-          return image
-        }
+    if videoTypes.contains(where: { utType.conforms(to: $0) }) {
+      if let image = await generateVideoThumbnail(from: url) {
+        return image
       }
+    }
 
-    return await generateQuickLookThumbnail(from: url)
+    return await generateQuickLookThumbnail(from: url, kind: .thumbnail)
   }
 
   private func generateVideoThumbnail(from url: URL) async -> Image? {
@@ -432,20 +472,23 @@ extension ChatView.InputBar.InputVM {
     }
   }
 
-  private func generateQuickLookThumbnail(from url: URL) async -> Image? {
-   let size = CGSize(width: maxDimension, height: maxDimension)
+  private func generateQuickLookThumbnail(
+    from url: URL,
+    kind: QLThumbnailGenerator.Request.RepresentationTypes
+  ) async -> Image? {
+    let size = CGSize(width: maxDimension, height: maxDimension)
     let scale: CGFloat
     #if canImport(AppKit)
       scale = NSScreen.main?.backingScaleFactor ?? 2.0
     #else
-    scale = await UIScreen.main.scale
+      scale = await UIScreen.main.scale
     #endif
 
     let request = QLThumbnailGenerator.Request(
       fileAt: url,
       size: size,
       scale: scale,
-      representationTypes: .thumbnail
+      representationTypes: kind
     )
 
     do {
