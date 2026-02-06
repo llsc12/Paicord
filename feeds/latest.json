@@ -1,12 +1,12 @@
 {
-  "commit": "9593a62",
-  "published_at": "2026-02-04T12:43:06Z",
+  "commit": "e5f6411",
+  "published_at": "2026-02-06T02:32:04Z",
   "mac": {
-    "version": "294",
-    "url": "https://github.com/llsc12/Paicord/releases/download/paicord-nightly-21671576553/Paicord-macOS-9593a62.dmg"
+    "version": "313",
+    "url": "https://github.com/llsc12/Paicord/releases/download/paicord-nightly-21736200570/Paicord-macOS-e5f6411.dmg"
   },
   "ios": {
-    "version": "294",
-    "url": "https://github.com/llsc12/Paicord/releases/download/paicord-nightly-21671576553/Paicord-iOS-9593a62.ipa"
+    "version": "313",
+    "url": "https://github.com/llsc12/Paicord/releases/download/paicord-nightly-21736200570/Paicord-iOS-e5f6411.ipa"
   }
 }
