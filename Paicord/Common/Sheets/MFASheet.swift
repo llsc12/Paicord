@@ -190,7 +190,7 @@ struct SixDigitInput: View {
     }
     .background(theme.common.primaryBackground.opacity(0.001))
     .overlay(
-      TextField("", text: $input)
+      TextField(text: $input)
         .textFieldStyle(.plain)
         .textContentType(.oneTimeCode)
         .opacity(0.008)
@@ -214,7 +214,7 @@ struct SixDigitInput: View {
   struct BlinkingCursor: View {
     @State var blink = true
     var body: some View {
-      Text("|")
+      Text(verbatim: "|")
         .font(.title)
         .opacity(blink ? 1 : 0)
         .onAppear {

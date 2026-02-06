@@ -18,7 +18,9 @@ extension SettingsView {
     
     SettingsGroup("Appearance", systemImage: "display") {
       SettingsItem("Animate Chat Messages", icon: "circle.grid.2x1.right.filled") {
-        Toggle("", isOn: $chatMessagesAnimated)
+        Toggle(isOn: $chatMessagesAnimated) {
+          Text(verbatim: "")
+        }
       }
     }
   }
@@ -105,7 +107,7 @@ struct ThemingSection: View {
       VStack(alignment: .leading) {
         Text(theme.metadata.name)
           .foregroundStyle(Color.primary)
-        Text("\(theme.metadata.author) • v\(theme.metadata.version)")
+        Text(verbatim: "\(theme.metadata.author) • v\(theme.metadata.version)")
           .font(.caption)
           .foregroundStyle(Color.secondary)
       }

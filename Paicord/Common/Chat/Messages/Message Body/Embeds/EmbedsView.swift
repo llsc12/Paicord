@@ -218,7 +218,7 @@ extension MessageCell {
               }
 
               if embed.footer != nil && embed.timestamp != nil {
-                Text("•")
+                Text(verbatim: "•")
               }
 
               if let ts = embed.timestamp {

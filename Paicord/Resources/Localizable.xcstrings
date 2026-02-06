@@ -1,0 +1,337 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    " and " : {
+
+    },
+    " are typing..." : {
+
+    },
+    " Forwarded" : {
+
+    },
+    " is typing..." : {
+
+    },
+    " Unsupported message type %@" : {
+
+    },
+    ", " : {
+
+    },
+    ":3" : {
+
+    },
+    "(edited)" : {
+
+    },
+    "@%@" : {
+
+    },
+    "%@ unsupported" : {
+
+    },
+    "%lld members" : {
+
+    },
+    "1" : {
+
+    },
+    "Account" : {
+
+    },
+    "Add Account" : {
+
+    },
+    "Add Theme" : {
+
+    },
+    "An action required MFA to continue." : {
+
+    },
+    "An unknown error occurred." : {
+
+    },
+    "and " : {
+
+    },
+    "Apps" : {
+
+    },
+    "Authenticator App" : {
+
+    },
+    "Awaiting READY" : {
+
+    },
+    "Backup Code" : {
+
+    },
+    "Check your phone!" : {
+
+    },
+    "Choose an account" : {
+
+    },
+    "ComponentsV2 unsupported" : {
+
+    },
+    "Copy Author ID" : {
+
+    },
+    "Copy Message ID" : {
+
+    },
+    "Copy Message Link" : {
+
+    },
+    "Copy Text" : {
+
+    },
+    "Copy User ID" : {
+
+    },
+    "Create Thread" : {
+
+    },
+    "Delete" : {
+
+    },
+    "Direct Messages" : {
+
+    },
+    "Dismiss" : {
+
+    },
+    "Donate" : {
+
+    },
+    "Donors get Discord server roles, and custom profile badges visible to other Paicord users!" : {
+
+    },
+    "Edit Message" : {
+
+    },
+    "Edit Profile" : {
+
+    },
+    "Edited at %@" : {
+
+    },
+    "Editing Message" : {
+
+    },
+    "Email or Phone Number" : {
+
+    },
+    "Enjoying Paicord?" : {
+
+    },
+    "Enter a valid login above to send a reset link!" : {
+
+    },
+    "Enter the code sent to your phone" : {
+
+    },
+    "Enter your authentication code" : {
+
+    },
+    "Enter your backup code" : {
+
+    },
+    "Error" : {
+
+    },
+    "Forgot Password" : {
+
+    },
+    "Forgot your password?" : {
+
+    },
+    "Forward" : {
+
+    },
+    "Further MFA restricted actions will be allowed for the next 5 minutes." : {
+
+    },
+    "Home" : {
+
+    },
+    "If you like Paicord and would like to support its development, consider donating! You'll receive a Donator role in the Discord server and you'll receive custom badges!" : {
+
+    },
+    "Installed Themes" : {
+
+    },
+    "Join the [Paicord Server](https://discord.gg/fqhPGHPyaK) to manage badges!" : {
+
+    },
+    "Log In" : {
+
+    },
+    "Log in with QR Code" : {
+
+    },
+    "Logging in as %@" : {
+
+    },
+    "Login requires MFA to continue." : {
+
+    },
+    "Made with ❤️ by llsc12" : {
+
+    },
+    "Mark Unread" : {
+
+    },
+    "Mention" : {
+
+    },
+    "Multi-Factor Authentication" : {
+
+    },
+    "Notifications" : {
+
+    },
+    "Notifications View" : {
+
+    },
+    "OFF" : {
+
+    },
+    "OK" : {
+
+    },
+    "ON" : {
+
+    },
+    "Paicord" : {
+
+    },
+    "Paicord is free and open source software. If you enjoy using Paicord, consider sponsoring its development to help support ongoing improvements and new features!" : {
+
+    },
+    "Paicord Logs" : {
+
+    },
+    "Password" : {
+
+    },
+    "Playgrounds" : {
+
+    },
+    "Profile" : {
+
+    },
+    "Remind Me Later" : {
+
+    },
+    "Reply" : {
+
+    },
+    "Replying to %@" : {
+
+    },
+    "Scan this with the Paicord or Discord mobile app to log in instantly." : {
+
+    },
+    "Select a channel to start chatting" : {
+
+    },
+    "Select an account to continue or add a new one." : {
+
+    },
+    "Settings" : {
+
+    },
+    "Sketchy shit" : {
+
+    },
+    "SMS" : {
+
+    },
+    "Something really bad has happened, gateway connections disabled.\nPlease report this." : {
+
+    },
+    "Sponsor" : {
+
+    },
+    "Swipe on a theme to delete it." : {
+
+    },
+    "Switch Account" : {
+
+    },
+    "Toggle Member List" : {
+
+    },
+    "Toggle Sidebar" : {
+
+    },
+    "Tools" : {
+
+    },
+    "Unimplemented" : {
+
+    },
+    "Unknown User" : {
+
+    },
+    "Unsupported block: %@" : {
+
+    },
+    "Unsupported embed type: %@" : {
+
+    },
+    "Upload Files" : {
+
+    },
+    "Version %@ (%@)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Version %1$@ (%2$@)"
+          }
+        }
+      }
+    },
+    "View Logs" : {
+
+    },
+    "We're so excited to see you again!" : {
+
+    },
+    "Welcome Back!" : {
+
+    },
+    "Welcome to the start of #%@" : {
+
+    },
+    "Welcome to the start of this channel" : {
+
+    },
+    "wip bro go do totp" : {
+
+    },
+    "Yesterday at " : {
+
+    },
+    "You can only use each backup code once." : {
+
+    },
+    "You don't have permission to view the message history in this channel." : {
+
+    },
+    "You don't have permission to view the message history of #%@." : {
+
+    },
+    "You will receive a password reset form shortly!" : {
+
+    }
+  },
+  "version" : "1.1"
+}

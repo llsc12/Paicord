@@ -146,11 +146,11 @@ struct MemberSidebarView: View {
 
         FlowLayout(xSpacing: 8, ySpacing: 2) {
           Group {
-            Text("@\(user.username ?? "unknown")")
+            Text(verbatim: "@\(user.username ?? "unknown")")
             if let pronouns = profileMeta?.pronouns ?? user.pronouns,
               !pronouns.isEmpty
             {
-              Text("•")
+              Text(verbatim: "•")
               Text(pronouns)
             }
           }

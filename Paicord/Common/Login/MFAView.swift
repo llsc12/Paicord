@@ -151,7 +151,7 @@ struct MFAView: View {
             .foregroundStyle(.tertiary)
             .font(.caption2)
 
-          TextField("", text: $input)
+          TextField(text: $input)
             .textFieldStyle(.plain)
             .padding(10)
             .frame(maxWidth: .infinity)
@@ -201,7 +201,7 @@ struct MFAView: View {
             .font(.caption)
 
           HStack {
-            TextField("", text: $input)
+            TextField(text: $input)
               .textFieldStyle(.plain)
               .keyboardType(.numberPad)
               .padding(10)

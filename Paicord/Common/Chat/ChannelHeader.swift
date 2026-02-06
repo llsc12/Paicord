@@ -113,7 +113,7 @@ extension ChatView {
   //      } label: {
   //        LabeledContent {
   //          HStack(spacing: 5) {
-  //            Text("•")
+  //            Text(verbatim: "•")
   //              .foregroundStyle(.tertiary)
   //
   //            Text(topic)

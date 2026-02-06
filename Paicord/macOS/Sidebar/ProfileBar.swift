@@ -44,7 +44,7 @@ struct ProfileBar: View {
             )
             .bold()
             if showingUsername {
-              Text("@\(gw.user.currentUser?.username ?? "Unknown User")")
+              Text(verbatim: "@\(gw.user.currentUser?.username ?? "Unknown User")")
                 .transition(.opacity)
             } else {
               if let session = gw.user.sessions.first(where: { $0.id == "all" }
@@ -146,7 +146,7 @@ struct ProfileBar: View {
                 ?? "Unknown User"
             )
             .bold()
-            Text("@\(gw.user.currentUser?.username ?? "Unknown User")")
+            Text(verbatim: "@\(gw.user.currentUser?.username ?? "Unknown User")")
           }
         }
         .padding(.vertical, 5)
@@ -215,7 +215,7 @@ struct ProfileBar: View {
                   )
                   .lineSpacing(1)
                   .bold()
-                  Text("@\(account.user.username)")
+                  Text(verbatim: "@\(account.user.username)")
                     .lineSpacing(1)
                 }
 

@@ -38,7 +38,7 @@ extension ChatView {
                 + Text(last).fontWeight(.heavy)
                 + Text(" are typing...")
             } else {
-              let ppl = typingUsernames.reduce(Text("")) {
+              let ppl = typingUsernames.reduce(Text(verbatim: "")) {
                 partialResult,
                 username in
                 if username == typingUsernames.last {
