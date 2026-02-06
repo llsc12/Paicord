@@ -37,6 +37,9 @@
     "1" : {
 
     },
+    "A new version of Paicord is available! Head to [the releases page](https://github.com/llsc12/Paicord/releases/latest), or [the Discord server](https://discord.gg/fqhPGHPyaK) to download the latest version." : {
+
+    },
     "Account" : {
 
     },
@@ -58,6 +61,9 @@
     "Apps" : {
 
     },
+    "Are you sure?" : {
+
+    },
     "Authenticator App" : {
 
     },
@@ -67,6 +73,9 @@
     "Backup Code" : {
 
     },
+    "Camera" : {
+
+    },
     "Check your phone!" : {
 
     },
@@ -74,6 +83,9 @@
 
     },
     "ComponentsV2 unsupported" : {
+
+    },
+    "Copy" : {
 
     },
     "Copy Author ID" : {
@@ -97,6 +109,9 @@
     "Delete" : {
 
     },
+    "Delete Message" : {
+
+    },
     "Direct Messages" : {
 
     },
@@ -107,6 +122,9 @@
 
     },
     "Donors get Discord server roles, and custom profile badges visible to other Paicord users!" : {
+
+    },
+    "Download IPA" : {
 
     },
     "Edit Message" : {
@@ -122,6 +140,9 @@
 
     },
     "Email or Phone Number" : {
+
+    },
+    "Emojis" : {
 
     },
     "Enjoying Paicord?" : {
@@ -154,7 +175,16 @@
     "Further MFA restricted actions will be allowed for the next 5 minutes." : {
 
     },
+    "GIF Picker Coming Soon!" : {
+
+    },
+    "GIFS" : {
+
+    },
     "Home" : {
+
+    },
+    "idk bro ur files cooked" : {
 
     },
     "If you like Paicord and would like to support its development, consider donating! You'll receive a Donator role in the Discord server and you'll receive custom badges!" : {
@@ -226,6 +256,9 @@
     "Remind Me Later" : {
 
     },
+    "Remote Authentication" : {
+
+    },
     "Reply" : {
 
     },
@@ -244,10 +277,16 @@
     "Settings" : {
 
     },
+    "Show FLEX" : {
+
+    },
     "Sketchy shit" : {
 
     },
     "SMS" : {
+
+    },
+    "Some files were not added" : {
 
     },
     "Something really bad has happened, gateway connections disabled.\nPlease report this." : {
@@ -256,10 +295,22 @@
     "Sponsor" : {
 
     },
+    "Sticker Picker Coming Soon!" : {
+
+    },
+    "Stickers" : {
+
+    },
     "Swipe on a theme to delete it." : {
 
     },
     "Switch Account" : {
+
+    },
+    "This MFA method is not currently supported." : {
+
+    },
+    "Thread" : {
 
     },
     "Toggle Member List" : {
@@ -283,7 +334,13 @@
     "Unsupported embed type: %@" : {
 
     },
+    "Update Available" : {
+
+    },
     "Upload Files" : {
+
+    },
+    "Upload Photos" : {
 
     },
     "Version %@ (%@)" : {
@@ -317,6 +374,9 @@
     "Yesterday at " : {
 
     },
+    "You are giving access to your Discord account to another device." : {
+
+    },
     "You can only use each backup code once." : {
 
     },
@@ -328,6 +388,16 @@
     },
     "You will receive a password reset form shortly!" : {
 
+    },
+    "You're on build %lld, and the latest build is %lld." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You're on build %1$lld, and the latest build is %2$lld."
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

@@ -16,6 +16,7 @@ import SwiftUIX
       @Binding var text: String
       @Binding var isFocused: Bool
       var onPasteFiles: (([URL]) -> Void)?
+      let maxHeight: CGFloat = 150
 
       func makeUIView(context: Context) -> PastableUITextView {
         let textView = PastableUITextView()
@@ -23,18 +24,24 @@ import SwiftUIX
         textView.onPasteFiles = onPasteFiles
         textView.font = .preferredFont(forTextStyle: .body)
         textView.backgroundColor = .clear
-        textView.isScrollEnabled = false
         textView.textContainerInset = .zero
         textView.textContainer.lineFragmentPadding = 0
+        textView.textContainer.lineBreakMode = .byWordWrapping
+        textView.showsHorizontalScrollIndicator = false
+        textView.isScrollEnabled = true
+        textView.maxHeight = maxHeight
+
         return textView
       }
 
       func updateUIView(_ textView: PastableUITextView, context: Context) {
         if textView.text != text {
           textView.text = text
+          textView.invalidateIntrinsicContentSize()
         }
 
         textView.onPasteFiles = onPasteFiles
+        textView.maxHeight = maxHeight
 
         context.coordinator.updatePlaceholder(
           textView,
@@ -47,6 +54,22 @@ import SwiftUIX
         } else {
           textView.resignFirstResponder()
         }
+      }
+
+      func sizeThatFits(
+        _ proposal: ProposedViewSize,
+        uiView: PastableUITextView,
+        context: Context
+      ) -> CGSize? {
+        let targetWidth = proposal.width ?? uiView.bounds.width
+        let fittingSize = uiView.sizeThatFits(
+          CGSize(width: targetWidth, height: .greatestFiniteMagnitude)
+        )
+
+        return CGSize(
+          width: targetWidth,
+          height: min(fittingSize.height, maxHeight)
+        )
       }
 
       func makeCoordinator() -> Coordinator {
@@ -68,6 +91,9 @@ import SwiftUIX
             placeholder: parent.placeholder,
             isEmpty: textView.text.isEmpty
           )
+          if let textView = textView as? PastableUITextView {
+            textView.invalidateIntrinsicContentSize()
+          }
         }
 
         func textViewDidBeginEditing(_ textView: UITextView) {
@@ -106,6 +132,22 @@ import SwiftUIX
 
       class PastableUITextView: UITextView {
         var onPasteFiles: (([URL]) -> Void)?
+        var maxHeight: CGFloat = 150
+
+        override var intrinsicContentSize: CGSize {
+          let fittingSize = sizeThatFits(
+            CGSize(width: bounds.width, height: .greatestFiniteMagnitude)
+          )
+          return CGSize(
+            width: UIView.noIntrinsicMetric,
+            height: min(fittingSize.height, maxHeight)
+          )
+        }
+
+        override func layoutSubviews() {
+          super.layoutSubviews()
+          invalidateIntrinsicContentSize()
+        }
 
         override func canPerformAction(
           _ action: Selector,
@@ -119,7 +161,6 @@ import SwiftUIX
           return super.canPerformAction(action, withSender: sender)
         }
 
-        // override paste to get data
         override func paste(_ sender: Any?) {
           let pasteboard = UIPasteboard.general
 
@@ -144,16 +185,6 @@ import SwiftUIX
               return
             }
           }
-          // difficult to handle file urls, security scoped resources require fileimporter or documentpicker
-          //        if pasteboard.hasURLs, let pasteURLs = pasteboard.urls {
-          //          let fileURLs = pasteURLs.filter {
-          //            $0.isFileURL && FileManager.default.fileExists(atPath: $0.path)
-          //          }
-          //          if !fileURLs.isEmpty {
-          //            onPasteFiles?(fileURLs)
-          //            return
-          //          }
-          //        }
 
           super.paste(sender)
         }

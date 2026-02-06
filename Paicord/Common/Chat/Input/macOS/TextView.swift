@@ -44,7 +44,7 @@ import SwiftUIX
         @Binding var text: String
         var onSubmit: () -> Void
         var onPasteFiles: (([URL]) -> Void)?
-        var maxHeight: CGFloat = 150
+        let maxHeight: CGFloat = 150
 
         func makeNSView(context: Context) -> NSScrollView {
           let textStorage = NSTextStorage()

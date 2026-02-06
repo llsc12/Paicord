@@ -79,9 +79,10 @@ extension ChatView {
 
       @State private var properties = PickerInteractionProperties()
 
-      @State var pickersClosedWhenChatClosed: (photos: Bool, files: Bool) = (
-        false, false
-      )
+      @State var pickersClosedWhenChatClosed:
+        (photos: Bool, files: Bool, emoji: Bool, keyboardFocused: Bool) = (
+          false, false, false, false
+        )
       @State var cameraPickerPresented: Bool = false
     #else
       @State private var fileImporterPresented: Bool = false
@@ -258,6 +259,7 @@ extension ChatView {
           if isFocused {
             properties.showPhotosPicker = false
             properties.showFilePicker = false
+            properties.showEmojiPicker = false
           }
         }  // dismiss picker when keyboard is activated
         .onChange(of: properties.pickerShown) {
@@ -270,8 +272,12 @@ extension ChatView {
             pickersClosedWhenChatClosed.photos =
               properties.showPhotosPicker
             pickersClosedWhenChatClosed.files = properties.showFilePicker
+            pickersClosedWhenChatClosed.emoji = properties.showEmojiPicker
+            pickersClosedWhenChatClosed.keyboardFocused = isFocused
             properties.showPhotosPicker = false
             properties.showFilePicker = false
+            properties.showEmojiPicker = false
+            isFocused = false
           } else {
             // restore pickers if they were open before chat closed
             if pickersClosedWhenChatClosed.photos {
@@ -280,7 +286,13 @@ extension ChatView {
             if pickersClosedWhenChatClosed.files {
               properties.showFilePicker = true
             }
-            pickersClosedWhenChatClosed = (false, false)
+            if pickersClosedWhenChatClosed.emoji {
+              properties.showEmojiPicker = true
+            }
+            if pickersClosedWhenChatClosed.keyboardFocused {
+              isFocused = true
+            }
+            pickersClosedWhenChatClosed = (false, false, false, false)
           }
         }  // dismiss pickers when chat is closed
       #else
@@ -402,9 +414,6 @@ extension ChatView {
             isFocused: $isFocused,
             onPasteFiles: handlePastedFiles
           )
-          .maxHeight(150)
-          .fixedSize(horizontal: false, vertical: true)
-          .disabled(appState.chatOpen == false)
           .padding(.vertical, 7)
           .padding(.horizontal, 12)
         #else
