@@ -100,7 +100,7 @@ extension MemberSidebarView {
           }
         }
       }
-      .frame(height: 40)
+      .frame(height: 45)
     }
   }
 }

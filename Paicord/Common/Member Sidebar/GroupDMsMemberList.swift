@@ -19,7 +19,7 @@ extension MemberSidebarView {
         LazyVStack(alignment: .leading, spacing: 2) {
           ForEach(recipients) { recipient in
             MemberRowView(user: recipient)
-              .frame(height: 40)
+              .frame(height: 45)
           }
         }
         .padding(.horizontal, 2)

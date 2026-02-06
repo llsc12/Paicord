@@ -5,8 +5,8 @@
 //  Created by plzdonthaxme on 23/10/2025.
 //
 
-import DiscordModels
-import SwiftUI
+import PaicordLib
+import SwiftUIX
 
 extension MemberSidebarView {
   struct MemberRowView: View {
@@ -48,13 +48,13 @@ extension MemberSidebarView {
             if isHovering {
               Color.gray.opacity(0.2)
             } else {
-              Color.clear
+              Color.almostClear
             }
           }
         )
-        .clipShape(.rect(cornerRadius: 4))
+        .clipShape(.rounded)
       }
-      .buttonStyle(.borderless)
+      .buttonStyle(.plain)
       .onHover { self.isHovering = $0 }
       .popover(isPresented: $showPopover) {
         ProfilePopoutView(

@@ -294,7 +294,8 @@ class ChannelStore: DiscordDataStore {
     messages.removeValue(forKey: messageDelete.id)
   }
 
-  private func handleMessageDeleteBulk(_ bulkDelete: Gateway.MessageDeleteBulk) {
+  private func handleMessageDeleteBulk(_ bulkDelete: Gateway.MessageDeleteBulk)
+  {
     for messageId in bulkDelete.ids {
       messages.removeValue(forKey: messageId)
     }
@@ -316,7 +317,8 @@ class ChannelStore: DiscordDataStore {
 
     // get the reaction struct for this message and emoji, or create a new one
     guard let message = messages[reactionAdd.message_id] else { return }
-    if reactions[reactionAdd.message_id, default: [:]][reactionAdd.emoji] == nil {
+    if reactions[reactionAdd.message_id, default: [:]][reactionAdd.emoji] == nil
+    {
       // make new object
       let reaction = Reaction(
         message: message,
@@ -424,7 +426,8 @@ class ChannelStore: DiscordDataStore {
     }
   }
 
-  private func handleChannelPinsUpdate(_ pinsUpdate: Gateway.ChannelPinsUpdate) {
+  private func handleChannelPinsUpdate(_ pinsUpdate: Gateway.ChannelPinsUpdate)
+  {
     // Update channel's last pin timestamp if we have the channel
     guard var currentChannel = channel else { return }
     currentChannel.last_pin_timestamp = pinsUpdate.last_pin_timestamp
@@ -714,7 +717,8 @@ extension ChannelStore {
     // oneshot data from gateway reaction add event, contains only emoji and user id data for one person
     private var gatewayReactionAddData: Gateway.MessageReactionAdd?
     // oneshot data from gateway reaction add many event, contains only emoji and user id data for multiple people
-    private var gatewayReactionAddManyData: Gateway.MessageReactionAddMany.DebouncedReactions?
+    private var gatewayReactionAddManyData:
+      Gateway.MessageReactionAddMany.DebouncedReactions?
     // array of known user ids to have reacted with this reaction by listing users via api or gateway events
     private var userIds: Set<UserSnowflake> = []
 
@@ -978,8 +982,9 @@ extension ChannelStore {
     private var positions: [Double] = []
     private var items: [MixedItem] = []
 
-    var groups: OrderedDictionary<RoleSnowflake, Gateway.GuildMemberListUpdate.GroupCount> =
-      [:]
+    var groups:
+      OrderedDictionary<RoleSnowflake, Gateway.GuildMemberListUpdate.GroupCount> =
+        [:]
     var memberCount: Int = 0
     var onlineCount: Int = 0
 
@@ -1011,9 +1016,18 @@ extension ChannelStore {
             pos += 1
           }
 
-          if positions.count > 2 && needsRebalance(around: positions.count - 1) {
+          if positions.count > 2 && needsRebalance(around: positions.count - 1)
+          {
             rebalanceAll()
           }
+
+          let members = newItems.compactMap { item -> Guild.Member? in
+            if case .member(let member) = item {
+              return member
+            }
+            return nil
+          }
+          handleMemberData(members)
         case .insert(let index, let item):
           let before = position(at: index - 1)
           let after = position(at: index)
@@ -1027,8 +1041,15 @@ extension ChannelStore {
           if needsRebalance(around: idx) {
             rebalance(around: idx)
           }
+
+          if case .member(let member) = item {
+            handleMemberData(member)
+          }
         case .update(let index, let item):
           setRow(index, to: item)
+          if case .member(let member) = item {
+            handleMemberData(member)
+          }
         case .delete(let index):
           guard index < items.count else { return }
           positions.remove(at: index)
@@ -1134,6 +1155,25 @@ extension ChannelStore {
       for i in lower...upper {
         positions[i] = value
         value += 1
+      }
+    }
+
+    /// Handles incoming member data from either a single member update or a batch of members.
+    func handleMemberData(_ member: Guild.Member) {
+      handleMemberData([member])
+    }
+    /// Handles incoming member data from either a single member update or a batch of members.
+    func handleMemberData(_ members: [Guild.Member]) {
+      for member in members {  // combine single member and multiple members into one array
+        // add member data to guildstore and user data to user store
+        guard let user = member.user?.toPartialUser() else { continue }
+        let member = member.toPartialMember()
+        primaryChannelStore.guildStore?.members[user.id, default: member]
+          .update(with: member)
+        primaryChannelStore.gateway?.user.users[user.id, default: user].update(
+          with: user
+        )
+        primaryChannelStore.gateway?.user.presences[user.id] = member.presence
       }
     }
 
