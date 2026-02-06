@@ -139,6 +139,9 @@
 		AABED5A62E7F514B005BDD63 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABED5A52E7F5148005BDD63 /* SettingsStore.swift */; };
 		AABED5A92E7FF982005BDD63 /* Merging.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABED5A82E7FF979005BDD63 /* Merging.swift */; };
 		AAC07FC32F2D9E460077B8FA /* DownloadButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC07FC22F2D9E460077B8FA /* DownloadButton.swift */; };
+		AACADCB62F3370B60007F705 /* PastableTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AACADCB52F3370B60007F705 /* PastableTextField.swift */; };
+		AACADCB82F3371160007F705 /* DocumentPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AACADCB72F3371160007F705 /* DocumentPickerViewController.swift */; };
+		AACADCBA2F3372060007F705 /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AACADCB92F3372060007F705 /* TextView.swift */; };
 		AAD4469D2ECFBC1A006CB07C /* UserGuildSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD4469C2ECFB915006CB07C /* UserGuildSettingsStore.swift */; };
 		AAD4469F2ECFD6D6006CB07C /* ReadStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD4469E2ECFD6D2006CB07C /* ReadStateStore.swift */; };
 		AAD446A22ED07916006CB07C /* SettingsKit in Frameworks */ = {isa = PBXBuildFile; productRef = AAD446A12ED07916006CB07C /* SettingsKit */; };
@@ -270,6 +273,9 @@
 		AABED5A52E7F5148005BDD63 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
 		AABED5A82E7FF979005BDD63 /* Merging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Merging.swift; sourceTree = "<group>"; };
 		AAC07FC22F2D9E460077B8FA /* DownloadButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadButton.swift; sourceTree = "<group>"; };
+		AACADCB52F3370B60007F705 /* PastableTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PastableTextField.swift; sourceTree = "<group>"; };
+		AACADCB72F3371160007F705 /* DocumentPickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPickerViewController.swift; sourceTree = "<group>"; };
+		AACADCB92F3372060007F705 /* TextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextView.swift; sourceTree = "<group>"; };
 		AAD4469C2ECFB915006CB07C /* UserGuildSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserGuildSettingsStore.swift; sourceTree = "<group>"; };
 		AAD4469E2ECFD6D2006CB07C /* ReadStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadStateStore.swift; sourceTree = "<group>"; };
 		AAD446A32ED0B631006CB07C /* ShellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellView.swift; sourceTree = "<group>"; };
@@ -608,6 +614,8 @@
 		AA36D5A52EB60F23006612F8 /* Input */ = {
 			isa = PBXGroup;
 			children = (
+				AACADCB32F336EE60007F705 /* iOS */,
+				AACADCB42F336EE60007F705 /* macOS */,
 				AA06247F2F0A04DA007F28EB /* MessageDrainView.swift */,
 				AA70EFB02EA1B3BA00344D98 /* InputBar.swift */,
 				AA67FD142EF4A7F4004676A1 /* CameraPicker.swift */,
@@ -908,6 +916,23 @@
 			path = "PaicordLib++";
 			sourceTree = "<group>";
 		};
+		AACADCB32F336EE60007F705 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				AACADCB72F3371160007F705 /* DocumentPickerViewController.swift */,
+				AACADCB52F3370B60007F705 /* PastableTextField.swift */,
+			);
+			path = iOS;
+			sourceTree = "<group>";
+		};
+		AACADCB42F336EE60007F705 /* macOS */ = {
+			isa = PBXGroup;
+			children = (
+				AACADCB92F3372060007F705 /* TextView.swift */,
+			);
+			path = macOS;
+			sourceTree = "<group>";
+		};
 		AAEEC71D2E6511E700EB5FC9 /* Stores */ = {
 			isa = PBXGroup;
 			children = (
@@ -1084,6 +1109,7 @@
 				AA9C81832E6660BE0086B1DA /* GuildButton.swift in Sources */,
 				AA4207CF2F2D1170006B8227 /* EmojiPicker.swift in Sources */,
 				AA2F51C32EE4ABCE00F18DB7 /* Storage.swift in Sources */,
+				AACADCB82F3371160007F705 /* DocumentPickerViewController.swift in Sources */,
 				57A55C572E7560CF005C8226 /* MarkdownText.swift in Sources */,
 				57DA042C2E79B26200DB4C7C /* AsyncButton.swift in Sources */,
 				57F5AF492E7CB13100AD5674 /* PaicordAppState.swift in Sources */,
@@ -1144,6 +1170,7 @@
 				AA47AF262EDEF14F008A50C9 /* ClipsSection.swift in Sources */,
 				AAFD41382E92FA43002BC9BE /* Array+safe.swift in Sources */,
 				AA47AF282EDEF158008A50C9 /* AppearanceSection.swift in Sources */,
+				AACADCB62F3370B60007F705 /* PastableTextField.swift in Sources */,
 				57F5AF4F2E7CB14F00AD5674 /* RootView.swift in Sources */,
 				AA5CA6522E9BCCFF00C7C82A /* Maths.swift in Sources */,
 				57A4E70B2E6B315F00470131 /* LoginView.swift in Sources */,
@@ -1163,6 +1190,7 @@
 				AAD446A42ED0B631006CB07C /* ShellView.swift in Sources */,
 				AA47AF342EDEF1DC008A50C9 /* LanguageSection.swift in Sources */,
 				AA74E43F2EBE26E30031B285 /* PlaceholderMessageCell.swift in Sources */,
+				AACADCBA2F3372060007F705 /* TextView.swift in Sources */,
 				AA74E43B2EBCA9010031B285 /* Environment.swift in Sources */,
 				AA10971A2E64C181005BC3D2 /* ProfileView.swift in Sources */,
 				AAD4469D2ECFBC1A006CB07C /* UserGuildSettingsStore.swift in Sources */,
