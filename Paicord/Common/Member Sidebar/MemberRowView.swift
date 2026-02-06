@@ -29,17 +29,34 @@ extension MemberSidebarView {
           .profileShowsAvatarDecoration()
           .padding(2)
 
-          Text(member?.nick ?? user.global_name ?? user.username)
-            .foregroundStyle(.primary)
-            .lineLimit(1)
-            .truncationMode(.tail)
+          Group {
+            let userID = user.id
+            if let guildStore {
+              let member = guildStore.members[userID] ?? member
+              let color = member?.roles?.compactMap { guildStore.roles[$0] }
+                .sorted(by: { $0.position > $1.position })
+                .compactMap { $0.color.value != 0 ? $0.color : nil }
+                .first?.asColor()
+
+              Text(
+                member?.nick ?? user.global_name ?? user.username
+              )
+              .foregroundStyle(color != nil ? color! : .primary)
+            } else {
+              Text(user.global_name ?? user.username)
+            }
+          }
+          .font(.title3)
+          .fontWeight(.semibold)
+          .lineLimit(1)
+          .truncationMode(.tail)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(4)
         .background {
           if let nameplate = user.collectibles?.nameplate {
             Profile.NameplateView(nameplate: nameplate)
-              .opacity(0.5)
+              .opacity(isHovering ? 0.5 : 0.2)
               .transition(.opacity.animation(.default))
           }
         }

@@ -57,7 +57,6 @@ extension MemberSidebarView {
       }
       .scrollPosition(id: $upperBound, anchor: .bottom)
       .task(id: scrollPairs) {
-        print("req \(scrollPairs)")
         await channelStore.requestMemberListRange(scrollPairs)
       }
     }
@@ -75,10 +74,10 @@ extension MemberSidebarView {
             if let group = accumulator.groups[group.id] {
               let text: Text = {
                 if let role = guildStore.roles[group.id] {
-                  return (Text(role.name) + Text(" - \(group.count)"))
+                  return (Text(verbatim: role.name) + Text(verbatim: " - \(group.count)"))
                 } else {
                   let name: String = group.id.rawValue.capitalized
-                  return Text("\(name) - \(group.count)")
+                  return Text(verbatim: "\(name) - \(group.count)")
                 }
               }()
 
@@ -95,7 +94,7 @@ extension MemberSidebarView {
                 .padding([.bottom, .leading], 6)
             } else {
               // idk man
-              Text("\(group.id.rawValue)")
+              Text(verbatim: "\(group.id.rawValue)")
             }
           }
         }
