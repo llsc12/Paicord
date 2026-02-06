@@ -20,6 +20,8 @@ struct GuildButton: View {
   @Environment(\.gateway) var gw
   @Environment(\.colorScheme) var colorScheme
   @Environment(\.theme) var theme
+  
+  @State private var guildNamePopover = false
 
   init(guild: Guild?) {
     self.guild = guild
@@ -299,6 +301,14 @@ struct GuildButton: View {
                 }
             }
           }
+          .popover(isPresented: $guildNamePopover, arrowEdge: .trailing) {
+            Text(guild?.name ?? "")
+              .padding(10)
+              .foregroundStyle(theme.markdown.text)
+          }
+          .onHover { isHovering in
+            if guildNamePopover != isHovering { guildNamePopover = isHovering }
+          }
         } else {
           Rectangle()
             .fill(.clear)
@@ -315,6 +325,14 @@ struct GuildButton: View {
                 ? theme.common.accent
                 : theme.common.primaryButtonBackground.opacity(0.5)
             )
+            .popover(isPresented: $guildNamePopover, arrowEdge: .trailing) {
+              Text("Direct Messages")
+                .padding(10)
+                .foregroundStyle(theme.markdown.text)
+            }
+            .onHover { isHovering in
+              if guildNamePopover != isHovering { guildNamePopover = isHovering }
+            }
         }
       }
       .clipShape(.rect(cornerRadius: isSelected ? 10 : 32, style: .continuous))
