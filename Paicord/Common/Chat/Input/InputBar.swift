@@ -22,6 +22,7 @@ extension ChatView {
     @Environment(\.theme) var theme
     var vm: ChannelStore
     @State var inputVM: InputVM
+    @ViewStorage private var isManualUpdate = false
 
     static func vm(for channel: ChannelStore) -> InputVM {
       if let existingVM = InputBar.inputVMs[channel.channelId] {
@@ -256,6 +257,7 @@ extension ChatView {
           }
         }  // show errors for removed files
         .onChange(of: isFocused) {
+          guard !isManualUpdate else { return }
           if isFocused {
             properties.showPhotosPicker = false
             properties.showFilePicker = false
@@ -263,6 +265,7 @@ extension ChatView {
           }
         }  // dismiss picker when keyboard is activated
         .onChange(of: properties.pickerShown) {
+          guard !isManualUpdate else { return }
           if properties.pickerShown {
             isFocused = false
           }
@@ -427,6 +430,7 @@ extension ChatView {
         #endif
         Button {
           #if os(iOS)
+            isManualUpdate = true
             if !properties.showEmojiPicker {
               properties.showEmojiPicker = true
               isFocused = false
@@ -436,6 +440,7 @@ extension ChatView {
               properties.showPhotosPicker = false
               isFocused = true
             }
+            isManualUpdate = false
           #endif
         } label: {
           Image(systemName: "face.smiling")

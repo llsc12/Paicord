@@ -98,13 +98,17 @@ import SwiftUIX
 
         func textViewDidBeginEditing(_ textView: UITextView) {
           if parent.isFocused == false {
-            parent.isFocused = true
+            DispatchQueue.main.async {
+              self.parent.isFocused = true
+            }
           }
         }
 
         func textViewDidEndEditing(_ textView: UITextView) {
           if parent.isFocused == true {
-            parent.isFocused = false
+            DispatchQueue.main.async {
+              self.parent.isFocused = false
+            }
           }
         }
 
