@@ -140,7 +140,7 @@ public enum AST {
     public let children: [ASTNode]
     public let sourceLocation: SourceLocation?
 
-    /// Heading level (1-6)
+    /// Heading level (1-3)
     public let level: Int
 
     public init(
