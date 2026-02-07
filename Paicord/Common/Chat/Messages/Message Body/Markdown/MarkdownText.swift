@@ -219,11 +219,8 @@ struct MarkdownText: View, Equatable {
         if let children = block.children {
           VStack(alignment: .leading, spacing: 4) {
             ForEach(children) { child in
-              HStack(alignment: .top, spacing: 8) {
-                Text(verbatim: "•").font(.body)
-                BlockView(block: child)
-                  .equatable()
-              }
+              BlockView(block: child)
+                .equatable()
             }
           }
         }
@@ -233,10 +230,23 @@ struct MarkdownText: View, Equatable {
           let converted = AttributedString(attr)
           Text(converted)
         } else if let children = block.children {
+          // all the numbers
+          let isOrdered = block.isOrdered ?? false
+          let number = block.itemNumber ?? -1
+          let level = block.level ?? 0
+          
+          // string stuff
+          let bullet = level > 0 ? "◦" : "•" // hollow circle if nested, filled if not
+          let indentation = String(repeating: "\t", count: level)
+          let start = isOrdered ? "\(number)." : bullet
+          
           VStack(alignment: .leading, spacing: 4) {
             ForEach(children) { nested in
-              BlockView(block: nested)
-                .equatable()
+              HStack(alignment: .top, spacing: 8) {
+                Text(verbatim: indentation + start).font(.body)
+                BlockView(block: nested)
+                  .equatable()
+              }
             }
           }
         } else {
@@ -330,6 +340,7 @@ private struct BlockElement: Identifiable, Equatable, Hashable {
   let attributedContent: NSAttributedString?
   let isOrdered: Bool?
   let startingNumber: Int?
+  let itemNumber: Int?
   let codeContent: String?
   let language: String?
   let level: Int?
@@ -491,6 +502,7 @@ class MarkdownRendererVM {
         attributedContent: attributed,
         isOrdered: nil,
         startingNumber: nil,
+        itemNumber: nil,
         codeContent: nil,
         language: nil,
         level: nil,
@@ -511,6 +523,7 @@ class MarkdownRendererVM {
           attributedContent: attributed,
           isOrdered: nil,
           startingNumber: nil,
+          itemNumber: nil,
           codeContent: nil,
           language: nil,
           level: heading.level,
@@ -531,6 +544,7 @@ class MarkdownRendererVM {
         attributedContent: attributed,
         isOrdered: nil,
         startingNumber: nil,
+        itemNumber: nil,
         codeContent: nil,
         language: nil,
         level: nil,
@@ -546,6 +560,7 @@ class MarkdownRendererVM {
           attributedContent: nil,
           isOrdered: nil,
           startingNumber: nil,
+          itemNumber: nil,
           codeContent: code.content,
           language: code.language,
           level: nil,
@@ -568,6 +583,7 @@ class MarkdownRendererVM {
         attributedContent: nil,
         isOrdered: nil,
         startingNumber: nil,
+        itemNumber: nil,
         codeContent: nil,
         language: nil,
         level: nil,
@@ -593,11 +609,12 @@ class MarkdownRendererVM {
               ),
               nodeType: .listItem,
               attributedContent: nil,
-              isOrdered: nil,
-              startingNumber: nil,
+              isOrdered: list.isOrdered,
+              startingNumber: list.startNumber,
+              itemNumber: listItem.listNumber,
               codeContent: nil,
               language: nil,
-              level: nil,
+              level: listItem.level,
               children: listItemChildren,
               sourceLocation: listItem.sourceLocation
             )
@@ -611,8 +628,9 @@ class MarkdownRendererVM {
               id: makeID(base: sourceID(for: item), content: attr.string),
               nodeType: .listItem,
               attributedContent: attr,
-              isOrdered: nil,
-              startingNumber: nil,
+              isOrdered: list.isOrdered,
+              startingNumber: list.startNumber,
+              itemNumber: nil,
               codeContent: nil,
               language: nil,
               level: nil,
@@ -626,8 +644,9 @@ class MarkdownRendererVM {
           id: makeID(base: baseIDSeed, content: items.map(\.id).description),
           nodeType: .list,
           attributedContent: nil,
-          isOrdered: nil,
-          startingNumber: nil,
+          isOrdered: list.isOrdered,
+          startingNumber: list.startNumber,
+          itemNumber: nil,
           codeContent: nil,
           language: nil,
           level: nil,
@@ -645,6 +664,7 @@ class MarkdownRendererVM {
         attributedContent: attr,
         isOrdered: nil,
         startingNumber: nil,
+        itemNumber: nil,
         codeContent: nil,
         language: nil,
         level: nil,
@@ -664,6 +684,7 @@ class MarkdownRendererVM {
         attributedContent: attr,
         isOrdered: nil,
         startingNumber: nil,
+        itemNumber: nil,
         codeContent: nil,
         language: nil,
         level: nil,
@@ -1680,3 +1701,4 @@ final class EmojiAttachmentViewProvider: NSTextAttachmentViewProvider {
     container = nil
   }
 }
+

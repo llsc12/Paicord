@@ -432,18 +432,20 @@ public final class BlockParser {
     let startLocation = tokenStream.current.location
     let firstMarker = tokenStream.current.content
 
-    let isOrdered = firstMarker.last == "." || firstMarker.last == ")"
+    let isOrdered = firstMarker.last == "."
     let startNumber = isOrdered ? Int(firstMarker.dropLast()) : nil
     let delimiter = isOrdered ? firstMarker.last : nil
     let bulletChar = isOrdered ? nil : firstMarker.first
+    var itemNumber = startNumber ?? 1
 
     var items: [ASTNode] = []
 
+    var whitespaceCount = 0
     while !tokenStream.isAtEnd && tokenStream.check(.listMarker) {
       let marker = tokenStream.current.content
 
       // Check if this marker matches the list type
-      let markerIsOrdered = marker.last == "." || marker.last == ")"
+      let markerIsOrdered = marker.last == "."
       if markerIsOrdered != isOrdered {
         break
       }
@@ -459,10 +461,14 @@ public final class BlockParser {
       }
 
       // Parse list item
-      let item = try parseListItem()
+      let item = try parseListItem(whitespaceCount, itemNumber: itemNumber)
       items.append(item)
+      
+      if isOrdered {
+        itemNumber += 1
+      }
 
-      skipWhitespaceAndNewlines()
+      whitespaceCount = skipWhitespaceAndNewlines()
     }
 
     return AST.ListNode(
@@ -473,7 +479,7 @@ public final class BlockParser {
     )
   }
 
-  private func parseListItem() throws -> AST.ListItemNode {
+  private func parseListItem(_ whitespaceCount: Int, itemNumber: Int? = nil) throws -> AST.ListItemNode {
     let startLocation = tokenStream.current.location
 
     // Consume list marker
@@ -525,7 +531,7 @@ public final class BlockParser {
       }
     }
 
-    return AST.ListItemNode(children: children, sourceLocation: startLocation)
+    return AST.ListItemNode(level: whitespaceCount/2, itemNumber: itemNumber, children: children, sourceLocation: startLocation)
   }
 
   private func isNextListItem() -> Bool {
@@ -859,9 +865,12 @@ public final class BlockParser {
     }
   }
 
-  private func skipWhitespaceAndNewlines() {
+  private func skipWhitespaceAndNewlines() -> Int {
+    var count: Int = 0
     while tokenStream.check(.whitespace) || tokenStream.check(.newline) {
+      count += tokenStream.current.length
       tokenStream.advance()
     }
+    return count
   }
 }
