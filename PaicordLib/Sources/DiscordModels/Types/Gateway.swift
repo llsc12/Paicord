@@ -190,6 +190,7 @@ public struct Gateway: Sendable, Codable {
 
       case updateGuildSubscriptions(UpdateGuildSubscriptions)
       case guildMemberListUpdate(GuildMemberListUpdate)
+        case guildJoinRequestUpdate(GuildJoinRequestUpdate)
 
       //			case guildPowerupEntitlementsCreate // TODO
       //			case guildPowerupEntitlementsDelete // TODO
@@ -310,11 +311,13 @@ public struct Gateway: Sendable, Codable {
       case typingStart(TypingStart)
 
       case userUpdate(DiscordUser)
+      case userApplicationIdentityUpdate(UserApplicationIdentityUpdate)
 
       case voiceStateUpdate(VoiceState)
       case requestVoiceStateUpdate(VoiceStateUpdate)
       case voiceChannelStatusUpdate(VoiceChannelStatusUpdate)
       case voiceServerUpdate(VoiceServerUpdate)
+      case voiceChannelStartTimeUpdate(VoiceChannelStartTimeUpdate)
       //			case voiceChannelEffectSend() // TODO
 
       case webhooksUpdate(WebhooksUpdate)
@@ -340,6 +343,9 @@ public struct Gateway: Sendable, Codable {
       //			case userPremiumGuildSubscriptionSlotCreate() // TODO
       //			case userPremiumGuildSubscriptionSlotUpdate() // TODO
       //			case userPremiumGuildSubscriptionSlotDelete() // TODO
+
+      case embeddedActivityUpdateV2(EmbeddedActivityUpdateV2)
+      case contentInventoryInboxStale(ContentInventoryInboxStale)
 
       case __undocumented
 
@@ -738,6 +744,16 @@ public struct Gateway: Sendable, Codable {
           self.data = try .userSettingsUpdate(decodeData())
         case "GUILD_MEMBER_LIST_UPDATE":
           self.data = try .guildMemberListUpdate(decodeData())
+        case "EMBEDDED_ACTIVITY_UPDATE_V2":
+          self.data = try .embeddedActivityUpdateV2(decodeData())
+        case "CONTENT_INVENTORY_INBOX_STALE":
+          self.data = try .contentInventoryInboxStale(decodeData())
+        case "USER_APPLICATION_IDENTITY_UPDATE":
+          self.data = try .userApplicationIdentityUpdate(decodeData())
+        case "VOICE_CHANNEL_START_TIME_UPDATE":
+          self.data = try .voiceChannelStartTimeUpdate(decodeData())
+        case "GUILD_JOIN_REQUEST_UPDATE":
+          self.data = try .guildJoinRequestUpdate(decodeData())
         default:
           throw GatewayDecodingError.unhandledDispatchEvent(type: self.type)
         }

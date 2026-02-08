@@ -2068,7 +2068,10 @@ extension Gateway {
         switch opKind {
         case .sync:
           let range = try container.decode(IntPair.self, forKey: .range)
-          let items = try container.decode([GuildMemberListMixedItem].self, forKey: .items)
+          let items = try container.decode(
+            [GuildMemberListMixedItem].self,
+            forKey: .items
+          )
           self = .sync(range: range, items: items)
         case .update:
           let index = try container.decode(Int.self, forKey: .index)
@@ -2181,7 +2184,7 @@ extension Gateway {
           case member
           case group
         }
-        
+
         public var id: AnySnowflake {
           switch self {
           case .member(let member):
@@ -2213,8 +2216,86 @@ extension Gateway {
     }
 
     public struct GroupCount: Sendable, Codable {
-      public var id: RoleSnowflake  // annoyingly this can also be "online" to represent unhoisted online members
+      public var id: RoleSnowflake  // this can also be "online" to represent unhoisted online members or "offline" for offline members in "everyone" member lists
       public var count: Int
+    }
+  }
+
+  public struct ContentInventoryInboxStale: Sendable, Codable {
+    public var refresh_after_ms: UInt
+  }
+
+  public struct EmbeddedActivityUpdateV2: Sendable, Codable {
+    public var participants: [Participant]
+    public var location: Location
+    public var launch_id: AnySnowflake
+    public var instance_id: AnySnowflake
+    public var guild_id: GuildSnowflake
+    public var composite_instance_id: String
+    public var application_id: ApplicationSnowflake
+
+    public struct Participant: Sendable, Codable {
+      public var user_id: UserSnowflake
+      public var session_id: String
+      public var nonce: AnySnowflake
+      public var member: Guild.PartialMember
+    }
+
+    public struct Location: Sendable, Codable {
+      public var kind: String
+      public var channel_id: ChannelSnowflake
+      public var guild_id: GuildSnowflake
+      public var id: String
+    }
+  }
+
+  public struct UserApplicationIdentityUpdate: Sendable, Codable {
+    public var application_id: ApplicationSnowflake
+    public var username: String
+    public var user_id: UserSnowflake
+    public var avatar_hash: String?
+    public var metadata: String
+  }
+
+  public struct VoiceChannelStartTimeUpdate: Sendable, Codable {
+    public var voice_start_time: DiscordTimestamp
+    public var id: ChannelSnowflake
+    public var guild_id: GuildSnowflake
+  }
+
+  public struct GuildJoinRequestUpdate: Sendable, Codable {
+    public var status: Status
+    public var request: GuildJoinRequest
+    public var guild_id: GuildSnowflake
+    
+    public struct GuildJoinRequest: Sendable, Codable {
+      public var user_id: UserSnowflake
+      public var user: PartialUser
+      public var rejection_reason: String?
+      public var last_seen: DiscordTimestamp
+      public var join_request_id: AnySnowflake
+      public var interview_channel_id: ChannelSnowflake?
+      public var id: AnySnowflake
+      public var guild_id: GuildSnowflake
+      public var form_responses: [MemberVerificationFormField]
+      public var created_at: DiscordTimestamp
+      public var application_status: Status
+      public var actioned_by_user: PartialUser?
+      public var actioned_at: AnySnowflake?
+    }
+    
+    public struct MemberVerificationFormField: Sendable, Codable {
+      
+    }
+
+    @UnstableEnum<String>
+    public enum Status: Sendable, Codable {
+      case started  // STARTED
+      case submitted  // SUBMITTED
+      case rejected  // REJECTED
+      case approved  // APPROVED
+
+      case __undocumented(String)
     }
   }
 }
