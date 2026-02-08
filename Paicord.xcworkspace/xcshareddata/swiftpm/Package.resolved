@@ -1,5 +1,5 @@
 {
-  "originHash" : "a93622e22671438f42a166ab7a258adf68df6093e7afc92a9e1e5362e0d06f7c",
+  "originHash" : "30d9a161000990fd59ac6399649b019b839d21f151fb8dd7144bb6eb64d7e5cf",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "254d34096123cd5da4f82e69f52f622ac7526d68",
         "version" : "1.27.0"
+      }
+    },
+    {
+      "identity" : "btree",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/attaswift/BTree",
+      "state" : {
+        "branch" : "master",
+        "revision" : "407fda73e18cc9df9130453ee36f73408c22408f"
       }
     },
     {
