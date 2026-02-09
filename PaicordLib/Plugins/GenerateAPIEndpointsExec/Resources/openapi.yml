@@ -6184,6 +6184,43 @@ paths:
                 type: string
               example: ""
   /guilds/{guild_id}/voice-states/{user_id}:
+    get:
+      tags:
+        - Voice
+      summary: get voice state
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: guild_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+        - name: user_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: "(Required) "
+          example: <snowflake>
+      responses:
+        "200":
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ""
     patch:
       tags:
         - Voice

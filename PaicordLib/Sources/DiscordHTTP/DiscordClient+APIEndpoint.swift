@@ -2006,6 +2006,18 @@ extension DiscordClient {
     )
   }
 
+  /// https://discord.com/developers/docs/resources/guild#get-user-voice-state
+  @inlinable
+  public func getVoiceState(
+    guildId: GuildSnowflake,
+    userId: UserSnowflake
+  ) async throws -> DiscordClientResponse<VoiceState> {
+    let endpoint = APIEndpoint.getVoiceState(guildId: guildId, userId: userId)
+    return try await self.send(
+      request: .init(to: endpoint)
+    )
+  }
+
   /// https://discord.com/developers/docs/resources/guild#modify-user-voice-state
   @inlinable
   public func updateVoiceState(
