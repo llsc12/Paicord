@@ -72,6 +72,10 @@ class SettingsStore: DiscordDataStore {
     if let settings = readyData.user_settings_proto {
       userSettings = settings
     }
+    // get frecency settings from api
+    Task {
+      let res = gateway?.client.getUserInvites()
+    }
   }
 
   private func handleUserSettingsUpdate(

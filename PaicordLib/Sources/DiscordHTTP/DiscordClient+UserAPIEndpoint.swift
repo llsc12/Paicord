@@ -107,7 +107,7 @@ extension DiscordClient {
     )
   }
 
-  /// Initiates the password reset process for the given email or phone number. Returns a 204 empty response on success.
+  /// Initiates the password rea process for the given email or phone number. Returns a 204 empty response on success.
   /// https://docs.discord.food/authentication#forgot-password
   @inlinable
   public func forgotPassword(
