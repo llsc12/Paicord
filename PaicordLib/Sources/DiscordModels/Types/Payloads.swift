@@ -181,8 +181,7 @@ public enum Payloads {
 
   /// A allowed-mentions object, but for sending.
   /// https://discord.com/developers/docs/resources/channel#allowed-mentions-object
-  public struct AllowedMentions: Sendable, Hashable, Codable, ValidatablePayload
-  {
+  public struct AllowedMentions: Sendable, Hashable, Codable, ValidatablePayload {
     public var parse: [DiscordChannel.AllowedMentions.Kind]?
     public var roles: [RoleSnowflake]?
     public var users: [UserSnowflake]?
@@ -372,8 +371,7 @@ public enum Payloads {
     }
 
     /// https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure
-    internal enum CallbackData: Sendable, MultipartEncodable, ValidatablePayload
-    {
+    internal enum CallbackData: Sendable, MultipartEncodable, ValidatablePayload {
       case message(Message)
       case autocomplete(Autocomplete)
       case modal(Modal)
@@ -464,8 +462,7 @@ public enum Payloads {
     /// The `.ephemeral` message flag needs to be set here on a deferred message.
     /// The main message's flags can't override this flag.
     /// Discord barely mentions this behavior here: https://discord.com/developers/docs/interactions/receiving-and-responding#create-followup-message
-    public static func deferredUpdateMessage(isEphemeral: Bool = false) -> Self
-    {
+    public static func deferredUpdateMessage(isEphemeral: Bool = false) -> Self {
       .init(
         type: .deferredUpdateMessage,
         data: .flags(.init(isEphemeral: isEphemeral))
@@ -736,8 +733,7 @@ public enum Payloads {
   }
 
   /// https://discord.com/developers/docs/resources/webhook#execute-webhook-jsonform-params
-  public struct ExecuteWebhook: Sendable, MultipartEncodable, ValidatablePayload
-  {
+  public struct ExecuteWebhook: Sendable, MultipartEncodable, ValidatablePayload {
     public var content: String?
     public var username: String?
     public var avatar_url: String?
@@ -932,8 +928,7 @@ public enum Payloads {
     }
   }
 
-  public struct CreateThreadFromMessage: Sendable, Encodable, ValidatablePayload
-  {
+  public struct CreateThreadFromMessage: Sendable, Encodable, ValidatablePayload {
     public var name: String
     public var auto_archive_duration: DiscordChannel.AutoArchiveDuration?
     public var rate_limit_per_user: Int?
@@ -998,8 +993,7 @@ public enum Payloads {
   {
 
     /// https://discord.com/developers/docs/resources/channel#start-thread-in-forum-channel-forum-thread-message-params-object
-    public struct ForumMessage: Sendable, MultipartEncodable, ValidatablePayload
-    {
+    public struct ForumMessage: Sendable, MultipartEncodable, ValidatablePayload {
       public var content: String?
       public var embeds: [Embed]?
       public var allowed_mentions: AllowedMentions?
@@ -1216,8 +1210,7 @@ public enum Payloads {
     }
   }
 
-  public struct ApplicationCommandEdit: Sendable, Encodable, ValidatablePayload
-  {
+  public struct ApplicationCommandEdit: Sendable, Encodable, ValidatablePayload {
     public var name: String?
     public var name_localizations: DiscordLocaleDict<String>?
     public var description: String?
@@ -1381,8 +1374,7 @@ public enum Payloads {
     public var parent_id: AnySnowflake?
     public var rtc_region: String?
     public var video_quality_mode: DiscordChannel.VideoQualityMode?
-    public var default_auto_archive_duration:
-      DiscordChannel.AutoArchiveDuration?
+    public var default_auto_archive_duration: DiscordChannel.AutoArchiveDuration?
     public var flags: IntBitField<DiscordChannel.Flag>?
     public var available_tags: [PartialForumTag]?
     public var default_reaction_emoji: DiscordChannel.DefaultReaction?
@@ -1537,8 +1529,7 @@ public enum Payloads {
     public var parent_id: AnySnowflake?
     public var rtc_region: String?
     public var video_quality_mode: DiscordChannel.VideoQualityMode?
-    public var default_auto_archive_duration:
-      DiscordChannel.AutoArchiveDuration?
+    public var default_auto_archive_duration: DiscordChannel.AutoArchiveDuration?
     public var available_tags: [PartialForumTag]?
     public var default_reaction_emoji: DiscordChannel.DefaultReaction?
     public var default_sort_order: DiscordChannel.SortOrder?
@@ -1620,8 +1611,7 @@ public enum Payloads {
     public var name: String
     public var icon: ImageData?
     public var verification_level: Guild.VerificationLevel?
-    public var default_message_notifications:
-      Guild.DefaultMessageNotificationLevel?
+    public var default_message_notifications: Guild.DefaultMessageNotificationLevel?
     public var explicit_content_filter: Guild.ExplicitContentFilterLevel?
     public var roles: [Role]?
     public var channels: [DiscordChannel]?
@@ -1665,8 +1655,7 @@ public enum Payloads {
   public struct ModifyGuild: Sendable, Encodable, ValidatablePayload {
     public var name: String?
     public var verification_level: Guild.VerificationLevel?
-    public var default_message_notifications:
-      Guild.DefaultMessageNotificationLevel?
+    public var default_message_notifications: Guild.DefaultMessageNotificationLevel?
     public var explicit_content_filter: Guild.ExplicitContentFilterLevel?
     public var afk_channel_id: ChannelSnowflake?
     public var afk_timeout: Guild.AFKTimeout?
@@ -1784,8 +1773,7 @@ public enum Payloads {
   }
 
   /// https://docs.discord.food/resources/auto-moderation#execute-automod-alert-action
-  public struct ExecuteAutoModAlertAction: Sendable, Codable, ValidatablePayload
-  {
+  public struct ExecuteAutoModAlertAction: Sendable, Codable, ValidatablePayload {
     public var channel_id: ChannelSnowflake
     public var message_id: MessageSnowflake
     public var alert_action_type: AlertActionKind
@@ -1802,8 +1790,7 @@ public enum Payloads {
   }
 
   /// https://discord.com/developers/docs/resources/auto-moderation#create-auto-moderation-rule-json-params
-  public struct CreateAutoModerationRule: Sendable, Codable, ValidatablePayload
-  {
+  public struct CreateAutoModerationRule: Sendable, Codable, ValidatablePayload {
     public var name: String
     public var event_type: AutoModerationRule.EventKind
     public var trigger_type: AutoModerationRule.TriggerKind
@@ -1848,8 +1835,7 @@ public enum Payloads {
   }
 
   /// https://discord.com/developers/docs/resources/auto-moderation#modify-auto-moderation-rule
-  public struct ModifyAutoModerationRule: Sendable, Codable, ValidatablePayload
-  {
+  public struct ModifyAutoModerationRule: Sendable, Codable, ValidatablePayload {
     public var name: String?
     public var event_type: AutoModerationRule.EventKind?
     public var trigger_type: AutoModerationRule.TriggerKind?
@@ -2052,8 +2038,7 @@ public enum Payloads {
   }
 
   /// https://discord.com/developers/docs/resources/emoji#create-application-emoji-json-params
-  public struct CreateApplicationEmoji: Sendable, Encodable, ValidatablePayload
-  {
+  public struct CreateApplicationEmoji: Sendable, Encodable, ValidatablePayload {
     public var name: String
     public var image: ImageData
 
@@ -2079,8 +2064,7 @@ public enum Payloads {
   }
 
   /// https://discord.com/developers/docs/resources/emoji#modify-application-emoji-json-params
-  public struct ModifyApplicationEmoji: Sendable, Encodable, ValidatablePayload
-  {
+  public struct ModifyApplicationEmoji: Sendable, Encodable, ValidatablePayload {
     public var name: String
 
     public init(name: String) {
@@ -2597,8 +2581,7 @@ public enum Payloads {
       [self.file]
     }
 
-    public init(name: String, description: String, tags: String, file: RawFile)
-    {
+    public init(name: String, description: String, tags: String, file: RawFile) {
       self.name = name
       self.description = description
       self.tags = tags
@@ -2939,8 +2922,7 @@ public enum Payloads {
   }
 
   /// https://docs.discord.food/resources/relationships#bulk-remove-relationships
-  public struct BulkRemoveRelationships: Sendable, Encodable, ValidatablePayload
-  {
+  public struct BulkRemoveRelationships: Sendable, Encodable, ValidatablePayload {
     public var filters: Set<Filter>?
     public init(filters: Set<Filter>? = nil) {
       self.filters = filters
@@ -3115,8 +3097,7 @@ public enum Payloads {
   }
 
   /// https://docs.discord.food/remote-authentication/mobile#create-remote-auth-session
-  public struct CreateRemoteAuthSession: Sendable, Encodable, ValidatablePayload
-  {
+  public struct CreateRemoteAuthSession: Sendable, Encodable, ValidatablePayload {
     public var fingerprint: String
 
     public init(fingerprint: String) {

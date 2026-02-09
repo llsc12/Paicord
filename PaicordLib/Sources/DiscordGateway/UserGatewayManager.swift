@@ -281,8 +281,7 @@ public actor UserGatewayManager: GatewayManager {
           self.state.store(.configured, ordering: .relaxed)
           self.stateCallback?(.configured)
 
-          for try await message in inbound.messages(maxSize: self.maxFrameSize)
-          {
+          for try await message in inbound.messages(maxSize: self.maxFrameSize) {
             await self.processBinaryData(
               message,
               forConnectionWithId: connectionId

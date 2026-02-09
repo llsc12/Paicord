@@ -36,7 +36,11 @@ public enum GatewayCloseCode: UInt16, Sendable, Codable {
 }
 
 /// https://discord.com/developers/docs/topics/opcodes-and-status-codes#json-json-error-codes
-@UnstableEnum<Int>
+#if Non64BitSystemsCompatibility
+  @UnstableEnum<Int64>
+#else
+  @UnstableEnum<Int>
+#endif
 public enum JSONErrorCode: Sendable, Codable {
   case generalError  // 0
   case unknownAccount  // 10001
@@ -262,7 +266,11 @@ public enum JSONErrorCode: Sendable, Codable {
   case cannotEditPollMessage  // 520003
   case cannotUseEmojiIncludedWithThePoll  // 520004
   case cannotExpireNonPollMessage  // 520006
-  case __undocumented(Int)
+  #if Non64BitSystemsCompatibility
+    case __undocumented(Int64)
+  #else
+    case __undocumented(Int)
+  #endif
 }
 
 /// https://discord.com/developers/docs/topics/opcodes-and-status-codes#json

@@ -2,12 +2,7 @@ import DiscordModels
 import Foundation
 import NIOHTTP1
 
-#if compiler(>=5.10)
-  /// It's safe the way DiscordBM uses it.
-  nonisolated(unsafe) private let iso8601DateFormatter = ISO8601DateFormatter()
-#else
-  private let iso8601DateFormatter = ISO8601DateFormatter()
-#endif
+nonisolated(unsafe) private let iso8601DateFormatter = ISO8601DateFormatter()
 
 /// MARK: - +APIEndpoint
 extension DiscordClient {
@@ -2705,8 +2700,7 @@ extension DiscordClient {
 
   /// https://discord.com/developers/docs/resources/user#leave-guild
   @inlinable
-  public func leaveGuild(id: GuildSnowflake) async throws -> DiscordHTTPResponse
-  {
+  public func leaveGuild(id: GuildSnowflake) async throws -> DiscordHTTPResponse {
     let endpoint = APIEndpoint.leaveGuild(guildId: id)
     return try await self.send(request: .init(to: endpoint))
   }

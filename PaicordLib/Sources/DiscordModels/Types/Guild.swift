@@ -110,7 +110,11 @@ public struct Guild: Sendable, Codable {
   /// https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-structure
   public struct Member: Sendable, Codable, Equatable, Hashable {
     /// https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-flags
-    @UnstableEnum<UInt>
+    #if Non64BitSystemsCompatibility
+      @UnstableEnum<UInt64>
+    #else
+      @UnstableEnum<UInt>
+    #endif
     public enum Flag: Sendable {
       case didRejoin  // 0
       case completedOnboarding  // 1
@@ -121,7 +125,12 @@ public struct Guild: Sendable, Codable {
       case completedHomeActions  // 6
       case automodQuarantinedUsername  // 7
       case dmSettingsUpsellAcknowledged  // 9
-      case __undocumented(UInt)
+
+      #if Non64BitSystemsCompatibility
+        case __undocumented(UInt64)
+      #else
+        case __undocumented(UInt)
+      #endif
     }
 
     public var user: DiscordUser?
@@ -237,31 +246,55 @@ public struct Guild: Sendable, Codable {
   }
 
   /// https://discord.com/developers/docs/resources/guild#guild-object-verification-level
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum VerificationLevel: Sendable, Codable {
     case none  // 0
     case low  // 1
     case medium  // 2
     case high  // 3
     case veryHigh  // 4
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   /// https://discord.com/developers/docs/resources/guild#guild-object-default-message-notification-level
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum DefaultMessageNotificationLevel: Sendable, Codable {
     case allMessages  // 0
     case onlyMentions  // 1
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   /// https://discord.com/developers/docs/resources/guild#guild-object-explicit-content-filter-level
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum ExplicitContentFilterLevel: Sendable, Codable {
     case disabled  // 0
     case memberWithoutRoles  // 1
     case allMembers  // 2
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   /// https://discord.com/developers/docs/resources/guild#guild-object-guild-features
@@ -314,15 +347,27 @@ public struct Guild: Sendable, Codable {
   }
 
   /// https://discord.com/developers/docs/resources/guild#guild-object-mfa-level
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum MFALevel: Sendable, Codable {
     case none  // 0
     case elevated  // 1
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   /// https://discord.com/developers/docs/resources/guild#guild-object-system-channel-flags
-  @UnstableEnum<UInt>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<UInt64>
+  #else
+    @UnstableEnum<UInt>
+  #endif
   public enum SystemChannelFlag: Sendable {
     case suppressJoinNotifications  // 0
     case suppressPremiumSubscriptions  // 1
@@ -330,17 +375,30 @@ public struct Guild: Sendable, Codable {
     case suppressJoinNotificationReplies  // 3
     case suppressRoleSubscriptionPurchaseNotifications  // 4
     case suppressRoleSubscriptionPurchaseNotificationReplies  // 5
-    case __undocumented(UInt)
+
+    #if Non64BitSystemsCompatibility
+      case __undocumented(UInt64)
+    #else
+      case __undocumented(UInt)
+    #endif
   }
 
   /// https://discord.com/developers/docs/resources/guild#guild-object-premium-tier
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum PremiumTier: Sendable, Codable {
     case none  // 0
     case tier1  // 1
     case tier2  // 2
     case tier3  // 3
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   /// https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-structure
@@ -371,24 +429,40 @@ public struct Guild: Sendable, Codable {
   }
 
   /// https://discord.com/developers/docs/resources/guild#guild-object-guild-nsfw-level
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum NSFWLevel: Sendable, Codable {
     case `default`  // 0
     case explicit  // 1
     case safe  // 2
     case ageRestricted  // 3
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   /// https://discord.com/developers/docs/resources/guild#create-guild-json-params
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum AFKTimeout: Sendable, Codable {
     case oneMinute  // 60
     case fiveMinutes  // 300
     case fifteenMinutes  // 900
     case halfAnHour  // 1800
     case anHour  // 3600
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   public var id: GuildSnowflake
@@ -462,8 +536,7 @@ public struct PartialGuild: Sendable, Codable, Equatable, Hashable {
   public var widget_enabled: Bool?
   public var widget_channel_id: ChannelSnowflake?
   public var verification_level: Guild.VerificationLevel?
-  public var default_message_notifications:
-    Guild.DefaultMessageNotificationLevel?
+  public var default_message_notifications: Guild.DefaultMessageNotificationLevel?
   public var explicit_content_filter: Guild.ExplicitContentFilterLevel?
   public var roles: [Role]?
   public var emojis: [Emoji]?
@@ -592,11 +665,19 @@ extension Guild {
       }
 
       /// https://discord.com/developers/docs/resources/guild#guild-onboarding-object-prompt-types
-      @UnstableEnum<Int>
+      #if Non64BitSystemsCompatibility
+        @UnstableEnum<Int64>
+      #else
+        @UnstableEnum<Int>
+      #endif
       public enum Kind: Sendable, Codable {
         case multipleChoice  // 0
         case dropdown  // 1
-        case __undocumented(Int)
+        #if Non64BitSystemsCompatibility
+          case __undocumented(Int64)
+        #else
+          case __undocumented(Int)
+        #endif
       }
 
       public var id: OnboardingPromptSnowflake
@@ -729,7 +810,11 @@ extension Guild {
       public var muted: Bool
       public var mute_config: MuteConfig??
 
-      @UnstableEnum<UInt>
+      #if Non64BitSystemsCompatibility
+        @UnstableEnum<UInt64>
+      #else
+        @UnstableEnum<UInt>
+      #endif
       public enum Flag: Sendable {
         case unreadsOnlyMentions  // 9
         case unreadsAllMessages  // 10
@@ -737,27 +822,49 @@ extension Guild {
         case optInEnabled  // 12
         case newForumThreadsOff  // 13
         case newForumThreadsOn  // 14
-        case __undocumented(UInt)
+
+        #if Non64BitSystemsCompatibility
+          case __undocumented(UInt64)
+        #else
+          case __undocumented(UInt)
+        #endif
       }
 
-      @UnstableEnum<UInt>
+      #if Non64BitSystemsCompatibility
+        @UnstableEnum<UInt64>
+      #else
+        @UnstableEnum<UInt>
+      #endif
       public enum MessageNotifications: Sendable, Codable {
         case allMessages  // 0
         case onlyMentions  // 1
         case noMessages  // 2
         case inherit  // 3
-        case __undocumented(UInt)
+
+        #if Non64BitSystemsCompatibility
+          case __undocumented(UInt64)
+        #else
+          case __undocumented(UInt)
+        #endif
       }
     }
 
-    @UnstableEnum<UInt>
+    #if Non64BitSystemsCompatibility
+      @UnstableEnum<UInt64>
+    #else
+      @UnstableEnum<UInt>
+    #endif
     public enum Flag: Sendable {
       case unreadsAllMessages  // 11
       case unreadsOnlyMentions  // 12
       case optInChannelsOff  // 13
       case optInChannelsOn  // 14
 
-      case __undocumented(UInt)
+      #if Non64BitSystemsCompatibility
+        case __undocumented(UInt64)
+      #else
+        case __undocumented(UInt)
+      #endif
     }
 
     public struct MuteConfig: Sendable, Codable {

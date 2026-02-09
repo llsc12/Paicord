@@ -7,15 +7,21 @@ public protocol SnowflakeProtocol:
   Equatable,
   Comparable,
   CustomStringConvertible,
-  ExpressibleByStringLiteral
+  ExpressibleByStringLiteral,
+  ExpressibleByIntegerLiteral
 {
 
   var rawValue: String { get }
   init(variable: StringOrInt)
   init(_ rawValue: String)
+  init(_ snowflake: UInt64)
 }
 
 extension SnowflakeProtocol {
+  public init(_ snowflake: UInt64) {
+    self.init(snowflake.description)
+  }
+
   /// Initializes a snowflake from another snowflake.
   public init(_ snowflake: any SnowflakeProtocol) {
     self.init(snowflake.rawValue)
@@ -43,6 +49,10 @@ extension SnowflakeProtocol {
 
   public init(stringLiteral rawValue: String) {
     self.init(rawValue)
+  }
+
+  public init(integerLiteral value: UInt64) {
+    self.init(value)
   }
 
   /// Initializes a snowflake from a `SnowflakeInfo`.
@@ -470,7 +480,8 @@ extension DiscordChannel {
       }
     }
 
-    let joined = overwrites
+    let joined =
+      overwrites
       .sorted()
       .joined(separator: ",")
     let snowflake: MemberListSnowflake = .init(

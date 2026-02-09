@@ -59,23 +59,39 @@ public struct Interaction: Sendable, Codable {
   }
 
   /// https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-type
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum Kind: Sendable, Codable {
     case ping  // 1
     case applicationCommand  // 2
     case messageComponent  // 3
     case applicationCommandAutocomplete  // 4
     case modalSubmit  // 5
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   /// https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-context-types
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum ContextKind: Sendable, Codable {
     case guild  // 0
     case botDm  // 1
     case privateChannel  // 2
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   /// https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-application-command-data-structure
@@ -100,8 +116,7 @@ public struct Interaction: Sendable, Codable {
       public var roles: [RoleSnowflake: Role]?
       public var channels: [ChannelSnowflake: PartialChannel]?
       public var messages: [MessageSnowflake: DiscordChannel.PartialMessage]?
-      public var attachments:
-        [AttachmentSnowflake: DiscordChannel.Message.Attachment]?
+      public var attachments: [AttachmentSnowflake: DiscordChannel.Message.Attachment]?
     }
 
     /// https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-application-command-interaction-data-option-structure
@@ -293,8 +308,7 @@ public struct Interaction: Sendable, Codable {
   public var guild_locale: DiscordLocale?
   public var app_permissions: StringBitField<Permission>?
   public var entitlements: [Entitlement]
-  public var authorizing_integration_owners:
-    [DiscordApplication.IntegrationKind: AnySnowflake]?
+  public var authorizing_integration_owners: [DiscordApplication.IntegrationKind: AnySnowflake]?
   public var context: ContextKind?
 
   @available(
@@ -551,7 +565,11 @@ extension Interaction {
 
     /// https://discord.com/developers/docs/interactions/message-components#component-object-component-types
     /// https://docs.discord.food/resources/components#component-type
-    @UnstableEnum<Int>
+    #if Non64BitSystemsCompatibility
+      @UnstableEnum<Int64>
+    #else
+      @UnstableEnum<Int>
+    #endif
     public enum Kind: Sendable, Codable {
       case actionRow  // 1
       case button  // 2
@@ -573,7 +591,11 @@ extension Interaction {
       case separator  // 14
       case contentInventoryEntry  // 16
       case container  // 17
-      case __undocumented(Int)
+      #if Non64BitSystemsCompatibility
+        case __undocumented(Int64)
+      #else
+        case __undocumented(Int)
+      #endif
     }
 
     /// https://discord.com/developers/docs/interactions/message-components#button-object-button-structure
@@ -582,7 +604,11 @@ extension Interaction {
     {
 
       /// https://discord.com/developers/docs/interactions/message-components#button-object-button-styles
-      @UnstableEnum<Int>
+      #if Non64BitSystemsCompatibility
+        @UnstableEnum<Int64>
+      #else
+        @UnstableEnum<Int>
+      #endif
       public enum Style: Sendable, Codable {
         case primary  // 1
         case secondary  // 2
@@ -590,7 +616,11 @@ extension Interaction {
         case danger  // 4
         case link  // 5
         case premium  // 6
-        case __undocumented(Int)
+        #if Non64BitSystemsCompatibility
+          case __undocumented(Int64)
+        #else
+          case __undocumented(Int)
+        #endif
       }
 
       /// The same as ``Style``, but has no `link`.
@@ -986,11 +1016,19 @@ extension Interaction {
     {
 
       /// https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-styles
-      @UnstableEnum<Int>
+      #if Non64BitSystemsCompatibility
+        @UnstableEnum<Int64>
+      #else
+        @UnstableEnum<Int>
+      #endif
       public enum Style: Sendable, Codable {
         case short  // 1
         case paragraph  // 2
-        case __undocumented(Int)
+        #if Non64BitSystemsCompatibility
+          case __undocumented(Int64)
+        #else
+          case __undocumented(Int)
+        #endif
       }
 
       public var custom_id: String

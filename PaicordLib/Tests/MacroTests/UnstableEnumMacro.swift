@@ -193,6 +193,116 @@ class UnstableEnumMacroTests: XCTestCase {
     )
   }
 
+  func testIntEnumWithAVariable() throws {
+    assertMacroExpansion(
+      """
+      @UnstableEnum<Int>
+      enum MyEnum: RawRepresentable {
+          case a // 1
+          case b // 5
+          case __undocumented(Int)
+          
+          var extraVar: Int { 
+              0 
+          }
+      }
+      """,
+      expandedSource: """
+
+        enum MyEnum: RawRepresentable {
+            case a // 1
+            case b // 5
+            case __undocumented(Int)
+            
+            var extraVar: Int { 
+                0 
+            }
+
+            var rawValue: Int {
+                switch self {
+                case .a:
+                    return 1
+                case .b:
+                    return 5
+                case let .__undocumented(rawValue):
+                    return rawValue
+                }
+            }
+
+            init?(rawValue: Int) {
+                switch rawValue {
+                case 1:
+                    self = .a
+                case 5:
+                    self = .b
+                default:
+                    self = .__undocumented(rawValue)
+                }
+            }
+        }
+
+        extension MyEnum: RawRepresentable, LosslessRawRepresentable, Hashable {
+        }
+        """,
+      macros: macros
+    )
+  }
+
+  func testUIntEnumWithCompilerFlaggedUndocumentedCase() throws {
+    assertMacroExpansion(
+      """
+      @UnstableEnum<UInt64>
+      enum MyEnum: RawRepresentable {
+          case a // 1
+          case b // 5
+          #if Non64BitSystemsCompatibility
+          case __undocumented(UInt64)
+          #else
+          case __undocumented(UInt)
+          #endif
+      }
+      """,
+      expandedSource: """
+
+        enum MyEnum: RawRepresentable {
+            case a // 1
+            case b // 5
+            #if Non64BitSystemsCompatibility
+            case __undocumented(UInt64)
+            #else
+            case __undocumented(UInt)
+            #endif
+
+            var rawValue: UInt64 {
+                switch self {
+                case .a:
+                    return 1
+                case .b:
+                    return 5
+                case let .__undocumented(rawValue):
+                    return rawValue
+                }
+            }
+
+            init?(rawValue: UInt64) {
+                switch rawValue {
+                case 1:
+                    self = .a
+                case 5:
+                    self = .b
+                default:
+                    self = .__undocumented(rawValue)
+                }
+            }
+        }
+
+        extension MyEnum: RawRepresentable, LosslessRawRepresentable, Hashable {
+        }
+        """,
+      macros: macros
+    )
+  }
+
   func testDecodableEnum() throws {
     assertMacroExpansion(
       """

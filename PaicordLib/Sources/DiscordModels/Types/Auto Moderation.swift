@@ -2,34 +2,58 @@
 public struct AutoModerationRule: Sendable, Codable {
 
   /// https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-event-types
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum EventKind: Sendable, Codable {
     case messageSend  // 1
     case memberUpdate  // 2
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   /// https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-types
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum TriggerKind: Sendable, Codable {
     case keyword  // 1
     case spam  // 3
     case keywordPreset  // 4
     case mentionSpam  // 5
     case memberProfile  // 6
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   /// https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata
   public struct TriggerMetadata: Sendable, Codable {
 
     /// https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-keyword-preset-types
-    @UnstableEnum<Int>
+    #if Non64BitSystemsCompatibility
+      @UnstableEnum<Int64>
+    #else
+      @UnstableEnum<Int>
+    #endif
     public enum KeywordPreset: Sendable, Codable {
       case profanity  // 1
       case sexualContent  // 2
       case slurs  // 3
-      case __undocumented(Int)
+      #if Non64BitSystemsCompatibility
+        case __undocumented(Int64)
+      #else
+        case __undocumented(Int)
+      #endif
     }
 
     public var keyword_filter: [String]?

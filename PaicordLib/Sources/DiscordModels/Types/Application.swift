@@ -2,7 +2,11 @@
 public struct DiscordApplication: Sendable, Codable {
 
   /// https://discord.com/developers/docs/resources/application#application-object-application-flags
-  @UnstableEnum<UInt>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<UInt64>
+  #else
+    @UnstableEnum<UInt>
+  #endif
   public enum Flag: Sendable {
     case applicationAutoModerationRuleCreateBadge  // 6
     case gatewayPresence  // 12
@@ -14,7 +18,12 @@ public struct DiscordApplication: Sendable, Codable {
     case gatewayMessageContent  // 18
     case gatewayMessageContentLimited  // 19
     case applicationCommandBadge  // 23
-    case __undocumented(UInt)
+
+    #if Non64BitSystemsCompatibility
+      case __undocumented(UInt64)
+    #else
+      case __undocumented(UInt)
+    #endif
   }
 
   /// https://discord.com/developers/docs/resources/application#install-params-object
@@ -22,21 +31,28 @@ public struct DiscordApplication: Sendable, Codable {
     public var scopes: [OAuth2Scope]
     public var permissions: StringBitField<Permission>
 
-    public init(scopes: [OAuth2Scope], permissions: StringBitField<Permission>)
-    {
+    public init(scopes: [OAuth2Scope], permissions: StringBitField<Permission>) {
       self.scopes = scopes
       self.permissions = permissions
     }
   }
 
   /// https://discord.com/developers/docs/resources/application#application-object-application-integration-types
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum IntegrationKind: Sendable, Codable, CodingKeyRepresentable,
     Equatable
   {
     case guildInstall  // 0
     case userInstall  // 1
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   /// https://discord.com/developers/docs/resources/application#application-object-application-integration-type-configuration-object
@@ -77,8 +93,7 @@ public struct DiscordApplication: Sendable, Codable {
   public var tags: [String]?
   public var install_params: InstallParams?
   public var integration_types: [IntegrationKind]?
-  public var integration_types_config:
-    [IntegrationKind: IntegrationKindConfiguration]?
+  public var integration_types_config: [IntegrationKind: IntegrationKindConfiguration]?
   public var custom_install_url: String?
 
   /// https://docs.discord.food/resources/application#application-asset-object
@@ -88,11 +103,20 @@ public struct DiscordApplication: Sendable, Codable {
     public var name: String
 
     /// https://docs.discord.food/resources/application#application-asset-type
-    @UnstableEnum<UInt>
+    #if Non64BitSystemsCompatibility
+      @UnstableEnum<UInt64>
+    #else
+      @UnstableEnum<UInt>
+    #endif
     public enum Kind: Sendable, Codable {
       case one  // 1
       case two  // 2
-      case __undocumented(UInt)
+
+      #if Non64BitSystemsCompatibility
+        case __undocumented(UInt64)
+      #else
+        case __undocumented(UInt)
+      #endif
     }
   }
 }
@@ -159,27 +183,44 @@ public struct EmbeddedActivities: Sendable, Codable, Equatable, Hashable {
       case __undocumented(String)
     }
 
-    @UnstableEnum<UInt>
+    #if Non64BitSystemsCompatibility
+      @UnstableEnum<UInt64>
+    #else
+      @UnstableEnum<UInt>
+    #endif
     public enum OrientationLockState: Sendable, Codable {
       case unlocked  // 0
       case portrait  // 1
       case landscape  // 2
-      case __undocumented(UInt)
+
+      #if Non64BitSystemsCompatibility
+        case __undocumented(UInt64)
+      #else
+        case __undocumented(UInt)
+      #endif
     }
 
-    public struct PlatformConfiguration: Sendable, Codable, Equatable, Hashable
-    {
+    public struct PlatformConfiguration: Sendable, Codable, Equatable, Hashable {
       public var label_type: LabelType
       public var label_until: DiscordTimestamp?
       public var release_phase: ReleasePhase
       public var omit_badge_from_surfaces: [String]
 
-      @UnstableEnum<UInt>
+      #if Non64BitSystemsCompatibility
+        @UnstableEnum<UInt64>
+      #else
+        @UnstableEnum<UInt>
+      #endif
       public enum LabelType: Sendable, Codable {
         case none  // 0
         case new  // 1
         case updated  // 2
-        case __undocumented(UInt)
+
+        #if Non64BitSystemsCompatibility
+          case __undocumented(UInt64)
+        #else
+          case __undocumented(UInt)
+        #endif
       }
 
       @UnstableEnum<String>

@@ -626,7 +626,7 @@ extension DiscordClient {
     let endpoint = UserAPIEndpoint.createRemoteAuthSession
     return try await self.send(request: .init(to: endpoint), payload: payload)
   }
-  
+
   /// Finishes a remote auth session. This ends the remote auth session by sending an authentication token to the desktop client.
   /// https://docs.discord.food/remote-authentication/mobile#finish-remote-auth
   @inlinable
@@ -636,7 +636,7 @@ extension DiscordClient {
     let endpoint = UserAPIEndpoint.finishRemoteAuthSession
     return try await self.send(request: .init(to: endpoint), payload: payload)
   }
-  
+
   /// Cancels a remote auth session. This ends the remote auth session without sending an authentication token.
   /// https://docs.discord.food/remote-authentication/mobile#cancel-remote-auth
   @inlinable
@@ -646,7 +646,7 @@ extension DiscordClient {
     let endpoint = UserAPIEndpoint.cancelRemoteAuthSession
     return try await self.send(request: .init(to: endpoint), payload: payload)
   }
-  
+
   /// Exchange a remote auth ticket for an encrypted authentication token.
   /// https://docs.discord.food/remote-authentication/mobile#cancel-remote-auth
   @inlinable

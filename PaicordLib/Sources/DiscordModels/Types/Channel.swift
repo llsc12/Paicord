@@ -7,7 +7,11 @@ public struct DiscordChannel: Sendable, Codable, Equatable, Hashable {
 
   /// https://discord.com/developers/docs/resources/message#channel-object-channel-types
   /// https://docs.discord.food/resources/message#channel-type
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum Kind: Sendable, Codable {
     case guildText  // 0
     case dm  // 1
@@ -23,18 +27,30 @@ public struct DiscordChannel: Sendable, Codable, Equatable, Hashable {
     case guildDirectory  // 14
     case guildForum  // 15
     case guildMedia  // 16
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   /// https://discord.com/developers/docs/resources/message#overwrite-object
   public struct Overwrite: Sendable, Codable, Equatable, Hashable {
 
     /// https://discord.com/developers/docs/resources/message#overwrite-object
-    @UnstableEnum<Int>
+    #if Non64BitSystemsCompatibility
+      @UnstableEnum<Int64>
+    #else
+      @UnstableEnum<Int>
+    #endif
     public enum Kind: Sendable, Codable {
       case role  // 0
       case member  // 1
-      case __undocumented(Int)
+      #if Non64BitSystemsCompatibility
+        case __undocumented(Int64)
+      #else
+        case __undocumented(Int)
+      #endif
     }
 
     public var id: AnySnowflake
@@ -44,25 +60,45 @@ public struct DiscordChannel: Sendable, Codable, Equatable, Hashable {
   }
 
   /// https://discord.com/developers/docs/resources/message#channel-object-sort-order-types
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum SortOrder: Sendable, Codable {
     case latestActivity  // 0
     case creationDate  // 1
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   /// https://discord.com/developers/docs/resources/message#channel-object-forum-layout-types
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum ForumLayout: Sendable, Codable {
     case notSet  // 0
     case listView  // 1
     case galleryView  // 2
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   /// https://discord.com/developers/docs/resources/message#channel-object-channel-flags
   /// https://docs.discord.food/resources/message#channel-flags
-  @UnstableEnum<UInt>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<UInt64>
+  #else
+    @UnstableEnum<UInt>
+  #endif
   public enum Flag: Sendable {
     case guildFeedRemoved  // 0
     case pinned  // 1
@@ -79,27 +115,48 @@ public struct DiscordChannel: Sendable, Codable, Equatable, Hashable {
     case isJoinRequestInterviewChannel  // 16
     case obfuscated  // 17
     case isModeratorReportChannel  // 19
-    case __undocumented(UInt)
+
+    #if Non64BitSystemsCompatibility
+      case __undocumented(UInt64)
+    #else
+      case __undocumented(UInt)
+    #endif
   }
 
   /// https://discord.com/developers/docs/resources/message#channel-object-video-quality-modes
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum VideoQualityMode: Sendable, Codable, Equatable {
     case auto  // 1
     case full  // 2
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   /// Not exactly documented, but they do mention these times in a few different places.
   /// Times are in minutes.
   /// https://discord.com/developers/docs/resources/message#channel-object-channel-structure
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum AutoArchiveDuration: Sendable, Codable {
     case oneHour  // 60
     case oneDay  // 1_440
     case threeDays  // 4_320
     case sevenDays  // 10_080
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   /// https://discord.com/developers/docs/resources/message#default-reaction-object-default-reaction-structure
@@ -257,11 +314,19 @@ extension DiscordChannel {
 
     /// https://discord.com/developers/docs/resources/message#message-reference-object-message-reference-structure
     public struct MessageReference: Sendable, Codable, Equatable, Hashable {
-      @UnstableEnum<Int>
+      #if Non64BitSystemsCompatibility
+        @UnstableEnum<Int64>
+      #else
+        @UnstableEnum<Int>
+      #endif
       public enum Kind: Sendable, Codable {
         case reply  // 0
         case forward  // 1
-        case __undocumented(Int)
+        #if Non64BitSystemsCompatibility
+          case __undocumented(Int64)
+        #else
+          case __undocumented(Int)
+        #endif
       }
 
       public var type: Kind
@@ -287,7 +352,11 @@ extension DiscordChannel {
 
     /// https://discord.com/developers/docs/resources/message#message-object-message-types
     /// https://docs.discord.food/resources/message#message-type
-    @UnstableEnum<Int>
+    #if Non64BitSystemsCompatibility
+      @UnstableEnum<Int64>
+    #else
+      @UnstableEnum<Int>
+    #endif
     public enum Kind: Sendable, Codable {
       case `default`  // 0
       case recipientAdd  // 1
@@ -346,11 +415,19 @@ extension DiscordChannel {
       case reportToModBanUser  // 61
       case reportToModClosedReport  // 62
       case emojiAdded  // 63
-      case __undocumented(Int)
+      #if Non64BitSystemsCompatibility
+        case __undocumented(Int64)
+      #else
+        case __undocumented(Int)
+      #endif
     }
 
     /// https://discord.com/developers/docs/resources/message#message-object-message-flags
-    @UnstableEnum<UInt>
+    #if Non64BitSystemsCompatibility
+      @UnstableEnum<UInt64>
+    #else
+      @UnstableEnum<UInt>
+    #endif
     public enum Flag: Sendable {
       case crossposted  // 0
       case isCrosspost  // 1
@@ -365,7 +442,12 @@ extension DiscordChannel {
       case isVoiceMessage  // 13
       case hasSnapshot  // 14
       case isComponentsV2  // 15
-      case __undocumented(UInt)
+
+      #if Non64BitSystemsCompatibility
+        case __undocumented(UInt64)
+      #else
+        case __undocumented(UInt)
+      #endif
     }
 
     /// https://discord.com/developers/docs/resources/message#channel-mention-object
@@ -416,10 +498,19 @@ extension DiscordChannel {
       }
 
       /// https://discord.com/developers/docs/resources/message#attachment-object-attachment-flags
-      @UnstableEnum<UInt>
+      #if Non64BitSystemsCompatibility
+        @UnstableEnum<UInt64>
+      #else
+        @UnstableEnum<UInt>
+      #endif
       public enum Flag: Sendable {
         case isRemix  // 2
-        case __undocumented(UInt)
+
+        #if Non64BitSystemsCompatibility
+          case __undocumented(UInt64)
+        #else
+          case __undocumented(UInt)
+        #endif
       }
 
       public var id: AttachmentSnowflake
@@ -535,13 +626,21 @@ extension DiscordChannel {
     public struct Activity: Sendable, Codable, Equatable, Hashable {
 
       /// https://discord.com/developers/docs/resources/message#message-object-message-activity-types
-      @UnstableEnum<Int>
+      #if Non64BitSystemsCompatibility
+        @UnstableEnum<Int64>
+      #else
+        @UnstableEnum<Int>
+      #endif
       public enum Kind: Sendable, Codable {
         case join  // 1
         case spectate  // 2
         case listen  // 3
         case joinRequest  // 5
-        case __undocumented(Int)
+        #if Non64BitSystemsCompatibility
+          case __undocumented(Int64)
+        #else
+          case __undocumented(Int)
+        #endif
       }
 
       public var type: Kind
@@ -554,8 +653,7 @@ extension DiscordChannel {
       public var id: InteractionSnowflake
       public var type: Interaction.Kind
       public var user: DiscordUser
-      public var authorizing_integration_owners:
-        [DiscordApplication.IntegrationKind: AnySnowflake]
+      public var authorizing_integration_owners: [DiscordApplication.IntegrationKind: AnySnowflake]
       public var original_response_message_id: MessageSnowflake?
       public var target_user: DiscordUser?
       public var target_message_id: MessageSnowflake?
@@ -777,13 +875,22 @@ public struct ThreadMember: Sendable, Codable, Equatable, Hashable {
   }
 
   /// https://docs.discord.food/resources/message#thread-member-flags
-  @UnstableEnum<UInt>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<UInt64>
+  #else
+    @UnstableEnum<UInt>
+  #endif
   public enum Flag: Sendable {
     case hasInteracted  // 0
     case allMessages  // 1
     case onlyMentions  // 2
     case noMessages  // 3
-    case __undocumented(UInt)
+
+    #if Non64BitSystemsCompatibility
+      case __undocumented(UInt64)
+    #else
+      case __undocumented(UInt)
+    #endif
   }
 }
 
@@ -799,12 +906,20 @@ public struct ThreadMemberWithMember: Sendable, Codable {
 
 /// Thread-related subset of `DiscordChannel.Kind`
 /// https://discord.com/developers/docs/resources/message#channel-object-channel-types
-@UnstableEnum<Int>
+#if Non64BitSystemsCompatibility
+  @UnstableEnum<Int64>
+#else
+  @UnstableEnum<Int>
+#endif
 public enum ThreadKind: Sendable, Codable {
   case announcementThread  // 10
   case publicThread  // 11
   case privateThread  // 12
-  case __undocumented(Int)
+  #if Non64BitSystemsCompatibility
+    case __undocumented(Int64)
+  #else
+    case __undocumented(Int)
+  #endif
 }
 
 extension DiscordChannel {
@@ -828,8 +943,7 @@ extension DiscordChannel {
 }
 
 /// https://discord.com/developers/docs/resources/message#embed-object
-public struct Embed: Sendable, Codable, Equatable, Hashable, ValidatablePayload
-{
+public struct Embed: Sendable, Codable, Equatable, Hashable, ValidatablePayload {
 
   /// https://discord.com/developers/docs/resources/message#embed-object-embed-types
   @UnstableEnum<String>
@@ -1131,20 +1245,38 @@ public struct ConversationSummary: Sendable, Codable {
   public var source: Source
   public var type: Kind
 
-  @UnstableEnum<UInt>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<UInt64>
+  #else
+    @UnstableEnum<UInt>
+  #endif
   public enum Source: Sendable, Codable {
     case source0  // 0
     case source1  // 1
     case source2  // 2
-    case __undocumented(UInt)
+
+    #if Non64BitSystemsCompatibility
+      case __undocumented(UInt64)
+    #else
+      case __undocumented(UInt)
+    #endif
   }
 
-  @UnstableEnum<UInt>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<UInt64>
+  #else
+    @UnstableEnum<UInt>
+  #endif
   public enum Kind: Sendable, Codable {
     case unset  // 0
     case source1  // 1
     case source2  // 2
     case unknown  // 3
-    case __undocumented(UInt)
+
+    #if Non64BitSystemsCompatibility
+      case __undocumented(UInt64)
+    #else
+      case __undocumented(UInt)
+    #endif
   }
 }

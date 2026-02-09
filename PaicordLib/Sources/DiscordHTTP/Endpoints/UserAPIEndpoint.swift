@@ -127,7 +127,7 @@ public enum UserAPIEndpoint: Endpoint {
     withMutualFriendsCount: Bool,
     guildId: GuildSnowflake?
   )
-  
+
   // MARK: - Remote Authentication
   case createRemoteAuthSession
   case finishRemoteAuthSession
@@ -199,7 +199,7 @@ public enum UserAPIEndpoint: Endpoint {
       .createUserInvite,
       .revokeUserInvites:
       suffix = "users/@me/invites"
-      
+
     // MARK: - Messages
     case .createAttachments(let channelId):
       suffix = "channels/\(channelId.rawValue)/attachments"
@@ -284,8 +284,8 @@ public enum UserAPIEndpoint: Endpoint {
       let queryString =
         queryItems.isEmpty ? "" : "?" + queryItems.joined(separator: "&")
       suffix = "users/\(userId.rawValue)/profile\(queryString)"
-      
-      // MARK: - Remote Authentication
+
+    // MARK: - Remote Authentication
     case .createRemoteAuthSession:
       suffix = "users/@me/remote-auth"
     case .finishRemoteAuthSession:
@@ -613,7 +613,7 @@ public enum UserAPIEndpoint: Endpoint {
     case .createRemoteAuthSession: return true
     case .finishRemoteAuthSession: return true
     case .cancelRemoteAuthSession: return true
-      case .exchangeRemoteAuthTicket: return false
+    case .exchangeRemoteAuthTicket: return false
     case .__DO_NOT_USE_THIS_CASE:
       fatalError(
         "If the case name wasn't already clear enough: '__DO_NOT_USE_THIS_CASE' MUST NOT be used"
@@ -729,8 +729,8 @@ public enum UserAPIEndpoint: Endpoint {
     case .getUserInvites: return 52
     case .createUserInvite: return 53
     case .revokeUserInvites: return 54
-    case .createAttachments: return  50
-    case .deleteAttachment: return  51
+    case .createAttachments: return 50
+    case .deleteAttachment: return 51
     case .getRelationships: return 55
     case .sendFriendRequest: return 56
     case .createRelationship: return 57

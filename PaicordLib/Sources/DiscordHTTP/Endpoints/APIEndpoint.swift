@@ -3596,8 +3596,9 @@ public enum APIEndpoint: Endpoint {
       return "updateOwnApplication"
     case .updateOwnUser:
       return "updateOwnUser"
-    case let .getVoiceState(guildId, userId):
-      return "getVoiceState(guildId.rawValue: \(guildId.rawValue), userId.rawValue: \(userId.rawValue))"
+    case .getVoiceState(let guildId, let userId):
+      return
+        "getVoiceState(guildId.rawValue: \(guildId.rawValue), userId.rawValue: \(userId.rawValue))"
     case .listGuildVoiceRegions(let guildId):
       return "listGuildVoiceRegions(guildId.rawValue: \(guildId.rawValue))"
     case .listVoiceRegions:

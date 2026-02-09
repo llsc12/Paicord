@@ -4,19 +4,32 @@ import Foundation
 public struct ApplicationCommand: Sendable, Codable {
 
   /// https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-types
-  @UnstableEnum<UInt>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<UInt64>
+  #else
+    @UnstableEnum<UInt>
+  #endif
   public enum Kind: Sendable, Codable {
     case chatInput  // 1
     case user  // 2
     case message  // 3
-    case __undocumented(UInt)
+
+    #if Non64BitSystemsCompatibility
+      case __undocumented(UInt64)
+    #else
+      case __undocumented(UInt)
+    #endif
   }
 
   /// https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
   public struct Option: Sendable, Codable, ValidatablePayload {
 
     /// https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type
-    @UnstableEnum<UInt>
+    #if Non64BitSystemsCompatibility
+      @UnstableEnum<UInt64>
+    #else
+      @UnstableEnum<UInt>
+    #endif
     public enum Kind: Sendable, Codable {
       case subCommand  // 1
       case subCommandGroup  // 2
@@ -29,7 +42,12 @@ public struct ApplicationCommand: Sendable, Codable {
       case mentionable  // 9
       case number  // 10
       case attachment  // 11
-      case __undocumented(UInt)
+
+      #if Non64BitSystemsCompatibility
+        case __undocumented(UInt64)
+      #else
+        case __undocumented(UInt)
+      #endif
     }
 
     /// https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure
@@ -202,12 +220,20 @@ public struct GuildApplicationCommandPermissions: Sendable, Codable {
   public struct Permission: Sendable, Codable {
 
     /// https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permission-type
-    @UnstableEnum<Int>
+    #if Non64BitSystemsCompatibility
+      @UnstableEnum<Int64>
+    #else
+      @UnstableEnum<Int>
+    #endif
     public enum Kind: Sendable, Codable {
       case role  // 1
       case user  // 2
       case channel  // 3
-      case __undocumented(Int)
+      #if Non64BitSystemsCompatibility
+        case __undocumented(Int64)
+      #else
+        case __undocumented(Int)
+      #endif
     }
 
     public var type: Kind

@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.2
 
 import CompilerPluginSupport
 import PackageDescription
@@ -40,6 +40,9 @@ let package = Package(
       name: "DiscordAuth",
       targets: ["DiscordAuth"]
     ),
+  ],
+  traits: [
+    "Non64BitSystemsCompatibility"
   ],
   dependencies: [
     .package(url: "https://github.com/apple/swift-nio.git", from: "2.49.0"),
