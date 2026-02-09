@@ -216,13 +216,11 @@ public actor UserGatewayManager: GatewayManager {
     let queries: [(String, String)] = [
       ("v", "\(DiscordGlobalConfiguration.apiVersion)"),
       ("encoding", "json"),
-      ("compress", "zlib-stream"),
+      ("compress", "zstd-stream"),
     ]
-    let decompressorWSExtension: ZlibDecompressorWSExtension
+    let decompressorWSExtension: ZstdDecompressorWSExtension
     do {
-      decompressorWSExtension = try ZlibDecompressorWSExtension(
-        logger: self.logger
-      )
+      decompressorWSExtension = try ZstdDecompressorWSExtension(logger: self.logger)
     } catch {
       self.logger.critical(
         "Will not connect because can't create a decompressor. Something is wrong. Please report this failure at https://github.com/DiscordBM/DiscordBM/issues",
