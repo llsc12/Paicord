@@ -10,7 +10,11 @@
 /// https://docs.discord.food/resources/relationships#relationship-object
 public struct DiscordRelationship: Sendable, Codable {
 
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum Kind: Sendable, Codable {
     case none  // 0
     case friend  // 1
@@ -18,7 +22,11 @@ public struct DiscordRelationship: Sendable, Codable {
     case incomingRequest  // 3
     case outgoingRequest  // 4
     case implicit  // 5
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
 
     /// Used for query params, all caps with underscores. fatalError for undocumented
     public var queryString: String {
@@ -59,10 +67,19 @@ public struct FriendSuggestion: Sendable, Codable {
     //		public var platform: // FIXME: Needs type (string enum of services)
     public var name: String
 
-    @UnstableEnum<UInt>
+    #if Non64BitSystemsCompatibility
+      @UnstableEnum<UInt64>
+    #else
+      @UnstableEnum<UInt>
+    #endif
     public enum Kind: Sendable, Codable {
       case externalFriend  // 1
-      case __undocumented(UInt)
+
+      #if Non64BitSystemsCompatibility
+        case __undocumented(UInt64)
+      #else
+        case __undocumented(UInt)
+      #endif
     }
   }
 }

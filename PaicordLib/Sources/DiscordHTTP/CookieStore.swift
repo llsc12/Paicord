@@ -42,7 +42,7 @@ actor CookieStore {
       }
     }
   }
-  
+
   func checkIncomingHeaders(_ headers: [String: String]) {
     for (key, value) in headers where key.lowercased() == "set-cookie" {
       if let cookie = parseSetCookie(value) {

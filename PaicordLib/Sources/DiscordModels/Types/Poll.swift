@@ -42,10 +42,18 @@ public struct Poll: Sendable, Codable, Equatable, Hashable {
   }
 
   /// https://discord.com/developers/docs/resources/poll#layout-type
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum LayoutKind: Sendable, Codable {
     case `default`  // 1
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   /// https://discord.com/developers/docs/resources/poll#poll-results-object-poll-results-object-structure

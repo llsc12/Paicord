@@ -133,8 +133,7 @@ public actor RemoteAuthGatewayManager {
   //MARK: Event streams
   var eventsStreamContinuations: [AsyncStream<RemoteAuthPayload>.Continuation] =
     []
-  var eventsParseFailureContinuations:
-    [AsyncStream<(any Error, ByteBuffer)>.Continuation] = []
+  var eventsParseFailureContinuations: [AsyncStream<(any Error, ByteBuffer)>.Continuation] = []
 
   /// An async sequence of Gateway events.
   public var events: DiscordAsyncSequence<RemoteAuthPayload> {
@@ -282,8 +281,7 @@ public actor RemoteAuthGatewayManager {
           )
           await self.onSuccessfulConnection()
 
-          for try await message in inbound.messages(maxSize: self.maxFrameSize)
-          {
+          for try await message in inbound.messages(maxSize: self.maxFrameSize) {
             await self.processBinaryData(
               message,
               forConnectionWithId: connectionId

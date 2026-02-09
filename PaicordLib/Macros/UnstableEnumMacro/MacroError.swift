@@ -16,6 +16,11 @@ enum MacroError: String, Error {
   case couldNotFindLocationOfNode
   case lastCaseMustBe__undocumented
   case unexpectedSyntaxInLexicalContext
+  case expectedExactly2ClausesInIfConfigClause
+  case expectedEnumDeclSyntaxesInIfConfigClause
+  case expectedTheUndocumentedEnumInIfConfigEnumDecl
+  case invalidRawValueTypeInIfConfigClause
+  case noCasesMatchTheRawValueTypeInIfConfigClause
 }
 
 extension MacroError: DiagnosticMessage {

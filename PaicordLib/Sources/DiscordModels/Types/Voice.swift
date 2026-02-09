@@ -123,12 +123,20 @@ public struct VoiceStateUpdate: Sendable, Codable {
   }
 
   /// https://docs.discord.food/topics/voice-connections#voice-flags
-  @UnstableEnum<UInt>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<UInt64>
+  #else
+    @UnstableEnum<UInt>
+  #endif
   public enum Flags: Sendable {
     case clipsEnabled  // 0
     case allowVoiceRecording  // 1
     case allowAnyViewerClips  // 2
 
-    case __undocumented(UInt)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(UInt64)
+    #else
+      case __undocumented(UInt)
+    #endif
   }
 }

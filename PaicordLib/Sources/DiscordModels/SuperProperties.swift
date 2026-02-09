@@ -101,8 +101,7 @@ public enum SuperProperties {
   nonisolated(unsafe) private static
     var _client_heartbeat_session_id_last_generated: Date = Date
       .distantPast
-  nonisolated(unsafe) private static var _client_heartbeat_session_id_cached:
-    UUID? = nil
+  nonisolated(unsafe) private static var _client_heartbeat_session_id_cached: UUID? = nil
   static var _client_heartbeat_session_id: UUID {
     let now = Date.now
     if now.timeIntervalSince(_client_heartbeat_session_id_last_generated)
