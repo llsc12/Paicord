@@ -7,3 +7,4 @@ target
 Package.resolved
 **/xcuserdata/
 **/*.xcuserstate
+/PaicordKt/.idea
