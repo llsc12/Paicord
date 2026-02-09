@@ -234,6 +234,7 @@ public struct Interaction: Sendable, Codable {
   public struct ModalSubmit: Sendable, Codable {
     public var custom_id: String
     public var components: [ActionRow]
+    public var resolved: Interaction.ApplicationCommand.ResolvedData?
   }
 
   /// https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data

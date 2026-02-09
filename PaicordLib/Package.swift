@@ -1,4 +1,4 @@
-// swift-tools-version: 5.10
+// swift-tools-version: 6.0
 
 import CompilerPluginSupport
 import PackageDescription
@@ -111,7 +111,7 @@ let package = Package(
         .target(name: "DiscordHTTP"),
         .product(name: "Crypto", package: "swift-crypto"),
         .product(name: "_CryptoExtras", package: "swift-crypto"),
-],
+      ],
       swiftSettings: swiftSettings
     ),
     .target(
@@ -217,33 +217,11 @@ var featureFlags: [SwiftSetting] {
   [
     /// https://github.com/apple/swift-evolution/blob/main/proposals/0335-existential-any.md
     /// Require `any` for existential types.
-    .enableUpcomingFeature("ExistentialAny"),
-
-    /// https://github.com/apple/swift-evolution/blob/main/proposals/0274-magic-file.md
-    /// Nicer `#file`.
-    .enableUpcomingFeature("ConciseMagicFile"),
-
-    /// https://github.com/apple/swift-evolution/blob/main/proposals/0286-forward-scan-trailing-closures.md
-    /// This one shouldn't do much to be honest, but shouldn't hurt as well.
-    .enableUpcomingFeature("ForwardTrailingClosures"),
-
-    /// https://github.com/apple/swift-evolution/blob/main/proposals/0354-regex-literals.md
-    /// `BareSlashRegexLiterals` not enabled since we don't use regex anywhere.
-
-    /// https://github.com/apple/swift-evolution/blob/main/proposals/0384-importing-forward-declared-objc-interfaces-and-protocols.md
-    /// `ImportObjcForwardDeclarations` not enabled because it's objc-related.
-  ]
-}
-
-var experimentalFeatureFlags: [SwiftSetting] {
-  [
-    /// `DiscordBM` passes the `complete` level.
-    ///
-    /// `minimal` / `targeted` / `complete`
-    .enableExperimentalFeature("StrictConcurrency=complete")
+    .enableUpcomingFeature("ExistentialAny")
+    //		.define("DISCORDBM_ENABLE_LOGGING_DURING_DECODE", .when(configuration: .debug)),
   ]
 }
 
 var swiftSettings: [SwiftSetting] {
-  featureFlags + experimentalFeatureFlags
+  featureFlags
 }
