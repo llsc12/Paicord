@@ -1,7 +1,7 @@
 import AsyncHTTPClient
 import Atomics
 import Foundation
-import Logging
+import SkipFuse
 import XCTest
 
 @testable import DiscordGateway

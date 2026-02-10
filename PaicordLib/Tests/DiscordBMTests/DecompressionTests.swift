@@ -1,4 +1,4 @@
-import Logging
+import SkipFuse
 import NIOCore
 import NIOWebSocket
 import XCTest

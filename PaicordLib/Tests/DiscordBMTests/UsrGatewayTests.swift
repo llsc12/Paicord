@@ -6,7 +6,7 @@
 // Copyright © 2025 Lakhan Lothiyi.
 //
 
-import Logging
+import SkipFuse
 import PaicordLib
 import XCTest
 

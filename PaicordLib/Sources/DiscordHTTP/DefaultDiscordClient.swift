@@ -2,7 +2,7 @@ import AsyncHTTPClient
 import Atomics
 import DiscordModels
 import Foundation
-import Logging
+import SkipFuse
 import NIOCore
 import NIOFoundationCompat
 import NIOHTTP1

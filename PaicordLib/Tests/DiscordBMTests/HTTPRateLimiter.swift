@@ -1,4 +1,4 @@
-import Logging
+import SkipFuse
 import NIOHTTP1
 import XCTest
 

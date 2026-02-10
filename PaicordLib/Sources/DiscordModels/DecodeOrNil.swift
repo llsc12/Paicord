@@ -1,9 +1,9 @@
-import Foundation
+import SkipFoundation
 
 /// Decodes values, or `nil` if the decode fails.
-@_spi(UserInstallableApps)
+// SKIP @nobridge
 @propertyWrapper
-public struct DecodeOrNil<C> where C: Codable {
+package struct DecodeOrNil<C> where C: Codable {
   public var wrappedValue: C?
 
   public init(wrappedValue: C? = nil) {
@@ -11,7 +11,7 @@ public struct DecodeOrNil<C> where C: Codable {
   }
 }
 
-@_spi(UserInstallableApps)
+// SKIP @nobridge
 extension DecodeOrNil: Codable {
   public init(from decoder: any Decoder) throws {
     let container = try decoder.singleValueContainer()
@@ -23,38 +23,34 @@ extension DecodeOrNil: Codable {
     try container.encode(self.wrappedValue)
   }
 }
-
+// SKIP @nobridge
 extension DecodeOrNil: Equatable where C: Equatable {}
-
+// SKIP @nobridge
 extension DecodeOrNil: Hashable where C: Hashable {
-  public func hash(into hasher: inout Hasher) {
+  package func hash(into hasher: inout Hasher) {
     hasher.combine(self.wrappedValue)
   }
 }
-
-@_spi(UserInstallableApps)
+// SKIP @nobridge
 extension KeyedDecodingContainer {
-  public func decode<C>(
+  package func decode<C>(
     _ type: DecodeOrNil<C>.Type,
     forKey key: Key
   ) throws -> DecodeOrNil<C> where C: Codable {
     (try? self.decodeIfPresent(type, forKey: key)) ?? .init(wrappedValue: nil)
   }
 }
-
-@_spi(UserInstallableApps)
+// SKIP @nobridge
 extension DecodeOrNil: CustomStringConvertible {
   public var description: String {
     String(describing: self.wrappedValue)
   }
 }
-
-@_spi(UserInstallableApps)
+// SKIP @nobridge
 extension DecodeOrNil: CustomDebugStringConvertible {
   public var debugDescription: String {
     String(reflecting: self.wrappedValue)
   }
 }
-
-@_spi(UserInstallableApps)
+// SKIP @nobridge
 extension DecodeOrNil: Sendable where C: Sendable {}

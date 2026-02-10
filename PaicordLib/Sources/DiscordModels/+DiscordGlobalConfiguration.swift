@@ -1,4 +1,4 @@
-import Logging
+import SkipFuse
 
 /// The point of this storage is to disable Sendable warnings when using
 /// `-strict-concurrency=complete`
@@ -11,7 +11,7 @@ private class ConfigurationStorage: @unchecked Sendable {
 extension DiscordGlobalConfiguration {
   /// Global rate-limit for requests per second.
   /// 50 by default, but you can ask Discord for a raise.
-  public static var globalRateLimit: Int {
+  package static var globalRateLimit: Int {
     get { ConfigurationStorage.shared.globalRateLimit }
     set { ConfigurationStorage.shared.globalRateLimit = newValue }
   }
@@ -27,7 +27,7 @@ extension DiscordGlobalConfiguration {
       logger[metadataKey: "tag"] = "decode-logger"
       return logger
     #else
-      return Logger(label: label, factory: SwiftLogNoOpLogHandler.init)
+    return Logger.init(subsystem: "PaicordLib", category: label)
     #endif
   }
 }

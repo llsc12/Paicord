@@ -8,3 +8,4 @@ Package.resolved
 **/xcuserdata/
 **/*.xcuserstate
 /PaicordKt/.idea
+*.aar

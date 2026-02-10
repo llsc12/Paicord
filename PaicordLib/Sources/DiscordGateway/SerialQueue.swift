@@ -1,5 +1,5 @@
 import Foundation
-import Logging
+import SkipFuse
 import NIOCore
 
 actor SerialQueue {

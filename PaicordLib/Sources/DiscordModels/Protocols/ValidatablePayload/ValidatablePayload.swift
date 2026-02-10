@@ -183,7 +183,7 @@ extension ValidatablePayload {
 
 // MARK: - +Array
 extension Array: ValidatablePayload where Element: ValidatablePayload {
-  public func validate() -> [ValidationFailure] {
+  package func validate() -> [ValidationFailure] {
     for element in self {
       element.validate()
     }

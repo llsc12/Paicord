@@ -1,5 +1,5 @@
 import DiscordModels
-import Logging
+import SkipFuse
 
 /// Convenience protocol for handling gateway payloads.
 ///

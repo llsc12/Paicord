@@ -2,129 +2,129 @@ import Foundation
 import MultipartKit
 import NIOCore
 
-/// Note: you need to use a custom `CodingKeys` on conforming types to exclude
-/// this `files` field from Codable decode/encodes.
-public protocol MultipartEncodable: Encodable {
-  /// The files to be uploaded.
-  var files: [RawFile]? { get }
-  /// Encode the exact value of `Self`.
-  /// By default, DiscordBM encodes the `files` as one field,
-  /// and the rest of the payload as a `payload_json` field, which is what Discord asks.
-  /// However, very few endpoints don't accept that approach.
-  /// Payloads that set this to `true` mustn't specify `CodingKeys`
-  /// to exclude the `files` from `Codable`.
-  static var rawEncodable: Bool { get }
-}
-
-extension MultipartEncodable {
-  /// Default to `false` since that's what 99+ % need.
-  public static var rawEncodable: Bool { false }
-}
-
-/// `RawFile` is _mostly_ copy-pasted from Vapor's `File` :)
-
-public struct RawFile: Sendable, Encodable, MultipartPartConvertible, Hashable {
-  /// Name of the file, including extension.
-  public var filename: String
-
-  /// The file's data.
-  public var data: ByteBuffer
-
-  /// The file extension, if it has one.
-  public var `extension`: String? {
-    let parts = self.filename.split(separator: ".")
-    if parts.count > 1 {
-      return parts.last.map(String.init)
-    } else {
-      return nil
-    }
-  }
-
-  public var type: String? {
-    if let ext = self.extension,
-      let (type, subType) = fileExtensionMediaTypeMapping[ext]
-    {
-      return "\(type)/\(subType)"
-    } else {
-      return nil
-    }
-  }
-
-  enum CodingKeys: String, CodingKey {
-    case data
-    case filename
-  }
-
-  /// `Encodable` conformance.
-  public func encode(to encoder: any Encoder) throws {
-    var container = encoder.container(keyedBy: CodingKeys.self)
-    let data = Data(buffer: self.data)
-    try container.encode(data, forKey: .data)
-    try container.encode(self.filename, forKey: .filename)
-  }
-
-  /// Creates a new `File`.
-  ///
-  ///     let file = File(data: "hello", filename: "foo.txt")
-  ///
-  /// - parameters:
-  ///     - data: The file's contents.
-  ///     - filename: The name of the file **including extension**.
-  public init(data: ByteBuffer, filename: String) {
-    self.data = data
-    self.filename = filename
-  }
-
-  /// - Parameters:
-  ///   - data: The file's contents.
-  ///   - nameNoExtension: The file's name without the extension.
-  ///   - contentType: The content type header containing the file's extension.
-  public init(data: ByteBuffer, nameNoExtension: String, contentType: String) {
-    self.data = data
-    let format =
-      fileExtensionMediaTypeMapping.first(where: {
-        "\($0.value.0)/\($0.value.1)" == contentType
-      })
-      ?? fileExtensionMediaTypeMapping.first(where: {
-        $0.key == contentType
-      })
-    let `extension` = format.map({ ".\($0.key)" }) ?? ""
-    self.filename = nameNoExtension + `extension`
-  }
-
-  public var multipart: MultipartPart? {
-    var part = MultipartPart(headers: [:], body: self.data)
-    if let type {
-      part.headers.add(name: "Content-Type", value: type)
-    }
-    part.headers.add(
-      name: "Content-Disposition",
-      value: #"form-data; filename="\#(self.filename)""#
-    )
-    return part
-  }
-
-  public init?(multipart: MultipartPart) {
-    if let header = multipart.headers.first(name: "Content-Disposition") {
-      let parts = header.split(separator: ";").compactMap {
-        part -> (key: Substring, value: Substring)? in
-        let part = part.trimmingPrefix(" ")
-        let split = part.split(separator: "=")
-        guard split.count == 2 else { return nil }
-        return (split[0], split[1])
-      }
-      let filename = parts.first(where: { ["filename", "filename*"].contains($0.key) })
-      if let filename {
-        self.filename = String(filename.value)
-      } else {
-        return nil
-      }
-    } else {
-      return nil
-    }
-    self.data = multipart.body
-  }
-}
+///// Note: you need to use a custom `CodingKeys` on conforming types to exclude
+///// this `files` field from Codable decode/encodes.
+//public protocol MultipartEncodable: Encodable {
+//  /// The files to be uploaded.
+//  var files: [RawFile]? { get }
+//  /// Encode the exact value of `Self`.
+//  /// By default, DiscordBM encodes the `files` as one field,
+//  /// and the rest of the payload as a `payload_json` field, which is what Discord asks.
+//  /// However, very few endpoints don't accept that approach.
+//  /// Payloads that set this to `true` mustn't specify `CodingKeys`
+//  /// to exclude the `files` from `Codable`.
+//  static var rawEncodable: Bool { get }
+//}
+//
+//extension MultipartEncodable {
+//  /// Default to `false` since that's what 99+ % need.
+//  public static var rawEncodable: Bool { false }
+//}
+//
+///// `RawFile` is _mostly_ copy-pasted from Vapor's `File` :)
+//
+//public struct RawFile: Sendable, Encodable, MultipartPartConvertible, Hashable {
+//  /// Name of the file, including extension.
+//  public var filename: String
+//
+//  /// The file's data.
+//  public var data: ByteBuffer
+//
+//  /// The file extension, if it has one.
+//  public var `extension`: String? {
+//    let parts = self.filename.split(separator: ".")
+//    if parts.count > 1 {
+//      return parts.last.map(String.init)
+//    } else {
+//      return nil
+//    }
+//  }
+//
+//  public var type: String? {
+//    if let ext = self.extension,
+//      let (type, subType) = fileExtensionMediaTypeMapping[ext]
+//    {
+//      return "\(type)/\(subType)"
+//    } else {
+//      return nil
+//    }
+//  }
+//
+//  enum CodingKeys: String, CodingKey {
+//    case data
+//    case filename
+//  }
+//
+//  /// `Encodable` conformance.
+//  public func encode(to encoder: any Encoder) throws {
+//    var container = encoder.container(keyedBy: CodingKeys.self)
+//    let data = Data(buffer: self.data)
+//    try container.encode(data, forKey: .data)
+//    try container.encode(self.filename, forKey: .filename)
+//  }
+//
+//  /// Creates a new `File`.
+//  ///
+//  ///     let file = File(data: "hello", filename: "foo.txt")
+//  ///
+//  /// - parameters:
+//  ///     - data: The file's contents.
+//  ///     - filename: The name of the file **including extension**.
+//  public init(data: ByteBuffer, filename: String) {
+//    self.data = data
+//    self.filename = filename
+//  }
+//
+//  /// - Parameters:
+//  ///   - data: The file's contents.
+//  ///   - nameNoExtension: The file's name without the extension.
+//  ///   - contentType: The content type header containing the file's extension.
+//  public init(data: ByteBuffer, nameNoExtension: String, contentType: String) {
+//    self.data = data
+//    let format =
+//      fileExtensionMediaTypeMapping.first(where: {
+//        "\($0.value.0)/\($0.value.1)" == contentType
+//      })
+//      ?? fileExtensionMediaTypeMapping.first(where: {
+//        $0.key == contentType
+//      })
+//    let `extension` = format.map({ ".\($0.key)" }) ?? ""
+//    self.filename = nameNoExtension + `extension`
+//  }
+//
+//  public var multipart: MultipartPart? {
+//    var part = MultipartPart(headers: [:], body: self.data)
+//    if let type {
+//      part.headers.add(name: "Content-Type", value: type)
+//    }
+//    part.headers.add(
+//      name: "Content-Disposition",
+//      value: #"form-data; filename="\#(self.filename)""#
+//    )
+//    return part
+//  }
+//
+//  public init?(multipart: MultipartPart) {
+//    if let header = multipart.headers.first(name: "Content-Disposition") {
+//      let parts = header.split(separator: ";").compactMap {
+//        part -> (key: Substring, value: Substring)? in
+//        let part = part.trimmingPrefix(" ")
+//        let split = part.split(separator: "=")
+//        guard split.count == 2 else { return nil }
+//        return (split[0], split[1])
+//      }
+//      let filename = parts.first(where: { ["filename", "filename*"].contains($0.key) })
+//      if let filename {
+//        self.filename = String(filename.value)
+//      } else {
+//        return nil
+//      }
+//    } else {
+//      return nil
+//    }
+//    self.data = multipart.body
+//  }
+//}
 
 let fileExtensionMediaTypeMapping: [String: (String, String)] = [
   "ez": ("application", "andrew-inset"),

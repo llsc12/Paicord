@@ -12,7 +12,7 @@ import Crypto
 import DiscordHTTP
 import DiscordModels
 import Foundation
-import Logging
+import SkipFuse
 import NIO
 import NIOSSL
 import WSClient
@@ -186,9 +186,6 @@ public actor RemoteAuthGatewayManager {
     var logger = DiscordGlobalConfiguration.makeLogger(
       "RemoteAuthGatewayManager"
     )
-    logger[metadataKey: "gateway-id"] = .string(
-      "\(Self.idGenerator.wrappingIncrementThenLoad(ordering: .relaxed))"
-    )
     self.logger = logger
   }
 
@@ -219,23 +216,13 @@ public actor RemoteAuthGatewayManager {
     logger.debug("Connect method triggered")
     /// Guard we're attempting to connect too fast
     if let connectIn = connectionBackoff.canPerformIn() {
-      logger.warning(
-        "Cannot try to connect immediately due to backoff",
-        metadata: [
-          "wait-time": .stringConvertible(connectIn)
-        ]
-      )
+      logger.warning("Cannot try to connect immediately due to backoff, wait-time: \(connectIn)")
       try? await Task.sleep(for: connectIn)
     }
     /// Guard if other connections are in process
     let state = self.state.load(ordering: .relaxed)
     guard [.noConnection, .configured, .stopped].contains(state) else {
-      logger.error(
-        "Gateway state doesn't allow a new connection",
-        metadata: [
-          "state": .stringConvertible(state)
-        ]
-      )
+      logger.error("Gateway state doesn't allow a new connection, state: \(state)")
       return
     }
     self.state.store(.connecting, ordering: .relaxed)
@@ -273,7 +260,7 @@ public actor RemoteAuthGatewayManager {
           url: gatewayURL + queries.makeForURLQuery(),
           configuration: configuration,
           eventLoopGroup: self.eventLoopGroup,
-          logger: self.logger
+          logger: .init(label: "remoteauth-gw")
         ) { inbound, outbound, context in
           await self.setupOutboundWriter(outbound)
 
@@ -291,30 +278,13 @@ public actor RemoteAuthGatewayManager {
           }
         }
 
-        logger.debug(
-          "web-socket connection closed",
-          metadata: [
-            "closeCode": .string(String(reflecting: closeFrame?.closeCode)),
-            "closeReason": .string(String(reflecting: closeFrame?.reason)),
-            "connectionId": .stringConvertible(
-              self.connectionId.load(ordering: .relaxed)
-            ),
-          ]
-        )
+        logger.debug("web-socket connection closed, id: \(self.connectionId.load(ordering: .relaxed)), closeCode: \(String(reflecting: closeFrame?.closeCode)), reason: \(String(reflecting: closeFrame?.reason))",)
         await self.onClose(
           closeReason: .closeFrame(closeFrame),
           forConnectionWithId: connectionId
         )
       } catch {
-        logger.debug(
-          "web-socket error while connecting to Remote Auth Gateway. Will try again",
-          metadata: [
-            "error": .string(String(reflecting: error)),
-            "connectionId": .stringConvertible(
-              self.connectionId.load(ordering: .relaxed)
-            ),
-          ]
-        )
+        logger.debug( "web-socket error while connecting to Remote Auth Gateway. Will try again, id: \(self.connectionId.load(ordering: .relaxed)), error: \(String(reflecting: error))")
         self.state.store(.noConnection, ordering: .relaxed)
         self.stateCallback?(.noConnection)
         await self.onClose(
@@ -364,23 +334,25 @@ public actor RemoteAuthGatewayManager {
   /// Disconnects from Discord.
   /// Doesn't end the event streams.
   public func disconnect() async {
-    logger.debug(
-      "Will disconnect",
-      metadata: [
-        "connectionId": .stringConvertible(
-          self.connectionId.load(ordering: .relaxed)
-        )
-      ]
-    )
+//    logger.debug(
+//      "Will disconnect",
+//      metadata: [
+//        "connectionId": .stringConvertible(
+//          self.connectionId.load(ordering: .relaxed)
+//        )
+//      ]
+//    )
+    logger.debug("Will disconnect, id: \(self.connectionId.load(ordering: .relaxed))")
     if self.state.load(ordering: .relaxed) == .stopped {
-      logger.debug(
-        "Already disconnected",
-        metadata: [
-          "connectionId": .stringConvertible(
-            self.connectionId.load(ordering: .relaxed)
-          )
-        ]
-      )
+//      logger.debug(
+//        "Already disconnected",
+//        metadata: [
+//          "connectionId": .stringConvertible(
+//            self.connectionId.load(ordering: .relaxed)
+//          )
+//        ]
+//      )
+      logger.debug("Already disconnected, id: \(self.connectionId.load(ordering: .relaxed))")
       return
     }
     self.connectionId.wrappingIncrement(ordering: .relaxed)
@@ -425,12 +397,13 @@ extension RemoteAuthGatewayManager {
       ).replacingOccurrences(of: "=", with: "")
         .replacingOccurrences(of: "+", with: "-")
         .replacingOccurrences(of: "/", with: "_")
-      self.logger.debug(
-        "Sending nonce_proof",
-        metadata: [
-          "nonce_proof": .string(nonceProof)
-        ]
-      )
+//      self.logger.debug(
+//        "Sending nonce_proof",
+//        metadata: [
+//          "nonce_proof": .string(nonceProof)
+//        ]
+//      )
+      logger.debug("Sending nonce_proof, nonce_proof: \(nonceProof)")
       self.sendNonceProof(nonce: nonceProof)
     case .`init`: break
     default: break
@@ -448,20 +421,8 @@ extension RemoteAuthGatewayManager {
     let buffer: ByteBuffer
     switch message {
     case .text(let string):
-      self.logger.debug(
-        "Got text from websocket",
-        metadata: [
-          "text": .string(string)
-        ]
-      )
       buffer = ByteBuffer(string: string)
     case .binary(let _buffer):
-      self.logger.debug(
-        "Got binary from websocket",
-        metadata: [
-          "text": .string(String(buffer: _buffer))
-        ]
-      )
       buffer = _buffer
     }
 
@@ -470,13 +431,14 @@ extension RemoteAuthGatewayManager {
         RemoteAuthPayload.self,
         from: Data(buffer: buffer, byteTransferStrategy: .noCopy)
       )
-      self.logger.debug(
-        "Decoded remote-auth event",
-        metadata: [
-          "event": .string("\(event)"),
-          "op": .string(event.op.rawValue),
-        ]
-      )
+//      self.logger.debug(
+//        "Decoded remote-auth event",
+//        metadata: [
+//          "event": .string("\(event)"),
+//          "op": .string(event.op.rawValue),
+//        ]
+//      )
+      logger.debug("Decoded remote-auth event, op: \(event.op.rawValue), event: \(event)")
 
       // If we have an encrypted user payload and our private key exists,
       // attempt to decrypt and populate `user_payload`.
@@ -518,12 +480,7 @@ extension RemoteAuthGatewayManager {
         continuation.yield(event)
       }
     } catch {
-      self.logger.debug(
-        "Failed to decode remote-auth event",
-        metadata: [
-          "error": .string("\(error)")
-        ]
-      )
+      self.logger.debug("Failed to decode remote-auth event, error: \(error)")
       for continuation in self.eventsParseFailureContinuations {
         continuation.yield((error, buffer))
       }
@@ -547,27 +504,39 @@ extension RemoteAuthGatewayManager {
     let isDebugLevelCode = [nil, .goingAway, .unexpectedServerError].contains(
       code
     )
-    self.logger.log(
-      level: isDebugLevelCode ? .debug : .warning,
-      "Received connection close notification. Will try to reconnect",
-      metadata: [
-        "code": .string(codeDesc),
-        "closedConnectionId": .stringConvertible(
-          self.connectionId.load(ordering: .relaxed)
-        ),
-      ]
-    )
+//    self.logger.log(
+//      level: isDebugLevelCode ? .debug : .warning,
+//      "Received connection close notification. Will try to reconnect",
+//      metadata: [
+//        "code": .string(codeDesc),
+//        "closedConnectionId": .stringConvertible(
+//          self.connectionId.load(ordering: .relaxed)
+//        ),
+//      ]
+//    )
+    if isDebugLevelCode {
+      logger.debug(
+        "Received connection close notification. Will try to reconnect, code: \(codeDesc), id: \(self.connectionId.load(ordering: .relaxed))"
+      )
+    } else {
+      logger.warning(
+        "Received connection close notification. Will try to reconnect, code: \(codeDesc), id: \(self.connectionId.load(ordering: .relaxed))"
+      )
+    }
     if self.canTryReconnect(code: code) {
       self.state.store(.noConnection, ordering: .relaxed)
       self.stateCallback?(.noConnection)
-      self.logger.trace(
-        "Will try reconnect since gateway allows it.",
-        metadata: [
-          "code": .string(codeDesc),
-          "closedConnectionId": .stringConvertible(
-            self.connectionId.load(ordering: .relaxed)
-          ),
-        ]
+//      self.logger.trace(
+//        "Will try reconnect since gateway allows it.",
+//        metadata: [
+//          "code": .string(codeDesc),
+//          "closedConnectionId": .stringConvertible(
+//            self.connectionId.load(ordering: .relaxed)
+//          ),
+//        ]
+//      )
+      logger.debug(
+        "Will try reconnect since gateway allows it, code: \(codeDesc), id: \(self.connectionId.load(ordering: .relaxed))"
       )
       await self.connect()
     } else {
@@ -628,19 +597,25 @@ extension RemoteAuthGatewayManager {
     Task {
       try? await Task.sleep(for: duration)
       guard self.connectionId.load(ordering: .relaxed) == connectionId else {
-        self.logger.trace(
-          "Canceled a ping task",
-          metadata: [
-            "connectionId": .stringConvertible(connectionId)
-          ]
+//        self.logger.trace(
+//          "Canceled a ping task",
+//          metadata: [
+//            "connectionId": .stringConvertible(connectionId)
+//          ]
+//        )
+        logger.trace(
+          "Canceled a ping task, id: \(connectionId)"
         )
         return/// cancel
       }
-      self.logger.debug(
-        "Will send automatic ping",
-        metadata: [
-          "connectionId": .stringConvertible(connectionId)
-        ]
+//      self.logger.debug(
+//        "Will send automatic ping",
+//        metadata: [
+//          "connectionId": .stringConvertible(connectionId)
+//        ]
+//      )
+      logger.debug(
+        "Will send automatic ping, id: \(connectionId)"
       )
       self.sendHeartbeat()
       self.setupPingTask(forConnectionWithId: connectionId, every: duration)
@@ -648,11 +623,14 @@ extension RemoteAuthGatewayManager {
   }
 
   private func sendPing(forConnectionWithId connectionId: UInt) {
+//    logger.trace(
+//      "Will ping",
+//      metadata: [
+//        "connectionId": .stringConvertible(connectionId)
+//      ]
+//    )
     logger.trace(
-      "Will ping",
-      metadata: [
-        "connectionId": .stringConvertible(connectionId)
-      ]
+      "Will ping, id: \(connectionId)"
     )
     self.sendHeartbeat()
     Task {
@@ -671,14 +649,15 @@ extension RemoteAuthGatewayManager {
         self.unsuccessfulPingsCount += 1
       }
       if unsuccessfulPingsCount > 2 {
-        logger.debug(
-          "Too many unsuccessful pings. Will try to reconnect",
-          metadata: [
-            "connectionId": .stringConvertible(
-              self.connectionId.load(ordering: .relaxed)
-            )
-          ]
-        )
+//        logger.debug(
+//          "Too many unsuccessful pings. Will try to reconnect",
+//          metadata: [
+//            "connectionId": .stringConvertible(
+//              self.connectionId.load(ordering: .relaxed)
+//            )
+//          ]
+//        )
+        logger.debug("Too many unsuccessful pings. Will try to reconnect, id: \(self.connectionId.load(ordering: .relaxed))")
         self.state.store(.noConnection, ordering: .relaxed)
         self.stateCallback?(.noConnection)
         await self.connect()
@@ -694,11 +673,14 @@ extension RemoteAuthGatewayManager {
       case .connected:
         break
       case .stopped:
+//        logger.warning(
+//          "Will not send message because bot is stopped",
+//          metadata: [
+//            "message": .string("\(message)")
+//          ]
+//        )
         logger.warning(
-          "Will not send message because bot is stopped",
-          metadata: [
-            "message": .string("\(message)")
-          ]
+          "Will not send message because bot is stopped, message: \(String(describing: message))"
         )
         return
       case .noConnection, .connecting, .configured:
@@ -726,33 +708,42 @@ extension RemoteAuthGatewayManager {
         do {
           data = try DiscordGlobalConfiguration.encoder.encode(message.payload)
         } catch {
-          self.logger.error(
-            "Could not encode payload, \(error)",
-            metadata: [
-              "payload": .string("\(message.payload)"),
-              "opcode": .stringConvertible(opcode),
-              "connectionId": .stringConvertible(
-                self.connectionId.load(ordering: .relaxed)
-              ),
-            ]
+//          self.logger.error(
+//            "Could not encode payload, \(error)",
+//            metadata: [
+//              "payload": .string("\(message.payload)"),
+//              "opcode": .stringConvertible(opcode),
+//              "connectionId": .stringConvertible(
+//                self.connectionId.load(ordering: .relaxed)
+//              ),
+//            ]
+//          )
+          logger.error(
+            "Could not encode payload, error: \(error), payload: \(message.payload), opcode: \(opcode), id: \(self.connectionId.load(ordering: .relaxed))"
           )
           return
         }
 
         if let outboundWriter = await self.outboundWriter {
           do {
-            self.logger.debug(
-              "Will send payload",
-              metadata: [
-                "op": .string(message.payload.op.rawValue)
-              ]
+//            self.logger.debug(
+//              "Will send payload",
+//              metadata: [
+//                "op": .string(message.payload.op.rawValue)
+//              ]
+//            )
+//            self.logger.trace(
+//              "Will send payload",
+//              metadata: [
+//                "payload": .string("\(message.payload)"),
+//                "opcode": .stringConvertible(opcode),
+//              ]
+//            )
+            logger.debug(
+              "Will send payload, op: \(message.payload.op.rawValue), id: \(self.connectionId.load(ordering: .relaxed))"
             )
-            self.logger.trace(
-              "Will send payload",
-              metadata: [
-                "payload": .string("\(message.payload)"),
-                "opcode": .stringConvertible(opcode),
-              ]
+            logger.trace(
+              "Will send payload, payload: \(message.payload), opcode: \(opcode), id: \(self.connectionId.load(ordering: .relaxed))"
             )
             try await outboundWriter.write(
               .custom(
@@ -780,35 +771,41 @@ extension RemoteAuthGatewayManager {
                 "Received 'NIOAsyncWriterError.alreadyFinished' error while sending heartbeat through web-socket. Will ignore"
               )
             } else {
-              self.logger.error(
-                "Could not send payload through web-socket",
-                metadata: [
-                  "error": .string(String(reflecting: error)),
-                  "payload": .string("\(message.payload)"),
-                  "opcode": .stringConvertible(opcode),
-                  "state": .stringConvertible(
-                    self.state.load(ordering: .relaxed)
-                  ),
-                  "connectionId": .stringConvertible(
-                    self.connectionId.load(ordering: .relaxed)
-                  ),
-                ]
+//              self.logger.error(
+//                "Could not send payload through web-socket",
+//                metadata: [
+//                  "error": .string(String(reflecting: error)),
+//                  "payload": .string("\(message.payload)"),
+//                  "opcode": .stringConvertible(opcode),
+//                  "state": .stringConvertible(
+//                    self.state.load(ordering: .relaxed)
+//                  ),
+//                  "connectionId": .stringConvertible(
+//                    self.connectionId.load(ordering: .relaxed)
+//                  ),
+//                ]
+//              )
+              logger.error(
+                "Could not send payload through web-socket, error: \(String(reflecting: error)), payload: \(message.payload), opcode: \(opcode), state: \(self.state.load(ordering: .relaxed)), id: \(self.connectionId.load(ordering: .relaxed))"
               )
             }
           }
         } else {
           /// Heartbeats are fine if they are sent when a ws connection
           /// is not established.
-          self.logger.log(
-            level: (message.payload.op == .heartbeat) ? .debug : .warning,
-            "Trying to send through ws when a connection is not established",
-            metadata: [
-              "payload": .string("\(message.payload)"),
-              "state": .stringConvertible(self.state.load(ordering: .relaxed)),
-              "connectionId": .stringConvertible(
-                self.connectionId.load(ordering: .relaxed)
-              ),
-            ]
+//          self.logger.log(
+//            level: (message.payload.op == .heartbeat) ? .debug : .warning,
+//            "Trying to send through ws when a connection is not established",
+//            metadata: [
+//              "payload": .string("\(message.payload)"),
+//              "state": .stringConvertible(self.state.load(ordering: .relaxed)),
+//              "connectionId": .stringConvertible(
+//                self.connectionId.load(ordering: .relaxed)
+//              ),
+//            ]
+//          )
+          logger.warning(
+            "Trying to send through ws when a connection is not established, payload: \(message.payload), state: \(self.state.load(ordering: .relaxed)), id: \(self.connectionId.load(ordering: .relaxed))"
           )
         }
       }
@@ -832,11 +829,14 @@ extension RemoteAuthGatewayManager {
     do {
       try await self.outboundWriter?.close(.goingAway, reason: nil)
     } catch {
+//      logger.warning(
+//        "Will ignore WS closure failure",
+//        metadata: [
+//          "error": .string(String(reflecting: error))
+//        ]
+//      )
       logger.warning(
-        "Will ignore WS closure failure",
-        metadata: [
-          "error": .string(String(reflecting: error))
-        ]
+        "Will ignore WS closure failure, error: \(String(reflecting: error))"
       )
     }
     self.outboundWriter = nil

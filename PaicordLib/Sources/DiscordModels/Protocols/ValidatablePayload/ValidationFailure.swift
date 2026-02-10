@@ -47,7 +47,7 @@ public enum ValidationFailure: Sendable, CustomStringConvertible {
 extension [ValidationFailure] {
   /// Throws a `ValidationError` if any `ValidationFailure`s are available.
   /// - Parameter model: The data to be reported for debugging in case of throw.
-  public func `throw`(model: any Sendable) throws {
+  package func `throw`(model: any Sendable) throws {
     if !self.isEmpty {
       throw ValidationError(model: model, failures: self)
     }

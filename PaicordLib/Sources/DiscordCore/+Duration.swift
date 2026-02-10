@@ -9,12 +9,12 @@
 import Foundation
 
 extension Duration {
-  public static func minutes<T>(_ minutes: T) -> Duration
+  package static func minutes<T>(_ minutes: T) -> Duration
   where T: BinaryInteger {
     .seconds(minutes * 60)
   }
 
-  public static func minutes(_ minutes: Double) -> Duration {
+  package static func minutes(_ minutes: Double) -> Duration {
     .seconds(minutes * 60)
   }
 }

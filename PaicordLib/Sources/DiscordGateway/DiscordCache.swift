@@ -1,6 +1,6 @@
 import DiscordModels
 import Foundation
-import Logging
+import SkipFuse
 import OrderedCollections
 
 /// Caches Gateway events.
@@ -394,10 +394,7 @@ public actor DiscordCache {
   ///   - storage: The storage of cached stuff. You usually don't need to provide this parameter.
   public init(
     gatewayManager: any GatewayManager,
-    logger: Logger = Logger(
-      label: "no-op",
-      factory: SwiftLogNoOpLogHandler.init
-    ),
+    logger: Logger = .init(subsystem: "Paicord", category: "DiscordCache"),
     intents: Intents,
     requestAllMembers: RequestMembers,
     messageCachingPolicy: MessageCachingPolicy = .normal,
@@ -427,12 +424,8 @@ public actor DiscordCache {
 
   private func handleEvent(_ event: Gateway.Event) {
     guard intentsAllowCaching(event: event) else { return }
-
     logger.trace(
-      "Will handle an event in DiscordCache",
-      metadata: [
-        "event": .string("\(event)")
-      ]
+      "Will handle an event in DiscordCache, event: \(String(describing: event))"
     )
 
     switch event.data {

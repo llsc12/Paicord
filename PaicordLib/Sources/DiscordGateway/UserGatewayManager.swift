@@ -11,8 +11,8 @@ import Atomics
 import DiscordHTTP
 import DiscordModels
 import Foundation
-import Logging
 import NIO
+import SkipFuse
 import WSClient
 
 import enum NIOWebSocket.WebSocketErrorCode
@@ -178,7 +178,6 @@ public actor UserGatewayManager: GatewayManager {
     )
 
     var logger = DiscordGlobalConfiguration.makeLogger("GatewayManager")
-    logger[metadataKey: "gateway-id"] = .string("\(self.id)")
     self.logger = logger
   }
 
@@ -188,22 +187,28 @@ public actor UserGatewayManager: GatewayManager {
     logger.debug("Connect method triggered")
     /// Guard we're attempting to connect too fast
     if let connectIn = connectionBackoff.canPerformIn() {
-      logger.warning(
-        "Cannot try to connect immediately due to backoff",
-        metadata: [
-          "wait-time": .stringConvertible(connectIn)
-        ]
+      //      logger.warning(
+      //        "Cannot try to connect immediately due to backoff",
+      //        metadata: [
+      //          "wait-time": .stringConvertible(connectIn)
+      //        ]
+      //      )
+      logger.debug(
+        "Cannot try to connect immediately due to backoff, wait-time: \(connectIn)"
       )
       try? await Task.sleep(for: connectIn)
     }
     /// Guard if other connections are in process
     let state = self.state.load(ordering: .relaxed)
     guard [.noConnection, .configured, .stopped].contains(state) else {
+      //      logger.error(
+      //        "Gateway state doesn't allow a new connection",
+      //        metadata: [
+      //          "state": .stringConvertible(state)
+      //        ]
+      //      )
       logger.error(
-        "Gateway state doesn't allow a new connection",
-        metadata: [
-          "state": .stringConvertible(state)
-        ]
+        "Gateway state doesn't allow a new connection, state: \(state)"
       )
       return
     }
@@ -212,7 +217,7 @@ public actor UserGatewayManager: GatewayManager {
 
     await self.sendQueue.reset()
     let gatewayURL = await getGatewayURL()
-//    #if DEBUGo
+    //    #if DEBUGo
     let queries: [(String, String)] = [
       ("v", "\(DiscordGlobalConfiguration.apiVersion)"),
       ("encoding", "json"),
@@ -220,29 +225,34 @@ public actor UserGatewayManager: GatewayManager {
     ]
     let decompressorWSExtension: ZstdDecompressorWSExtension
     do {
-      decompressorWSExtension = try ZstdDecompressorWSExtension(logger: self.logger)
+      decompressorWSExtension = try ZstdDecompressorWSExtension(
+        logger: self.logger
+      )
     } catch {
-      self.logger.critical(
-        "Will not connect because can't create a decompressor. Something is wrong. Please report this failure at https://github.com/DiscordBM/DiscordBM/issues",
-        metadata: ["error": .string(String(reflecting: error))]
+      //      self.logger.critical(
+      //        "Will not connect because can't create a decompressor. Something is wrong. Please report this failure at https://github.com/DiscordBM/DiscordBM/issues",
+      //        metadata: ["error": .string(String(reflecting: error))]
+      //      )
+      logger.critical(
+        "Will not connect because can't create a decompressor. Something is wrong. Please report this failure at https://github.com/llsc12/Paicord/issues, error: \(error)"
       )
       return
     }
-//    #endif
+    //    #endif
 
-//    #if DEBUG
-//    let configuration = WebSocketClientConfiguration(
-//      maxFrameSize: self.maxFrameSize,
-//      additionalHeaders: [
-//        .userAgent: SuperProperties.useragent(ws: false)!,
-//        .origin: "https://discord.com",
-//        .cacheControl: "no-cache",
-//        .acceptLanguage: SuperProperties.GenerateLocaleHeader(),
-//
-//      ],
-//      extensions: []
-//    )
-//    #else
+    //    #if DEBUG
+    //    let configuration = WebSocketClientConfiguration(
+    //      maxFrameSize: self.maxFrameSize,
+    //      additionalHeaders: [
+    //        .userAgent: SuperProperties.useragent(ws: false)!,
+    //        .origin: "https://discord.com",
+    //        .cacheControl: "no-cache",
+    //        .acceptLanguage: SuperProperties.GenerateLocaleHeader(),
+    //
+    //      ],
+    //      extensions: []
+    //    )
+    //    #else
     let configuration = WebSocketClientConfiguration(
       maxFrameSize: self.maxFrameSize,
       additionalHeaders: [
@@ -254,7 +264,7 @@ public actor UserGatewayManager: GatewayManager {
       ],
       extensions: [.nonNegotiatedExtension { decompressorWSExtension }]
     )
-//    #endif
+    //    #endif
 
     logger.trace("Will try to connect to Discord through web-socket")
     let connectionId = self.connectionId.wrappingIncrementThenLoad(
@@ -269,7 +279,7 @@ public actor UserGatewayManager: GatewayManager {
           url: gatewayURL + queries.makeForURLQuery(),
           configuration: configuration,
           eventLoopGroup: self.eventLoopGroup,
-          logger: self.logger
+          logger: .init(label: "WebSocketClient")
         ) { inbound, outbound, context in
           await self.setupOutboundWriter(outbound)
 
@@ -279,7 +289,8 @@ public actor UserGatewayManager: GatewayManager {
           self.state.store(.configured, ordering: .relaxed)
           self.stateCallback?(.configured)
 
-          for try await message in inbound.messages(maxSize: self.maxFrameSize) {
+          for try await message in inbound.messages(maxSize: self.maxFrameSize)
+          {
             await self.processBinaryData(
               message,
               forConnectionWithId: connectionId
@@ -287,29 +298,35 @@ public actor UserGatewayManager: GatewayManager {
           }
         }
 
+        //        logger.debug(
+        //          "web-socket connection closed",
+        //          metadata: [
+        //            "closeCode": .string(String(reflecting: closeFrame?.closeCode)),
+        //            "closeReason": .string(String(reflecting: closeFrame?.reason)),
+        //            "connectionId": .stringConvertible(
+        //              self.connectionId.load(ordering: .relaxed)
+        //            ),
+        //          ]
+        //        )
         logger.debug(
-          "web-socket connection closed",
-          metadata: [
-            "closeCode": .string(String(reflecting: closeFrame?.closeCode)),
-            "closeReason": .string(String(reflecting: closeFrame?.reason)),
-            "connectionId": .stringConvertible(
-              self.connectionId.load(ordering: .relaxed)
-            ),
-          ]
+          "web-socket connection closed, closeCode: \(String(reflecting: closeFrame?.closeCode)), closeReason: \(String(reflecting: closeFrame?.reason)), connectionId: \(self.connectionId.load(ordering: .relaxed)) )"
         )
         await self.onClose(
           closeReason: .closeFrame(closeFrame),
           forConnectionWithId: connectionId
         )
       } catch {
+        //        logger.debug(
+        //          "web-socket error while connecting to Discord. Will try again",
+        //          metadata: [
+        //            "error": .string(String(reflecting: error)),
+        //            "connectionId": .stringConvertible(
+        //              self.connectionId.load(ordering: .relaxed)
+        //            ),
+        //          ]
+        //        )
         logger.debug(
-          "web-socket error while connecting to Discord. Will try again",
-          metadata: [
-            "error": .string(String(reflecting: error)),
-            "connectionId": .stringConvertible(
-              self.connectionId.load(ordering: .relaxed)
-            ),
-          ]
+          "web-socket error while connecting to Discord. Will try again, error: \(String(reflecting: error)), connectionId: \(self.connectionId.load(ordering: .relaxed)) )"
         )
         self.state.store(.noConnection, ordering: .relaxed)
         self.stateCallback?(.noConnection)
@@ -449,22 +466,28 @@ public actor UserGatewayManager: GatewayManager {
   /// Disconnects from Discord.
   /// Doesn't end the event streams.
   public func disconnect() async {
+    //    logger.debug(
+    //      "Will disconnect",
+    //      metadata: [
+    //        "connectionId": .stringConvertible(
+    //          self.connectionId.load(ordering: .relaxed)
+    //        )
+    //      ]
+    //    )
     logger.debug(
-      "Will disconnect",
-      metadata: [
-        "connectionId": .stringConvertible(
-          self.connectionId.load(ordering: .relaxed)
-        )
-      ]
+      "Will disconnect, connectionId: \(self.connectionId.load(ordering: .relaxed))"
     )
     if self.state.load(ordering: .relaxed) == .stopped {
+      //      logger.debug(
+      //        "Already disconnected",
+      //        metadata: [
+      //          "connectionId": .stringConvertible(
+      //            self.connectionId.load(ordering: .relaxed)
+      //          )
+      //        ]
+      //      )
       logger.debug(
-        "Already disconnected",
-        metadata: [
-          "connectionId": .stringConvertible(
-            self.connectionId.load(ordering: .relaxed)
-          )
-        ]
+        "Already disconnected, connectionId: \(self.connectionId.load(ordering: .relaxed))"
       )
       return
     }
@@ -500,11 +523,14 @@ extension UserGatewayManager {
 
     switch event.data {
     case .invalidSession(let canResume):
+      //      logger.warning(
+      //        "Got invalid session. Will try to reconnect or resume",
+      //        metadata: [
+      //          "canResume": .stringConvertible(canResume)
+      //        ]
+      //      )
       logger.warning(
-        "Got invalid session. Will try to reconnect or resume",
-        metadata: [
-          "canResume": .stringConvertible(canResume)
-        ]
+        "Got invalid session. Will try to reconnect or resume, canResume: \(canResume)"
       )
       if !canResume {
         self.sequenceNumber = nil
@@ -523,31 +549,40 @@ extension UserGatewayManager {
       )
       /// Sends the update time spent session id payload every 30 minutes, but also on connect too.
       self.sendUpdateTimeSpentSessionID(
-        forConnectionWithId: self.connectionId.load(ordering: .relaxed))
+        forConnectionWithId: self.connectionId.load(ordering: .relaxed)
+      )
       self.setupUpdateTimeSpentSessionID(
-        forConnectionWithId: self.connectionId.load(ordering: .relaxed), every: .minutes(30))
+        forConnectionWithId: self.connectionId.load(ordering: .relaxed),
+        every: .minutes(30)
+      )
       logger.trace("Will resume or identify")
       await self.sendResumeOrIdentify()
     case .ready(let payload):
+      //      logger.notice(
+      //        "Received ready notice. The connection is fully established",
+      //        metadata: [
+      //          "connectionId": .stringConvertible(
+      //            self.connectionId.load(ordering: .relaxed)
+      //          )
+      //        ]
+      //      )
       logger.notice(
-        "Received ready notice. The connection is fully established",
-        metadata: [
-          "connectionId": .stringConvertible(
-            self.connectionId.load(ordering: .relaxed)
-          )
-        ]
+        "Received ready notice. The connection is fully established, connectionId: \(self.connectionId.load(ordering: .relaxed))"
       )
       await self.onSuccessfulConnection()
       self.sessionId = payload.session_id
       self.resumeGatewayURL = payload.resume_gateway_url
     case .resumed:
+      //      logger.debug(
+      //        "Received resume notice. The connection is fully established",
+      //        metadata: [
+      //          "connectionId": .stringConvertible(
+      //            self.connectionId.load(ordering: .relaxed)
+      //          )
+      //        ]
+      //      )
       logger.debug(
-        "Received resume notice. The connection is fully established",
-        metadata: [
-          "connectionId": .stringConvertible(
-            self.connectionId.load(ordering: .relaxed)
-          )
-        ]
+        "Received resume notice. The connection is fully established, connectionId: \(self.connectionId.load(ordering: .relaxed))"
       )
       await self.onSuccessfulConnection()
     default:
@@ -574,12 +609,15 @@ extension UserGatewayManager {
     {
       self.sendResume(sessionId: sessionId, sequenceNumber: lastSequenceNumber)
     } else {
+      //      logger.debug(
+      //        "Can't resume last Discord connection. Will identify",
+      //        metadata: [
+      //          "sessionId": .stringConvertible(self.sessionId ?? "nil"),
+      //          "lastSequenceNumber": .stringConvertible(self.sequenceNumber ?? -1),
+      //        ]
+      //      )
       logger.debug(
-        "Can't resume last Discord connection. Will identify",
-        metadata: [
-          "sessionId": .stringConvertible(self.sessionId ?? "nil"),
-          "lastSequenceNumber": .stringConvertible(self.sequenceNumber ?? -1),
-        ]
+        "Can't resume last Discord connection. Will identify, sessionId: \(String(describing: self.sessionId)), lastSequenceNumber: \(String(describing: self.sequenceNumber))"
       )
       await self.sendIdentify()
     }
@@ -633,18 +671,12 @@ extension UserGatewayManager {
     switch message {
     case .text(let string):
       self.logger.debug(
-        "Got text from websocket",
-        metadata: [
-          "text": .string(string)
-        ]
+        "Got text from websocket, text: \(string)"
       )
       buffer = ByteBuffer(string: string)
     case .binary(let _buffer):
       self.logger.debug(
-        "Got binary from websocket",
-        metadata: [
-          "text": .string(String(buffer: _buffer))
-        ]
+        "Got binary from websocket, text: \(String(buffer: _buffer))"
       )
       buffer = _buffer
     }
@@ -654,23 +686,29 @@ extension UserGatewayManager {
         Gateway.Event.self,
         from: Data(buffer: buffer, byteTransferStrategy: .noCopy)
       )
-      self.logger.debug(
-        "Decoded event",
-        metadata: [
-          "event": .string("\(event)"),
-          "opcode": .string(event.opcode.description),
-        ]
+      //      self.logger.debug(
+      //        "Decoded event",
+      //        metadata: [
+      //          "event": .string("\(event)"),
+      //          "opcode": .string(event.opcode.description),
+      //        ]
+      //      )
+      logger.debug(
+        "Decoded event, event: \(String(describing: event)), opcode: \(event.opcode.description)"
       )
       Task { await self.processEvent(event) }
       for continuation in self.eventsStreamContinuations {
         continuation.yield(event)
       }
     } catch {
-      self.logger.debug(
-        "Failed to decode event",
-        metadata: [
-          "error": .string("\(error)")
-        ]
+      //      self.logger.debug(
+      //        "Failed to decode event",
+      //        metadata: [
+      //          "error": .string("\(error)")
+      //        ]
+      //      )
+      logger.debug(
+        "Failed to decode event, error: \(String(describing: error))"
       )
       for continuation in self.eventsParseFailureContinuations {
         continuation.yield((error, buffer))
@@ -695,27 +733,39 @@ extension UserGatewayManager {
     let isDebugLevelCode = [nil, .goingAway, .unexpectedServerError].contains(
       code
     )
-    self.logger.log(
-      level: isDebugLevelCode ? .debug : .warning,
-      "Received connection close notification. Will try to reconnect",
-      metadata: [
-        "code": .string(codeDesc),
-        "closedConnectionId": .stringConvertible(
-          self.connectionId.load(ordering: .relaxed)
-        ),
-      ]
-    )
+    //    self.logger.log(
+    //      level: isDebugLevelCode ? .debug : .warning,
+    //      "Received connection close notification. Will try to reconnect",
+    //      metadata: [
+    //        "code": .string(codeDesc),
+    //        "closedConnectionId": .stringConvertible(
+    //          self.connectionId.load(ordering: .relaxed)
+    //        ),
+    //      ]
+    //    )
+    if isDebugLevelCode {
+      logger.debug(
+        "Received connection close notification. Will try to reconnect, code: \(codeDesc), closedConnectionId: \(self.connectionId.load(ordering: .relaxed))"
+      )
+    } else {
+      logger.warning(
+        "Received connection close notification. Will try to reconnect, code: \(codeDesc), closedConnectionId: \(self.connectionId.load(ordering: .relaxed))"
+      )
+    }
     if self.canTryReconnect(code: code) {
       self.state.store(.noConnection, ordering: .relaxed)
       self.stateCallback?(.noConnection)
-      self.logger.trace(
-        "Will try reconnect since Discord does allow it.",
-        metadata: [
-          "code": .string(codeDesc),
-          "closedConnectionId": .stringConvertible(
-            self.connectionId.load(ordering: .relaxed)
-          ),
-        ]
+      //      self.logger.trace(
+      //        "Will try reconnect since Discord does allow it.",
+      //        metadata: [
+      //          "code": .string(codeDesc),
+      //          "closedConnectionId": .stringConvertible(
+      //            self.connectionId.load(ordering: .relaxed)
+      //          ),
+      //        ]
+      //      )
+      logger.trace(
+        "Will try reconnect since Discord does allow it, code: \(codeDesc), closedConnectionId: \(self.connectionId.load(ordering: .relaxed))"
       )
       await self.connect()
     } else {
@@ -776,20 +826,22 @@ extension UserGatewayManager {
     Task {
       try? await Task.sleep(for: duration)
       guard self.connectionId.load(ordering: .relaxed) == connectionId else {
-        self.logger.trace(
-          "Canceled a ping task",
-          metadata: [
-            "connectionId": .stringConvertible(connectionId)
-          ]
-        )
+        //        self.logger.trace(
+        //          "Canceled a ping task",
+        //          metadata: [
+        //            "connectionId": .stringConvertible(connectionId)
+        //          ]
+        //        )
+        logger.trace("Canceled a ping task, connectionId: \(connectionId)")
         return/// cancel
       }
-      self.logger.debug(
-        "Will send automatic ping",
-        metadata: [
-          "connectionId": .stringConvertible(connectionId)
-        ]
-      )
+      //      self.logger.debug(
+      //        "Will send automatic ping",
+      //        metadata: [
+      //          "connectionId": .stringConvertible(connectionId)
+      //        ]
+      //      )
+      logger.debug("Will send automatic ping, connectionId: \(connectionId)")
       self.sendPing(forConnectionWithId: connectionId)
       self.setupPingTask(forConnectionWithId: connectionId, every: duration)
     }
@@ -802,41 +854,43 @@ extension UserGatewayManager {
     Task {
       try? await Task.sleep(for: duration)
       guard self.connectionId.load(ordering: .relaxed) == connectionId else {
-        self.logger.trace(
-          "Canceled a session time spent update task",
-          metadata: [
-            "connectionId": .stringConvertible(connectionId)
-          ]
+        //        self.logger.trace(
+        //          "Canceled a session time spent update task",
+        //          metadata: [
+        //            "connectionId": .stringConvertible(connectionId)
+        //          ]
+        //        )
+        logger.trace(
+          "Canceled a session time spent update task, connectionId: \(connectionId)"
         )
         return/// cancel
       }
-      self.logger.debug(
-        "Will send automatic session time spent update",
-        metadata: [
-          "connectionId": .stringConvertible(connectionId)
-        ]
+      //      self.logger.debug(
+      //        "Will send automatic session time spent update",
+      //        metadata: [
+      //          "connectionId": .stringConvertible(connectionId)
+      //        ]
+      //      )
+      logger.debug(
+        "Will send automatic session time spent update, connectionId: \(connectionId)"
       )
       self.sendPing(forConnectionWithId: connectionId)
       self.sendUpdateTimeSpentSessionID(forConnectionWithId: connectionId)
-      self.setupUpdateTimeSpentSessionID(forConnectionWithId: connectionId, every: duration)
+      self.setupUpdateTimeSpentSessionID(
+        forConnectionWithId: connectionId,
+        every: duration
+      )
     }
   }
 
   private func sendPing(forConnectionWithId connectionId: UInt) {
-    logger.trace(
-      "Will ping",
-      metadata: [
-        "connectionId": .stringConvertible(connectionId)
-      ]
-    )
-    //        self.send(
-    //          message: .init(
-    //            payload: .init(
-    //              opcode: .heartbeat,
-    //              data: .heartbeat(lastSequenceNumber: self.sequenceNumber)
-    //            )
-    //          )
-    //        )
+    //    logger.trace(
+    //      "Will ping",
+    //      metadata: [
+    //        "connectionId": .stringConvertible(connectionId)
+    //      ]
+    //    )
+    logger.trace("Will ping, connectionId: \(connectionId)")
     // use QoS Heartbeat instead
     self.send(
       message: .init(
@@ -862,13 +916,16 @@ extension UserGatewayManager {
         self.unsuccessfulPingsCount += 1
       }
       if unsuccessfulPingsCount > 2 {
+        //        logger.debug(
+        //          "Too many unsuccessful pings. Will try to reconnect",
+        //          metadata: [
+        //            "connectionId": .stringConvertible(
+        //              self.connectionId.load(ordering: .relaxed)
+        //            )
+        //          ]
+        //        )
         logger.debug(
-          "Too many unsuccessful pings. Will try to reconnect",
-          metadata: [
-            "connectionId": .stringConvertible(
-              self.connectionId.load(ordering: .relaxed)
-            )
-          ]
+          "Too many unsuccessful pings. Will try to reconnect, connectionId: \(self.connectionId.load(ordering: .relaxed))"
         )
         self.state.store(.noConnection, ordering: .relaxed)
         self.stateCallback?(.noConnection)
@@ -877,12 +934,17 @@ extension UserGatewayManager {
     }
   }
 
-  private func sendUpdateTimeSpentSessionID(forConnectionWithId connectionId: UInt) {
+  private func sendUpdateTimeSpentSessionID(
+    forConnectionWithId connectionId: UInt
+  ) {
+    //    logger.trace(
+    //      "Will send session time spent update",
+    //      metadata: [
+    //        "connectionId": .stringConvertible(connectionId)
+    //      ]
+    //    )
     logger.trace(
-      "Will send session time spent update",
-      metadata: [
-        "connectionId": .stringConvertible(connectionId)
-      ]
+      "Will send session time spent update, connectionId: \(connectionId)"
     )
     self.send(
       message: .init(
@@ -902,11 +964,14 @@ extension UserGatewayManager {
       case .connected:
         break
       case .stopped:
+        //        logger.warning(
+        //          "Will not send message because bot is stopped",
+        //          metadata: [
+        //            "message": .string("\(message)")
+        //          ]
+        //        )
         logger.warning(
-          "Will not send message because bot is stopped",
-          metadata: [
-            "message": .string("\(message)")
-          ]
+          "Will not send message because bot is stopped, message: \(String(describing: message))"
         )
         return
       case .noConnection, .connecting, .configured:
@@ -939,33 +1004,42 @@ extension UserGatewayManager {
         do {
           data = try DiscordGlobalConfiguration.encoder.encode(message.payload)
         } catch {
-          self.logger.error(
-            "Could not encode payload, \(error)",
-            metadata: [
-              "payload": .string("\(message.payload)"),
-              "opcode": .stringConvertible(opcode),
-              "connectionId": .stringConvertible(
-                self.connectionId.load(ordering: .relaxed)
-              ),
-            ]
+          //          self.logger.error(
+          //            "Could not encode payload, \(error)",
+          //            metadata: [
+          //              "payload": .string("\(message.payload)"),
+          //              "opcode": .stringConvertible(opcode),
+          //              "connectionId": .stringConvertible(
+          //                self.connectionId.load(ordering: .relaxed)
+          //              ),
+          //            ]
+          //          )
+          logger.error(
+            "Could not encode payload, error: \(String(describing: error)), payload: \(String(describing: message.payload)), opcode: \(opcode), connectionId: \(self.connectionId.load(ordering: .relaxed))"
           )
           return
         }
 
         if let outboundWriter = await self.outboundWriter {
           do {
-            self.logger.debug(
-              "Will send a payload with opcode",
-              metadata: [
-                "opcode": .string(message.payload.opcode.description)
-              ]
+            //            self.logger.debug(
+            //              "Will send a payload with opcode",
+            //              metadata: [
+            //                "opcode": .string(message.payload.opcode.description)
+            //              ]
+            //            )
+            logger.debug(
+              "Will send a payload with opcode, opcode: \(message.payload.opcode.description)"
             )
-            self.logger.trace(
-              "Will send a payload",
-              metadata: [
-                "payload": .string("\(message.payload)"),
-                "opcode": .stringConvertible(opcode),
-              ]
+            //            self.logger.trace(
+            //              "Will send a payload",
+            //              metadata: [
+            //                "payload": .string("\(message.payload)"),
+            //                "opcode": .stringConvertible(opcode),
+            //              ]
+            //            )
+            logger.trace(
+              "Will send a payload, payload: \(String(describing: message.payload)), opcode: \(opcode)"
             )
             try await outboundWriter.write(
               .custom(
@@ -993,19 +1067,22 @@ extension UserGatewayManager {
                 "Received 'NIOAsyncWriterError.alreadyFinished' error while sending heartbeat through web-socket. Will ignore"
               )
             } else {
-              self.logger.error(
-                "Could not send payload through web-socket",
-                metadata: [
-                  "error": .string(String(reflecting: error)),
-                  "payload": .string("\(message.payload)"),
-                  "opcode": .stringConvertible(opcode),
-                  "state": .stringConvertible(
-                    self.state.load(ordering: .relaxed)
-                  ),
-                  "connectionId": .stringConvertible(
-                    self.connectionId.load(ordering: .relaxed)
-                  ),
-                ]
+              //              self.logger.error(
+              //                "Could not send payload through web-socket",
+              //                metadata: [
+              //                  "error": .string(String(reflecting: error)),
+              //                  "payload": .string("\(message.payload)"),
+              //                  "opcode": .stringConvertible(opcode),
+              //                  "state": .stringConvertible(
+              //                    self.state.load(ordering: .relaxed)
+              //                  ),
+              //                  "connectionId": .stringConvertible(
+              //                    self.connectionId.load(ordering: .relaxed)
+              //                  ),
+              //                ]
+              //              )
+              logger.error(
+                "Could not send payload through web-socket, error: \(String(reflecting: error)), payload: \(String(describing: message.payload)), opcode: \(opcode), state: \(self.state.load(ordering: .relaxed)), connectionId: \(self.connectionId.load(ordering: .relaxed))"
               )
             }
           }
@@ -1014,17 +1091,26 @@ extension UserGatewayManager {
           /// is not established. Pings are not disabled after a connection goes down
           /// so long story short, the gateway manager never gets stuck in a bad
           /// cycle of no-connection.
-          self.logger.log(
-            level: (message.payload.opcode == .heartbeat) ? .debug : .warning,
-            "Trying to send through ws when a connection is not established",
-            metadata: [
-              "payload": .string("\(message.payload)"),
-              "state": .stringConvertible(self.state.load(ordering: .relaxed)),
-              "connectionId": .stringConvertible(
-                self.connectionId.load(ordering: .relaxed)
-              ),
-            ]
-          )
+          //          self.logger.log(
+          //            level: (message.payload.opcode == .heartbeat) ? .debug : .warning,
+          //            "Trying to send through ws when a connection is not established",
+          //            metadata: [
+          //              "payload": .string("\(message.payload)"),
+          //              "state": .stringConvertible(self.state.load(ordering: .relaxed)),
+          //              "connectionId": .stringConvertible(
+          //                self.connectionId.load(ordering: .relaxed)
+          //              ),
+          //            ]
+          //          )
+          if message.payload.opcode == .heartbeat {
+            logger.debug(
+              "Trying to send through ws when a connection is not established, payload: \(String(describing: message.payload)), state: \(self.state.load(ordering: .relaxed)), connectionId: \(self.connectionId.load(ordering: .relaxed))"
+            )
+          } else {
+            logger.warning(
+              "Trying to send through ws when a connection is not established, payload: \(String(describing: message.payload)), state: \(self.state.load(ordering: .relaxed)), connectionId: \(self.connectionId.load(ordering: .relaxed))"
+            )
+          }
         }
       }
     }
@@ -1047,11 +1133,14 @@ extension UserGatewayManager {
     do {
       try await self.outboundWriter?.close(.goingAway, reason: nil)
     } catch {
+//      logger.warning(
+//        "Will ignore WS closure failure",
+//        metadata: [
+//          "error": .string(String(reflecting: error))
+//        ]
+//      )
       logger.warning(
-        "Will ignore WS closure failure",
-        metadata: [
-          "error": .string(String(reflecting: error))
-        ]
+        "Will ignore WS closure failure, error: \(String(reflecting: error))"
       )
     }
     self.outboundWriter = nil
@@ -1073,5 +1162,40 @@ extension UserGatewayManager {
     _ continuation: AsyncStream<(any Error, ByteBuffer)>.Continuation
   ) {
     self.eventsParseFailureContinuations.append(continuation)
+  }
+}
+
+//MARK: - GatewayState
+/// Represents the current state of the gateway connection lifecycle.
+public enum GatewayState: Int, Sendable, AtomicValue, CustomStringConvertible {
+  /// The gateway manager has been intentionally stopped and will not reconnect.
+  case stopped
+  /// No active connection exists; the gateway is disconnected and idle.
+  case noConnection
+  /// The gateway is in the process of establishing a connection.
+  case connecting
+  /// The gateway connection is established at the protocol level, but not yet fully ready (awaiting identification/resume).
+  case configured
+  /// The gateway has successfully connected, identified/resumed, and is fully ready to send/receive events.
+  case connected
+
+  public var description: String {
+    switch self {
+    case .stopped: return "stopped"
+    case .noConnection: return "noConnection"
+    case .connecting: return "connecting"
+    case .configured: return "configured"
+    case .connected: return "connected"
+    }
+  }
+}
+
+// MARK: - +Gateway.Opcode
+extension Gateway.Opcode {
+  var isSentForConnectionEstablishment: Bool {
+    switch self {
+    case .identify, .resume: true
+    default: false
+    }
   }
 }
