@@ -8,12 +8,14 @@
 
 import DiscordCore
 import Foundation
-import Playgrounds
-import SwiftUI
 import UInt128
 
 #if canImport(UIKit)
   import UIKit
+#endif
+
+#if os(Android)
+  import Bionic
 #endif
 
 // Discord clients send a horrific header containing your host machine information,
@@ -99,8 +101,7 @@ public enum SuperProperties {
   nonisolated(unsafe) private static
     var _client_heartbeat_session_id_last_generated: Date = Date
       .distantPast
-  nonisolated(unsafe) private static var _client_heartbeat_session_id_cached:
-    UUID? = nil
+  nonisolated(unsafe) private static var _client_heartbeat_session_id_cached: UUID? = nil
   static var _client_heartbeat_session_id: UUID {
     let now = Date.now
     if now.timeIntervalSince(_client_heartbeat_session_id_last_generated)
@@ -153,20 +154,47 @@ public enum SuperProperties {
 
   /// If ws is false this will never return nil.
   public static func useragent(ws: Bool) -> String? {
-    switch Gateway.Identify.ConnectionProperties.__defaultOS {
     // for these useragents, we will sub in values from the other functions
-    case "iOS", "watchOS":
+    #if os(macOS)
+      return
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/\(Self.webkitVer()) (KHTML, like Gecko) discord/\(Self.client_version()) Chrome/\(Self.chromeVer()) Electron/\(Self.browser_version()) Safari/\(Self.webkitVer())"
+    #elseif os(Linux)
+      return "Linux"
+    #elseif os(iOS) || os(watchOS) || os(tvOS) || os(visionOS)
       if ws { return nil }  // no useragent when identifying browser_user_agent key in ws
       return
         "Discord/\(Self.client_build_number()!) CFNetwork/\(Self.cfnetwork_version()) Darwin/\(Self.kernel_version())"
-    case "Mac OS X":
-      return
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/\(Self.webkitVer()) (KHTML, like Gecko) discord/\(Self.client_version()) Chrome/\(Self.chromeVer()) Electron/\(Self.browser_version()) Safari/\(Self.webkitVer())"
-    default:
-      // TODO: do something better for other OSes
+    #elseif os(Windows)
       return
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Safari/605.1.15"
-    }
+    #elseif canImport(Musl)
+      return
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Safari/605.1.15"
+    #elseif os(FreeBSD)
+      return
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Safari/605.1.15"
+    #elseif os(OpenBSD)
+      return
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Safari/605.1.15"
+    #elseif os(Android)
+      return
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Safari/605.1.15"
+    #elseif os(PS4)
+      return
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Safari/605.1.15"
+    #elseif os(Cygwin)
+      return
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Safari/605.1.15"
+    #elseif os(Haiku)
+      return
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Safari/605.1.15"
+    #elseif os(WASI)
+      return
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Safari/605.1.15"
+    #else
+      return
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Safari/605.1.15"
+    #endif
   }
 
   public static func chromeVer() -> String {
@@ -323,6 +351,8 @@ public enum SuperProperties {
       // for now, i was told its safe to use macos one instead.
       //    return nil
       return _launch_signature.uuidString.lowercased()
+    #else
+      return nil
     #endif
   }
 
@@ -332,20 +362,22 @@ public enum SuperProperties {
     return version
   }
 
-  public static func kernel_version() -> String {
-    var systemInfo = utsname()
-    uname(&systemInfo)
-    let versionMirror = Mirror(reflecting: systemInfo.release)
-    let version = versionMirror.children.reduce("") {
-      version,
-      element in
-      guard let value = element.value as? Int8, value != 0 else {
-        return version
+  #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS) || os(visionOS)
+    public static func kernel_version() -> String {
+      var systemInfo = utsname()
+      uname(&systemInfo)
+      let versionMirror = Mirror(reflecting: systemInfo.release)
+      let version = versionMirror.children.reduce("") {
+        version,
+        element in
+        guard let value = element.value as? Int8, value != 0 else {
+          return version
+        }
+        return version + String(UnicodeScalar(UInt8(value)))
       }
-      return version + String(UnicodeScalar(UInt8(value)))
+      return version
     }
-    return version
-  }
+  #endif
 
   public static func os_sdk_version() -> String? {
     #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS) || os(visionOS)
@@ -421,16 +453,4 @@ extension UUID {
 
     return UUID.init(finalUInt)
   }
-}
-
-#Playground {
-  let number: UInt = 1_734_653
-  let parsed = IntBitField<Gateway.Capability>.init(rawValue: number)
-  var capabilities: [Gateway.Capability] = []
-  for cap in Gateway.Capability.allCases {
-    if parsed.contains(cap) {
-      capabilities.append(cap)
-    }
-  }
-  print(capabilities)
 }

@@ -2,21 +2,37 @@
 public struct Sticker: Sendable, Codable, Identifiable, Equatable, Hashable {
 
   /// https://discord.com/developers/docs/resources/sticker#sticker-object-sticker-types
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum Kind: Sendable, Codable {
     case standard  // 1
     case guild  // 2
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   /// https://discord.com/developers/docs/resources/sticker#sticker-object-sticker-format-types
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum FormatKind: Sendable, Codable {
     case png  // 1
     case apng  // 2
     case lottie  // 3
     case gif  // 4
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   public var id: StickerSnowflake

@@ -973,15 +973,6 @@ extension ChannelStore {
   class MemberListAccumulator {
     var primaryChannelStore: ChannelStore!
 
-    // previously just had a dictionary. switched to a positions array and items array to avoid array shifts.
-    // the positions array holds the "position" of each item in the logical member list, allowing us to
-    // insert items at specific positions without needing to shift large arrays around. we can just insert a new
-    // position between two existing positions.
-    // note that I have tried to comment stuff bc this took a while to get working.
-    // ikik very rare but ykyk
-    private var positions: [Double] = []
-    private var items: [MixedItem] = []
-
     var groups:
       OrderedDictionary<RoleSnowflake, Gateway.GuildMemberListUpdate.GroupCount> =
         [:]
@@ -997,6 +988,12 @@ extension ChannelStore {
       self.primaryChannelStore = primaryChannelStore
     }
 
+    private var items: [Int: MixedItem] = [:]
+
+    subscript(row index: Int) -> MixedItem? {
+      items[index]
+    }
+
     func update(with update: Gateway.GuildMemberListUpdate) {
       self.memberCount = update.member_count
       self.onlineCount = update.online_count
@@ -1007,154 +1004,53 @@ extension ChannelStore {
       for op in update.ops {
         switch op {
         case .sync(let pair, let newItems):
-          var pos = Double(pair.first)
-
-          for item in newItems {
-            let idx = indexForPosition(pos)
-            positions.insert(pos, at: idx)
-            items.insert(item, at: idx)
-            pos += 1
+          for i in pair.first..<pair.second {
+            items.removeValue(forKey: i)
           }
-
-          if positions.count > 2 && needsRebalance(around: positions.count - 1)
-          {
-            rebalanceAll()
+          for (i, item) in newItems.enumerated() {
+            items[pair.first + i] = item
           }
-
           let members = newItems.compactMap { item -> Guild.Member? in
-            if case .member(let member) = item {
-              return member
-            }
+            if case .member(let member) = item { return member }
             return nil
           }
           handleMemberData(members)
         case .insert(let index, let item):
-          let before = position(at: index - 1)
-          let after = position(at: index)
-
-          let newPos = makePosition(before: before, after: after)
-          let idx = indexForPosition(newPos)
-
-          positions.insert(newPos, at: idx)
-          items.insert(item, at: idx)
-
-          if needsRebalance(around: idx) {
-            rebalance(around: idx)
+          var updated: [Int: MixedItem] = [:]
+          for (key, value) in items {
+            if key >= index {
+              updated[key + 1] = value
+            } else {
+              updated[key] = value
+            }
           }
-
+          updated[index] = item
+          items = updated
           if case .member(let member) = item {
             handleMemberData(member)
           }
         case .update(let index, let item):
-          setRow(index, to: item)
+          items[index] = item
           if case .member(let member) = item {
             handleMemberData(member)
           }
         case .delete(let index):
-          guard index < items.count else { return }
-          positions.remove(at: index)
-          items.remove(at: index)
-        case .invalidate(_):
-          // happens when we unsub from a range. we dont need to react to this.
-          // we rely on the row count to pregen rows then as the user scrolls, the rows fill with data
-          break
+          items.removeValue(forKey: index)
+          // Shift everything above down by 1
+          var updated: [Int: MixedItem] = [:]
+          for (key, value) in items {
+            if key > index {
+              updated[key - 1] = value
+            } else {
+              updated[key] = value
+            }
+          }
+          items = updated
+        case .invalidate(let range):
+          for i in range.first..<range.second {
+            items.removeValue(forKey: i)
+          }
         }
-      }
-    }
-
-    /// Sets the item at the specified index to a new value, ensuring that the index is within bounds of the current items array.
-    /// - Parameters:
-    ///   - index: The logical index of the item to update in the member list.
-    ///   - item: The new `MixedItem` value to set at the specified index.
-    private func setRow(_ index: Int, to item: MixedItem) {
-      guard index >= 0 && index < items.count else { return }
-      items[index] = item
-    }
-
-    subscript(row index: Int) -> MixedItem? {
-      guard index >= 0 && index < items.count else { return nil }
-      return items[index]
-    }
-
-    /// Retrieves the position value for a given logical index in the member list, returning `nil` if the index is out of bounds.
-    /// - Parameter logicalIndex: The logical index of the item in the member list for which to retrieve the position.
-    /// - Returns: The position value corresponding to the specified logical index, or `nil` if the index is out of bounds.
-    private func position(at logicalIndex: Int) -> Double? {
-      guard logicalIndex >= 0 && logicalIndex < positions.count else {
-        return nil
-      }
-      return positions[logicalIndex]
-    }
-
-    /// Retrieves the logical index in the member list for a given position value using a binary search algorithm.
-    /// - Parameter position: The position value for which to find the corresponding logical index in the member list.
-    /// - Returns: The logical index corresponding to the specified position value.
-    private func indexForPosition(_ position: Double) -> Int {
-      var low = 0
-      var high = positions.count
-
-      while low < high {
-        let mid = (low + high) / 2
-        if positions[mid] < position {
-          low = mid + 1
-        } else {
-          high = mid
-        }
-      }
-      return low
-    }
-
-    /// Calculates a new position value for an item being inserted between two existing items in the member list.
-    /// - Parameters:
-    ///   - before: The position value of the item immediately before the insertion point, or `nil` if inserting at the beginning of the list.
-    ///   - after: The position value of the item immediately after the insertion point, or `nil` if inserting at the end of the list.
-    /// - Returns: A new position value that can be assigned to the item being inserted.
-    private func makePosition(before: Double?, after: Double?) -> Double {
-      switch (before, after) {
-      case (nil, nil): return 0
-      case (nil, let b?): return b - 1
-      case (let a?, nil): return a + 1
-      case (let a?, let b?): return (a + b) / 2
-      }
-    }
-
-    /// The minimum gap between positions to avoid precision issues.
-    private let minGap: Double = 1e-9
-
-    /// Checks if the gap between the position at the given index and its neighbors is too small, indicating that a rebalance is needed to maintain precision for future inserts.
-    /// - Parameter index: The index around which to check for the need to rebalance.
-    /// - Returns: `true` if a rebalance is needed, `false` otherwise.
-    func needsRebalance(around index: Int) -> Bool {
-      guard index > 0, index < positions.count else { return false }
-      return abs(positions[index] - positions[index - 1]) < minGap
-    }
-
-    /// Rebalances the positions around a specific index, ensuring that there is sufficient gap between
-    /// positions to allow for future inserts without immediate need for another rebalance.
-    /// Not a good idea to rebalance the entire list on larger member lists.
-    func rebalanceAll() {
-      guard !positions.isEmpty else { return }
-
-      for i in positions.indices {
-        positions[i] = Double(i)
-      }
-    }
-
-    /// Rebalances the positions around a specific index, ensuring that there is sufficient gap between positions to allow for future inserts without immediate need for another rebalance.
-    /// - Parameters:
-    ///   - center: The index around which to rebalance the positions.
-    ///   - radius: The number of positions on either side of the center index to include in the rebalance.
-    func rebalance(around center: Int, radius: Int = 200) {
-      guard !positions.isEmpty else { return }
-
-      let lower = max(0, center - radius)
-      let upper = min(positions.count - 1, center + radius)
-
-      var value = positions[lower]
-
-      for i in lower...upper {
-        positions[i] = value
-        value += 1
       }
     }
 

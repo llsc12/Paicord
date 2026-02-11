@@ -321,7 +321,11 @@ extension Gateway {
   }
 
   /// https://discord.com/developers/docs/topics/gateway#gateway-intents
-  @UnstableEnum<UInt>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<UInt64>
+  #else
+    @UnstableEnum<UInt>
+  #endif
   public enum Intent: Sendable, Codable, CaseIterable {
     case guilds  // 0
     case guildMembers  // 1
@@ -344,11 +348,20 @@ extension Gateway {
     case autoModerationExecution  // 21
     case guildMessagePolls  // 24
     case directMessagePolls  // 25
-    case __undocumented(UInt)
+
+    #if Non64BitSystemsCompatibility
+      case __undocumented(UInt64)
+    #else
+      case __undocumented(UInt)
+    #endif
   }
 
   /// https://docs.discord.food/topics/gateway#list-of-capabilities
-  @UnstableEnum<UInt>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<UInt64>
+  #else
+    @UnstableEnum<UInt>
+  #endif
   public enum Capability: Sendable, Codable, CaseIterable {
     case lazyUserNotes  // 0
     case noAffineUserIDs  // 1
@@ -366,7 +379,12 @@ extension Gateway {
     case debounceMessageReactions  // 13
     case passiveGuildUpdateV2  // 14
     case autoLobbyConnect  // 16
-    case __undocumented(UInt)
+
+    #if Non64BitSystemsCompatibility
+      case __undocumented(UInt64)
+    #else
+      case __undocumented(UInt)
+    #endif
   }
 
   /// https://discord.com/developers/docs/topics/gateway-events#resume-resume-structure
@@ -427,8 +445,7 @@ extension Gateway {
 
     // user only
     public var sessions: [Session]
-    public var user_settings_proto:
-      DiscordProtos_DiscordUsers_V1_PreloadedUserSettings?
+    public var user_settings_proto: DiscordProtos_DiscordUsers_V1_PreloadedUserSettings?
     public var connected_accounts: [DiscordUser.Connection]
     public var user_guild_settings: [Guild.UserGuildSettings]
     //		public var guild_join_requests
@@ -539,8 +556,7 @@ extension Gateway {
     public var widget_enabled: Bool?
     public var widget_channel_id: ChannelSnowflake?
     public var verification_level: Guild.VerificationLevel
-    public var default_message_notifications:
-      Guild.DefaultMessageNotificationLevel
+    public var default_message_notifications: Guild.DefaultMessageNotificationLevel
     public var explicit_content_filter: Guild.ExplicitContentFilterLevel
     public var roles: [Role]
     public var emojis: [Emoji]
@@ -890,8 +906,7 @@ extension Gateway {
     public var flags: IntBitField<DiscordChannel.Message.Flag>?
     public var referenced_message: DereferenceBox<MessageCreate>?
     public var message_snapshots: [DiscordChannel.MessageSnapshot]?
-    //		@_spi(UserInstallableApps) @DecodeOrNil
-    //		public var interaction_metadata: DiscordChannel.Message.InteractionMetadata?
+    public var interaction_metadata: DiscordChannel.Message.InteractionMetadata?
     public var interaction: MessageInteraction?
     public var thread: DiscordChannel?
     public var components: Interaction.ComponentSwitch?
@@ -998,11 +1013,19 @@ extension Gateway {
     public var guild_id: GuildSnowflake?
   }
 
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum ReactionKind: Sendable, Codable {
     case normal  // 0
     case burst  // 1
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   /// https://discord.com/developers/docs/topics/gateway-events#message-reaction-add-message-reaction-add-event-fields
@@ -1213,15 +1236,23 @@ extension Gateway {
   public struct Activity: Sendable, Codable, Equatable, Hashable {
 
     /// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-types
-    @UnstableEnum<Int>
+    #if Non64BitSystemsCompatibility
+      @UnstableEnum<Int64>
+    #else
+      @UnstableEnum<Int>
+    #endif
     public enum Kind: Sendable, Codable {
-      case game  // 0
+      case playing  // 0
       case streaming  // 1
       case listening  // 2
       case watching  // 3
       case custom  // 4
       case competing  // 5
-      case __undocumented(Int)
+      #if Non64BitSystemsCompatibility
+        case __undocumented(Int64)
+      #else
+        case __undocumented(Int)
+      #endif
     }
 
     /// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-timestamps
@@ -1301,7 +1332,11 @@ extension Gateway {
     }
 
     /// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-flags
-    @UnstableEnum<UInt>
+    #if Non64BitSystemsCompatibility
+      @UnstableEnum<UInt64>
+    #else
+      @UnstableEnum<UInt>
+    #endif
     public enum Flag: Sendable {
       case instance  // 0
       case join  // 1
@@ -1312,7 +1347,12 @@ extension Gateway {
       case partyPrivacyFriends  // 6
       case partyPrivacyVoiceChannel  // 7
       case embedded  // 8
-      case __undocumented(UInt)
+
+      #if Non64BitSystemsCompatibility
+        case __undocumented(UInt64)
+      #else
+        case __undocumented(UInt)
+      #endif
     }
 
     /// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-buttons
@@ -1576,7 +1616,11 @@ extension Gateway {
     public var nonce: String?
     public var reason_code: Reason
 
-    @UnstableEnum<UInt>
+    #if Non64BitSystemsCompatibility
+      @UnstableEnum<UInt64>
+    #else
+      @UnstableEnum<UInt>
+    #endif
     public enum Reason: Sendable, Codable {
       case unknown  // 1
       case timeout  // 2
@@ -1599,7 +1643,11 @@ extension Gateway {
       case activityLaunchInvalidLocationType  // 19
       case activityLaunchInvalidUserRegionForApplication  // 20
 
-      case __undocumented(UInt)
+      #if Non64BitSystemsCompatibility
+        case __undocumented(UInt64)
+      #else
+        case __undocumented(UInt)
+      #endif
     }
   }
 
@@ -1637,12 +1685,21 @@ extension Gateway {
     public var iframe_path: String
     public var modal_size: ModalSize
 
-    @UnstableEnum<UInt>
+    #if Non64BitSystemsCompatibility
+      @UnstableEnum<UInt64>
+    #else
+      @UnstableEnum<UInt>
+    #endif
     public enum ModalSize: Sendable, Codable {
       case small  // 1
       case normal  // 2
       case big  // 3
-      case __undocumented(UInt)
+
+      #if Non64BitSystemsCompatibility
+        case __undocumented(UInt64)
+      #else
+        case __undocumented(UInt)
+      #endif
     }
   }
 
@@ -1661,11 +1718,20 @@ extension Gateway {
   public struct NotificationSettings: Sendable, Codable {
     public var flags: IntBitField<Flag>?
 
-    @UnstableEnum<UInt>
+    #if Non64BitSystemsCompatibility
+      @UnstableEnum<UInt64>
+    #else
+      @UnstableEnum<UInt>
+    #endif
     public enum Flag: Sendable {
       case useNewNotifications  // 4
       case mentionOnAllMessages  // 5
-      case __undocumented(UInt)
+
+      #if Non64BitSystemsCompatibility
+        case __undocumented(UInt64)
+      #else
+        case __undocumented(UInt)
+      #endif
     }
   }
 
@@ -1846,11 +1912,20 @@ extension Gateway {
       case type  // the type hint
     }
 
-    @UnstableEnum<UInt>
+    #if Non64BitSystemsCompatibility
+      @UnstableEnum<UInt64>
+    #else
+      @UnstableEnum<UInt>
+    #endif
     public enum Kind: Sendable, Codable {
       case preloaded  // 1
       case frecency  // 2
-      case __undocumented(UInt)
+
+      #if Non64BitSystemsCompatibility
+        case __undocumented(UInt64)
+      #else
+        case __undocumented(UInt)
+      #endif
     }
   }
 
@@ -1904,7 +1979,11 @@ extension Gateway {
     public var last_pin_timestamp: DiscordTimestamp?
     public var flags: IntBitField<Flags>?
 
-    @UnstableEnum<UInt>
+    #if Non64BitSystemsCompatibility
+      @UnstableEnum<UInt64>
+    #else
+      @UnstableEnum<UInt>
+    #endif
     public enum Kind: Sendable, Codable {
       case channel  // 0
       case guildEvent  // 1
@@ -1913,16 +1992,28 @@ extension Gateway {
       case guildOnboardingQuestion  // 4
       case messageRequests  // 5
 
-      case __undocumented(UInt)
+      #if Non64BitSystemsCompatibility
+        case __undocumented(UInt64)
+      #else
+        case __undocumented(UInt)
+      #endif
     }
 
-    @UnstableEnum<UInt>
+    #if Non64BitSystemsCompatibility
+      @UnstableEnum<UInt64>
+    #else
+      @UnstableEnum<UInt>
+    #endif
     public enum Flags: Sendable, Codable {
       case isGuildChannel  // 0
       case isThread  // 1
       case isMentionLowImportance  // 2
 
-      case __undocumented(UInt)
+      #if Non64BitSystemsCompatibility
+        case __undocumented(UInt64)
+      #else
+        case __undocumented(UInt)
+      #endif
     }
   }
 
@@ -2068,7 +2159,10 @@ extension Gateway {
         switch opKind {
         case .sync:
           let range = try container.decode(IntPair.self, forKey: .range)
-          let items = try container.decode([GuildMemberListMixedItem].self, forKey: .items)
+          let items = try container.decode(
+            [GuildMemberListMixedItem].self,
+            forKey: .items
+          )
           self = .sync(range: range, items: items)
         case .update:
           let index = try container.decode(Int.self, forKey: .index)
@@ -2181,7 +2275,7 @@ extension Gateway {
           case member
           case group
         }
-        
+
         public var id: AnySnowflake {
           switch self {
           case .member(let member):
@@ -2213,8 +2307,86 @@ extension Gateway {
     }
 
     public struct GroupCount: Sendable, Codable {
-      public var id: RoleSnowflake  // annoyingly this can also be "online" to represent unhoisted online members
+      public var id: RoleSnowflake  // this can also be "online" to represent unhoisted online members or "offline" for offline members in "everyone" member lists
       public var count: Int
+    }
+  }
+
+  public struct ContentInventoryInboxStale: Sendable, Codable {
+    public var refresh_after_ms: UInt
+  }
+
+  public struct EmbeddedActivityUpdateV2: Sendable, Codable {
+    public var participants: [Participant]
+    public var location: Location
+    public var launch_id: AnySnowflake
+    public var instance_id: AnySnowflake
+    public var guild_id: GuildSnowflake
+    public var composite_instance_id: String
+    public var application_id: ApplicationSnowflake
+
+    public struct Participant: Sendable, Codable {
+      public var user_id: UserSnowflake
+      public var session_id: String
+      public var nonce: AnySnowflake
+      public var member: Guild.PartialMember
+    }
+
+    public struct Location: Sendable, Codable {
+      public var kind: String
+      public var channel_id: ChannelSnowflake
+      public var guild_id: GuildSnowflake
+      public var id: String
+    }
+  }
+
+  public struct UserApplicationIdentityUpdate: Sendable, Codable {
+    public var application_id: ApplicationSnowflake
+    public var username: String
+    public var user_id: UserSnowflake
+    public var avatar_hash: String?
+    public var metadata: String
+  }
+
+  public struct VoiceChannelStartTimeUpdate: Sendable, Codable {
+    public var voice_start_time: DiscordTimestamp
+    public var id: ChannelSnowflake
+    public var guild_id: GuildSnowflake
+  }
+
+  public struct GuildJoinRequestUpdate: Sendable, Codable {
+    public var status: Status
+    public var request: GuildJoinRequest
+    public var guild_id: GuildSnowflake
+
+    public struct GuildJoinRequest: Sendable, Codable {
+      public var user_id: UserSnowflake
+      public var user: PartialUser
+      public var rejection_reason: String?
+      public var last_seen: DiscordTimestamp
+      public var join_request_id: AnySnowflake
+      public var interview_channel_id: ChannelSnowflake?
+      public var id: AnySnowflake
+      public var guild_id: GuildSnowflake
+      public var form_responses: [MemberVerificationFormField]
+      public var created_at: DiscordTimestamp
+      public var application_status: Status
+      public var actioned_by_user: PartialUser?
+      public var actioned_at: AnySnowflake?
+    }
+
+    public struct MemberVerificationFormField: Sendable, Codable {
+
+    }
+
+    @UnstableEnum<String>
+    public enum Status: Sendable, Codable {
+      case started  // STARTED
+      case submitted  // SUBMITTED
+      case rejected  // REJECTED
+      case approved  // APPROVED
+
+      case __undocumented(String)
     }
   }
 }

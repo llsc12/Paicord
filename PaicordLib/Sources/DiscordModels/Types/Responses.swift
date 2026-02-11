@@ -58,6 +58,11 @@ public enum Responses {
     }
   }
 
+  /// https://discord.com/developers/docs/resources/emoji#list-application-emojis
+  public struct ListApplicationEmojis: Sendable, Codable {
+    public var items: [Emoji]
+  }
+
   /// https://discord.com/developers/docs/resources/poll#get-answer-voters-response-body
   public struct ListPollAnswerVoters: Sendable, Codable {
     public var users: [DiscordUser]

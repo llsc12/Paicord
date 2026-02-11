@@ -129,7 +129,11 @@ public struct AuditLog: Sendable, Codable {
     }
 
     /// https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events
-    @UnstableEnum<Int>
+    #if Non64BitSystemsCompatibility
+      @UnstableEnum<Int64>
+    #else
+      @UnstableEnum<Int>
+    #endif
     public enum ActionKind: Sendable, Codable {
       case guildUpdate  // 1
       case channelCreate  // 10
@@ -194,7 +198,11 @@ public struct AuditLog: Sendable, Codable {
       case onboardingUpdate  // 167
       case homeSettingsCreate  // 190
       case homeSettingsUpdate  // 191
-      case __undocumented(Int)
+      #if Non64BitSystemsCompatibility
+        case __undocumented(Int64)
+      #else
+        case __undocumented(Int)
+      #endif
     }
 
     /// A mix of the below two types.

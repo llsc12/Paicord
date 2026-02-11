@@ -26,7 +26,7 @@ struct Test {
         case .pending_ticket:
           // ticket pending, awaiting user confirmation from remote device for auth.
           // we received encrypted user data which we can use to show a preview of the account
-          print(event.user_payload)
+          print(event.user_payload?.username ?? "Unknown")
         case .pending_login:
           // login pending, user confirmed on remote device, need to send ticket
           // exchanging it for token.

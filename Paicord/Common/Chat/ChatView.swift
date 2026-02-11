@@ -181,9 +181,14 @@ struct ChatView: View {
         let channelId = info["channelId"] as? ChannelSnowflake,
         channelId == vm.channelId
       else { return }
-      let isNearBottom = orderedMessages.suffix(5).contains {
-        $0.id == self.currentScrollPosition
-      }
+      let isNearBottom =
+        (orderedMessages.suffix(10).map(\.id)
+        + pendingMessages.values.compactMap(\.nonce).map({
+          MessageSnowflake($0.asString)
+        }))
+        .contains {
+          $0 == self.currentScrollPosition
+        }
       let immediate = (info["immediate"] as? Bool == true)
       guard isNearBottom || immediate else {
         return
