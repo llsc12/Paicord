@@ -428,7 +428,7 @@ public final class BlockParser {
 
   // MARK: - List Parsers
 
-  private func parseList() throws -> AST.ListNode {
+  private func parseList(_ indentationLevel: Int = 0) throws -> AST.ListNode {
     let startLocation = tokenStream.current.location
     let firstMarker = tokenStream.current.content
 
@@ -442,6 +442,11 @@ public final class BlockParser {
 
     var whitespaceCount = 0
     while !tokenStream.isAtEnd && tokenStream.check(.listMarker) {
+      let level = whitespaceCount / 2
+      if whitespaceCount != 0 && level < indentationLevel {
+        print(tokenStream.current.content)
+        break
+      }
       let marker = tokenStream.current.content
 
       // Check if this marker matches the list type
@@ -461,7 +466,12 @@ public final class BlockParser {
       }
 
       // Parse list item
-      let item = try parseListItem(whitespaceCount, itemNumber: itemNumber)
+      var item: ASTNode
+      if whitespaceCount > 0 {
+        item = try parseList(indentationLevel == level ? indentationLevel : indentationLevel + 1)
+      } else {
+        item = try parseListItem(itemNumber: itemNumber)
+      }
       items.append(item)
       
       if isOrdered {
@@ -474,12 +484,13 @@ public final class BlockParser {
     return AST.ListNode(
       isOrdered: isOrdered,
       startNumber: startNumber,
+      level: indentationLevel,
       items: items,
       sourceLocation: startLocation
     )
   }
 
-  private func parseListItem(_ whitespaceCount: Int, itemNumber: Int? = nil) throws -> AST.ListItemNode {
+  private func parseListItem(itemNumber: Int? = nil) throws -> AST.ListItemNode {
     let startLocation = tokenStream.current.location
 
     // Consume list marker
@@ -531,7 +542,7 @@ public final class BlockParser {
       }
     }
 
-    return AST.ListItemNode(level: whitespaceCount/2, itemNumber: itemNumber, children: children, sourceLocation: startLocation)
+    return AST.ListItemNode(itemNumber: itemNumber, children: children, sourceLocation: startLocation)
   }
 
   private func isNextListItem() -> Bool {
@@ -868,7 +879,9 @@ public final class BlockParser {
   private func skipWhitespaceAndNewlines() -> Int {
     var count: Int = 0
     while tokenStream.check(.whitespace) || tokenStream.check(.newline) {
-      count += tokenStream.current.length
+      if tokenStream.check(.whitespace) {
+        count += tokenStream.current.length
+      }
       tokenStream.advance()
     }
     return count

@@ -177,6 +177,9 @@ public enum AST {
 
     /// Starting number for ordered lists
     public let startNumber: Int?
+    
+    /// Nesting level
+    public let level: Int
 
     /// List items
     public let items: [ASTNode]
@@ -184,11 +187,13 @@ public enum AST {
     public init(
       isOrdered: Bool,
       startNumber: Int? = nil,
+      level: Int,
       items: [ASTNode],
       sourceLocation: SourceLocation? = nil
     ) {
       self.isOrdered = isOrdered
       self.startNumber = startNumber
+      self.level = level
       self.items = items
       self.sourceLocation = sourceLocation
       self.children = items
@@ -201,17 +206,13 @@ public enum AST {
     public let children: [ASTNode]
     public let sourceLocation: SourceLocation?
     
-    /// Indentation level
-    public let level: Int
-    
     /// Number of the item in the ordered list
     public let listNumber: Int?
 
-    public init(level: Int, itemNumber: Int? = nil, children: [ASTNode], sourceLocation: SourceLocation? = nil) {
+    public init(itemNumber: Int? = nil, children: [ASTNode], sourceLocation: SourceLocation? = nil) {
+      self.listNumber = itemNumber
       self.children = children
       self.sourceLocation = sourceLocation
-      self.level = level
-      self.listNumber = itemNumber
     }
   }
 

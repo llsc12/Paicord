@@ -219,8 +219,12 @@ struct MarkdownText: View, Equatable {
         if let children = block.children {
           VStack(alignment: .leading, spacing: 4) {
             ForEach(children) { child in
-              BlockView(block: child)
-                .equatable()
+              HStack(alignment: .top, spacing: 0) {
+//                Text(verbatim: String(repeating: "\t", count: block.level ?? 0))
+                Text(verbatim: String(block.level ?? -1))
+                BlockView(block: child)
+                  .equatable()
+              }
             }
           }
         }
@@ -230,20 +234,12 @@ struct MarkdownText: View, Equatable {
           let converted = AttributedString(attr)
           Text(converted)
         } else if let children = block.children {
-          // all the numbers
-          let isOrdered = block.isOrdered ?? false
-          let number = block.itemNumber ?? -1
-          let level = block.level ?? 0
-          
-          // string stuff
-          let bullet = level > 0 ? "◦" : "•" // hollow circle if nested, filled if not
-          let indentation = String(repeating: "\t", count: level)
-          let start = isOrdered ? "\(number)." : bullet
+          let level = block.level ?? -1
           
           VStack(alignment: .leading, spacing: 4) {
             ForEach(children) { nested in
               HStack(alignment: .top, spacing: 8) {
-                Text(verbatim: indentation + start).font(.body)
+                Text(verbatim: block.itemNumber != nil ? "\(block.itemNumber ?? -1)." : level > 0 ? "◦" : "•").font(.body)
                 BlockView(block: nested)
                   .equatable()
               }
@@ -614,7 +610,7 @@ class MarkdownRendererVM {
               itemNumber: listItem.listNumber,
               codeContent: nil,
               language: nil,
-              level: listItem.level,
+              level: list.level,
               children: listItemChildren,
               sourceLocation: listItem.sourceLocation
             )
@@ -633,7 +629,7 @@ class MarkdownRendererVM {
               itemNumber: nil,
               codeContent: nil,
               language: nil,
-              level: nil,
+              level: list.level,
               children: nil,
               sourceLocation: item.sourceLocation
             )
@@ -649,7 +645,7 @@ class MarkdownRendererVM {
           itemNumber: nil,
           codeContent: nil,
           language: nil,
-          level: nil,
+          level: list.level,
           children: items,
           sourceLocation: node.sourceLocation
         )
@@ -1700,5 +1696,76 @@ final class EmojiAttachmentViewProvider: NSTextAttachmentViewProvider {
     animatedImageView = nil
     container = nil
   }
+}
+
+#Preview {
+  let msg = """
+    1. Item 1
+    3. Item 2 (3.)
+      5. Item 2a (5.)
+      2. Item 2b (2.)
+    7. Item 3 (7.)
+    """
+  let user = DiscordUser(
+    id: .init("381538809180848128"),
+    username: "markdown test",
+    discriminator: "0",
+    global_name: nil,
+    avatar: "df71b3f223666fd8331c9940c6f7cbd9",
+    banner: nil,
+    bot: false,
+    system: false,
+    mfa_enabled: true,
+    accent_color: nil,
+    locale: .englishUS,
+    verified: true,
+    email: nil,
+    flags: .init(rawValue: 4_194_352),
+    premium_type: nil,
+    public_flags: .init(rawValue: 4_194_304),
+    avatar_decoration_data: nil
+  )
+  MessageCell(
+    for: .init(
+      id: try! .makeFake(),
+      channel_id: try! .makeFake(),
+      author: user,
+      content: msg,
+      timestamp: .init(date: .now),
+      edited_timestamp: nil,
+      tts: false,
+      mention_everyone: false,
+      mentions: [],
+      mention_roles: [],
+      mention_channels: nil,
+      attachments: [],
+      embeds: [],
+      reactions: nil,
+      nonce: nil,
+      pinned: false,
+      webhook_id: nil,
+      type: DiscordChannel.Message.Kind.default,
+      activity: nil,
+      application: nil,
+      application_id: nil,
+      message_reference: nil,
+      flags: [],
+      referenced_message: nil,
+      interaction: nil,
+      thread: nil,
+      components: nil,
+      sticker_items: nil,
+      stickers: nil,
+      position: nil,
+      role_subscription_data: nil,
+      resolved: nil,
+      poll: nil,
+      call: nil,
+      guild_id: nil,
+      member: nil
+    ),
+    prior: nil,
+    channel: .init(id: try! .makeFake())
+  )
 }
 
