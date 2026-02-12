@@ -263,5 +263,5 @@ jobs:
             await github.rest.issues.createComment({
               ...context.repo,
               issue_number: pr,
-              body: `✅ PR /release build finished for commit \`${commit}\`.\n\nArtifacts (unsigned) uploaded as workflow artifacts. Download them from the workflow run: ${runUrl}`
+              body: `✅ PR /release build finished for commit \`${commit}\`.\n\nArtifacts (unsigned) uploaded as workflow artifacts. Downloads: [macOS](https://nightly.link/llsc12/Paicord/actions/runs/${process.env.GITHUB_RUN_ID}/Paicord-macOS.zip) [iOS](https://nightly.link/llsc12/Paicord/actions/runs/${process.env.GITHUB_RUN_ID}/Paicord-iOS.zip).\n\n[View workflow run](${runUrl})`
             });
