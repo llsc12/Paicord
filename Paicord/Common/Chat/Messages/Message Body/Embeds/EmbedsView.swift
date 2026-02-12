@@ -268,27 +268,28 @@ extension MessageCell {
           AttachmentsView.AttachmentSizedView(attachment: items[0]) {
             AttachmentsView.AttachmentItemPreview(attachment: items[0])
           }
+          .clipShape(.rounded)  
         case 2:
-          HStack(spacing: 8) {
+          HStack(spacing: 4) {
             ForEach(items.prefix(2), id: \.hashValue) { item in
               AttachmentsView.AttachmentItemPreview(attachment: item)
                 .scaledToFill()
-                .clipped()
+                .clipShape(.rect(cornerRadius: 4))
             }
           }
-          .clipped()
+          .clipShape(.rounded)
         case 3:
-          HStack(spacing: 8) {
+          HStack(spacing: 4) {
             if let item = items.first {
               Color.almostClear
                 .overlay {
                   AttachmentsView.AttachmentItemPreview(attachment: item)
                     .scaledToFill()
                 }
-                .clipShape(.rounded)
+                .clipShape(.rect(cornerRadius: 4))
             }
 
-            VStack(spacing: 8) {
+            VStack(spacing: 4) {
               ForEach(items.suffix(2), id: \.hashValue) { item in
                 Color.almostClear
                   .overlay {
@@ -296,14 +297,14 @@ extension MessageCell {
                       .scaledToFill()
                   }
                   .aspectRatio(1.6, contentMode: .fit)
-                  .clipShape(.rounded)
+                  .clipShape(.rect(cornerRadius: 4))
               }
             }
-            .clipped()
           }
+          .clipShape(.rounded)
         default:
-          VStack(spacing: 8) {
-            HStack(spacing: 8) {
+          VStack(spacing: 4) {
+            HStack(spacing: 4) {
               ForEach(items.prefix(2), id: \.hashValue) { item in
                 Color.almostClear
                   .overlay {
@@ -314,9 +315,8 @@ extension MessageCell {
                   .clipShape(.rounded)
               }
             }
-            .clipped()
 
-            HStack(spacing: 8) {
+            HStack(spacing: 4) {
               ForEach(items.suffix(2), id: \.hashValue) { item in
                 Color.almostClear
                   .overlay {
@@ -324,11 +324,11 @@ extension MessageCell {
                       .scaledToFill()
                   }
                   .aspectRatio(1.6, contentMode: .fit)
-                  .clipShape(.rounded)
+                  .clipShape(.rect(cornerRadius: 4))
               }
             }
-            .clipped()
           }
+          .clipShape(.rounded)
         }
       }
 
@@ -351,7 +351,7 @@ extension MessageCell {
       var body: some View {
         AVPlayerLayerContainer(player: controller.player)
           .aspectRatio(media.aspectRatio, contentMode: .fit)
-          .clipShape(RoundedRectangle(cornerRadius: 8))
+          .clipShape(.rounded)
           .frame(maxWidth: maxWidth, maxHeight: maxHeight, alignment: .leading)
           .onAppear { controller.play() }
           .onDisappear { controller.pauseAndReset() }
