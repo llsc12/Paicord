@@ -268,7 +268,7 @@ extension MessageCell {
           AttachmentsView.AttachmentSizedView(attachment: items[0]) {
             AttachmentsView.AttachmentItemPreview(attachment: items[0])
           }
-          .clipShape(.rounded)  
+          .clipShape(.rounded)
         case 2:
           HStack(spacing: 4) {
             ForEach(items.prefix(2), id: \.hashValue) { item in
@@ -312,7 +312,7 @@ extension MessageCell {
                       .scaledToFill()
                   }
                   .aspectRatio(1.6, contentMode: .fit)
-                  .clipShape(.rounded)
+                  .clipShape(.rect(cornerRadius: 4))
               }
             }
 
@@ -741,7 +741,7 @@ extension MessageCell {
         "Youtube fastesttube downloader will make your internet expirience faster harder beter stronger.",
       url: "https://kwizzu.com/",
       timestamp: nil,
-      color: nil,
+      color: .orange,
       footer: nil,
       image: .init(
         url: .exact("http://kwizzu.com/img/og_images/safari.jpg"),
@@ -837,7 +837,7 @@ extension MessageCell {
         "Youtube fastesttube downloader will make your internet expirience faster harder beter stronger.",
       url: "https://a.com/",
       timestamp: nil,
-      color: nil,
+      color: .green,
       footer: nil,
       image: .init(
         url: .exact("http://kwizzu.com/img/og_images/safari.jpg"),
@@ -908,7 +908,7 @@ extension MessageCell {
     )
     .padding()
   }
-  .frame(height: 600)
+  .frame(height: 800)
 }
 
 extension Date {
