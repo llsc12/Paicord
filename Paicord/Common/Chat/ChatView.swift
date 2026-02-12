@@ -18,7 +18,7 @@ struct ChatView: View {
   @Environment(\.accessibilityReduceMotion) var accessibilityReduceMotion
   @Environment(\.userInterfaceIdiom) var idiom
   @Environment(\.theme) var theme
-  
+
   @State private var currentScrollPosition: MessageSnowflake?
   @State private var isScrolling: Bool = false
 
@@ -32,8 +32,8 @@ struct ChatView: View {
   #if os(macOS)
     @FocusState private var isChatFocused: Bool
 
-    @State private var scrollStopWorkItem: DispatchWorkItem?
-    @State private var scrollObserver: NSObjectProtocol?
+    @ViewStorage private var scrollStopWorkItem: DispatchWorkItem?
+    @ViewStorage private var scrollObserver: NSObjectProtocol?
   #endif
 
   var body: some View {
@@ -63,7 +63,12 @@ struct ChatView: View {
           ForEach(orderedMessages) { msg in
             let prior = vm.getMessage(before: msg)
             if messageAllowed(msg) {
-              MessageCell(for: msg, prior: prior, channel: vm, scrolling: isScrolling)
+              MessageCell(
+                for: msg,
+                prior: prior,
+                channel: vm,
+                scrolling: isScrolling
+              )
             }
           }
 
@@ -122,22 +127,24 @@ struct ChatView: View {
           guard scrollObserver == nil else { return }
           clipView.postsBoundsChangedNotifications = true
 
-          // defer to avoid "Modifying state during view update" warning
-          DispatchQueue.main.async {
-            scrollObserver = NotificationCenter.default.addObserver(
-              forName: NSView.boundsDidChangeNotification,
-              object: clipView,
-              queue: .main
-            ) { _ in
+          scrollObserver = NotificationCenter.default.addObserver(
+            forName: NSView.boundsDidChangeNotification,
+            object: clipView,
+            queue: .main
+          ) { _ in
+            DispatchQueue.main.async {
               isScrolling = true
-
-              scrollStopWorkItem?.cancel()
-              let work = DispatchWorkItem {
-                isScrolling = false
-              }
-              scrollStopWorkItem = work
-              DispatchQueue.main.asyncAfter(deadline: .now() + 0.12, execute: work)
             }
+
+            scrollStopWorkItem?.cancel()
+            let work = DispatchWorkItem {
+              isScrolling = false
+            }
+            scrollStopWorkItem = work
+            DispatchQueue.main.asyncAfter(
+              deadline: .now() + 0.12,
+              execute: work
+            )
           }
         }
       #endif
@@ -204,7 +211,7 @@ struct ChatView: View {
           NotificationCenter.default.removeObserver(observer)
           scrollObserver = nil
         }
-        
+
         scrollStopWorkItem?.cancel()
         scrollStopWorkItem = nil
       }
