@@ -27,7 +27,7 @@ extension MessageCell {
     init(attachments: [DiscordChannel.Message.Attachment]) {
       for att in attachments {
         if let type = UTType(mimeType: att.content_type ?? ""),
-          AttachmentGridItemPreview.supportedTypes.contains(type)
+          AttachmentItemPreview.supportedTypes.contains(type)
         {
           previewableAttachments.append(att)
         } else if let type = UTType(mimeType: att.content_type ?? ""),
@@ -78,6 +78,7 @@ extension MessageCell {
 
     @ViewBuilder
     var mosaic: some View {
+      #warning("Do this soon")
       list
     }
 
@@ -85,7 +86,7 @@ extension MessageCell {
     var list: some View {
       ForEach(previewableAttachments) { attachment in
         AttachmentSizedView(attachment: attachment) {
-          AttachmentGridItemPreview(
+          AttachmentItemPreview(
             attachment: attachment
           )
         }
@@ -107,20 +108,30 @@ extension MessageCell {
         self.content = content()
       }
 
-      private let maxWidth: CGFloat = 500
-      private let maxHeight: CGFloat = 300
+      private let maxWidth = 500
+      private let maxHeight = 300
+      
+      var width: CGFloat {
+        .init(min(maxWidth, attachment.width ?? maxWidth))
+      }
+      var height: CGFloat {
+        .init(min(maxHeight, attachment.height ?? maxHeight))
+      }
 
       var body: some View {
-        content
+        Color.almostClear
           .aspectRatio(attachment.aspectRatio, contentMode: .fit)
-          .clipShape(.rounded)
-          .frame(maxWidth: maxWidth, maxHeight: maxHeight, alignment: .leading)
-          .fixedSize(horizontal: false, vertical: true)
+          .frame(maxWidth: width, maxHeight: height, alignment: .leading)
+          .overlay(alignment: .topLeading) {
+            content
+              .clipShape(.rounded)
+              .scaledToFit()
+          }
       }
     }
 
     /// Handles images, videos
-    struct AttachmentGridItemPreview: View {
+    struct AttachmentItemPreview: View {
       static let supportedTypes: [UTType] = [
         .png,
         .jpeg,
@@ -139,7 +150,9 @@ extension MessageCell {
         case .mpeg4Movie, .quickTimeMovie:
           VideoView(attachment: attachment)
         default:
-          Text("\(attachment.type) unsupported")
+          // unknown type. sadly discord can sometimes not provide content type.
+          // fields like thumbnail may not always send content type field.
+          ImageView(attachment: attachment)
         }
       }
 
@@ -155,12 +168,15 @@ extension MessageCell {
               #if os(macOS)
                 Image(nsImage: img)
                   .resizable()
+                  .aspectRatio(attachment.aspectRatio, contentMode: .fill)
               #else
                 Image(uiImage: img)
                   .resizable()
+                  .aspectRatio(attachment.aspectRatio, contentMode: .fill)
               #endif
             } else {
               Color.gray.opacity(0.2)
+                .aspectRatio(attachment.aspectRatio, contentMode: .fill)
             }
 
           }
@@ -234,7 +250,6 @@ extension MessageCell {
             VideoPlayer(player: player)
           }
         }
-
       }
     }
 
