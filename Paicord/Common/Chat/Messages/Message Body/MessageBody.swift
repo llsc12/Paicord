@@ -70,7 +70,6 @@ extension MessageCell {
 
         // Reactions
         let reactions = channelStore.reactions[message.id, default: [:]]
-
         if !reactions.isEmpty {
           ReactionsView(reactions: reactions)
         }
