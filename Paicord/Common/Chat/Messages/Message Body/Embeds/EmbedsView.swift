@@ -49,7 +49,7 @@ extension MessageCell {
             }
           case .gifv:
             if let video = embed.video {
-              GifvView(media: video, staticMedia: embed.image)
+              AttachmentsView.GifvView(media: video, staticMedia: embed.image)
             }
           case .link:
             LinkEmbedView(embed: embed, items: embedData.items)
@@ -220,7 +220,10 @@ extension MessageCell {
 
             if !items.isEmpty {
               images
-            } else if let image = embed.image {
+            } else if let image =
+              (embed.type == .article
+                ? embed.image ?? embed.thumbnail : embed.image)
+            {
               AttachmentsView.AttachmentSizedView(attachment: image) {
                 AttachmentsView.AttachmentItemPreview(attachment: image)
               }
@@ -332,142 +335,6 @@ extension MessageCell {
         }
       }
 
-    }
-
-    struct GifvView: View {
-      @State private var controller: PlayerController
-      private let media: Embed.Media
-      private let staticMedia: Embed.Media?
-
-      private let maxWidth: CGFloat = 500
-      private let maxHeight: CGFloat = 300
-
-      init(media: Embed.Media, staticMedia: Embed.Media? = nil) {
-        self.media = media
-        self.staticMedia = staticMedia
-        _controller = State(initialValue: PlayerController(media: media))
-      }
-
-      var body: some View {
-        AVPlayerLayerContainer(player: controller.player)
-          .aspectRatio(media.aspectRatio, contentMode: .fit)
-          .clipShape(.rounded)
-          .frame(maxWidth: maxWidth, maxHeight: maxHeight, alignment: .leading)
-          .onAppear { controller.play() }
-          .onDisappear { controller.pauseAndReset() }
-      }
-
-      @Observable
-      final class PlayerController {
-        let player: AVPlayer
-        private var observerToken: Any?
-
-        init(media: Embed.Media) {
-          guard let url = URL(string: media.proxyurl)
-          else {
-            self.player = AVPlayer()
-            return
-          }
-          let item = AVPlayerItem(asset: AVAsset(url: url))
-          self.player = AVPlayer(playerItem: item)
-
-          observerToken = NotificationCenter.default.addObserver(
-            forName: .AVPlayerItemDidPlayToEndTime,
-            object: item,
-            queue: .main
-          ) { [weak self] _ in
-            self?.player.seek(to: .zero)
-            self?.player.play()
-          }
-        }
-
-        deinit {
-          if let o = observerToken {
-            NotificationCenter.default.removeObserver(o)
-          }
-          player.pause()
-        }
-
-        func play() { player.play() }
-        func pauseAndReset() {
-          player.seek(to: .zero)
-          player.pause()
-        }
-      }
-
-      struct AVPlayerLayerContainer: AppKitOrUIKitViewRepresentable {
-        var player: AVPlayer
-
-        typealias AppKitOrUIKitViewType = AppKitOrUIKitView
-
-        func makeAppKitOrUIKitView(context: Context) -> AppKitOrUIKitView {
-          #if os(iOS)
-            let view = PlayerView_iOS()
-            view.player = player
-            return view
-          #elseif os(macOS)
-            let view = PlayerView_macOS()
-            view.player = player
-            return view
-          #endif
-        }
-
-        func updateAppKitOrUIKitView(
-          _ view: AppKitOrUIKitViewType,
-          context: Context
-        ) {
-          #if os(iOS)
-            (view as? PlayerView_iOS)?.player = player
-          #elseif os(macOS)
-            (view as? PlayerView_macOS)?.player = player
-          #endif
-        }
-
-        #if os(iOS)
-          class PlayerView_iOS: AppKitOrUIKitView {
-            override class var layerClass: AnyClass { AVPlayerLayer.self }
-            var player: AVPlayer? {
-              get { (layer as? AVPlayerLayer)?.player }
-              set { (layer as? AVPlayerLayer)?.player = newValue }
-            }
-          }
-        #elseif os(macOS)
-          class PlayerView_macOS: AppKitOrUIKitView {
-            override init(frame frameRect: CGRect) {
-              super.init(frame: frameRect)
-              wantsLayer = true
-            }
-            required init?(coder: NSCoder) {
-              super.init(coder: coder)
-              wantsLayer = true
-            }
-
-            var player: AVPlayer? {
-              didSet { updatePlayerLayer() }
-            }
-
-            private var playerLayer: AVPlayerLayer?
-
-            override func layout() {
-              super.layout()
-              playerLayer?.frame = bounds
-            }
-
-            private func updatePlayerLayer() {
-              playerLayer?.removeFromSuperlayer()
-              guard let player = player else {
-                playerLayer = nil
-                return
-              }
-              let pl = AVPlayerLayer(player: player)
-              pl.frame = bounds
-              pl.videoGravity = .resizeAspect
-              layer?.addSublayer(pl)
-              playerLayer = pl
-            }
-          }
-        #endif
-      }
     }
 
     struct LinkEmbedView: View {
