@@ -93,6 +93,7 @@
 		AA5CA6602E9D435800C7C82A /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = AA5CA65F2E9D435800C7C82A /* SDWebImageSwiftUI */; };
 		AA5DC55A2E9482ED00D81EB5 /* MessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5DC5592E9482ED00D81EB5 /* MessageCell.swift */; };
 		AA5F76EB2F3E5E2100A7A003 /* QuickSwitcherProviderStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5F76EA2F3E5E1900A7A003 /* QuickSwitcherProviderStore.swift */; };
+		AA5F76EE2F3EA53300A7A003 /* QuickSwitcherModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5F76ED2F3EA52D00A7A003 /* QuickSwitcherModifier.swift */; };
 		AA63EB722EA711D000A5F21D /* EmbedsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA63EB712EA711CD00A5F21D /* EmbedsView.swift */; };
 		AA63EB762EA712D900A5F21D /* ReactionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA63EB752EA712D500A5F21D /* ReactionsView.swift */; };
 		AA67FD132EF4A792004676A1 /* InputVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA67FD122EF4A792004676A1 /* InputVM.swift */; };
@@ -239,6 +240,7 @@
 		AA5CA6532E9BD37500C7C82A /* ComponentsV2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentsV2.swift; sourceTree = "<group>"; };
 		AA5DC5592E9482ED00D81EB5 /* MessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageCell.swift; sourceTree = "<group>"; };
 		AA5F76EA2F3E5E1900A7A003 /* QuickSwitcherProviderStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickSwitcherProviderStore.swift; sourceTree = "<group>"; };
+		AA5F76ED2F3EA52D00A7A003 /* QuickSwitcherModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickSwitcherModifier.swift; sourceTree = "<group>"; };
 		AA63EB712EA711CD00A5F21D /* EmbedsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbedsView.swift; sourceTree = "<group>"; };
 		AA63EB752EA712D500A5F21D /* ReactionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReactionsView.swift; sourceTree = "<group>"; };
 		AA67FD122EF4A792004676A1 /* InputVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputVM.swift; sourceTree = "<group>"; };
@@ -819,6 +821,14 @@
 			path = Messages;
 			sourceTree = "<group>";
 		};
+		AA5F76EC2F3EA50D00A7A003 /* Quick Switcher */ = {
+			isa = PBXGroup;
+			children = (
+				AA5F76ED2F3EA52D00A7A003 /* QuickSwitcherModifier.swift */,
+			);
+			path = "Quick Switcher";
+			sourceTree = "<group>";
+		};
 		AA63EB702EA711C200A5F21D /* Embeds */ = {
 			isa = PBXGroup;
 			children = (
@@ -864,14 +874,15 @@
 		AA9C81802E665E190086B1DA /* Common */ = {
 			isa = PBXGroup;
 			children = (
-				AA4207CD2F2D1165006B8227 /* Emoji Picker */,
 				57A4E7092E6B315700470131 /* Login */,
 				57DA04282E79893B00DB4C7C /* Launch */,
 				57A55C552E7560BB005C8226 /* Guilds */,
 				AA1097082E64C181005BC3D2 /* Chat */,
+				AA4207CD2F2D1165006B8227 /* Emoji Picker */,
 				AA21D2852EAB08E500C75093 /* Member Sidebar */,
 				57DA042D2E79DC4400DB4C7C /* Settings */,
 				AA2278C32EA44819002C335F /* Profiles */,
+				AA5F76EC2F3EA50D00A7A003 /* Quick Switcher */,
 				57A55C542E7560B3005C8226 /* Sheets */,
 				AA9C81842E6667050086B1DA /* Utilities */,
 			);
@@ -1125,6 +1136,7 @@
 				AAB50A522E9AC9CB0048E8B0 /* ChannelHeader.swift in Sources */,
 				AA47AF3B2EDEF990008A50C9 /* ProfilesSection.swift in Sources */,
 				AA2278C72EA448C7002C335F /* Profile.swift in Sources */,
+				AA5F76EE2F3EA53300A7A003 /* QuickSwitcherModifier.swift in Sources */,
 				AA70EFB12EA1B3BD00344D98 /* InputBar.swift in Sources */,
 				AADD58652E82A95B00CBC8B6 /* GuildScrollBar.swift in Sources */,
 				AA0624802F0A04DF007F28EB /* MessageDrainView.swift in Sources */,

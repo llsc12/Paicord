@@ -18,6 +18,10 @@ final class PaicordAppState {
 
   // MARK: - iOS Specific
   var chatOpen: Bool = true
+  
+  // MARK: - General
+  var isActiveWindow = true
+  var showingQuickSwitcher: Bool = false
 
   // MARK: - Selected Guild & Channel Persistence
 

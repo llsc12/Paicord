@@ -17,6 +17,7 @@ struct RootView: View {
   @Environment(\.challenges) var challenges
   @Environment(\.userInterfaceIdiom) var idiom
   @Environment(\.horizontalSizeClass) var hSizeClass
+  @Environment(\.appearsActive) var active
 
   #if os(macOS)
     @Weak var window: NSWindow?
@@ -55,6 +56,7 @@ struct RootView: View {
             LargeBaseplate()
           }
         }
+        .quickSwitcher()
         .sponsorSheet()
         .updateSheet()
         .task {
@@ -82,6 +84,9 @@ struct RootView: View {
     }
     .onDisappear {
       PaicordAppState.instances.removeValue(forKey: appState.id)
+    }
+    .task(id: self.active) {
+      appState.isActiveWindow = self.active
     }
     #if os(macOS)
       .introspect(.window, on: .macOS(.v14...)) { window in
