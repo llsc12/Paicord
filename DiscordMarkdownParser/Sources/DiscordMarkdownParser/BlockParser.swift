@@ -436,11 +436,11 @@ public final class BlockParser {
     let startNumber = isOrdered ? Int(firstMarker.dropLast()) : nil
     let delimiter = isOrdered ? firstMarker.last : nil
     let bulletChar = isOrdered ? nil : firstMarker.first
-    var itemNumber = startNumber ?? 1
 
     var items: [ASTNode] = []
 
     var whitespaceCount = 0
+    var itemNumber = startNumber
     while !tokenStream.isAtEnd && tokenStream.check(.listMarker) {
       let level = whitespaceCount / 2
       if whitespaceCount != 0 && level < indentationLevel {
@@ -467,15 +467,15 @@ public final class BlockParser {
 
       // Parse list item
       var item: ASTNode
-      if whitespaceCount > 0 {
+      if whitespaceCount > 0 && level != indentationLevel {
         item = try parseList(indentationLevel == level ? indentationLevel : indentationLevel + 1)
       } else {
-        item = try parseListItem(itemNumber: itemNumber)
+        item = try parseListItem(itemNumber)
       }
       items.append(item)
       
       if isOrdered {
-        itemNumber += 1
+        itemNumber! += 1
       }
 
       whitespaceCount = skipWhitespaceAndNewlines()
@@ -490,7 +490,7 @@ public final class BlockParser {
     )
   }
 
-  private func parseListItem(itemNumber: Int? = nil) throws -> AST.ListItemNode {
+  private func parseListItem(_ itemNumber: Int?) throws -> AST.ListItemNode {
     let startLocation = tokenStream.current.location
 
     // Consume list marker
