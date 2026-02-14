@@ -1,6 +1,6 @@
 # Paicord
 
-A new Discord client written in SwiftUI, with a goal of feature parity with customisation and Quality-of-Life additions!
+A  native Discord client written in Swift using SwiftUI, with a goal of feature parity with customisation and Quality-of-Life additions!
 
  [![GitHub Release](https://img.shields.io/github/v/release/llsc12/Paicord?include_prereleases)](https://github.com/llsc12/Paicord/releases) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/llsc12/paicord/build.yml) [![GitHub License](https://img.shields.io/github/license/llsc12/Paicord)](https://github.com/llsc12/Paicord/blob/main/LICENSE) [![Discord](https://img.shields.io/discord/1417976730303463436?style=flat&label=discord)](https://discord.gg/fqhPGHPyaK) ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/llsc12/paicord/total)
 
@@ -19,6 +19,9 @@ This list is not exhaustive but the goal for Paicord is to have parity with the 
 > [!WARNING]
 >
 > As all third-party clients and client mods do, using Paicord is a violation of Discord ToS! Whilst Paicord ensures to pretend to be Discord as close as possible, the risk of account bans is ever-present. Beware! 
+
+## Cross-platform
+We have subprojects in the works to port the client to other platforms natively too! Keep an eye out on the repo or join the [Discord Server](https://discord.gg/fqhPGHPyaK)!
 
 ## Installing
 

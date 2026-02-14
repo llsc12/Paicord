@@ -18,7 +18,9 @@ struct ChatView: View {
   @Environment(\.accessibilityReduceMotion) var accessibilityReduceMotion
   @Environment(\.userInterfaceIdiom) var idiom
   @Environment(\.theme) var theme
+
   @State private var currentScrollPosition: MessageSnowflake?
+  @State private var isScrolling: Bool = false
 
   var drain: MessageDrainStore { gw.messageDrain }
 
@@ -29,6 +31,9 @@ struct ChatView: View {
 
   #if os(macOS)
     @FocusState private var isChatFocused: Bool
+
+    @ViewStorage private var scrollStopWorkItem: DispatchWorkItem?
+    @ViewStorage private var scrollObserver: NSObjectProtocol?
   #endif
 
   var body: some View {
@@ -58,7 +63,12 @@ struct ChatView: View {
           ForEach(orderedMessages) { msg in
             let prior = vm.getMessage(before: msg)
             if messageAllowed(msg) {
-              MessageCell(for: msg, prior: prior, channel: vm)
+              MessageCell(
+                for: msg,
+                prior: prior,
+                channel: vm,
+                scrolling: isScrolling
+              )
             }
           }
 
@@ -109,6 +119,33 @@ struct ChatView: View {
             object: ["channelId": vm.channelId, "immediate": true]
           )
           return .handled
+        }
+        .introspect(.scrollView, on: .macOS(.v14...)) { scrollView in
+
+          let clipView = scrollView.contentView
+
+          guard scrollObserver == nil else { return }
+          clipView.postsBoundsChangedNotifications = true
+
+          scrollObserver = NotificationCenter.default.addObserver(
+            forName: NSView.boundsDidChangeNotification,
+            object: clipView,
+            queue: .main
+          ) { _ in
+            DispatchQueue.main.async {
+              isScrolling = true
+            }
+
+            scrollStopWorkItem?.cancel()
+            let work = DispatchWorkItem {
+              isScrolling = false
+            }
+            scrollStopWorkItem = work
+            DispatchQueue.main.asyncAfter(
+              deadline: .now() + 0.12,
+              execute: work
+            )
+          }
         }
       #endif
       .scrollPosition(id: $currentScrollPosition, anchor: .bottom)  // causes issues with input bar height changes:
@@ -167,6 +204,19 @@ struct ChatView: View {
     .scrollDismissesKeyboard(.interactively)
     .background(theme.common.secondaryBackground)
     .ignoresSafeArea(.keyboard, edges: .all)
+
+    #if os(macOS)
+      .onDisappear {
+        if let observer = scrollObserver {
+          NotificationCenter.default.removeObserver(observer)
+          scrollObserver = nil
+        }
+
+        scrollStopWorkItem?.cancel()
+        scrollStopWorkItem = nil
+      }
+    #endif
+
     .toolbar {
       ToolbarItem(placement: .navigation) {
         ChannelHeader(vm: vm)

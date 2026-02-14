@@ -21,16 +21,19 @@ struct MessageCell: View {
   var message: DiscordChannel.Message
   var priorMessage: DiscordChannel.Message?
   var channelStore: ChannelStore
+  var isScrolling: Bool = false
   @State var cellHighlighted = false
 
   init(
     for message: DiscordChannel.Message,
     prior: DiscordChannel.Message? = nil,
-    channel: ChannelStore
+    channel: ChannelStore,
+    scrolling: Bool = false
   ) {
     self.message = message
     self.priorMessage = prior
     self.channelStore = channel
+    self.isScrolling = scrolling
   }
 
   var userMentioned: Bool {
@@ -97,7 +100,7 @@ struct MessageCell: View {
     #if os(macOS)
       .onHover { self.cellHighlighted = $0 }
       .background(
-        cellHighlighted
+        !isScrolling && cellHighlighted
           ? Color(NSColor.secondaryLabelColor).opacity(0.1) : .clear
       )
     #endif

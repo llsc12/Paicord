@@ -106,6 +106,7 @@ extension View {
     onEnded: @escaping (CGFloat, CGFloat) -> Void
   ) -> some View {
     if #available(iOS 18.0, *) {
+      #if os(iOS)
       self.gesture(
         SlideoverUIKitGesture(
           isEnabled: isEnabled,
@@ -113,6 +114,7 @@ extension View {
           onEnded: onEnded
         )
       )
+      #endif
     } else {
       self.gesture(
         DragGesture()
