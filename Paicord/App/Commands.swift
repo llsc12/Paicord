@@ -13,6 +13,7 @@ import SwiftUI
 struct PaicordCommands: Commands {
   @Environment(\.gateway) var gatewayStore
   @Environment(\.openWindow) var openWindow
+  @FocusedValue(\.appState) var appState
 
   var body: some Commands {
     CommandGroup(replacing: .appSettings) {
@@ -36,6 +37,7 @@ struct PaicordCommands: Commands {
     // add reload button to the system's View menu
     CommandGroup(after: .toolbar) {
       Button("Reload") {
+        appState?.showingQuickSwitcher = false
         Task {
           await gatewayStore.disconnectIfNeeded()
           gatewayStore.resetStores()
@@ -47,15 +49,10 @@ struct PaicordCommands: Commands {
       .disabled(gatewayStore.state != .connected)
       
       Button("Quick Switcher") {
-        let activeWindow = getActiveWindowState()
-        activeWindow?.showingQuickSwitcher.toggle()
+        appState?.showingQuickSwitcher.toggle()
       }
       .keyboardShortcut("k", modifiers: [.command])
       .disabled(gatewayStore.state != .connected)
     }
-  }
-  
-  func getActiveWindowState() -> PaicordAppState? {
-    PaicordAppState.instances.values.first { $0.isActiveWindow }
   }
 }

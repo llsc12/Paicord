@@ -14,13 +14,28 @@ final class PaicordAppState {
   // each window gets its own app state
   static var instances: [UUID: PaicordAppState] = [:]
 
+  init() {
+    Self.instances[id] = self
+
+    loadPrevSelectedChannels()
+    if let lastDM = self.rawPrevSelectedChannels[
+      self.selectedGuild?.rawValue ?? "nil"
+    ] {
+      self.selectedChannel = ChannelSnowflake(lastDM)
+    } else {
+      self.selectedChannel = nil
+    }
+  }
+  deinit {
+    Self.instances.removeValue(forKey: id)
+  }
+
   let id = UUID()
 
   // MARK: - iOS Specific
   var chatOpen: Bool = true
-  
+
   // MARK: - General
-  var isActiveWindow = true
   var showingQuickSwitcher: Bool = false
 
   // MARK: - Selected Guild & Channel Persistence
@@ -71,17 +86,6 @@ final class PaicordAppState {
   // persistent mapping as [String: String] where key == guild.rawValue or "nil"
   @ObservationIgnored
   private var rawPrevSelectedChannels: [String: String] = [:]
-
-  init() {
-    loadPrevSelectedChannels()
-    if let lastDM = self.rawPrevSelectedChannels[
-      self.selectedGuild?.rawValue ?? "nil"
-    ] {
-      self.selectedChannel = ChannelSnowflake(lastDM)
-    } else {
-      self.selectedChannel = nil
-    }
-  }
 
   func resetStore() {
     selectedGuild = nil

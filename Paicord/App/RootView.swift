@@ -17,7 +17,6 @@ struct RootView: View {
   @Environment(\.challenges) var challenges
   @Environment(\.userInterfaceIdiom) var idiom
   @Environment(\.horizontalSizeClass) var hSizeClass
-  @Environment(\.appearsActive) var active
 
   #if os(macOS)
     @Weak var window: NSWindow?
@@ -68,6 +67,7 @@ struct RootView: View {
       }
     }
     .environment(\.appState, appState)
+    .focusedSceneValue(\.appState, appState)
     .navigationTitle(Text(verbatim: ""))
     .animation(.default, value: gatewayStore.state.hashValue)
     .fontDesign(.rounded)
@@ -79,15 +79,6 @@ struct RootView: View {
       )
     )
     .onAppear { setupGatewayCallbacks() }
-    .onAppear {
-      PaicordAppState.instances[appState.id] = appState
-    }
-    .onDisappear {
-      PaicordAppState.instances.removeValue(forKey: appState.id)
-    }
-    .task(id: self.active) {
-      appState.isActiveWindow = self.active
-    }
     #if os(macOS)
       .introspect(.window, on: .macOS(.v14...)) { window in
         self.window = window
