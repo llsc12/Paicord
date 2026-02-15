@@ -56,6 +56,10 @@ struct QuickSwitcherView: View {
     .frame(maxWidth: 630, maxHeight: 350)
     .background(.ultraThinMaterial)
     .clipShape(.rounded)
+    .background {
+      RoundedRectangle(cornerRadius: 15, style: .continuous)
+        .strokeBorder(.bar.opacity(0.5), lineWidth: 0.5)
+    }
   }
 }
 

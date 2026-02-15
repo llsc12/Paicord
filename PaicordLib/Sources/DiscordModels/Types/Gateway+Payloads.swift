@@ -2349,7 +2349,7 @@ extension Gateway {
   }
 
   public struct VoiceChannelStartTimeUpdate: Sendable, Codable {
-    public var voice_start_time: DiscordTimestamp
+    public var voice_start_time: DiscordTimestamp?
     public var id: ChannelSnowflake
     public var guild_id: GuildSnowflake
   }
