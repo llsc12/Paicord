@@ -16,6 +16,7 @@ final class LoginViewModel {
     Task { await fingerprintSetup() }
 
     Task {
+      guard [GatewayState.connected, .configured].contains(gw?.state ?? .connected) == false else { return }
       await remoteAuthGatewayManager.connect()
 
       for await event in await remoteAuthGatewayManager.events {
@@ -23,6 +24,11 @@ final class LoginViewModel {
         case .pending_remote_init:
           // remote auth started
           self.raFingerprint = event.fingerprint
+          
+          if [GatewayState.connected, .configured].contains(gw?.state ?? .connected) {
+            // for some reason we're connected to the gateway when the remote auth process started, disconnect.
+            await remoteAuthGatewayManager.disconnect()
+          }
         case .pending_ticket:
           // qr code was scanned
           self.raUser = event.user_payload?.toPartialUser()

@@ -2342,10 +2342,10 @@ extension Gateway {
 
   public struct UserApplicationIdentityUpdate: Sendable, Codable {
     public var application_id: ApplicationSnowflake
-    public var username: String
+    public var username: String?
     public var user_id: UserSnowflake
     public var avatar_hash: String?
-    public var metadata: String
+    public var metadata: String?
   }
 
   public struct VoiceChannelStartTimeUpdate: Sendable, Codable {

@@ -268,6 +268,16 @@
     "Replying to %@" : {
 
     },
+    "Result %lld for \"%@\"" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Result %1$lld for \"%2$@\""
+          }
+        }
+      }
+    },
     "Scan this with the Paicord or Discord mobile app to log in instantly." : {
 
     },

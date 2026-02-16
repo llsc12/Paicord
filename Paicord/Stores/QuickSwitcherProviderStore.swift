@@ -28,5 +28,12 @@ class QuickSwitcherProviderStore: DiscordDataStore {
     }
   }
   
+  enum SearchResult {
+    case user(UserSnowflake)
+    case textChannel(ChannelSnowflake)
+    case voiceChannel(ChannelSnowflake)
+    case guild(GuildSnowflake)
+  }
   
+//  func search(_ query: String)
 }
