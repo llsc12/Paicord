@@ -34,6 +34,16 @@
     "•" : {
 
     },
+    "%lld Result%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld Result%2$@"
+          }
+        }
+      }
+    },
     "1" : {
 
     },
@@ -253,6 +263,9 @@
     "Profile" : {
 
     },
+    "Quick Switcher" : {
+
+    },
     "Remind Me Later" : {
 
     },
@@ -366,6 +379,9 @@
 
     },
     "Welcome to the start of this channel" : {
+
+    },
+    "Where would you like to go?" : {
 
     },
     "wip bro go do totp" : {

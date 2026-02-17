@@ -20,3 +20,7 @@ extension EnvironmentValues {
 
   @Entry var challenges: Challenges?
 }
+
+extension FocusedValues {
+  @Entry var appState: PaicordAppState?
+}

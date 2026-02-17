@@ -1,0 +1,267 @@
+name: PR Release Build Command
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  issues: write
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  comment-start:
+    name: Comment Build started
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'issue_comment' && github.event.comment.body == '/release' && github.event.issue.pull_request != null && github.event.comment.user.login == 'llsc12' }}
+    outputs:
+      commit: ${{ steps.prepare.outputs.commit }}
+      pr_number: ${{ steps.prepare.outputs.pr_number }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: prepare
+        name: Prepare metadata
+        run: |
+          set -euo pipefail
+          PR_NUMBER=${{ github.event.issue.number }}
+          echo "Fetching PR #${PR_NUMBER} head for metadata"
+          git fetch origin "pull/${PR_NUMBER}/head:pr-${PR_NUMBER}" --no-tags || true
+          git checkout "pr-${PR_NUMBER}" || true
+          COMMIT_HASH=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+          echo "Commit: $COMMIT_HASH"
+          echo "commit=$COMMIT_HASH" >> $GITHUB_OUTPUT
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+
+      - name: Post start comment
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = ${{ steps.prepare.outputs.pr_number }};
+            const commit = '${{ steps.prepare.outputs.commit }}';
+            const author = context.payload.comment.user.login;
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: pr,
+              body: `🔧 /release build requested by @${author}\n\nStarting a Release-optimized PR build for commit \`${commit}\`. I will upload unsigned artifacts to the workflow run when finished.`
+            });
+
+  build-macos:
+    name: Build macOS
+    runs-on: macos-26
+    needs: comment-start
+    if: ${{ github.event_name == 'issue_comment' && github.event.comment.body == '/release' && github.event.issue.pull_request != null && github.event.comment.user.login == 'llsc12' }}
+    steps:
+      - name: Show trigger info
+        run: |
+          echo "Triggered by comment: ${{ github.event.comment.body }}"
+          echo "Comment author: ${{ github.event.comment.user.login }}"
+          echo "Issue/PR number: ${{ github.event.issue.number }}"
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout PR
+        run: |
+          set -euo pipefail
+          PR_NUMBER=${{ github.event.issue.number }}
+          echo "Fetching PR #$PR_NUMBER head and checking out"
+          git fetch origin "pull/${PR_NUMBER}/head:pr-${PR_NUMBER}" --no-tags
+          git checkout "pr-${PR_NUMBER}"
+          git rev-parse --abbrev-ref HEAD || true
+          git log -1 --oneline
+
+      - name: Prepare build metadata
+        run: |
+          set -euo pipefail
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          BUILD_NUMBER=$(git rev-list --count HEAD)
+          echo "Commit: $COMMIT_HASH"
+          echo "Build number: $BUILD_NUMBER"
+          echo "COMMIT_HASH=$COMMIT_HASH" >> $GITHUB_OUTPUT
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_OUTPUT
+
+      - name: Cache Xcode DerivedData
+        uses: actions/cache@v4
+        with:
+          path: |
+            build
+          key: pr-release-deriveddata-macos-${{ github.event.issue.number }}-${{ hashFiles('**/*.swift','**/*.m','**/*.mm','**/*.h','**/*.plist') }}
+          restore-keys: |
+            pr-release-deriveddata-macos-
+
+      - name: Build macOS
+        run: |
+          set -euo pipefail
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          BUILD_NUMBER=$(git rev-list --count HEAD)
+
+          xcodebuild -workspace Paicord.xcworkspace \
+            -scheme Paicord \
+            -configuration Release \
+            -destination "platform=macOS" \
+            -derivedDataPath build \
+            CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO \
+            CURRENT_PROJECT_VERSION="$BUILD_NUMBER"
+
+          mkdir -p dist
+          MAC_APP_DIR="build/Build/Products/Release/Paicord.app"
+          if [ -d "$MAC_APP_DIR" ]; then
+            cp -R "$MAC_APP_DIR" dist/Paicord.app
+            zip -r9 "dist/Paicord-macOS-${COMMIT_HASH}.zip" dist/Paicord.app
+            echo "macOS app packaged: dist/Paicord-macOS-${COMMIT_HASH}.zip"
+          else
+            echo "ERROR: macOS app not found at $MAC_APP_DIR" >&2
+            ls -al build || true
+            exit 1
+          fi
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Paicord-macOS
+          path: dist/Paicord-macOS-*.zip
+
+  build-ios:
+    name: Build iOS
+    runs-on: macos-26
+    needs: comment-start
+    if: ${{ github.event_name == 'issue_comment' && github.event.comment.body == '/release' && github.event.issue.pull_request != null && github.event.comment.user.login == 'llsc12' }}
+    steps:
+      - name: Show trigger info
+        run: |
+          echo "Triggered by comment: ${{ github.event.comment.body }}"
+          echo "Comment author: ${{ github.event.comment.user.login }}"
+          echo "Issue/PR number: ${{ github.event.issue.number }}"
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout PR
+        run: |
+          set -euo pipefail
+          PR_NUMBER=${{ github.event.issue.number }}
+          echo "Fetching PR #$PR_NUMBER head and checking out"
+          git fetch origin "pull/${PR_NUMBER}/head:pr-${PR_NUMBER}" --no-tags
+          git checkout "pr-${PR_NUMBER}"
+          git rev-parse --abbrev-ref HEAD || true
+          git log -1 --oneline
+
+      - name: Prepare build metadata
+        run: |
+          set -euo pipefail
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          BUILD_NUMBER=$(git rev-list --count HEAD)
+          echo "Commit: $COMMIT_HASH"
+          echo "Build number: $BUILD_NUMBER"
+          echo "COMMIT_HASH=$COMMIT_HASH" >> $GITHUB_OUTPUT
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_OUTPUT
+
+      - name: Cache Xcode DerivedData
+        uses: actions/cache@v4
+        with:
+          path: |
+            build
+          key: pr-release-deriveddata-ios-${{ github.event.issue.number }}-${{ hashFiles('**/*.swift','**/*.m','**/*.mm','**/*.h','**/*.plist') }}
+          restore-keys: |
+            pr-release-deriveddata-ios-
+
+      - name: Install ldid
+        run: |
+          if command -v ldid >/dev/null 2>&1; then
+            echo "ldid already installed at: $(command -v ldid)"
+            ldid --version || true
+          else
+            echo "ldid not found — downloading and installing"
+            curl -LO https://github.com/ProcursusTeam/ldid/releases/latest/download/ldid_macosx_x86_64
+            sudo install -m755 ldid_macosx_x86_64 /usr/local/bin/ldid
+            rm -f ldid_macosx_x86_64
+            echo "ldid installed at: $(command -v ldid)"
+          fi
+
+      - name: Build iOS
+        run: |
+          set -euo pipefail
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          BUILD_NUMBER=$(git rev-list --count HEAD)
+
+          # Build for real devices (iphoneos) and arm64
+          xcodebuild -workspace Paicord.xcworkspace \
+            -scheme Paicord \
+            -configuration Release \
+            -arch arm64 \
+            -sdk iphoneos \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CURRENT_PROJECT_VERSION="$BUILD_NUMBER"
+
+      - name: Archive .ipa
+        run: |
+          set -e
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          APP_PATH="build/Build/Products/Release-iphoneos/Paicord.app"
+          STAGE_DIR="stage-ios"
+          rm -rf Payload "$STAGE_DIR"
+          mkdir -p "$STAGE_DIR/Payload"
+          if [ ! -d "$APP_PATH" ]; then
+            echo "ERROR: iOS device app not found at $APP_PATH" >&2
+            ls -al build || true
+            exit 1
+          fi
+          cp -R "$APP_PATH" "$STAGE_DIR/Payload/Paicord.app"
+          # Use ldid to apply a lightweight signature so the .ipa can be inspected.
+          if [ -f Paicord/Paicord.entitlements ]; then
+            ldid -SPaicord/Paicord.entitlements "$STAGE_DIR/Payload/Paicord.app/"
+          else
+            ldid -S"$STAGE_DIR/Payload/Paicord.app/"
+          fi
+          rm -rf "$STAGE_DIR/Payload/Paicord.app/_CodeSignature"
+          cd "$STAGE_DIR"
+          zip -r9 ../Paicord.ipa Payload
+          cd ..
+          mkdir -p dist
+          mv Paicord.ipa dist/Paicord-iOS-${COMMIT_HASH}.ipa
+          echo "iOS device IPA packaged: dist/Paicord-iOS-${COMMIT_HASH}.ipa"
+
+      - name: Upload iOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Paicord-iOS
+          path: dist/Paicord-iOS-*.ipa
+
+  comment-finish:
+    name: Comment Build finished
+    runs-on: ubuntu-latest
+    needs:
+      - comment-start
+      - build-macos
+      - build-ios
+    if: ${{ github.event_name == 'issue_comment' && github.event.comment.body == '/release' && github.event.issue.pull_request != null && github.event.comment.user.login == 'llsc12' }}
+    steps:
+      - name: Post finish comment
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.issue.number;
+            const commit = '${{ needs.comment-start.outputs.commit }}';
+            const runUrl = `https://github.com/${{ github.repository }}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            await github.rest.issues.createComment({
+              ...context.repo,
+              issue_number: pr,
+              body: `✅ PR /release build finished for commit \`${commit}\`.\n\nArtifacts (unsigned) uploaded as workflow artifacts. Downloads: [macOS](https://nightly.link/llsc12/Paicord/actions/runs/${process.env.GITHUB_RUN_ID}/Paicord-macOS.zip) [iOS](https://nightly.link/llsc12/Paicord/actions/runs/${process.env.GITHUB_RUN_ID}/Paicord-iOS.zip).\n\n[View workflow run](${runUrl})`
+            });
