@@ -34,6 +34,16 @@
     "%lld members" : {
 
     },
+    "%lld Result%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld Result%2$@"
+          }
+        }
+      }
+    },
     "1" : {
 
     },
@@ -267,16 +277,6 @@
     },
     "Replying to %@" : {
 
-    },
-    "Result %lld for \"%@\"" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Result %1$lld for \"%2$@\""
-          }
-        }
-      }
     },
     "Scan this with the Paicord or Discord mobile app to log in instantly." : {
 

@@ -112,6 +112,7 @@ final class GatewayStore {
     readStates.setGateway(self)
     presence.setGateway(self)
     messageDrain.setGateway(self)
+    switcher.setGateway(self)
 
     // Update existing channel stores
     for channelStore in channels.values {
@@ -125,12 +126,13 @@ final class GatewayStore {
   }
 
   func resetStores() {
-    user = CurrentUserStore()
-    settings = SettingsStore()
-    userGuildSettings = UserGuildSettingsStore()
-    readStates = ReadStateStore()
-    presence = PresenceStore()
-    messageDrain = MessageDrainStore()
+    user = .init()
+    settings = .init()
+    userGuildSettings = .init()
+    readStates = .init()
+    presence = .init()
+    messageDrain = .init()
+    switcher = .init()
     channels = [:]
     guilds = [:]
     subscribedGuilds = []
@@ -149,6 +151,7 @@ final class GatewayStore {
   let externalBadges = ExternalBadgeStore()
   var presence = PresenceStore()
   var messageDrain = MessageDrainStore()
+  var switcher = QuickSwitcherProviderStore()
 
   private var channels: [ChannelSnowflake: ChannelStore] = [:]
   func getChannelStore(for id: ChannelSnowflake, from guild: GuildStore? = nil)
