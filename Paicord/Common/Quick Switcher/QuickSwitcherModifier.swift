@@ -243,7 +243,7 @@ struct QuickSwitcherView: View {
               } label: {
                 resultCell(result)
               }
-              .buttonStyle(.borderless)
+              .buttonStyle(.plain)
               .background(
                 i == (self.focusedRow ?? -1) ? Color.accentColor : Color.clear
               )
