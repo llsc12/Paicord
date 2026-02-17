@@ -136,9 +136,6 @@ final class GatewayStore {
     channels = [:]
     guilds = [:]
     subscribedGuilds = []
-    _ = PaicordAppState.instances.mapValues { appState in
-      appState.resetStore()
-    }
   }
 
   // MARK: - Data Stores

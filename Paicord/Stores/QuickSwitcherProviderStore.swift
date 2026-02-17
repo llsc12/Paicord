@@ -8,8 +8,6 @@
 
 import Foundation
 import PaicordLib
-import SwiftPrettyPrint
-import SwiftUIX
 
 @Observable
 class QuickSwitcherProviderStore: DiscordDataStore {
@@ -18,14 +16,14 @@ class QuickSwitcherProviderStore: DiscordDataStore {
   var eventTask: Task<Void, Never>?
 
   func setupEventHandling() {
-    eventTask = Task { @MainActor in
-      guard let gateway = gateway?.gateway else { return }
-      for await event in await gateway.events {
-        switch event.data {
-        default: break
-        }
-      }
-    }
+    //    eventTask = Task { @MainActor in
+    //      guard let gateway = gateway?.gateway else { return }
+    //      for await event in await gateway.events {
+    //        switch event.data {
+    //        default: break
+    //        }
+    //      }
+    //    }
   }
 
   enum SearchResult: Hashable {
@@ -49,6 +47,8 @@ class QuickSwitcherProviderStore: DiscordDataStore {
           continuation.finish()
           return
         }
+
+        defer { continuation.finish() }
 
         var yieldedIds = Set<String>()
         var currentResults: [(result: SearchResult, name: String)] = []
@@ -131,7 +131,9 @@ class QuickSwitcherProviderStore: DiscordDataStore {
               name.lowercased().contains(normalizedQuery)
             {
               // get the category channel if it exists
-              let category = guild.channels?.first { $0.id.rawValue == channel.parent_id?.rawValue }
+              let category = guild.channels?.first {
+                $0.id.rawValue == channel.parent_id?.rawValue
+              }
               addIfNew(
                 .guildChannel(channel, category, guild),
                 name: name,
@@ -151,8 +153,6 @@ class QuickSwitcherProviderStore: DiscordDataStore {
             addIfNew(.user(user), name: displayName, id: user.id.rawValue)
           }
         }
-
-        continuation.finish()
       }
 
       continuation.onTermination = { _ in
