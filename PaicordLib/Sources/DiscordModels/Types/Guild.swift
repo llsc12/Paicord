@@ -1,5 +1,5 @@
 /// https://discord.com/developers/docs/resources/guild#guild-object-guild-structure
-public struct Guild: Sendable, Codable {
+public struct Guild: Sendable, Codable, Hashable, Equatable, Identifiable {
 
   public init(
     id: GuildSnowflake,
