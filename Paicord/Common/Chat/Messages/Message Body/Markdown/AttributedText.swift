@@ -36,7 +36,7 @@ struct AttributedText: View {
       Coordinator(openURL: openURL)
     }
 
-    func makeNSView(context: Context) -> ModifiedCopyingTextView {
+    func makeNSView(context: Context) -> IntrinsicTextView {
       let textStorage = NSTextStorage()
       let layoutManager = NSLayoutManager()
       let textContainer = NSTextContainer()
@@ -45,60 +45,39 @@ struct AttributedText: View {
       textStorage.addLayoutManager(layoutManager)
       layoutManager.addTextContainer(textContainer)
 
-      let tv = ModifiedCopyingTextView(
-        frame: .zero,
-        textContainer: textContainer
-      )
-
+      let tv = IntrinsicTextView(frame: .zero, textContainer: textContainer)
       tv.isEditable = false
       tv.isSelectable = true
       tv.drawsBackground = false
       tv.textContainerInset = .zero
       tv.textContainer?.lineFragmentPadding = 0
       tv.textContainer?.widthTracksTextView = true
+      tv.textContainer?.heightTracksTextView = false
       tv.isAutomaticLinkDetectionEnabled = false
       tv.linkTextAttributes = [:]
       tv.delegate = context.coordinator
       tv.customCoordinator = context.coordinator
-      tv.textStorage?.setAttributedString(attributedString)
-      tv.textContainer?.maximumNumberOfLines = lineLimit ?? 0
       tv.usesAdaptiveColorMappingForDarkAppearance = true
+
+      tv.setAttributedStringAndInvalidate(attributedString)
+      tv.setLineLimitAndInvalidate(lineLimit)
+
+      tv.setContentHuggingPriority(.required, for: .vertical)
+      tv.setContentCompressionResistancePriority(.required, for: .vertical)
+      tv.setContentHuggingPriority(.defaultLow, for: .horizontal)
+      tv.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
 
       return tv
     }
 
-    func updateNSView(_ nsView: ModifiedCopyingTextView, context: Context) {
+    func updateNSView(_ nsView: IntrinsicTextView, context: Context) {
       nsView.customCoordinator = context.coordinator
 
       if nsView.attributedString() != attributedString {
-        nsView.textStorage?.setAttributedString(attributedString)
+        nsView.setAttributedStringAndInvalidate(attributedString)
       }
 
-      if nsView.textContainer?.maximumNumberOfLines != (lineLimit ?? 0) {
-        nsView.textContainer?.maximumNumberOfLines = lineLimit ?? 0
-      }
-    }
-
-    func sizeThatFits(
-      _ proposal: ProposedViewSize,
-      nsView: ModifiedCopyingTextView,
-      context: Context
-    ) -> CGSize? {
-      let targetWidth = proposal.width ?? 400
-      guard let layoutManager = nsView.layoutManager,
-        let textContainer = nsView.textContainer
-      else { return nil }
-
-      // Set size for calculation
-      textContainer.containerSize = CGSize(
-        width: targetWidth,
-        height: .greatestFiniteMagnitude
-      )
-      layoutManager.ensureLayout(for: textContainer)
-
-      let usedRect = layoutManager.usedRect(for: textContainer)
-
-      return CGSize(width: targetWidth, height: ceil(usedRect.height))
+      nsView.setLineLimitAndInvalidate(lineLimit)
     }
 
     final class Coordinator: NSObject, NSTextViewDelegate {
@@ -119,8 +98,63 @@ struct AttributedText: View {
     }
   }
 
-  // Custom NSTextView to preserve rawContent on copy and avoid context-menu conflicts
-  final class ModifiedCopyingTextView: NSTextView {
+  final class IntrinsicTextView: ModifiedCopyingTextView {
+    private var lastMeasuredWidth: CGFloat = -1
+    private var lastLineLimit: Int? = nil
+
+    func setAttributedStringAndInvalidate(_ s: NSAttributedString) {
+      textStorage?.setAttributedString(s)
+      invalidateIntrinsicAndLayout()
+    }
+
+    func setLineLimitAndInvalidate(_ lineLimit: Int?) {
+      let normalized = (lineLimit == 0) ? nil : lineLimit
+      if lastLineLimit != normalized {
+        lastLineLimit = normalized
+        textContainer?.maximumNumberOfLines = normalized ?? 0
+        invalidateIntrinsicAndLayout()
+      }
+    }
+
+    private func invalidateIntrinsicAndLayout() {
+      invalidateIntrinsicContentSize()
+      needsLayout = true
+    }
+
+    override func layout() {
+      super.layout()
+
+      let w = bounds.width
+      if w > 0, abs(w - lastMeasuredWidth) > 0.5 {
+        lastMeasuredWidth = w
+        textContainer?.containerSize = CGSize(
+          width: w,
+          height: .greatestFiniteMagnitude
+        )
+        invalidateIntrinsicContentSize()
+      }
+    }
+
+    override var intrinsicContentSize: NSSize {
+      let w = bounds.width > 0 ? bounds.width : 400
+      guard let layoutManager = layoutManager, let textContainer = textContainer
+      else {
+        return NSSize(width: w, height: 0)
+      }
+
+      textContainer.containerSize = CGSize(
+        width: w,
+        height: .greatestFiniteMagnitude
+      )
+
+      layoutManager.ensureLayout(for: textContainer)
+      let used = layoutManager.usedRect(for: textContainer)
+
+      return NSSize(width: w, height: ceil(used.height))
+    }
+  }
+
+  class ModifiedCopyingTextView: NSTextView {
     weak fileprivate var customCoordinator: _AttributedTextView.Coordinator?
 
     override func rightMouseDown(with event: NSEvent) {
@@ -177,7 +211,7 @@ struct AttributedText: View {
       Coordinator(openURL: openURL)
     }
 
-    func makeUIView(context: Context) -> ModifiedCopyingTextView {
+    func makeUIView(context: Context) -> IntrinsicTextView {
       let textStorage = NSTextStorage()
       let layoutManager = NSLayoutManager()
       let textContainer = NSTextContainer()
@@ -186,81 +220,47 @@ struct AttributedText: View {
       textStorage.addLayoutManager(layoutManager)
       layoutManager.addTextContainer(textContainer)
 
-      let tv = ModifiedCopyingTextView(
-        frame: .zero,
-        textContainer: textContainer
-      )
-
+      let tv = IntrinsicTextView(frame: .zero, textContainer: textContainer)
       tv.isEditable = false
       tv.isSelectable = true
       tv.isScrollEnabled = false
       tv.backgroundColor = .clear
       tv.textContainerInset = .zero
       tv.textContainer.lineFragmentPadding = 0
+      tv.textContainer.widthTracksTextView = true
+      tv.textContainer.heightTracksTextView = false
       tv.delegate = context.coordinator
       tv.dataDetectorTypes = []
       tv.linkTextAttributes = [:]
 
       tv.setAttributedTextPreservingSelection(attributedString)
+      tv.setLineLimitAndInvalidate(lineLimit)
+
+      tv.setContentHuggingPriority(.required, for: .vertical)
+      tv.setContentCompressionResistancePriority(.required, for: .vertical)
+      tv.setContentHuggingPriority(.defaultLow, for: .horizontal)
+      tv.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
 
       return tv
     }
 
-    func updateUIView(_ uiView: ModifiedCopyingTextView, context: Context) {
-      // Simplified update logic: NSAttributedString equality check is more robust than length hashing
+    func updateUIView(_ uiView: IntrinsicTextView, context: Context) {
       if uiView.attributedText != attributedString {
         uiView.setAttributedTextPreservingSelection(attributedString)
-        // Ensure the line limit is updated if it changed via Environment
-        uiView.textContainer.maximumNumberOfLines = lineLimit ?? 0
+        uiView.invalidateIntrinsicAndLayout()
       }
-    }
 
-    func sizeThatFits(
-      _ proposal: ProposedViewSize,
-      uiView: ModifiedCopyingTextView,
-      context: Context
-    ) -> CGSize? {
-      //      let targetWidth = proposal.width ?? 400
-      //      let size = uiView.sizeThatFits(
-      //        CGSize(width: targetWidth, height: .greatestFiniteMagnitude)
-      //      )
-      //      return CGSize(width: targetWidth, height: size.height)
-
-      let targetWidth = proposal.width ?? 400
-      let layoutManager = uiView.layoutManager
-      let textContainer = uiView.textContainer
-
-      // Set size for calculation
-      textContainer.containerSize = CGSize(
-        width: targetWidth,
-        height: .greatestFiniteMagnitude
-      )
-      layoutManager.ensureLayout(for: textContainer)
-
-      let usedRect = layoutManager.usedRect(for: textContainer)
-
-      return CGSize(width: targetWidth, height: ceil(usedRect.height))
+      uiView.setLineLimitAndInvalidate(lineLimit)
     }
 
     final class Coordinator: NSObject, UITextViewDelegate {
       let openURL: OpenURLAction
       init(openURL: OpenURLAction) { self.openURL = openURL }
 
-      //      func textView(
-      //        _ textView: UITextView,
-      //        shouldInteractWith URL: URL,
-      //        in characterRange: NSRange,
-      //        interaction: UITextItemInteraction
-      //      ) -> Bool {
-      //        openURL(URL)
-      //        if PaicordChatLink.init(url: URL) != nil {
-      //          return false
-      //        }
-      //        return true
-      //      }
-
       func textView(
-        _ textView: UITextView, primaryActionFor textItem: UITextItem, defaultAction: UIAction
+        _ textView: UITextView,
+        primaryActionFor textItem: UITextItem,
+        defaultAction: UIAction
       ) -> UIAction? {
         switch textItem.content {
         case .link(let url):
@@ -276,7 +276,50 @@ struct AttributedText: View {
     }
   }
 
-  final class ModifiedCopyingTextView: UITextView {
+  final class IntrinsicTextView: ModifiedCopyingTextView {
+    private var lastMeasuredWidth: CGFloat = -1
+    private var lastLineLimit: Int? = nil
+
+    func setLineLimitAndInvalidate(_ lineLimit: Int?) {
+      let normalized = (lineLimit == 0) ? nil : lineLimit
+      if lastLineLimit != normalized {
+        lastLineLimit = normalized
+        textContainer.maximumNumberOfLines = normalized ?? 0
+        invalidateIntrinsicAndLayout()
+      }
+    }
+
+    fileprivate func invalidateIntrinsicAndLayout() {
+      invalidateIntrinsicContentSize()
+      setNeedsLayout()
+      layoutIfNeeded()
+    }
+
+    override func layoutSubviews() {
+      super.layoutSubviews()
+
+      let w = bounds.width
+      if w > 0, abs(w - lastMeasuredWidth) > 0.5 {
+        lastMeasuredWidth = w
+        textContainer.size = CGSize(width: w, height: .greatestFiniteMagnitude)
+        invalidateIntrinsicContentSize()
+      }
+    }
+
+    override var intrinsicContentSize: CGSize {
+      let targetWidth = (bounds.width > 0) ? bounds.width : 400
+
+      textContainer.size = CGSize(
+        width: targetWidth,
+        height: .greatestFiniteMagnitude
+      )
+      let used = layoutManager.usedRect(for: textContainer)
+
+      return CGSize(width: targetWidth, height: ceil(used.height))
+    }
+  }
+
+  class ModifiedCopyingTextView: UITextView {
     override func canPerformAction(_ action: Selector, withSender sender: Any?)
       -> Bool
     {
@@ -307,7 +350,6 @@ struct AttributedText: View {
       UIPasteboard.general.string = mutable.string
     }
 
-    /// Convenience to avoid clearing selection/caret flicker when resetting text.
     func setAttributedTextPreservingSelection(_ text: NSAttributedString) {
       let sel = selectedRange
       attributedText = text

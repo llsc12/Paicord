@@ -97,13 +97,6 @@ extension MessageCell {
         return nil
       }
 
-      private var thumbnailURL: URL? {
-        if let thumb = embed.thumbnail?.proxyurl, let url = URL(string: thumb) {
-          return url
-        }
-        return nil
-      }
-
       private var footerIconURL: URL? {
         if let icon = embed.footer?.proxy_icon_url,
           let url = URL(string: icon)
@@ -171,11 +164,10 @@ extension MessageCell {
                     .equatable()
                 }
               }
-              .padding(.trailing, thumbnailURL == nil ? 40 : 0)
+              .padding(.trailing, embed.thumbnail == nil ? 40 : 0)
 
-              if embed.type != .article, let thumbURL = thumbnailURL {
-                AnimatedImage(url: thumbURL)
-                  .resizable()
+              if embed.type != .article, let thumbnail = embed.thumbnail {
+                AttachmentsView.AttachmentItemPreview(attachment: thumbnail)
                   .scaledToFill()
                   .frame(width: 72, height: 72)
                   .clipped()
@@ -275,8 +267,11 @@ extension MessageCell {
         case 2:
           HStack(spacing: 4) {
             ForEach(items.prefix(2), id: \.hashValue) { item in
-              AttachmentsView.AttachmentItemPreview(attachment: item)
-                .scaledToFill()
+              Color.almostClear
+                .overlay {
+                  AttachmentsView.AttachmentItemPreview(attachment: item)
+                    .scaledToFill()
+                }
                 .clipShape(.rect(cornerRadius: 4))
             }
           }
