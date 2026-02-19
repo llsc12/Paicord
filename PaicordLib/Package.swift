@@ -85,7 +85,7 @@ let package = Package(
     .package(
       url: "https://github.com/alta/swift-opus.git",
       branch: "main"
-    )
+    ),
   ],
   targets: [
     .target(
@@ -165,7 +165,12 @@ let package = Package(
     .target(
       name: "DiscordAuth",
       dependencies: [
-        .target(name: "DiscordModels")
+        .product(name: "NIOCore", package: "swift-nio"),
+        .product(name: "AsyncHTTPClient", package: "async-http-client"),
+        .product(name: "WSClient", package: "swift-websocket"),
+        .product(name: "Crypto", package: "swift-crypto"),
+        .product(name: "_CryptoExtras", package: "swift-crypto"),
+        .target(name: "DiscordGateway"),
       ],
       swiftSettings: swiftSettings
     ),

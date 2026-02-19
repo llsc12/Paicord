@@ -18,7 +18,7 @@ import WSClient
 import enum NIOWebSocket.WebSocketErrorCode
 import struct NIOWebSocket.WebSocketOpcode
 
-public actor UserGatewayManager: GatewayManager {
+public actor UserGatewayManager {
 
   private struct Message {
     let payload: Gateway.Event
@@ -281,7 +281,8 @@ public actor UserGatewayManager: GatewayManager {
           self.state.store(.configured, ordering: .relaxed)
           self.stateCallback?(.configured)
 
-          for try await message in inbound.messages(maxSize: self.maxFrameSize) {
+          for try await message in inbound.messages(maxSize: self.maxFrameSize)
+          {
             await self.processBinaryData(
               message,
               forConnectionWithId: connectionId
