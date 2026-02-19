@@ -217,10 +217,13 @@ struct MarkdownText: View, Equatable {
 
       case .list:
         if let children = block.children {
+          HStack(alignment: .top, spacing: 0) {
+          Text(verbatim: String(repeating: "\t", count: block.level ?? 0))
           VStack(alignment: .leading, spacing: 4) {
             ForEach(children) { child in
               BlockView(block: child)
                 .equatable()
+              }
             }
           }
         }
