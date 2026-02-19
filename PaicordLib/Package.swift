@@ -29,6 +29,10 @@ let package = Package(
       targets: ["DiscordGateway"]
     ),
     .library(
+      name: "DiscordVoice",
+      targets: ["DiscordVoice"]
+    ),
+    .library(
       name: "DiscordModels",
       targets: ["DiscordModels"]
     ),
@@ -74,6 +78,14 @@ let package = Package(
       url: "https://github.com/apple/swift-crypto.git",
       "1.0.0"..<"5.0.0"
     ),
+    .package(
+      url: "https://github.com/jedisct1/swift-sodium.git",
+      from: "0.10.0"
+    ),
+    .package(
+      url: "https://github.com/alta/swift-opus.git",
+      branch: "main"
+    )
   ],
   targets: [
     .target(
@@ -82,6 +94,7 @@ let package = Package(
         .target(name: "DiscordAuth"),
         .target(name: "DiscordHTTP"),
         .target(name: "DiscordCore"),
+        .target(name: "DiscordVoice"),
         .target(name: "DiscordGateway"),
         .target(name: "DiscordModels"),
         .target(name: "DiscordUtilities"),
@@ -111,9 +124,22 @@ let package = Package(
         .product(name: "AsyncHTTPClient", package: "async-http-client"),
         .product(name: "WSClient", package: "swift-websocket"),
         .product(name: "libzstd", package: "zstd"),
-        .target(name: "DiscordHTTP"),
         .product(name: "Crypto", package: "swift-crypto"),
         .product(name: "_CryptoExtras", package: "swift-crypto"),
+        .target(name: "DiscordHTTP"),
+      ],
+      swiftSettings: swiftSettings
+    ),
+    .target(
+      name: "DiscordVoice",
+      dependencies: [
+        .product(name: "NIOCore", package: "swift-nio"),
+        .product(name: "AsyncHTTPClient", package: "async-http-client"),
+        .product(name: "WSClient", package: "swift-websocket"),
+        .product(name: "libzstd", package: "zstd"),
+        .product(name: "Opus", package: "swift-opus"),
+        .product(name: "Sodium", package: "swift-sodium"),
+        .target(name: "DiscordHTTP"),
       ],
       swiftSettings: swiftSettings
     ),

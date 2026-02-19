@@ -1,5 +1,5 @@
 {
-  "originHash" : "bfacdd34b4927d43359347cb7517b46411822ef5371dc63508a5a8ed06405338",
+  "originHash" : "b27bf575182b512b6c2e0bcf8d0980f3c2abf425f317f9801c6eeaa2d2fcca11",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -344,6 +344,15 @@
       }
     },
     {
+      "identity" : "swift-opus",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/alta/swift-opus.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "6f3cb6bd3ffed1fe5f06d00a962d5c191a50daf8"
+      }
+    },
+    {
       "identity" : "swift-protobuf",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-protobuf.git",
@@ -359,6 +368,15 @@
       "state" : {
         "revision" : "e7187309187695115033536e8fc9b2eb87fd956d",
         "version" : "2.8.0"
+      }
+    },
+    {
+      "identity" : "swift-sodium",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/jedisct1/swift-sodium.git",
+      "state" : {
+        "revision" : "e7e799cd1eaa4d0f6d3eab56832e7f4b377f4a4f",
+        "version" : "0.10.0"
       }
     },
     {
