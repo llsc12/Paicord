@@ -137,6 +137,7 @@ extension VoiceGateway {
     }
   }
 
+  /// https://docs.discord.food/topics/voice-connections#encryption-mode
   @UnstableEnum<String>
   public enum EncryptionMode: Sendable, Codable {
     // preferred
@@ -161,7 +162,7 @@ extension VoiceGateway {
     public var rtx_payload_type: Int?
     public var encode: Bool?
     public var decode: Bool?
-    
+
     public static let opusCodec = Codec(
       name: .opus,
       type: "audio",
@@ -171,7 +172,7 @@ extension VoiceGateway {
       encode: nil,
       decode: nil
     )
-    
+
     public static let h265Codec = Codec(
       name: .h265,
       type: "video",
@@ -181,7 +182,7 @@ extension VoiceGateway {
       encode: true,
       decode: true
     )
-    
+
     public static let h264Codec = Codec(
       name: .h264,
       type: "video",
@@ -202,5 +203,179 @@ extension VoiceGateway {
       case vp9  // VP9
       case __undocumented(String)
     }
+  }
+
+  /// https://docs.discord.food/topics/voice-connections#session-description-structure
+  public struct SessionDescription: Sendable, Codable {
+    public var audio_codec: Codec.CodecName
+    public var video_codec: Codec.CodecName
+    public var media_session_id: String
+    public var mode: EncryptionMode?
+    public var secret_key: [Int]?
+    public var sdp: String?  // not applicable to udp
+    public var keyframe_interval: Int?  // not applicable to udp
+  }
+
+  /// https://docs.discord.food/topics/voice-connections#session-update-structure-(send)
+  /// https://docs.discord.food/topics/voice-connections#session-update-structure-(receive)
+  public struct SessionUpdate: Sendable, Codable {
+    // send properties
+    public var codecs: [Codec]?
+
+    // receive properties
+    public var audio_codec: Codec.CodecName?
+    public var video_codec: Codec.CodecName?
+    public var media_session_id: String?
+    public var keyframe_interval: Int?  // not applicable to udp
+  }
+
+  /// https://docs.discord.food/topics/voice-connections#hello-structure
+  public struct Hello: Sendable, Codable {
+    public var heartbeat_interval: Int
+    public var v: Int
+  }
+
+  /// https://docs.discord.food/topics/voice-connections#heartbeat-structure
+  public struct Heartbeat: Sendable, Codable {
+    public var t: Int /* current unix timestamp */ = Int(
+      Date().timeIntervalSince1970
+    )
+    public var seq_ack: Int? = nil
+  }
+
+  /// https://docs.discord.food/topics/voice-connections#speaking-structure
+  public struct Speaking: Sendable, Codable {
+    public var speaking: IntBitField<Flag>
+    public var delay: Int? = nil
+    public var ssrc: Int? = nil
+
+    #if Non64BitSystemsCompatibility
+      @UnstableEnum<UInt64>
+    #else
+      @UnstableEnum<UInt>
+    #endif
+    public enum Flag: Sendable, Codable {
+      case voice  // 0
+      case soundshare  // 1
+      case priority  // 2
+
+      #if Non64BitSystemsCompatibility
+        case __undocumented(UInt64)
+      #else
+        case __undocumented(UInt)
+      #endif
+    }
+  }
+
+  /// https://docs.discord.food/topics/voice-connections#resume-structure
+  public struct Resume: Sendable, Codable {
+    public var server_id: GuildSnowflake
+    public var channel_id: ChannelSnowflake
+    public var session_id: String
+    public var token: Secret
+    public var seq_ack: Int?
+  }
+
+  /// https://docs.discord.food/topics/voice-connections#example-client-connect
+  public struct ClientConnect: Sendable, Codable {
+    public var user_ids: [UserSnowflake]
+  }
+
+  /// https://docs.discord.food/topics/voice-connections#client-flags-structure
+  public struct ClientFlags: Sendable, Codable {
+    public var user_id: UserSnowflake
+    public var flags: IntBitField<VoiceStateUpdate.Flags>
+  }
+
+  /// https://docs.discord.food/topics/voice-connections#voice-platform
+  public struct ClientPlatform: Sendable, Codable {
+  }
+
+  /// https://docs.discord.food/topics/voice-connections#client-disconnect-structure
+  public struct ClientDisconnect: Sendable, Codable {
+    public var user_id: UserSnowflake
+  }
+
+  /// https://docs.discord.food/topics/voice-connections#video-structure
+  public struct Video: Sendable, Codable {
+    public var audio_ssrc: Int
+    public var video_ssrc: Int
+    public var rtx_ssrc: Int
+    public var streams: [Stream]?  // sent by client only
+    public var user_id: UserSnowflake?  // sent by server only
+  }
+
+  /// https://docs.discord.food/topics/voice-connections#example-media-sink-wants
+  public struct MediaSinkWants: Sendable, Codable {
+    public var pixelCounts: [String: Double]
+    public var ssrcs: [String: Int]
+
+    public init(from decoder: any Decoder) throws {
+      let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
+      var pixelCounts: [String: Double] = [:]
+      var ssrcs: [String: Int] = [:]
+      for key in container.allKeys {
+        if key.stringValue == "pixelCounts" {
+          pixelCounts = try container.decode([String: Double].self, forKey: key)
+        } else {
+          let value = try container.decode(Int.self, forKey: key)
+          ssrcs[key.stringValue] = value
+        }
+      }
+      self.pixelCounts = pixelCounts
+      self.ssrcs = ssrcs
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+      var container = encoder.container(keyedBy: DynamicCodingKeys.self)
+      try container.encode(pixelCounts, forKey: .pixelCounts)
+      for (key, value) in ssrcs {
+        try container.encode(value, forKey: .dynamic(key))
+      }
+    }
+
+    public init(
+      pixelCounts: [String: Double],
+      ssrcs: [String: Int]
+    ) {
+      self.pixelCounts = pixelCounts
+      self.ssrcs = ssrcs
+    }
+
+    private enum DynamicCodingKeys: CodingKey {
+      case pixelCounts
+      case dynamic(String)
+
+      init?(stringValue: String) {
+        if stringValue == "pixelCounts" {
+          self = .pixelCounts
+        } else {
+          self = .dynamic(stringValue)
+        }
+      }
+
+      var stringValue: String {
+        switch self {
+        case .pixelCounts:
+          return "pixelCounts"
+        case .dynamic(let key):
+          return key
+        }
+      }
+
+      init?(intValue: Int) {
+        return nil
+      }
+
+      var intValue: Int? {
+        return nil
+      }
+    }
+  }
+  
+  /// https://docs.discord.food/topics/voice-connections#voice-backend-version-structure
+  public struct VoiceBackendVersion: Sendable, Codable {
+    public var voice: String
+    public var rtc_worker: String
   }
 }

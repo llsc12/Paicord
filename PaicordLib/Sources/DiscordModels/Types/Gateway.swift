@@ -1,7 +1,7 @@
 import Foundation
 
 public struct Gateway: Sendable, Codable {
-
+  
   /// https://discord.com/developers/docs/topics/opcodes-and-status-codes#opcodes-and-status-codes
   public enum Opcode: UInt8, Sendable, Codable, CustomStringConvertible {
     // common
@@ -17,7 +17,7 @@ public struct Gateway: Sendable, Codable {
     case hello = 10
     case heartbeatAccepted = 11
     case requestSoundboardSounds = 31
-
+    
     // user only gateway opcodes ?
     case voiceServerPing = 5
     case callConnect = 13
@@ -41,7 +41,7 @@ public struct Gateway: Sendable, Codable {
     case requestChannelMemberCounts = 39
     case qosHeartbeat = 40
     case updateTimeSpentSessionId = 41
-
+    
     public var description: String {
       switch self {
       case .dispatch: return "dispatch"
@@ -81,17 +81,17 @@ public struct Gateway: Sendable, Codable {
       }
     }
   }
-
+  
   /// The top-level gateway event.
   /// https://discord.com/developers/docs/topics/gateway#gateway-events
   public struct Event: Sendable, Codable {
-
+    
     /// This enum is just for swiftly organizing Discord gateway event's `data`.
     /// You need to read each case's inner payload's documentation for more info.
     ///
     /// `indirect` is used to mitigate this issue: https://github.com/swiftlang/swift/issues/74303
     indirect
-      public enum Payload: Sendable
+    public enum Payload: Sendable
     {
       /// https://discord.com/developers/docs/topics/gateway-events#heartbeat
       case heartbeat(lastSequenceNumber: Int?)
@@ -109,277 +109,277 @@ public struct Gateway: Sendable, Codable {
       case invalidSession(canResume: Bool)
       case authSessionChange(AuthSessionChange)
       case sessionsReplace(SessionsReplace)
-
+      
       case updateTimeSpentSessionId(UpdateTimeSpentSessionID)
-
+      
       //      case authenticatorCreate // TODO
       //      case authenticatorUpdate // TODO
       //      case authenticatorDelete // TODO
-
+      
       case channelCreate(DiscordChannel)
       case channelUpdate(DiscordChannel)
       case channelDelete(DiscordChannel)
-
+      
       case callCreate(CallCreate)
       case callUpdate(CallUpdate)
       case callDelete(CallDelete)
-
+      
       case voiceChannelStatuses(VoiceChannelStatuses)
       case channelPinsUpdate(ChannelPinsUpdate)
-
+      
       case conversationSummaryUpdate(ConversationSummaryUpdate)
-
+      
       case channelRecipientAdd(ChannelRecipientAdd)
       case channelRecipientRemove(ChannelRecipientRemove)
-
+      
       case channelUnreadUpdate(ChannelUnreadUpdate)
-
+      
       case consoleCommandUpdate(ConsoleCommandUpdate)  // TODO
-
+      
       case dmSettingsShow(DMSettingsShow)
-
+      
       case threadCreate(DiscordChannel)
       case threadUpdate(DiscordChannel)
       case threadDelete(ThreadDelete)
-
+      
       case threadSyncList(ThreadListSync)
       case threadMemberUpdate(ThreadMemberUpdate)
       case threadMembersUpdate(ThreadMembersUpdate)
-
+      
       case entitlementCreate(Entitlement)
       case entitlementUpdate(Entitlement)
       case entitlementDelete(Entitlement)
-
+      
       case friendSuggestionCreate(FriendSuggestionCreate)
       case friendSuggestionDelete(FriendSuggestionDelete)
-
+      
       //			case giftCodeCreate // TODO
       //			case giftCodeUpdate // TODO
-
+      
       case guildCreate(GuildCreate)
       case guildUpdate(Guild)
       case guildDelete(UnavailableGuild)
-
+      
       case guildApplicationCommandIndexUpdate(
         GuildApplicationCommandIndexUpdate
       )
       case guildAppliedBoostsUpdate(Guild.PremiumGuildSubscription)
       case guildAuditLogEntryCreate(AuditLog.Entry)
-
+      
       case guildBanAdd(GuildBan)
       case guildBanRemove(GuildBan)
-
+      
       //			case guildDirectoryEntryCreate // TODO
       //			case guildDirectoryEntryUpdate // TODO
       //			case guildDirectoryEntryDelete // TODO
-
+      
       //			case guildJoinRequestCreate // TODO
       //			case guildJoinRequestUpdate // TODO
       //			case guildJoinRequestDelete // TODO
-
+      
       case guildMemberAdd(GuildMemberAdd)
       case guildMemberRemove(GuildMemberRemove)
       case guildMemberUpdate(GuildMemberAdd)
-
+      
       case guildRoleCreate(GuildRole)
       case guildRoleUpdate(GuildRole)
       case guildRoleDelete(GuildRoleDelete)
-
+      
       case guildMembersChunk(GuildMembersChunk)
       case requestGuildMembers(RequestGuildMembers)
-
+      
       case updateGuildSubscriptions(UpdateGuildSubscriptions)
       case guildMemberListUpdate(GuildMemberListUpdate)
       case guildJoinRequestUpdate(GuildJoinRequestUpdate)
-
+      
       //			case guildPowerupEntitlementsCreate // TODO
       //			case guildPowerupEntitlementsDelete // TODO
-
+      
       case guildEmojisUpdate(GuildEmojisUpdate)
       case guildStickersUpdate(GuildStickersUpdate)
-
+      
       case guildScheduledEventCreate(GuildScheduledEvent)
       case guildScheduledEventUpdate(GuildScheduledEvent)
       case guildScheduledEventDelete(GuildScheduledEvent)
-
+      
       case guildScheduledEventExceptionCreate(GuildScheduledEventException)
       case guildScheduledEventExceptionUpdate(GuildScheduledEventException)
       case guildScheduledEventExceptionDelete(GuildScheduledEventException)
       case guildScheduledEventExceptionsDelete(
         GuildScheduledEventExceptionsDelete
       )
-
+      
       case guildScheduledEventUserAdd(GuildScheduledEventUser)
       case guildScheduledEventUserRemove(GuildScheduledEventUser)
-
+      
       case guildSoundboardSoundCreate(SoundboardSound)
       case guildSoundboardSoundUpdate(SoundboardSound)
       case guildSoundboardSoundDelete(SoundboardSoundDelete)  // TODO
-
+      
       case soundboardSounds(SoundboardSounds)
-
+      
       case guildIntegrationsUpdate(GuildIntegrationsUpdate)
-
+      
       case integrationCreate(IntegrationCreate)
       case integrationUpdate(IntegrationCreate)
       case integrationDelete(IntegrationDelete)
-
+      
       //			case interactionCreate(Interaction) // bot gets full interaction object
       case interactionCreate(InteractionCreate)  // user gets limited object
       case interactionFailure(InteractionFailure)
       case interactionSuccess(InteractionSuccess)
-
+      
       case applicationCommandAutocompleteResponse(
         ApplicationCommandAutocomplete
       )
-
+      
       case interactionModalCreate(InteractionModalCreate)
       case interactionIFrameModalCreate(InteractionIFrameModalCreate)
-
+      
       case inviteCreate(InviteCreate)
       case inviteDelete(InviteDelete)
-
+      
       case messageCreate(MessageCreate)
       case messageUpdate(DiscordChannel.PartialMessage)
       case messageDelete(MessageDelete)
       case messageDeleteBulk(MessageDeleteBulk)
-
+      
       case messageAcknowledge(MessageAcknowledge)
       case channelPinsAcknowledge(ChannelPinsAcknowledge)
       case userNonChannelAcknowledge(UserNonChannelAcknowledge)
-
+      
       case messagePollVoteAdd(MessagePollVote)
       case messagePollVoteRemove(MessagePollVote)
-
+      
       case messageReactionAdd(MessageReactionAdd)
       case messageReactionAddMany(MessageReactionAddMany)
       case messageReactionRemove(MessageReactionRemove)
       case messageReactionRemoveAll(MessageReactionRemoveAll)
       case messageReactionRemoveEmoji(MessageReactionRemoveEmoji)
-
+      
       case requestLastMessages(RequestLastMessages)
       case lastMessages(LastMessages)
-
+      
       case recentMentionDelete(RecentMentionDelete)
-
+      
       case notificationSettingsUpdate(NotificationSettings)
-
+      
       //			case oauth2TokenRevoke // TODO
-
+      
       case presenceUpdate(PresenceUpdate)
       case requestPresenceUpdate(Identify.Presence)
-
+      
       //			case questsUserStatusUpdate // TODO
       //			case questsUserCompletionUpdate // TODO
-
+      
       case relationshipAdd(DiscordRelationship)
       case relationshipUpdate(PartialRelationship)
       case relationshipRemove(PartialRelationship)
-
+      
       //			case gameRelationshipAdd // TODO
       //			case gameRelationshipRemove // TODO
-
+      
       case savedMessageCreate(SavedMessageCreate)
       case savedMessageDelete(SavedMessageDelete)
-
+      
       case channelMemberCountUpdate(ChannelMemberCountUpdate)
       case requestChannelMemberCount(RequestChannelMemberCount)
-
+      
       case autoModerationRuleCreate(AutoModerationRule)
       case autoModerationRuleUpdate(AutoModerationRule)
       case autoModerationRuleDelete(AutoModerationRule)
-
+      
       case autoModerationActionExecution(AutoModerationActionExecution)
       case autoModerationMentionRaidDetection(
         AutoModerationMentionRaidDetection
       )
-
+      
       case stageInstanceCreate(StageInstance)
       case stageInstanceDelete(StageInstance)
       case stageInstanceUpdate(StageInstance)
-
+      
       //			case streamCreateStream() // TODO
       //			case streamServerUpdate() // TODO
       //			case streamUpdateStream() // TODO
       //			case streamDelete() // TODO
-
+      
       //			case speedTestCreate() // TODO
       //			case speedTestServerUpdate() // TODO
       //			case speedTestUpdate() // TODO
       //			case speedTestDelete() // TODO
-
+      
       case typingStart(TypingStart)
-
+      
       case userUpdate(DiscordUser)
       case userApplicationIdentityUpdate(UserApplicationIdentityUpdate)
-
+      
       case voiceStateUpdate(VoiceState)
       case requestVoiceStateUpdate(VoiceStateUpdate)
       case voiceChannelStatusUpdate(VoiceChannelStatusUpdate)
       case voiceServerUpdate(VoiceServerUpdate)
       case voiceChannelStartTimeUpdate(VoiceChannelStartTimeUpdate)
       //			case voiceChannelEffectSend() // TODO
-
+      
       case webhooksUpdate(WebhooksUpdate)
-
+      
       case applicationCommandPermissionsUpdate(
         GuildApplicationCommandPermissions
       )
-
+      
       case userApplicationUpdate(UserApplicationUpdate)
       case userApplicationRemove(UserApplicationRemove)
-
+      
       case userConnectionsUpdate(UserConnectionsUpdate)
-
+      
       case userGuildSettingsUpdate(Guild.UserGuildSettings)
-
+      
       case userNoteUpdate(UserNote)
-
+      
       //			case userRequiredActionUpdate() // TODO
       case userSettingsUpdate(UserSettingsProtoUpdate)
-
+      
       //				case audioSettingsUpdate() // TODO
-
+      
       //			case userPremiumGuildSubscriptionSlotCreate() // TODO
       //			case userPremiumGuildSubscriptionSlotUpdate() // TODO
       //			case userPremiumGuildSubscriptionSlotDelete() // TODO
-
+      
       case embeddedActivityUpdateV2(EmbeddedActivityUpdateV2)
       case contentInventoryInboxStale(ContentInventoryInboxStale)
-
+      
       case __undocumented
-
+      
       // MARK: - End of payloads
-
+      
       public var correspondingIntents: [Intent] {
         switch self {
         case .heartbeat, .identify, .hello, .ready, .resume, .resumed,
-          .invalidSession, .requestGuildMembers,
-          .requestPresenceUpdate, .requestVoiceStateUpdate, .interactionCreate,
-          .entitlementCreate,
-          .entitlementUpdate, .entitlementDelete,
-          .applicationCommandPermissionsUpdate, .userUpdate,
-          .voiceServerUpdate, .updateGuildSubscriptions, .guildMemberListUpdate:
+            .invalidSession, .requestGuildMembers,
+            .requestPresenceUpdate, .requestVoiceStateUpdate, .interactionCreate,
+            .entitlementCreate,
+            .entitlementUpdate, .entitlementDelete,
+            .applicationCommandPermissionsUpdate, .userUpdate,
+            .voiceServerUpdate, .updateGuildSubscriptions, .guildMemberListUpdate:
           return []
         case .guildCreate, .guildUpdate, .guildDelete, .guildMembersChunk,
-          .guildRoleCreate, .guildRoleUpdate,
-          .guildRoleDelete, .channelCreate, .channelUpdate, .channelDelete,
-          .threadCreate, .threadUpdate,
-          .threadDelete, .threadSyncList, .threadMemberUpdate,
-          .stageInstanceCreate, .stageInstanceDelete,
-          .stageInstanceUpdate:
+            .guildRoleCreate, .guildRoleUpdate,
+            .guildRoleDelete, .channelCreate, .channelUpdate, .channelDelete,
+            .threadCreate, .threadUpdate,
+            .threadDelete, .threadSyncList, .threadMemberUpdate,
+            .stageInstanceCreate, .stageInstanceDelete,
+            .stageInstanceUpdate:
           return [.guilds]
         case .channelPinsUpdate:
           return [.guilds, .directMessages]
         case .threadMembersUpdate, .guildMemberAdd, .guildMemberRemove,
-          .guildMemberUpdate:
+            .guildMemberUpdate:
           return [.guilds, .guildMembers]
         case .guildAuditLogEntryCreate, .guildBanAdd, .guildBanRemove:
           return [.guildModeration]
         case .guildEmojisUpdate, .guildStickersUpdate:
           return [.guildEmojisAndStickers]
         case .guildIntegrationsUpdate, .integrationCreate, .integrationUpdate,
-          .integrationDelete:
+            .integrationDelete:
           return [.guildIntegrations]
         case .webhooksUpdate:
           return [.guildWebhooks]
@@ -390,22 +390,22 @@ public struct Gateway: Sendable, Codable {
         case .presenceUpdate:
           return [.guildPresences]
         case .messageCreate, .messageUpdate, .messageDelete,
-          .messageAcknowledge:
+            .messageAcknowledge:
           return [.guildMessages, .directMessages]
         case .messageDeleteBulk:
           return [.guildMessages]
         case .messageReactionAdd, .messageReactionRemove,
-          .messageReactionRemoveAll,
-          .messageReactionRemoveEmoji:
+            .messageReactionRemoveAll,
+            .messageReactionRemoveEmoji:
           return [.guildMessageReactions]
         case .typingStart:
           return [.guildMessageTyping]
         case .guildScheduledEventCreate, .guildScheduledEventUpdate,
-          .guildScheduledEventDelete,
-          .guildScheduledEventUserAdd, .guildScheduledEventUserRemove:
+            .guildScheduledEventDelete,
+            .guildScheduledEventUserAdd, .guildScheduledEventUserRemove:
           return [.guildScheduledEvents]
         case .autoModerationRuleCreate, .autoModerationRuleUpdate,
-          .autoModerationRuleDelete:
+            .autoModerationRuleDelete:
           return [.autoModerationConfiguration]
         case .autoModerationActionExecution:
           return [.autoModerationExecution]
@@ -419,32 +419,32 @@ public struct Gateway: Sendable, Codable {
         }
       }
     }
-
+    
     public enum GatewayDecodingError: Error, CustomStringConvertible {
       /// The dispatch event type '\(type ?? "nil")' is unhandled. This is probably a new Discord event which is not yet officially documented. I actively look for new events, and check Discord docs, so there is nothing to worry about. The library will support this event when it should.
       case unhandledDispatchEvent(type: String?)
-
+      
       public var description: String {
         switch self {
         case .unhandledDispatchEvent(let type):
           return
-            "Gateway.Event.GatewayDecodingError.unhandledDispatchEvent(type: \(type ?? "nil"))"
+          "Gateway.Event.GatewayDecodingError.unhandledDispatchEvent(type: \(type ?? "nil"))"
         }
       }
     }
-
+    
     enum CodingKeys: String, CodingKey {
       case opcode = "op"
       case data = "d"
       case sequenceNumber = "s"
       case type = "t"
     }
-
+    
     public var opcode: Opcode
     public var data: Payload?
     public var sequenceNumber: Int?
     public var type: String?
-
+    
     public init(
       opcode: Opcode,
       data: Payload? = nil,
@@ -456,7 +456,7 @@ public struct Gateway: Sendable, Codable {
       self.sequenceNumber = sequenceNumber
       self.type = type
     }
-
+    
     public init(from decoder: any Decoder) throws {
       let container = try decoder.container(keyedBy: CodingKeys.self)
       self.opcode = try container.decode(Opcode.self, forKey: .opcode)
@@ -465,11 +465,11 @@ public struct Gateway: Sendable, Codable {
         forKey: .sequenceNumber
       )
       self.type = try container.decodeIfPresent(String.self, forKey: .type)
-
+      
       func decodeData<D: Decodable>(as type: D.Type = D.self) throws -> D {
         try container.decode(D.self, forKey: .data)
       }
-
+      
       switch opcode {
       case .heartbeat, .heartbeatAccepted, .reconnect:
         guard try container.decodeNil(forKey: .data) else {
@@ -484,14 +484,14 @@ public struct Gateway: Sendable, Codable {
         }
         self.data = nil
       case .identify, .presenceUpdate, .voiceStateUpdate, .resume,
-        .requestGuildMembers, .requestSoundboardSounds, .voiceServerPing,
-        .callConnect,
-        .guildSubscriptions, .lobbyVoiceStates, .streamCreate, .streamDelete,
-        .streamWatch, .streamPing, .streamSetPaused, .requestForumUnread,
-        .remoteCommand, .requestDeletedEntityIds, .speedtestCreate,
-        .speedtestDelete, .requestLastMessages, .searchRecentMembers,
-        .requestChannelStatuses, .guildSubscriptionsBulk, .guildChannelsResync,
-        .requestChannelMemberCounts, .qosHeartbeat, .updateTimeSpentSessionId:
+          .requestGuildMembers, .requestSoundboardSounds, .voiceServerPing,
+          .callConnect,
+          .guildSubscriptions, .lobbyVoiceStates, .streamCreate, .streamDelete,
+          .streamWatch, .streamPing, .streamSetPaused, .requestForumUnread,
+          .remoteCommand, .requestDeletedEntityIds, .speedtestCreate,
+          .speedtestDelete, .requestLastMessages, .searchRecentMembers,
+          .requestChannelStatuses, .guildSubscriptionsBulk, .guildChannelsResync,
+          .requestChannelMemberCounts, .qosHeartbeat, .updateTimeSpentSessionId:
         throw DecodingError.dataCorrupted(
           .init(
             codingPath: container.codingPath,
@@ -759,11 +759,11 @@ public struct Gateway: Sendable, Codable {
         }
       }
     }
-
+    
     public enum EncodingError: Error, CustomStringConvertible {
       /// This event is not supposed to be sent at all. This could be a library issue, please report at https://github.com/DiscordBM/DiscordBM/issues.
       case notSupposedToBeSent(message: String)
-
+      
       public var description: String {
         switch self {
         case .notSupposedToBeSent(let message):
@@ -771,10 +771,10 @@ public struct Gateway: Sendable, Codable {
         }
       }
     }
-
+    
     public func encode(to encoder: any Encoder) throws {
       var container = encoder.container(keyedBy: CodingKeys.self)
-
+      
       switch self.opcode {
       case .dispatch, .reconnect, .invalidSession, .heartbeatAccepted, .hello:
         throw EncodingError.notSupposedToBeSent(
@@ -784,7 +784,7 @@ public struct Gateway: Sendable, Codable {
       default: break
       }
       try container.encode(self.opcode, forKey: .opcode)
-
+      
       if self.sequenceNumber != nil {
         throw EncodingError.notSupposedToBeSent(
           message:
@@ -797,7 +797,7 @@ public struct Gateway: Sendable, Codable {
             "'type' is supposed to never be sent but wasn't nil (\(String(describing: type))."
         )
       }
-
+      
       switch self.data {
       case .none:
         try container.encodeNil(forKey: .data)
@@ -824,44 +824,6 @@ public struct Gateway: Sendable, Codable {
           message: "'\(self)' data is supposed to never be sent."
         )
       }
-    }
-  }
-}
-
-// MARK: + Gateway.Intent
-extension Gateway.Intent {
-  /// All intents that require no privileges.
-  /// https://discord.com/developers/docs/topics/gateway#privileged-intents
-  public static var unprivileged: [Gateway.Intent] {
-    Gateway.Intent.allCases.filter { !$0.isPrivileged }
-  }
-
-  /// https://discord.com/developers/docs/topics/gateway#privileged-intents
-  public var isPrivileged: Bool {
-    switch self {
-    case .guilds: return false
-    case .guildMembers: return true
-    case .guildModeration: return false
-    case .guildEmojisAndStickers: return false
-    case .guildIntegrations: return false
-    case .guildWebhooks: return false
-    case .guildInvites: return false
-    case .guildVoiceStates: return false
-    case .guildPresences: return true
-    case .guildMessages: return false
-    case .guildMessageReactions: return false
-    case .guildMessageTyping: return false
-    case .directMessages: return false
-    case .directMessageReactions: return false
-    case .directMessageTyping: return false
-    case .messageContent: return true
-    case .guildScheduledEvents: return false
-    case .autoModerationConfiguration: return false
-    case .autoModerationExecution: return false
-    case .guildMessagePolls: return false
-    case .directMessagePolls: return false
-    /// Undocumented cases are considered privileged just to be safe than sorry
-    case .__undocumented: return true
     }
   }
 }

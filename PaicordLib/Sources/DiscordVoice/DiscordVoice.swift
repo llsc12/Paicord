@@ -8,3 +8,5 @@
 
 import Sodium
 import Opus
+
+/// https://docs.discord.food/topics/voice-connections#voice-data-interpolation

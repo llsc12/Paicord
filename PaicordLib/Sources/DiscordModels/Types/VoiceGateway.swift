@@ -14,14 +14,14 @@ public struct VoiceGateway: Sendable, Codable {
   public enum Opcode: UInt8, Sendable, Codable, CustomStringConvertible {
     case identify = 0  // s
     case selectProtocol = 1  // s
-    case clientPlatform = 2  // r
+    case ready = 2  // r
     case heartbeat = 3  // s
     case sessionDescription = 4  // r
     case speaking = 5  // s r
     case heartbeatAck = 6  // r
     case resume = 7  // s
     case hello = 8  // r
-    case resumed = 9 // r
+    case resumed = 9  // r
     // signal opcode deprecated
     case clientConnect = 11  // r
     case video = 12  // r
@@ -29,13 +29,15 @@ public struct VoiceGateway: Sendable, Codable {
     case sessionUpdate = 14  // s r
     case mediaSinkWants = 15  // s r
     case voiceBackendVersion = 16  // s r
-    case channelOptionsUpdate = 17  // unknown, not docced too.
+    case channelOptionsUpdate = 17  // unknown
+    case clientFlags = 18
+    case clientPlatform = 20
 
     public var description: String {
       switch self {
       case .identify: return "identify"
       case .selectProtocol: return "selectProtocol"
-      case .clientPlatform: return "clientPlatform"
+      case .ready: return "ready"
       case .heartbeat: return "heartbeat"
       case .sessionDescription: return "sessionDescription"
       case .speaking: return "speaking"
@@ -50,6 +52,8 @@ public struct VoiceGateway: Sendable, Codable {
       case .mediaSinkWants: return "mediaSinkWants"
       case .voiceBackendVersion: return "voiceBackendVersion"
       case .channelOptionsUpdate: return "channelOptionsUpdate"
+        case .clientFlags: return "clientFlags"
+        case .clientPlatform: return "clientPlatform"
       }
     }
   }
@@ -65,7 +69,23 @@ public struct VoiceGateway: Sendable, Codable {
     indirect public enum Payload: Sendable {
       case identify(Identify)
       case ready(Ready)
-      case 
+      case selectProtocol(SelectProtocol)
+      case heartbeat(Heartbeat)
+      case sessionDescription(SessionDescription)
+      case speaking(Speaking)
+      case heartbeatAck(Heartbeat)
+      case resume(Resume)
+      case hello(Hello)
+      case resumed
+      case clientConnect(ClientConnect)
+      case video(Video)
+      case clientDisconnect(ClientDisconnect)
+      case sessionUpdate(SessionUpdate)
+      case mediaSinkWants(MediaSinkWants)
+      case voiceBackendVersion(VoiceBackendVersion)
+//      case channelOptionsUpdate
+      case clientFlags(ClientFlags)
+      case clientPlatform(ClientPlatform)
 
       case __undocumented
 
@@ -117,19 +137,19 @@ public struct VoiceGateway: Sendable, Codable {
       }
 
       switch opcode {
-      //      case .none:
-      //        guard try container.decodeNil(forKey: .data) else {
-      //          throw DecodingError.typeMismatch(
-      //            Optional<Never>.self,
-      //            .init(
-      //              codingPath: container.codingPath,
-      //              debugDescription:
-      //                "`\(opcode)` opcode is supposed to have no data."
-      //            )
-      //          )
-      //        }
-      //        self.data = nil
-      case .identify, .selectProtocol, .heartbeat, .resume:
+      case .resumed:
+        guard try container.decodeNil(forKey: .data) else {
+          throw DecodingError.typeMismatch(
+            Optional<Never>.self,
+            .init(
+              codingPath: container.codingPath,
+              debugDescription:
+                "`\(opcode)` opcode is supposed to have no data."
+            )
+          )
+        }
+        self.data = nil
+      case .identify, .selectProtocol, .resume:
         throw DecodingError.dataCorrupted(
           .init(
             codingPath: container.codingPath,
@@ -137,9 +157,36 @@ public struct VoiceGateway: Sendable, Codable {
               "'\(opcode)' opcode is supposed to never be received."
           )
         )
-      case .invalidSession:
-        self.data = try .invalidSession(canResume: decodeData())
+      case .ready:
+        self.data = .ready(try decodeData())
+      case .sessionDescription:
+        self.data = .sessionDescription(try decodeData())
+      case .sessionUpdate:
+        self.data = .sessionUpdate(try decodeData())
       case .hello:
+        self.data = .hello(try decodeData())
+      case .heartbeat:
+        self.data = .heartbeat(try decodeData())
+      case .speaking:
+        self.data = .speaking(try decodeData())
+      case .heartbeatAck:
+        self.data = .heartbeatAck(try decodeData())
+      case .clientConnect:
+        self.data = .clientConnect(try decodeData())
+      case .video:
+        self.data = .video(try decodeData())
+      case .clientDisconnect:  
+        self.data = .clientDisconnect(try decodeData())
+      case .mediaSinkWants:
+        self.data = .mediaSinkWants(try decodeData())
+      case .voiceBackendVersion:
+        self.data = .voiceBackendVersion(try decodeData())
+      case .channelOptionsUpdate:
+        self.data = .__undocumented
+      case .clientFlags:
+        self.data = .clientFlags(try decodeData())
+      case .clientPlatform:
+        self.data = .clientPlatform(try decodeData())
       }
     }
 
@@ -159,7 +206,8 @@ public struct VoiceGateway: Sendable, Codable {
       var container = encoder.container(keyedBy: CodingKeys.self)
 
       switch self.opcode {
-      case .dispatch, .reconnect, .invalidSession, .heartbeatAccepted, .hello:
+      case .ready, .sessionDescription, .heartbeatAck, .hello, .resumed,
+        .clientConnect, .video, .clientDisconnect:
         throw EncodingError.notSupposedToBeSent(
           message:
             "`\(self.opcode.rawValue)` opcode is supposed to never be sent."
@@ -174,33 +222,25 @@ public struct VoiceGateway: Sendable, Codable {
             "'sequenceNumber' is supposed to never be sent but wasn't nil (\(String(describing: sequenceNumber))."
         )
       }
-      if self.type != nil {
-        throw EncodingError.notSupposedToBeSent(
-          message:
-            "'type' is supposed to never be sent but wasn't nil (\(String(describing: type))."
-        )
-      }
 
       switch self.data {
       case .none:
         try container.encodeNil(forKey: .data)
-      case .heartbeat(let lastSequenceNumber):
-        try container.encode(lastSequenceNumber, forKey: .data)
-      case .qosHeartbeat(let payload):
-        try container.encode(payload, forKey: .data)
       case .identify(let payload):
+        try container.encode(payload, forKey: .data)
+      case .selectProtocol(let payload):
+        try container.encode(payload, forKey: .data)
+      case .heartbeat(let payload):
+        try container.encode(payload, forKey: .data)
+      case .speaking(let payload):
         try container.encode(payload, forKey: .data)
       case .resume(let payload):
         try container.encode(payload, forKey: .data)
-      case .requestGuildMembers(let payload):
+      case .sessionUpdate(let payload):
         try container.encode(payload, forKey: .data)
-      case .requestPresenceUpdate(let payload):
+      case .mediaSinkWants(let payload):
         try container.encode(payload, forKey: .data)
-      case .requestVoiceStateUpdate(let payload):
-        try container.encode(payload, forKey: .data)
-      case .updateGuildSubscriptions(let payload):
-        try container.encode(payload, forKey: .data)
-      case .updateTimeSpentSessionId(let payload):
+      case .voiceBackendVersion(let payload):
         try container.encode(payload, forKey: .data)
       default:
         throw EncodingError.notSupposedToBeSent(
