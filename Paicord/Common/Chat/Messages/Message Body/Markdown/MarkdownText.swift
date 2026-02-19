@@ -219,12 +219,8 @@ struct MarkdownText: View, Equatable {
         if let children = block.children {
           VStack(alignment: .leading, spacing: 4) {
             ForEach(children) { child in
-              HStack(alignment: .top, spacing: 0) {
-//                Text(verbatim: String(repeating: "\t", count: block.level ?? 0))
-                Text(verbatim: String(block.level ?? -1))
-                BlockView(block: child)
-                  .equatable()
-              }
+              BlockView(block: child)
+                .equatable()
             }
           }
         }
@@ -235,11 +231,13 @@ struct MarkdownText: View, Equatable {
           Text(converted)
         } else if let children = block.children {
           let level = block.level ?? -1
+          let number = block.itemNumber ?? -1
+          let ordered = block.isOrdered ?? false
           
           VStack(alignment: .leading, spacing: 4) {
             ForEach(children) { nested in
               HStack(alignment: .top, spacing: 8) {
-                Text(verbatim: block.itemNumber != nil ? "\(block.itemNumber ?? -1)." : level > 0 ? "◦" : "•").font(.body)
+                Text(verbatim: ordered ? "\(number)." : level > 0 ? "◦" : "•").font(.body)
                 BlockView(block: nested)
                   .equatable()
               }
