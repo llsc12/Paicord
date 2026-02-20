@@ -30,6 +30,7 @@ extension VoiceGateway {
       self.streams = streams
     }
 
+    public var max_dave_protocol_version: Int = 1
     public var server_id: GuildSnowflake
     public var channel_id: ChannelSnowflake
     public var user_id: UserSnowflake
@@ -237,6 +238,11 @@ extension VoiceGateway {
 
   /// https://docs.discord.food/topics/voice-connections#heartbeat-structure
   public struct Heartbeat: Sendable, Codable {
+    public init(t: Int, seq_ack: Int? = nil) {
+      self.t = t
+      self.seq_ack = seq_ack
+    }
+
     public var t: Int /* current unix timestamp */ = Int(
       Date().timeIntervalSince1970
     )
@@ -269,6 +275,20 @@ extension VoiceGateway {
 
   /// https://docs.discord.food/topics/voice-connections#resume-structure
   public struct Resume: Sendable, Codable {
+    public init(
+      server_id: GuildSnowflake,
+      channel_id: ChannelSnowflake,
+      session_id: String,
+      token: Secret,
+      seq_ack: Int? = nil
+    ) {
+      self.server_id = server_id
+      self.channel_id = channel_id
+      self.session_id = session_id
+      self.token = token
+      self.seq_ack = seq_ack
+    }
+
     public var server_id: GuildSnowflake
     public var channel_id: ChannelSnowflake
     public var session_id: String
@@ -372,7 +392,7 @@ extension VoiceGateway {
       }
     }
   }
-  
+
   /// https://docs.discord.food/topics/voice-connections#voice-backend-version-structure
   public struct VoiceBackendVersion: Sendable, Codable {
     public var voice: String

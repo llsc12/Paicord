@@ -61,7 +61,7 @@ final package class Backoff {
     self.tryCount = 0
   }
 
-  func willTry() {
+  package func willTry() {
     self.previousTry = Date().timeIntervalSince1970
   }
 
