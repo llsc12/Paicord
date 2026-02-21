@@ -22,10 +22,11 @@ jobs:
       commit: ${{ steps.prepare.outputs.commit }}
       pr_number: ${{ steps.prepare.outputs.pr_number }}
     steps:
-      - name: Checkout repo
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          submodules: 'true'
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - id: prepare
         name: Prepare metadata
@@ -69,7 +70,8 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          submodules: 'true'
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout PR
         run: |
@@ -147,7 +149,8 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          submodules: 'true'
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout PR
         run: |
