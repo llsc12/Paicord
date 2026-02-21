@@ -7,11 +7,16 @@
 //
 
 import Foundation
+import NIOCore
 
 public struct VoiceGateway: Sendable, Codable {
 
   /// https://docs.discord.food/topics/voice-connections
   public enum Opcode: UInt8, Sendable, Codable, CustomStringConvertible {
+    // key:
+    // r - received by client
+    // s - sent by client
+    // b - sent/received as binary
     case identify = 0  // s
     case selectProtocol = 1  // s
     case ready = 2  // r
@@ -22,7 +27,7 @@ public struct VoiceGateway: Sendable, Codable {
     case resume = 7  // s
     case hello = 8  // r
     case resumed = 9  // r
-    // signal opcode deprecated
+    // signal opcode deprecated, but its 10 jsyk ykyk
     case clientConnect = 11  // r
     case video = 12  // r
     case clientDisconnect = 13  // r
@@ -32,6 +37,18 @@ public struct VoiceGateway: Sendable, Codable {
     case channelOptionsUpdate = 17  // unknown
     case clientFlags = 18
     case clientPlatform = 20
+    // https://github.com/Snazzah/davey/blob/master/docs/USAGE.md
+    case davePrepareTransition = 21  // r
+    case daveExecuteTransition = 22  // r
+    case daveTransitionReady = 23  // s
+    case davePrepareEpoch = 24  // r
+    case mlsExternalSender = 25  // b r
+    case mlsKeyPackage = 26  // b s
+    case mlsProposals = 27  // b r
+    case mlsCommitWelcome = 28  // b s
+    case mlsAnnounceCommitTransition = 29  // b r
+    case mlsWelcome = 30  // b r
+    case mlsInvalidCommitWelcome = 31  // b s
 
     public var description: String {
       switch self {
@@ -52,8 +69,19 @@ public struct VoiceGateway: Sendable, Codable {
       case .mediaSinkWants: return "mediaSinkWants"
       case .voiceBackendVersion: return "voiceBackendVersion"
       case .channelOptionsUpdate: return "channelOptionsUpdate"
-        case .clientFlags: return "clientFlags"
-        case .clientPlatform: return "clientPlatform"
+      case .clientFlags: return "clientFlags"
+      case .clientPlatform: return "clientPlatform"
+      case .davePrepareTransition: return "davePrepareTransition"
+      case .daveExecuteTransition: return "daveExecuteTransition"
+      case .daveTransitionReady: return "daveTransitionReady"
+      case .davePrepareEpoch: return "davePrepareEpoch"
+      case .mlsExternalSender: return "mlsExternalSender"
+      case .mlsKeyPackage: return "mlsKeyPackage"
+      case .mlsProposals: return "mlsProposals"
+      case .mlsCommitWelcome: return "mlsCommitWelcome"
+      case .mlsAnnounceCommitTransition: return "mlsAnnounceCommitTransition"
+      case .mlsWelcome: return "mlsWelcome"
+      case .mlsInvalidCommitWelcome: return "mlsInvalidCommitWelcome"
       }
     }
   }
@@ -83,22 +111,38 @@ public struct VoiceGateway: Sendable, Codable {
       case sessionUpdate(SessionUpdate)
       case mediaSinkWants(MediaSinkWants)
       case voiceBackendVersion(VoiceBackendVersion)
-//      case channelOptionsUpdate
+      //      case channelOptionsUpdate
       case clientFlags(ClientFlags)
       case clientPlatform(ClientPlatform)
 
-      case __undocumented
+      // dave stuff packages the entire frame.
+      case davePrepareTransition(DavePrepareTransition)
+      case daveExecuteTransition(DaveCommitTransition)
+      case daveTransitionReady(DaveTransitionReady)
+      case davePrepareEpoch(DavePrepareEpoch)
+      case mlsExternalSender(Data)
+      case mlsKeyPackage(Data)
+      case mlsProposals(Data)
+      case mlsCommitWelcome(Data)
+      case mlsAnnounceCommitTransition(transitionId: UInt16, commit: Data)
+      case mlsWelcome(transitionId: UInt16, welcome: Data)
+      case mlsInvalidCommitWelcome(DaveMLSInvalidCommitWelcome)
 
+      case __undocumented
     }
 
     public enum GatewayDecodingError: Error, CustomStringConvertible {
       case unhandledDispatchEvent(type: String?)
+      case unexpectedBinaryData(message: String)
 
       public var description: String {
         switch self {
         case .unhandledDispatchEvent(let type):
           return
             "Gateway.Event.GatewayDecodingError.unhandledDispatchEvent(type: \(type ?? "nil"))"
+        case .unexpectedBinaryData(let message):
+          return
+            "Gateway.Event.GatewayDecodingError.unexpectedBinaryData(message: \(message))"
         }
       }
     }
@@ -125,68 +169,158 @@ public struct VoiceGateway: Sendable, Codable {
     }
 
     public init(from decoder: any Decoder) throws {
-      let container = try decoder.container(keyedBy: CodingKeys.self)
-      self.opcode = try container.decode(Opcode.self, forKey: .opcode)
-      self.sequenceNumber = try container.decodeIfPresent(
-        Int.self,
-        forKey: .sequenceNumber
-      )
+      // the data could be binary or json.
+      do {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
 
-      func decodeData<D: Decodable>(as type: D.Type = D.self) throws -> D {
-        try container.decode(D.self, forKey: .data)
-      }
+        self.opcode = try container.decode(Opcode.self, forKey: .opcode)
+        self.sequenceNumber = try container.decodeIfPresent(
+          Int.self,
+          forKey: .sequenceNumber
+        )
 
-      switch opcode {
-      case .resumed:
-        guard try container.decodeNil(forKey: .data) else {
-          throw DecodingError.typeMismatch(
-            Optional<Never>.self,
+        func decodeData<D: Decodable>(as type: D.Type = D.self) throws -> D {
+          try container.decode(D.self, forKey: .data)
+        }
+
+        switch opcode {
+        case .resumed:
+          guard try container.decodeNil(forKey: .data) else {
+            throw DecodingError.typeMismatch(
+              Optional<Never>.self,
+              .init(
+                codingPath: container.codingPath,
+                debugDescription:
+                  "`\(opcode)` opcode is supposed to have no data."
+              )
+            )
+          }
+          self.data = nil
+        case .identify, .selectProtocol, .resume, .daveTransitionReady,
+          .mlsKeyPackage, .mlsCommitWelcome, .mlsInvalidCommitWelcome:
+          throw DecodingError.dataCorrupted(
             .init(
               codingPath: container.codingPath,
               debugDescription:
-                "`\(opcode)` opcode is supposed to have no data."
+                "'\(opcode)' opcode is supposed to never be received."
             )
           )
-        }
-        self.data = nil
-      case .identify, .selectProtocol, .resume:
-        throw DecodingError.dataCorrupted(
-          .init(
-            codingPath: container.codingPath,
-            debugDescription:
-              "'\(opcode)' opcode is supposed to never be received."
+        case .ready:
+          self.data = .ready(try decodeData())
+        case .sessionDescription:
+          self.data = .sessionDescription(try decodeData())
+        case .sessionUpdate:
+          self.data = .sessionUpdate(try decodeData())
+        case .hello:
+          self.data = .hello(try decodeData())
+        case .heartbeat:
+          self.data = .heartbeat(try decodeData())
+        case .speaking:
+          self.data = .speaking(try decodeData())
+        case .heartbeatAck:
+          self.data = .heartbeatAck(try decodeData())
+        case .clientConnect:
+          self.data = .clientConnect(try decodeData())
+        case .video:
+          self.data = .video(try decodeData())
+        case .clientDisconnect:
+          self.data = .clientDisconnect(try decodeData())
+        case .mediaSinkWants:
+          self.data = .mediaSinkWants(try decodeData())
+        case .voiceBackendVersion:
+          self.data = .voiceBackendVersion(try decodeData())
+        case .channelOptionsUpdate:
+          self.data = .__undocumented
+        case .clientFlags:
+          self.data = .clientFlags(try decodeData())
+        case .clientPlatform:
+          self.data = .clientPlatform(try decodeData())
+        case .davePrepareTransition:
+          self.data = .davePrepareTransition(try decodeData())
+        case .daveExecuteTransition:
+          self.data = .daveExecuteTransition(try decodeData())
+        case .davePrepareEpoch:
+          self.data = .davePrepareEpoch(try decodeData())
+        case .mlsExternalSender, .mlsProposals, .mlsAnnounceCommitTransition,
+          .mlsWelcome:
+          print(
+            "Received an opcode \(opcode.description) that is supposed to be binary, but it came as JSON."
           )
-        )
-      case .ready:
-        self.data = .ready(try decodeData())
-      case .sessionDescription:
-        self.data = .sessionDescription(try decodeData())
-      case .sessionUpdate:
-        self.data = .sessionUpdate(try decodeData())
-      case .hello:
-        self.data = .hello(try decodeData())
-      case .heartbeat:
-        self.data = .heartbeat(try decodeData())
-      case .speaking:
-        self.data = .speaking(try decodeData())
-      case .heartbeatAck:
-        self.data = .heartbeatAck(try decodeData())
-      case .clientConnect:
-        self.data = .clientConnect(try decodeData())
-      case .video:
-        self.data = .video(try decodeData())
-      case .clientDisconnect:  
-        self.data = .clientDisconnect(try decodeData())
-      case .mediaSinkWants:
-        self.data = .mediaSinkWants(try decodeData())
-      case .voiceBackendVersion:
-        self.data = .voiceBackendVersion(try decodeData())
-      case .channelOptionsUpdate:
-        self.data = .__undocumented
-      case .clientFlags:
-        self.data = .clientFlags(try decodeData())
-      case .clientPlatform:
-        self.data = .clientPlatform(try decodeData())
+          self.data = .none
+          break
+        }
+      } catch let decodingError {
+        // try to decode entire thing as a ByteBuffer, then try to get binary out.
+        // https://github.com/Snazzah/davey/blob/master/docs/USAGE.md
+        if var buffer = try? ByteBuffer(from: decoder) {
+          guard let seq = buffer.readInteger(as: UInt16.self) else {
+            throw DecodingError.dataCorrupted(
+              .init(
+                codingPath: [],
+                debugDescription:
+                  "Expected the first 2 bytes of the binary data to be the sequence number, but it couldn't be read as UInt16."
+              )
+            )
+          }
+          self.sequenceNumber = .init(seq)
+
+          guard let opcode = buffer.readInteger(as: UInt8.self),
+            let opcode = Opcode(rawValue: opcode)
+          else {
+            throw DecodingError.dataCorrupted(
+              .init(
+                codingPath: [],
+                debugDescription:
+                  "Expected the 3rd byte of the binary data to be the opcode, but it couldn't be read as UInt8 or didn't match any known opcode."
+              )
+            )
+          }
+          self.opcode = opcode
+
+          switch opcode {
+          case .mlsExternalSender:
+            self.data = .mlsExternalSender(Data(buffer: buffer))
+          case .mlsProposals:
+            self.data = .mlsProposals(Data(buffer: buffer))
+          case .mlsAnnounceCommitTransition:
+            guard let transitionId = buffer.readInteger(as: UInt16.self) else {
+              throw DecodingError.dataCorrupted(
+                .init(
+                  codingPath: [],
+                  debugDescription:
+                    "Expected the first 2 bytes of the binary data after the mlsAnnounceCommitTransition opcode to be the transition ID, but it couldn't be read as UInt16."
+                )
+              )
+            }
+            let commit = Data(buffer: buffer)
+            self.data = .mlsAnnounceCommitTransition(
+              transitionId: transitionId,
+              commit: commit
+            )
+          case .mlsWelcome:
+            guard let transitionId = buffer.readInteger(as: UInt16.self) else {
+              throw DecodingError.dataCorrupted(
+                .init(
+                  codingPath: [],
+                  debugDescription:
+                    "Expected the first 2 bytes of the binary data after the mlsWelcome opcode to be the transition ID, but it couldn't be read as UInt16."
+                )
+              )
+            }
+            let welcome = Data(buffer: buffer)
+            self.data = .mlsWelcome(
+              transitionId: transitionId,
+              welcome: welcome
+            )
+          default:
+            print(
+              "Received an opcode \(opcode.description) that is not expected to be binary, but it came as binary."
+            )
+            self.data = .none
+          }
+        } else {
+          throw decodingError
+        }
       }
     }
 
@@ -247,44 +381,6 @@ public struct VoiceGateway: Sendable, Codable {
           message: "'\(self)' data is supposed to never be sent."
         )
       }
-    }
-  }
-}
-
-// MARK: + Gateway.Intent
-extension Gateway.Intent {
-  /// All intents that require no privileges.
-  /// https://discord.com/developers/docs/topics/gateway#privileged-intents
-  public static var unprivileged: [Gateway.Intent] {
-    Gateway.Intent.allCases.filter { !$0.isPrivileged }
-  }
-
-  /// https://discord.com/developers/docs/topics/gateway#privileged-intents
-  public var isPrivileged: Bool {
-    switch self {
-    case .guilds: return false
-    case .guildMembers: return true
-    case .guildModeration: return false
-    case .guildEmojisAndStickers: return false
-    case .guildIntegrations: return false
-    case .guildWebhooks: return false
-    case .guildInvites: return false
-    case .guildVoiceStates: return false
-    case .guildPresences: return true
-    case .guildMessages: return false
-    case .guildMessageReactions: return false
-    case .guildMessageTyping: return false
-    case .directMessages: return false
-    case .directMessageReactions: return false
-    case .directMessageTyping: return false
-    case .messageContent: return true
-    case .guildScheduledEvents: return false
-    case .autoModerationConfiguration: return false
-    case .autoModerationExecution: return false
-    case .guildMessagePolls: return false
-    case .directMessagePolls: return false
-    /// Undocumented cases are considered privileged just to be safe than sorry
-    case .__undocumented: return true
     }
   }
 }

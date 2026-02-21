@@ -100,7 +100,7 @@ extension VoiceGateway {
 
   /// https://docs.discord.food/topics/voice-connections#ready-structure
   public struct Ready: Sendable, Codable {
-    public var ssrc: Int
+    public var ssrc: UInt
     public var ip: String
     public var port: Int
     public var modes: [EncryptionMode]
@@ -212,7 +212,8 @@ extension VoiceGateway {
     public var video_codec: Codec.CodecName
     public var media_session_id: String
     public var mode: EncryptionMode?
-    public var secret_key: [Int]?
+    public var secretKey: [UInt8]
+    public var daveProtocolVersion: UInt8
     public var sdp: String?  // not applicable to udp
     public var keyframe_interval: Int?  // not applicable to udp
   }
@@ -238,22 +239,23 @@ extension VoiceGateway {
 
   /// https://docs.discord.food/topics/voice-connections#heartbeat-structure
   public struct Heartbeat: Sendable, Codable {
-    public init(t: Int, seq_ack: Int? = nil) {
+    public init(seq_ack: Int? = nil) {
+      self.seq_ack = seq_ack
+    }
+    public init(t: UInt, seq_ack: Int? = nil) {
       self.t = t
       self.seq_ack = seq_ack
     }
 
-    public var t: Int /* current unix timestamp */ = Int(
-      Date().timeIntervalSince1970
-    )
+    public var t: UInt = UInt(Date.now.timeIntervalSince1970)
     public var seq_ack: Int? = nil
   }
 
   /// https://docs.discord.food/topics/voice-connections#speaking-structure
   public struct Speaking: Sendable, Codable {
     public var speaking: IntBitField<Flag>
-    public var delay: Int? = nil
-    public var ssrc: Int? = nil
+    public var delay: UInt? = nil
+    public var ssrc: UInt? = nil
 
     #if Non64BitSystemsCompatibility
       @UnstableEnum<UInt64>
@@ -318,9 +320,9 @@ extension VoiceGateway {
 
   /// https://docs.discord.food/topics/voice-connections#video-structure
   public struct Video: Sendable, Codable {
-    public var audio_ssrc: Int
-    public var video_ssrc: Int
-    public var rtx_ssrc: Int
+    public var audio_ssrc: UInt
+    public var video_ssrc: UInt
+    public var rtx_ssrc: UInt
     public var streams: [Stream]?  // sent by client only
     public var user_id: UserSnowflake?  // sent by server only
   }
@@ -397,5 +399,35 @@ extension VoiceGateway {
   public struct VoiceBackendVersion: Sendable, Codable {
     public var voice: String
     public var rtc_worker: String
+  }
+
+  public struct DavePrepareTransition: Sendable, Codable {
+    public var transitionId: UInt16
+    public var protocolVersion: UInt16
+  }
+
+  public struct DaveCommitTransition: Sendable, Codable {
+    public var transitionId: UInt16
+  }
+
+  public struct DavePrepareEpoch: Sendable, Codable {
+    public var epoch: UInt32
+    public var protocolVersion: UInt16
+  }
+
+  public struct DaveTransitionReady: Sendable, Codable {
+    public init(transitionId: UInt16) {
+      self.transitionId = transitionId
+    }
+
+    public var transitionId: UInt16
+  }
+
+  public struct DaveMLSInvalidCommitWelcome: Sendable, Codable {
+    public init(transitionId: UInt16) {
+      self.transitionId = transitionId
+    }
+
+    public var transitionId: UInt16
   }
 }

@@ -56,3 +56,6 @@ Paicord uses modified versions of [DiscordBM](https://github.com/DiscordBM/Disco
 - [Cyclone](https://github.com/slice/cyclone)
 
 And of course, [Discord Userdoccers and its maintainers](https://docs.discord.food) helped massively with their unofficial documentation and direct help.
+
+For voice, work from [SwiftDiscordAudio/DiscordAudioKit](https://github.com/SwiftDiscordAudio/DiscordAudioKit) was used for reference a lot, and also uses [these RTP packet models etc.](https://github.com/SwiftDiscordAudio/DiscordAudioKit/tree/main/Sources/DiscordRTP) too. Paicord relies on [DaveKit](https://github.com/SwiftDiscordAudio/DaveKit) for voice too!
+

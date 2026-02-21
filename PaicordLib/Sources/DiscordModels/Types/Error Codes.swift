@@ -42,23 +42,8 @@ public enum GatewayCloseCode: UInt16, Sendable, Codable {
   }
 }
 
-// CODE  DESCRIPTION
-// 4001  Unknown opcode
-// 4002  Failed to decode
-// 4003  Not authenticated
-// 4004  Authentication failed
-// 4005  Already authenticated
-// 4006  Session no longer valid
-// 4009  Session timeout
-// 4011  Server not found
-// 4012  Unknown protocol
-// 4014  Disconnected
-// 4015  Voice server crashed
-// 4016  Unknown encryption
-// 4020  Bad request
-// 4021  Rate limited
-// 4022  Disconnected
 /// https://docs.discord.food/topics/opcodes-and-status-codes#voice-close-event-codes
+/// https://docs.discord.com/developers/topics/opcodes-and-status-codes#voice
 public enum VoiceGatewayCloseCode: UInt16, Sendable, Codable {
   case unknownOpcode = 4001
   case decodeError = 4002
@@ -69,12 +54,12 @@ public enum VoiceGatewayCloseCode: UInt16, Sendable, Codable {
   case sessionTimedOut = 4009
   case serverNotFound = 4011
   case unknownProtocol = 4012
-  case disconnected1 = 4014
+  case disconnected = 4014
   case voiceServerCrashed = 4015
   case unknownEncryption = 4016
   case badRequest = 4020
   case rateLimited = 4021
-  case disconnected2 = 4022
+  case callTerminated = 4022
 
   public var canTryReconnect: Bool {
     switch self {
@@ -83,15 +68,16 @@ public enum VoiceGatewayCloseCode: UInt16, Sendable, Codable {
     case .notAuthenticated: return true
     case .authenticationFailed: return false
     case .alreadyAuthenticated: return true
-    case .rateLimited: return true
+    case .rateLimited: return false
     case .sessionTimedOut: return true
     case .sessionNoLongerValid: return true
     case .serverNotFound: return false
     case .unknownProtocol: return false
-    case .disconnected1, .disconnected2: return true
+    case .disconnected: return false
     case .voiceServerCrashed: return true
     case .unknownEncryption: return false
     case .badRequest: return false
+    case .callTerminated: return false
     }
   }
 }

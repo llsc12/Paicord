@@ -1,5 +1,5 @@
 {
-  "originHash" : "b27bf575182b512b6c2e0bcf8d0980f3c2abf425f317f9801c6eeaa2d2fcca11",
+  "originHash" : "991f119a6548b62f1958bda935b935816c57860692d86d336c2f87c3654bc16f",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -71,6 +71,15 @@
       "state" : {
         "revision" : "4331dd50bc1db007db664a23f32e6f3df93d4e1a",
         "version" : "4.0.2"
+      }
+    },
+    {
+      "identity" : "davekit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/llsc12/DaveKit.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "7dc9a2ff50d58d14f358c45b1e5090d1e6cd56ae"
       }
     },
     {
@@ -285,8 +294,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-log.git",
       "state" : {
-        "revision" : "ce592ae52f982c847a4efc0dd881cc9eb32d29f2",
-        "version" : "1.6.4"
+        "revision" : "bbd81b6725ae874c69e9b8c8804d462356b55523",
+        "version" : "1.10.1"
       }
     },
     {
@@ -368,15 +377,6 @@
       "state" : {
         "revision" : "e7187309187695115033536e8fc9b2eb87fd956d",
         "version" : "2.8.0"
-      }
-    },
-    {
-      "identity" : "swift-sodium",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/jedisct1/swift-sodium.git",
-      "state" : {
-        "revision" : "e7e799cd1eaa4d0f6d3eab56832e7f4b377f4a4f",
-        "version" : "0.10.0"
       }
     },
     {

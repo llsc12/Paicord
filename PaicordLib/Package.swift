@@ -79,11 +79,11 @@ let package = Package(
       "1.0.0"..<"5.0.0"
     ),
     .package(
-      url: "https://github.com/jedisct1/swift-sodium.git",
-      from: "0.10.0"
+      url: "https://github.com/alta/swift-opus.git",
+      branch: "main"
     ),
     .package(
-      url: "https://github.com/alta/swift-opus.git",
+      url: "https://github.com/llsc12/DaveKit.git",
       branch: "main"
     ),
   ],
@@ -138,8 +138,8 @@ let package = Package(
         .product(name: "WSClient", package: "swift-websocket"),
         .product(name: "libzstd", package: "zstd"),
         .product(name: "Opus", package: "swift-opus"),
-        .product(name: "Sodium", package: "swift-sodium"),
-        .target(name: "DiscordHTTP"),
+        .product(name: "DaveKit", package: "DaveKit"),
+        .target(name: "DiscordGateway"),
       ],
       swiftSettings: swiftSettings
     ),

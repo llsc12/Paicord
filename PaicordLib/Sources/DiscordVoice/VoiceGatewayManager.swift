@@ -9,13 +9,11 @@
 import AsyncHTTPClient
 import Atomics
 import DiscordGateway
-import DiscordHTTP
 import DiscordModels
 import Foundation
 import Logging
 import NIO
 import Opus
-import Sodium
 import WSClient
 
 import enum NIOWebSocket.WebSocketErrorCode
@@ -45,10 +43,17 @@ public actor VoiceGatewayManager {
     }
   }
 
+  struct ConnectionData {
+    var token: Secret  // voice token
+    var guildID: GuildSnowflake
+    var channelID: ChannelSnowflake
+    var userID: UserSnowflake
+    var sessionID: String
+  }
+
   var outboundWriter: WebSocketOutboundWriter?
   let eventLoopGroup: any EventLoopGroup
-  /// A client to send requests to Discord.
-  public nonisolated let client: any DiscordClient
+  
   /// Max frame size we accept to receive through the web-socket connection.
   let maxFrameSize: Int
   /// Generator of `UserGatewayManager` ids.
@@ -60,8 +65,8 @@ public actor VoiceGatewayManager {
   let logger: Logger
 
   private var lastSentPingNonce: Int = 0
-  
-  private var connectionData: Gateway.VoiceServerUpdate
+
+  private var connectionData: ConnectionData
 
   //MARK: Event streams
   var eventsStreamContinuations = [AsyncStream<Gateway.Event>.Continuation]()
@@ -135,24 +140,33 @@ public actor VoiceGatewayManager {
   var unsuccessfulPingsCount = 0
   var lastPongDate = Date()
 
-  
   public init(
     eventLoopGroup: any EventLoopGroup = HTTPClient.shared.eventLoopGroup,
     maxFrameSize: Int = 1 << 28,
-    voiceServerUpdatePayload: Gateway.VoiceServerUpdate,
+    token: Secret,
+    session: Gateway.Session,
+    userID: UserSnowflake,
+    guildID: GuildSnowflake,  // or init with channel id if in dms
+    channelID: ChannelSnowflake,
     stateCallback: (@Sendable (GatewayState) -> Void)? = nil
   ) async {
     self.eventLoopGroup = eventLoopGroup
     self.stateCallback = stateCallback
     self.maxFrameSize = maxFrameSize
-    self.connectionData = voiceServerUpdatePayload
+    self.connectionData = .init(
+      token: token,
+      guildID: guildID,
+      channelID: channelID,
+      userID: userID,
+      sessionID: session.id
+    )
     self.identifyPayload = .init(
-      server_id: connectionData.guild_id,
-      channel_id: <#T##ChannelSnowflake#>,
-      user_id: <#T##UserSnowflake#>,
-      session_id: <#T##String#>,
-      token: <#T##Secret#>,
-      video: <#T##Bool?#>,
+      server_id: connectionData.guildID,
+      channel_id: connectionData.channelID,
+      user_id: connectionData.userID,
+      session_id: connectionData.sessionID,
+      token: connectionData.token,
+      video: false,
       streams: nil
     )
 
@@ -474,9 +488,11 @@ extension VoiceGatewayManager {
       opcode: .resume,
       data: .resume(
         .init(
-          token: identifyPayload.token,
-          session_id: sessionId,
-          sequence: sequenceNumber
+          server_id: connectionData.guildID,
+          channel_id: connectionData.channelID,
+          session_id: connectionData.sessionID,
+          token: connectionData.token,
+          seq_ack: sequenceNumber
         )
       )
     )
@@ -695,7 +711,7 @@ extension VoiceGatewayManager {
         payload: .init(
           opcode: .heartbeat,
           data: .heartbeat(
-            .init(t: lastSentPingNonce, seq_ack: self.sequenceNumber)
+            .init(seq_ack: self.sequenceNumber)
           )
         ),
       )
