@@ -25,7 +25,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          submodules: 'true'
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Certificates
         uses: apple-actions/import-codesign-certs@v5
@@ -175,7 +176,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          submodules: 'true'
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Disable Swift macro plugin consent prompt
         run: |
