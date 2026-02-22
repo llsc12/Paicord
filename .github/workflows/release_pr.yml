@@ -102,6 +102,13 @@ jobs:
           restore-keys: |
             pr-release-deriveddata-macos-
 
+      - name: Force Git to use HTTPS
+        run: |
+          # rewrite any git@github.com:... clones to https://github.com/...
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+          # optional: debug the rule
+          git config --get-regexp '^url\.' || true
+
       - name: Build macOS
         run: |
           set -euo pipefail
@@ -193,6 +200,13 @@ jobs:
             rm -f ldid_macosx_x86_64
             echo "ldid installed at: $(command -v ldid)"
           fi
+
+      - name: Force Git to use HTTPS
+        run: |
+          # rewrite any git@github.com:... clones to https://github.com/...
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+          # optional: debug the rule
+          git config --get-regexp '^url\.' || true
 
       - name: Build iOS
         run: |
