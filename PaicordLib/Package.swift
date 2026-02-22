@@ -148,10 +148,10 @@ let package = Package(
       dependencies: [
         .product(name: "NIOFoundationCompat", package: "swift-nio"),
         .product(name: "MultipartKit", package: "multipart-kit"),
-        .target(name: "DiscordCore"),
-        .target(name: "UnstableEnumMacro"),
         .product(name: "SwiftProtobuf", package: "swift-protobuf"),
         .product(name: "UInt128", package: "UInt128"),
+        .target(name: "DiscordCore"),
+        .target(name: "UnstableEnumMacro"),
       ],
       swiftSettings: swiftSettings
     ),
@@ -242,9 +242,10 @@ let package = Package(
 
 var featureFlags: [SwiftSetting] {
   [
+    .interoperabilityMode(.Cxx),
     /// https://github.com/apple/swift-evolution/blob/main/proposals/0335-existential-any.md
     /// Require `any` for existential types.
-    .enableUpcomingFeature("ExistentialAny")
+    .enableUpcomingFeature("ExistentialAny"),
     //		.define("DISCORDBM_ENABLE_LOGGING_DURING_DECODE", .when(configuration: .debug)),
   ]
 }
