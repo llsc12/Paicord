@@ -1,5 +1,5 @@
 {
-  "originHash" : "0fec6dffd3755fefeb06c808d171eaa14e9b282a409e1ea7091a5c9795cb4f75",
+  "originHash" : "87c1c63e097acb72b6a9235c44f2ace2180cf8cb96ab1d19a0d9e6a811371624",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -79,7 +79,7 @@
       "location" : "https://github.com/llsc12/DaveKit.git",
       "state" : {
         "branch" : "main",
-        "revision" : "41756edece55a9dd0d45eb87c3f9a3c2c3f25a4e"
+        "revision" : "967172de5c8ea2cf1958a6e916704a4c3bdcb9b8"
       }
     },
     {
@@ -161,6 +161,15 @@
       "state" : {
         "revision" : "3498e60218e6003894ff95192d756e238c01f44e",
         "version" : "4.7.1"
+      }
+    },
+    {
+      "identity" : "openssl-package",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/krzyzanowskim/OpenSSL-Package.git",
+      "state" : {
+        "revision" : "4db40e8f0bac4edd7b605cc692b924b558f0d125",
+        "version" : "3.6.1"
       }
     },
     {
