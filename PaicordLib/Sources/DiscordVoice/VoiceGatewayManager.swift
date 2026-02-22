@@ -14,6 +14,7 @@ import Foundation
 import Logging
 import NIO
 import Opus
+import DaveKit
 import WSClient
 
 import enum NIOWebSocket.WebSocketErrorCode

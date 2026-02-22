@@ -150,7 +150,7 @@ extension VoiceGateway {
     case aead_aes256_gcm
     case xsalsa20_poly1305
     case xsalsa20_poly1305_suffix
-    case xsalsa20_poly1305_lit
+    case xsalsa20_poly1305_lite
     case __undocumented(String)
   }
 
