@@ -33,6 +33,13 @@ jobs:
             deriveddata-macos-pr-${{ github.event.pull_request.number }}-
             deriveddata-macos-pr-
 
+      - name: Force Git to use HTTPS
+        run: |
+          # rewrite any git@github.com:... clones to https://github.com/...
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+          # optional: debug the rule
+          git config --get-regexp '^url\.' || true
+
       - name: Build macOS
         id: build
         run: |
@@ -76,6 +83,13 @@ jobs:
           restore-keys: |
             deriveddata-ios-pr-${{ github.event.pull_request.number }}-
             deriveddata-ios-pr-
+
+      - name: Force Git to use HTTPS
+        run: |
+          # rewrite any git@github.com:... clones to https://github.com/...
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+          # optional: debug the rule
+          git config --get-regexp '^url\.' || true
 
       - name: Build iOS
         id: build
