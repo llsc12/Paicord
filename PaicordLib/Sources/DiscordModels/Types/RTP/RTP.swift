@@ -151,6 +151,26 @@ public struct RTPPacket: RawRepresentable {
 
   /// Remaining payload data
   public let payload: ByteBuffer
+  
+  public init(
+    payloadType: RTPType,
+    sequence: UInt16,
+    timestamp: UInt32,
+    ssrc: UInt32,
+    payload: ByteBuffer,
+    marker: Bool = false
+  ) {
+    self.version = 2
+    self.padding = false
+    self.extension = false
+    self.marker = marker
+    self.payloadType = payloadType
+    self.sequence = sequence
+    self.timestamp = timestamp
+    self.ssrc = ssrc
+    self.csrcs = []
+    self.payload = payload
+  }
 
   public init?(rawValue: ByteBuffer) {
     var buffer: ByteBuffer = rawValue

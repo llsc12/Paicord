@@ -74,6 +74,76 @@ extension VoiceGateway.EncryptionMode {
     }
   }
 
+  func encrypt(
+    buffer: consuming Data,
+    using key: SymmetricKey
+  ) -> (ciphertext: Data, tag: Data, nonceSuffix: Data)? {
+
+    var nonceSuffixValue = UInt32.random(in: .min ... .max)
+    var beNonceSuffix = nonceSuffixValue.bigEndian
+    let nonceSuffix = withUnsafeBytes(of: &beNonceSuffix) {
+      Data($0)
+    }
+
+    var nonce = Data(repeating: 0, count: nonceLength)
+    nonce.replaceSubrange(
+      nonce.count - nonceSuffix.count..<nonce.count,
+      with: nonceSuffix
+    )
+
+    switch self {
+
+    case .aead_aes256_gcm_rtpsize:
+      guard let aesNonce = try? AES.GCM.Nonce(data: nonce) else {
+        return nil
+      }
+
+      guard let sealed = try? AES.GCM.seal(
+        buffer,
+        using: key,
+        nonce: aesNonce
+      ) else {
+        return nil
+      }
+
+      return (sealed.ciphertext, sealed.tag, nonceSuffix)
+
+    case .aead_xchacha20_poly1305_rtpsize:
+      guard let chachaNonce = try? ChaChaPoly.Nonce(data: nonce) else {
+        return nil
+      }
+
+      guard let sealed = try? ChaChaPoly.seal(
+        buffer,
+        using: key,
+        nonce: chachaNonce
+      ) else {
+        return nil
+      }
+
+      return (sealed.ciphertext, sealed.tag, nonceSuffix)
+
+    default:
+      fatalError("[Voice Crypto] Unsupported encryption mode \(self)")
+    }
+  }
+
+  private func buildEncryptedPacket(
+    rtpHeader: Data,
+    ciphertext: Data,
+    tag: Data,
+    nonceSuffix: Data
+  ) -> ByteBuffer {
+
+    var buffer = ByteBuffer()
+    buffer.writeBytes(rtpHeader)
+    buffer.writeBytes(ciphertext)
+    buffer.writeBytes(tag)
+    buffer.writeBytes(nonceSuffix)
+
+    return buffer
+  }
+
   /// The length of the nonce as it is stored in the RTP packet
   private var rtpNonceLength: Int {
     switch self {

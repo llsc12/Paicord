@@ -127,7 +127,14 @@ public actor VoiceGatewayManager {
   private var udpConnection: VoiceConnection? = nil
   private var udpConnectionTask: Task<Void, any Error>?
   /// Once the session description event is received, we can listen.
-  var udpListeningTask: Task<Void, any Error>?
+  private var udpListeningTask: Task<Void, any Error>?
+  private var udpSpeakingTask: Task<Void, Never>?
+
+  private var pendingOpusFrames: [Data] = []
+  private var channelDrainTask: Task<Void, Never>?
+
+  /// This contains the speaking payload to send next when there is data to send over UDP.
+  public var nextSpeakingPayload: VoiceGateway.Speaking? = nil
 
   private lazy var dave: DaveSessionManager = {
     return DaveSessionManager(
@@ -136,6 +143,19 @@ public actor VoiceGatewayManager {
       delegate: self,
     )
   }()
+
+  var audioSSRC: UInt {
+    return self.knownSSRCs.first(where: {
+      $0.value == self.connectionData.userID
+    })?.key ?? 0
+  }
+
+  private let outgoingOpusChannel = AsyncChannel<Data>()
+  private let incomingOpusChannel = AsyncChannel<Data>()
+
+  public var incomingOpusPackets: AsyncChannel<Data> {
+    incomingOpusChannel
+  }
 
   //MARK: Send queue
 
@@ -342,12 +362,44 @@ public actor VoiceGatewayManager {
         every: .milliseconds(payload.heartbeat_interval)
       )
     case .ready(let payload):
+      self.knownSSRCs[UInt(payload.ssrc)] = self.connectionData.userID
       setupUDP(payload)
     case .sessionDescription(let payload):
       await self.dave.selectProtocol(
         protocolVersion: payload.daveProtocolVersion
       )
-    // listen on udp
+
+      self.nextSpeakingPayload = .init(
+        speaking: [.voice],
+        ssrc: audioSSRC,
+        delay: 0
+      )
+
+      guard
+        let udpConnection,
+        let mode = payload.mode
+      else { return }
+
+      let key = SymmetricKey(data: payload.secretKey)
+
+      // find ssrc for current user id in connectionData.userID
+      guard
+        let ssrc = self.knownSSRCs.first(where: {
+          $0.value == self.connectionData.userID
+        })?.key
+      else {
+        self.logger.error(
+          "Failed to find SSRC for current user ID when trying to start speaking",
+        )
+        return
+      }
+
+      self.listen(description: payload)
+      self.speak(
+        ssrc: .init(ssrc),
+        mode: mode,
+        key: key
+      )
     case .speaking(let payload):
       self.knownSSRCs[payload.ssrc] = payload.user_id
     case .clientConnect(let payload):
@@ -448,6 +500,271 @@ public actor VoiceGatewayManager {
   }
   private func storeConnection(_ connection: VoiceConnection) {
     self.udpConnection = connection
+  }
+
+  /// Start listening for incoming audio packets on the UDP connection.
+  private func listen(
+    description: VoiceGateway.SessionDescription,
+  ) {
+    guard let encryption = description.mode,
+      VoiceGateway.EncryptionMode.supportedCases.contains(encryption)
+    else {
+      logger.error(
+        "Unsupported crypto mode: \(description.mode?.rawValue ?? "nil")"
+      )
+      return
+    }
+
+    let key = SymmetricKey(data: description.secretKey)
+
+    self.udpListeningTask = Task {
+      guard let udpConnection = self.udpConnection else {
+        return
+      }
+
+      defer {
+        // When the UDP listening ends, cancel the UDP connection task
+        self.udpConnectionTask?.cancel()
+      }
+
+      for try await envelope in udpConnection.inbound {
+        guard let packet = RTPPacket(rawValue: envelope.data) else {
+          continue
+        }
+
+        await self.processIncomingVoicePacket(
+          packet,
+          mode: encryption,
+          key: key
+        )
+      }
+    }
+  }
+
+  /// Writes Opus data out through UDP.
+  private func speak(
+    ssrc: UInt32,
+    mode: VoiceGateway.EncryptionMode,
+    key: SymmetricKey
+  ) {
+    // Start draining channel first
+    startDrainingOutgoingChannel()
+
+    udpSpeakingTask = Task {
+      var sequence: UInt16 = 0
+      var timestamp: UInt32 = 0
+
+      let clock = ContinuousClock()
+      let interval: Duration = .milliseconds(20)
+
+      while !Task.isCancelled {
+        let start = clock.now
+
+        let frame: Data?
+        if pendingOpusFrames.isEmpty {
+          frame = nil
+        } else {
+          frame = pendingOpusFrames.removeFirst()
+        }
+
+        if frame != nil, let payload = self.nextSpeakingPayload {
+          // we're going to start talking, send any pending speaking payloads first.
+          self.send(
+            message: .init(
+              payload: .init(opcode: .speaking, data: .speaking(payload)),
+              opcode: .text
+            )
+          )
+          self.nextSpeakingPayload = nil
+        }
+
+        if let frame {
+          await sendPacket(
+            frame: frame,
+            sequence: sequence,
+            timestamp: timestamp,
+            ssrc: ssrc,
+            mode: mode,
+            key: key
+          )
+        } else {
+          await sendSilence(
+            sequence: sequence,
+            timestamp: timestamp,
+            ssrc: ssrc,
+            mode: mode,
+            key: key
+          )
+        }
+
+        timestamp &+= 960
+        sequence &+= 1
+
+        try? await clock.sleep(until: start + interval)
+      }
+    }
+  }
+
+  private func sendSilence(
+    sequence: UInt16,
+    timestamp: UInt32,
+    ssrc: UInt32,
+    mode: VoiceGateway.EncryptionMode,
+    key: SymmetricKey
+  ) async {
+    // Discord Opus silence frame
+    let silence = Data([0xF8, 0xFF, 0xFE])
+
+    await sendPacket(
+      frame: silence,
+      sequence: sequence,
+      timestamp: timestamp,
+      ssrc: ssrc,
+      mode: mode,
+      key: key
+    )
+  }
+
+  private func startDrainingOutgoingChannel() {
+    channelDrainTask = Task {
+      for await frame in outgoingOpusChannel {
+        pendingOpusFrames.append(frame)
+
+        if pendingOpusFrames.count > 5 {
+          pendingOpusFrames.removeFirst()
+        }
+      }
+    }
+  }
+
+  func sendPacket(
+    frame: Data,
+    sequence: UInt16,
+    timestamp: UInt32,
+    ssrc: UInt32,
+    mode: VoiceGateway.EncryptionMode,
+    key: SymmetricKey
+  ) async {
+
+    guard let udpConnection = self.udpConnection else {
+      return
+    }
+
+    guard
+      let encrypted = mode.encrypt(
+        buffer: frame,
+        using: key
+      )
+    else {
+      logger.error("Voice encryption failed")
+      return
+    }
+
+    let headerPacket = RTPPacket(
+      payloadType: .dynamic(.init(VoiceGateway.Codec.opusCodec.payload_type)),
+      sequence: sequence,
+      timestamp: timestamp,
+      ssrc: ssrc,
+      payload: ByteBuffer()  // empty for now
+    )
+
+    var headerBuffer = headerPacket.rawValue
+
+    guard let headerBytes = headerBuffer.readBytes(length: 12) else {
+      logger.error("Failed to extract RTP header")
+      return
+    }
+
+    var packet = ByteBuffer()
+
+    packet.writeBytes(headerBytes)
+    packet.writeBytes(encrypted.ciphertext)
+    packet.writeBytes(encrypted.tag)
+    packet.writeBytes(encrypted.nonceSuffix)
+
+    // dave encrypt
+
+    do {
+      let daveEncrypted = try await self.dave.encrypt(
+        ssrc: ssrc,
+        data: .init(buffer: packet, byteTransferStrategy: .noCopy),
+        mediaType: .audio
+      )
+      try await udpConnection.send(buffer: .init(data: daveEncrypted))
+    } catch {
+      logger.error(
+        "Failed to send voice packet",
+        metadata: [
+          "error": .string(String(reflecting: error))
+        ]
+      )
+    }
+  }
+
+  /// Process an incoming voice packet. Voice packets are RTP packets that are encrypted
+  /// using the selected crypto mode and key, E2EE encrypted using Dave, and then encoded
+  /// using OPUS.
+  private func processIncomingVoicePacket(
+    _ packet: RTPPacket,
+    mode: VoiceGateway.EncryptionMode,
+    key: SymmetricKey
+  ) async {
+    var buffer = packet.payload
+    // First, decrypt the RTP packet payload
+
+    var extensionLength: UInt16?
+    if packet.extension {
+      // If the packet has an extension, the metadata for the extension is stored
+      // outside of the encrypted portion of the payload, but the extension data itself
+      // is encrypted. This is not compliant with the RTP spec, but is how Discord
+      // implements it.
+      guard buffer.readInteger(as: UInt16.self) != nil,  // extension info
+        let length = buffer.readInteger(as: UInt16.self)
+      else {
+        return
+      }
+
+      extensionLength = length
+    }
+
+    guard
+      var data = mode.decrypt(
+        buffer: packet.payload,
+        with: key,
+      )
+    else {
+      return
+    }
+
+    if let extensionLength {
+      data.removeFirst(Int(extensionLength) * 4)
+    }
+
+    if data.isEmpty {
+      return
+    }
+
+    // We've removed the crypto layer, now to remove the Dave E2EE layer
+
+    guard let userId = knownSSRCs[.init(packet.ssrc)] else {
+      return
+    }
+
+    guard
+      let data = try? await dave.decrypt(
+        userId: userId.rawValue,
+        data: data,
+        mediaType: .audio
+      )
+    else {
+      return
+    }
+
+    await incomingOpusChannel.send(data)
+  }
+
+  public func sendOpusFrame(_ frame: Data) {
+
   }
 
   // MARK: - Gateway actions
