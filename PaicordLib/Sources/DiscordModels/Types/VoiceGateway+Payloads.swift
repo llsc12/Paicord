@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import DaveKit
 
 extension VoiceGateway {
 
@@ -30,7 +31,7 @@ extension VoiceGateway {
       self.streams = streams
     }
 
-    public var max_dave_protocol_version: Int = 1
+    public var max_dave_protocol_version: Int = .init(DaveSessionManager.maxSupportedProtocolVersion())
     public var server_id: GuildSnowflake
     public var channel_id: ChannelSnowflake
     public var user_id: UserSnowflake
