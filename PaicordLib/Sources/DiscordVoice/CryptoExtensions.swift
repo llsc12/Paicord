@@ -14,6 +14,13 @@ import NIOCore
 /// https://github.com/SwiftDiscordAudio/DiscordAudioKit/blob/main/Sources/DiscordAudioKit/CryptoMode.swift
 
 extension VoiceGateway.EncryptionMode {
+  static var supportedCases: [Self] {
+    [
+      .aead_aes256_gcm_rtpsize,
+      .aead_xchacha20_poly1305_rtpsize,
+    ]
+  }
+
   func decrypt(
     buffer: consuming ByteBuffer,
     with key: SymmetricKey,

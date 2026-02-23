@@ -101,7 +101,7 @@ extension VoiceGateway {
 
   /// https://docs.discord.food/topics/voice-connections#ready-structure
   public struct Ready: Sendable, Codable {
-    public var ssrc: UInt
+    public var ssrc: UInt32
     public var ip: String
     public var port: Int
     public var modes: [EncryptionMode]
@@ -133,6 +133,12 @@ extension VoiceGateway {
 
     /// https://docs.discord.food/topics/voice-connections#protocol-data-structure
     public struct ProtocolData: Sendable, Codable {
+      public init(address: String, port: Int, mode: EncryptionMode) {
+        self.address = address
+        self.port = port
+        self.mode = mode
+      }
+      
       public var address: String
       public var port: Int
       public var mode: EncryptionMode
@@ -330,7 +336,7 @@ extension VoiceGateway {
 
   /// https://docs.discord.food/topics/voice-connections#example-media-sink-wants
   public struct MediaSinkWants: Sendable, Codable {
-    public var pixelCounts: [String: Double]
+    public var pixelCounts: [String: Double]?
     public var ssrcs: [String: Int]
 
     public init(from decoder: any Decoder) throws {
@@ -358,8 +364,8 @@ extension VoiceGateway {
     }
 
     public init(
-      pixelCounts: [String: Double],
-      ssrcs: [String: Int]
+      ssrcs: [String: Int],
+      pixelCounts: [String: Double]?
     ) {
       self.pixelCounts = pixelCounts
       self.ssrcs = ssrcs

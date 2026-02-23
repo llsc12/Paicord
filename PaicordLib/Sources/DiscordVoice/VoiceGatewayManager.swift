@@ -114,17 +114,24 @@ public actor VoiceGatewayManager {
 
   //MARK: Connection data
   public nonisolated let identifyPayload: VoiceGateway.Identify
+  // discord uses this for analytics but we'll send it anyways
+  public nonisolated let rtcConnectionID = UUID().uuidString.lowercased()
 
   //MARK: Connection state
   public nonisolated let state = ManagedAtomic(GatewayState.noConnection)
   public nonisolated let stateCallback: (@Sendable (GatewayState) -> Void)?
 
   //MARK: UDP Connection
+  /// Created upon ready event receive
   var udpConnection: VoiceConnection? = nil
+  var udpConnectionTask: Task<Void, any Error>?
+  /// Once the session description event is received, we can listen.
+  var udpListeningTask: Task<Void, any Error>?
+
   private lazy var dave: DaveSessionManager = {
     return DaveSessionManager(
-      selfUserId: "",
-      groupId: 0,
+      selfUserId: connectionData.userID.rawValue,
+      groupId: .init(connectionData.channelID.rawValue) ?? 0,
       delegate: self,
     )
   }()
@@ -318,6 +325,95 @@ public actor VoiceGatewayManager {
     }
   }
 
+  // MARK: - Internal event handling and connection management
+  // required to manage connection. library users can watch events to get this instead.
+  private var knownSSRCs: [UInt32: UserSnowflake] = [:]
+
+  private func processEvent(_ event: VoiceGateway.Event) async {
+    if let sequenceNumber = event.sequenceNumber {
+      self.sequenceNumber = sequenceNumber
+    }
+
+    switch event.data {
+    case .hello(let payload):
+      self.setupPingTask(
+        forConnectionWithId: self.connectionId.load(ordering: .relaxed),
+        every: .milliseconds(payload.heartbeat_interval)
+      )
+    case .ready(let payload):
+      setupUDP(payload)
+    default:
+      break
+    }
+  }
+
+  func setupUDP(_ payload: VoiceGateway.Ready) {
+    self.udpConnectionTask = Task {
+      try await VoiceConnection.connect(
+        host: payload.ip,
+        port: Int(payload.port)
+      ) { connection in
+        guard
+          let (ip, port) = try await connection.discoverExternalIP(
+            ssrc: payload.ssrc,
+          )
+        else {
+          self.logger.error("Failed to discover external IP and port")
+          return
+        }
+
+        guard
+          let mode = VoiceGateway.EncryptionMode.supportedCases.first(where: {
+            mode in
+            payload.modes.contains(mode)
+          })
+        else {
+          self.logger.error("No supported crypto modes found")
+          return
+        }
+
+        self.send(
+          message: .init(
+            payload: .init(
+              opcode: .selectProtocol,
+              data: .selectProtocol(
+                .init(
+                  protocol: "udp",
+                  data: .init(
+                    address: ip,
+                    port: .init(port),
+                    mode: mode
+                  ),
+                  rtc_connection_id: self.rtcConnectionID,
+                  codecs: [
+                    .opusCodec,
+                    .h264Codec,
+                    .h265Codec
+                  ],
+                  experiments: nil
+                )
+              )
+            ),
+            opcode: .text
+          )
+        )
+
+        await self.storeConnection(connection)
+
+        // When this function returns, the UDP connection will be closed, so we
+        // need to keep it alive. Other things will be handled in other tasks.
+        // Luckily, we also need to send keepalive packets to the voice server.
+        // We can accomplish both requirements by awaiting the keepalive task
+        // here.
+        try await connection.keepalive(ssrc: payload.ssrc)
+      }
+    }
+  }
+
+  private func storeConnection(_ connection: VoiceConnection) {
+    self.udpConnection = connection
+  }
+
   // MARK: - Gateway actions
 
   //  /// https://discord.com/developers/docs/topics/gateway-events#update-presence
@@ -394,25 +490,6 @@ public actor VoiceGatewayManager {
 }
 
 extension VoiceGatewayManager {
-  private func processEvent(_ event: VoiceGateway.Event) async {
-    if let sequenceNumber = event.sequenceNumber {
-      self.sequenceNumber = sequenceNumber
-    }
-
-    switch event.opcode {
-    case .hello:
-      // get heartbeat interval and setup ping task
-      if case .hello(let payload) = event.data {
-        self.setupPingTask(
-          forConnectionWithId: self.connectionId.load(ordering: .relaxed),
-          every: .milliseconds(payload.heartbeat_interval)
-        )
-      }
-    default:
-      break
-    }
-  }
-
   private func sendResumeOrIdentify() async {
     if let lastSequenceNumber = self.sequenceNumber {
       self.sendResume(sequenceNumber: lastSequenceNumber)
@@ -1003,7 +1080,7 @@ extension VoiceGatewayManager: DaveSessionDelegate {
       )
     )
   }
-  
+
   public func readyForTransition(transitionId: UInt16) async {
     let event = VoiceGateway.Event(
       opcode: .daveTransitionReady,
