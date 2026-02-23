@@ -48,7 +48,7 @@ public struct VoiceGateway: Sendable, Codable {
     case mlsCommitWelcome = 28  // b s
     case mlsAnnounceCommitTransition = 29  // b r
     case mlsWelcome = 30  // b r
-    case mlsInvalidCommitWelcome = 31  // b s
+    case mlsInvalidCommitWelcome = 31  // s
 
     public var description: String {
       switch self {
@@ -161,7 +161,6 @@ public struct VoiceGateway: Sendable, Codable {
       opcode: Opcode,
       data: Payload? = nil,
       sequenceNumber: Int? = nil,
-      type: String? = nil
     ) {
       self.opcode = opcode
       self.data = data
@@ -169,158 +168,83 @@ public struct VoiceGateway: Sendable, Codable {
     }
 
     public init(from decoder: any Decoder) throws {
-      // the data could be binary or json.
-      do {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
+      let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        self.opcode = try container.decode(Opcode.self, forKey: .opcode)
-        self.sequenceNumber = try container.decodeIfPresent(
-          Int.self,
-          forKey: .sequenceNumber
-        )
+      self.opcode = try container.decode(Opcode.self, forKey: .opcode)
+      self.sequenceNumber = try container.decodeIfPresent(
+        Int.self,
+        forKey: .sequenceNumber
+      )
 
-        func decodeData<D: Decodable>(as type: D.Type = D.self) throws -> D {
-          try container.decode(D.self, forKey: .data)
-        }
+      func decodeData<D: Decodable>(as type: D.Type = D.self) throws -> D {
+        try container.decode(D.self, forKey: .data)
+      }
 
-        switch opcode {
-        case .resumed:
-          guard try container.decodeNil(forKey: .data) else {
-            throw DecodingError.typeMismatch(
-              Optional<Never>.self,
-              .init(
-                codingPath: container.codingPath,
-                debugDescription:
-                  "`\(opcode)` opcode is supposed to have no data."
-              )
-            )
-          }
-          self.data = nil
-        case .identify, .selectProtocol, .resume, .daveTransitionReady,
-          .mlsKeyPackage, .mlsCommitWelcome, .mlsInvalidCommitWelcome:
-          throw DecodingError.dataCorrupted(
+      switch opcode {
+      case .resumed:
+        guard try container.decodeNil(forKey: .data) else {
+          throw DecodingError.typeMismatch(
+            Optional<Never>.self,
             .init(
               codingPath: container.codingPath,
               debugDescription:
-                "'\(opcode)' opcode is supposed to never be received."
+                "`\(opcode)` opcode is supposed to have no data."
             )
           )
-        case .ready:
-          self.data = .ready(try decodeData())
-        case .sessionDescription:
-          self.data = .sessionDescription(try decodeData())
-        case .sessionUpdate:
-          self.data = .sessionUpdate(try decodeData())
-        case .hello:
-          self.data = .hello(try decodeData())
-        case .heartbeat:
-          self.data = .heartbeat(try decodeData())
-        case .speaking:
-          self.data = .speaking(try decodeData())
-        case .heartbeatAck:
-          self.data = .heartbeatAck(try decodeData())
-        case .clientConnect:
-          self.data = .clientConnect(try decodeData())
-        case .video:
-          self.data = .video(try decodeData())
-        case .clientDisconnect:
-          self.data = .clientDisconnect(try decodeData())
-        case .mediaSinkWants:
-          self.data = .mediaSinkWants(try decodeData())
-        case .voiceBackendVersion:
-          self.data = .voiceBackendVersion(try decodeData())
-        case .channelOptionsUpdate:
-          self.data = .__undocumented
-        case .clientFlags:
-          self.data = .clientFlags(try decodeData())
-        case .clientPlatform:
-          self.data = .clientPlatform(try decodeData())
-        case .davePrepareTransition:
-          self.data = .davePrepareTransition(try decodeData())
-        case .daveExecuteTransition:
-          self.data = .daveExecuteTransition(try decodeData())
-        case .davePrepareEpoch:
-          self.data = .davePrepareEpoch(try decodeData())
-        case .mlsExternalSender, .mlsProposals, .mlsAnnounceCommitTransition,
-          .mlsWelcome:
-          print(
-            "Received an opcode \(opcode.description) that is supposed to be binary, but it came as JSON."
+        }
+        self.data = nil
+      case .identify, .selectProtocol, .resume, .daveTransitionReady,
+        .mlsKeyPackage, .mlsCommitWelcome, .mlsInvalidCommitWelcome:
+        throw DecodingError.dataCorrupted(
+          .init(
+            codingPath: container.codingPath,
+            debugDescription:
+              "'\(opcode)' opcode is supposed to never be received."
           )
-          self.data = .none
-          break
-        }
-      } catch let decodingError {
-        // try to decode entire thing as a ByteBuffer, then try to get binary out.
-        // https://github.com/Snazzah/davey/blob/master/docs/USAGE.md
-        if var buffer = try? ByteBuffer(from: decoder) {
-          guard let seq = buffer.readInteger(as: UInt16.self) else {
-            throw DecodingError.dataCorrupted(
-              .init(
-                codingPath: [],
-                debugDescription:
-                  "Expected the first 2 bytes of the binary data to be the sequence number, but it couldn't be read as UInt16."
-              )
-            )
-          }
-          self.sequenceNumber = .init(seq)
-
-          guard let opcode = buffer.readInteger(as: UInt8.self),
-            let opcode = Opcode(rawValue: opcode)
-          else {
-            throw DecodingError.dataCorrupted(
-              .init(
-                codingPath: [],
-                debugDescription:
-                  "Expected the 3rd byte of the binary data to be the opcode, but it couldn't be read as UInt8 or didn't match any known opcode."
-              )
-            )
-          }
-          self.opcode = opcode
-
-          switch opcode {
-          case .mlsExternalSender:
-            self.data = .mlsExternalSender(Data(buffer: buffer))
-          case .mlsProposals:
-            self.data = .mlsProposals(Data(buffer: buffer))
-          case .mlsAnnounceCommitTransition:
-            guard let transitionId = buffer.readInteger(as: UInt16.self) else {
-              throw DecodingError.dataCorrupted(
-                .init(
-                  codingPath: [],
-                  debugDescription:
-                    "Expected the first 2 bytes of the binary data after the mlsAnnounceCommitTransition opcode to be the transition ID, but it couldn't be read as UInt16."
-                )
-              )
-            }
-            let commit = Data(buffer: buffer)
-            self.data = .mlsAnnounceCommitTransition(
-              transitionId: transitionId,
-              commit: commit
-            )
-          case .mlsWelcome:
-            guard let transitionId = buffer.readInteger(as: UInt16.self) else {
-              throw DecodingError.dataCorrupted(
-                .init(
-                  codingPath: [],
-                  debugDescription:
-                    "Expected the first 2 bytes of the binary data after the mlsWelcome opcode to be the transition ID, but it couldn't be read as UInt16."
-                )
-              )
-            }
-            let welcome = Data(buffer: buffer)
-            self.data = .mlsWelcome(
-              transitionId: transitionId,
-              welcome: welcome
-            )
-          default:
-            print(
-              "Received an opcode \(opcode.description) that is not expected to be binary, but it came as binary."
-            )
-            self.data = .none
-          }
-        } else {
-          throw decodingError
-        }
+        )
+      case .ready:
+        self.data = .ready(try decodeData())
+      case .sessionDescription:
+        self.data = .sessionDescription(try decodeData())
+      case .sessionUpdate:
+        self.data = .sessionUpdate(try decodeData())
+      case .hello:
+        self.data = .hello(try decodeData())
+      case .heartbeat:
+        self.data = .heartbeat(try decodeData())
+      case .speaking:
+        self.data = .speaking(try decodeData())
+      case .heartbeatAck:
+        self.data = .heartbeatAck(try decodeData())
+      case .clientConnect:
+        self.data = .clientConnect(try decodeData())
+      case .video:
+        self.data = .video(try decodeData())
+      case .clientDisconnect:
+        self.data = .clientDisconnect(try decodeData())
+      case .mediaSinkWants:
+        self.data = .mediaSinkWants(try decodeData())
+      case .voiceBackendVersion:
+        self.data = .voiceBackendVersion(try decodeData())
+      case .channelOptionsUpdate:
+        self.data = .__undocumented
+      case .clientFlags:
+        self.data = .clientFlags(try decodeData())
+      case .clientPlatform:
+        self.data = .clientPlatform(try decodeData())
+      case .davePrepareTransition:
+        self.data = .davePrepareTransition(try decodeData())
+      case .daveExecuteTransition:
+        self.data = .daveExecuteTransition(try decodeData())
+      case .davePrepareEpoch:
+        self.data = .davePrepareEpoch(try decodeData())
+      case .mlsExternalSender, .mlsProposals, .mlsAnnounceCommitTransition,
+        .mlsWelcome:
+        print(
+          "Received an opcode \(opcode.description) that is supposed to be binary, but it came as JSON."
+        )
+        self.data = .none
+        break
       }
     }
 

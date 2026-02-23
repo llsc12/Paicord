@@ -14,8 +14,7 @@ private class ConfigurationStorage: @unchecked Sendable {
 
 /// A container for **on-boot & one-time-only** configuration options.
 public enum DiscordGlobalConfiguration {
-  /// Currently only 10 is supported.
-  /// official client is on v9, not v10.
+  /// The API and Gateway version used. Official client uses v9. v10 is for bots.
   public static let apiVersion = 9
 
   /// https://docs.discord.food/topics/gateway-events#qos-payload-structure

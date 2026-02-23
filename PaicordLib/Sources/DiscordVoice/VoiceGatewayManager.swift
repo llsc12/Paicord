@@ -8,13 +8,13 @@
 
 import AsyncHTTPClient
 import Atomics
+import DaveKit
 import DiscordGateway
 import DiscordModels
 import Foundation
 import Logging
 import NIO
 import Opus
-import DaveKit
 import WSClient
 
 import enum NIOWebSocket.WebSocketErrorCode
@@ -44,17 +44,35 @@ public actor VoiceGatewayManager {
     }
   }
 
-  struct ConnectionData {
-    var token: Secret  // voice token
-    var guildID: GuildSnowflake
-    var channelID: ChannelSnowflake
-    var userID: UserSnowflake
-    var sessionID: String
+  /// Structure used to initialise voice connections
+  public struct ConnectionData {
+    public var token: Secret  // voice token
+    public var guildID: GuildSnowflake
+    public var channelID: ChannelSnowflake
+    public var userID: UserSnowflake
+    public var sessionID: String
+    public var endpoint: String?
+
+    public init(
+      token: Secret,
+      guildID: GuildSnowflake,
+      channelID: ChannelSnowflake,
+      userID: UserSnowflake,
+      sessionID: String,
+      endpoint: String
+    ) {
+      self.token = token
+      self.guildID = guildID
+      self.channelID = channelID
+      self.userID = userID
+      self.sessionID = sessionID
+      self.endpoint = endpoint
+    }
   }
 
   var outboundWriter: WebSocketOutboundWriter?
   let eventLoopGroup: any EventLoopGroup
-  
+
   /// Max frame size we accept to receive through the web-socket connection.
   let maxFrameSize: Int
   /// Generator of `UserGatewayManager` ids.
@@ -70,15 +88,17 @@ public actor VoiceGatewayManager {
   private var connectionData: ConnectionData
 
   //MARK: Event streams
-  var eventsStreamContinuations = [AsyncStream<Gateway.Event>.Continuation]()
+  var eventsStreamContinuations = [
+    AsyncStream<VoiceGateway.Event>.Continuation
+  ]()
   var eventsParseFailureContinuations = [
     AsyncStream<(any Error, ByteBuffer)>.Continuation
   ]()
 
   /// An async sequence of Gateway events.
-  public var events: DiscordAsyncSequence<Gateway.Event> {
-    DiscordAsyncSequence<Gateway.Event>(
-      base: AsyncStream<Gateway.Event> { continuation in
+  public var events: DiscordAsyncSequence<VoiceGateway.Event> {
+    DiscordAsyncSequence<VoiceGateway.Event>(
+      base: AsyncStream<VoiceGateway.Event> { continuation in
         self.eventsStreamContinuations.append(continuation)
       }
     )
@@ -99,6 +119,16 @@ public actor VoiceGatewayManager {
   public nonisolated let state = ManagedAtomic(GatewayState.noConnection)
   public nonisolated let stateCallback: (@Sendable (GatewayState) -> Void)?
 
+  //MARK: UDP Connection
+  var udpConnection: VoiceConnection? = nil
+  private lazy var dave: DaveSessionManager = {
+    return DaveSessionManager(
+      selfUserId: "",
+      groupId: 0,
+      delegate: self,
+    )
+  }()
+
   //MARK: Send queue
 
   /// 120 per 60 seconds (1 every 500ms),
@@ -114,10 +144,10 @@ public actor VoiceGatewayManager {
 
   /// The sequence number for the payloads sent to us.
   var sequenceNumber: Int? = nil
-  /// The ID of the current Discord-related session.
-  var sessionId: String? = nil
-  /// Gateway URL for resuming the connection, so we don't need to make an api call.
-  var resumeGatewayURL: String? = nil
+  /// Gateway URL for connecting and resuming connections.
+  var resumeGatewayURL: String? {
+    return connectionData.endpoint.map { "wss://\($0)" }
+  }
 
   //MARK: Backoff
 
@@ -135,7 +165,6 @@ public actor VoiceGatewayManager {
     coefficient: 1,
     minBackoff: 15
   )
-  // TODO: - Reconfigure the backoff to be more suitable for users.
 
   //MARK: Ping-pong tracking properties
   var unsuccessfulPingsCount = 0
@@ -144,34 +173,35 @@ public actor VoiceGatewayManager {
   public init(
     eventLoopGroup: any EventLoopGroup = HTTPClient.shared.eventLoopGroup,
     maxFrameSize: Int = 1 << 28,
-    token: Secret,
-    session: Gateway.Session,
-    userID: UserSnowflake,
-    guildID: GuildSnowflake,  // or init with channel id if in dms
-    channelID: ChannelSnowflake,
+    connectionData: ConnectionData,
     stateCallback: (@Sendable (GatewayState) -> Void)? = nil
-  ) async {
+  ) {
     self.eventLoopGroup = eventLoopGroup
     self.stateCallback = stateCallback
     self.maxFrameSize = maxFrameSize
-    self.connectionData = .init(
-      token: token,
-      guildID: guildID,
-      channelID: channelID,
-      userID: userID,
-      sessionID: session.id
-    )
+    self.connectionData = connectionData
     self.identifyPayload = .init(
       server_id: connectionData.guildID,
       channel_id: connectionData.channelID,
       user_id: connectionData.userID,
       session_id: connectionData.sessionID,
       token: connectionData.token,
-      video: false,
-      streams: nil
+      video: true,
+      streams: [
+        .init(
+          type: .video,
+          rid: "100",
+          quality: 100
+        ),
+        .init(
+          type: .video,
+          rid: "50",
+          quality: 50
+        ),
+      ]
     )
 
-    var logger = DiscordGlobalConfiguration.makeLogger("GatewayManager")
+    var logger = DiscordGlobalConfiguration.makeLogger("VoiceGatewayManager")
     logger[metadataKey: "gateway-id"] = .string("\(self.id)")
     self.logger = logger
   }
@@ -205,28 +235,11 @@ public actor VoiceGatewayManager {
     self.stateCallback?(.connecting)
 
     await self.sendQueue.reset()
-    let gatewayURL = await getGatewayURL()
-    //    #if DEBUGo
+    let gatewayURL = self.resumeGatewayURL ?? ""
     let queries: [(String, String)] = [
-      ("v", "\(DiscordGlobalConfiguration.apiVersion)"),
-      ("encoding", "json"),
-      ("compress", "zstd-stream"),
+      ("v", "\(DiscordGlobalConfiguration.apiVersion)")
     ]
-    //    #endif
 
-    //    #if DEBUG
-    //    let configuration = WebSocketClientConfiguration(
-    //      maxFrameSize: self.maxFrameSize,
-    //      additionalHeaders: [
-    //        .userAgent: SuperProperties.useragent(ws: false)!,
-    //        .origin: "https://discord.com",
-    //        .cacheControl: "no-cache",
-    //        .acceptLanguage: SuperProperties.GenerateLocaleHeader(),
-    //
-    //      ],
-    //      extensions: []
-    //    )
-    //    #else
     let configuration = WebSocketClientConfiguration(
       maxFrameSize: self.maxFrameSize,
       additionalHeaders: [
@@ -238,7 +251,6 @@ public actor VoiceGatewayManager {
       ],
       extensions: []
     )
-    //    #endif
 
     logger.trace("Will try to connect to Discord through web-socket")
     let connectionId = self.connectionId.wrappingIncrementThenLoad(
@@ -338,7 +350,7 @@ public actor VoiceGatewayManager {
 
   /// Makes an stream of Gateway events.
   @available(*, deprecated, renamed: "events")
-  public func makeEventsStream() -> AsyncStream<Gateway.Event> {
+  public func makeEventsStream() -> AsyncStream<VoiceGateway.Event> {
     self.events.base
   }
 
@@ -382,109 +394,40 @@ public actor VoiceGatewayManager {
 }
 
 extension VoiceGatewayManager {
-  private func processEvent(_ event: Gateway.Event) async {
+  private func processEvent(_ event: VoiceGateway.Event) async {
     if let sequenceNumber = event.sequenceNumber {
       self.sequenceNumber = sequenceNumber
     }
 
     switch event.opcode {
-    case .heartbeat:
-      self.sendPing(
-        forConnectionWithId: self.connectionId.load(ordering: .relaxed)
-      )
-    case .heartbeatAccepted:
-      self.lastPongDate = Date()
-    case .reconnect:
-      logger.debug(
-        "Received reconnect request. Will reconnect after connection closure"
-      )
-    default:
-      break
-    }
-
-    switch event.data {
-    case .invalidSession(let canResume):
-      logger.warning(
-        "Got invalid session. Will try to reconnect or resume",
-        metadata: [
-          "canResume": .stringConvertible(canResume)
-        ]
-      )
-      if !canResume {
-        self.sequenceNumber = nil
-        self.resumeGatewayURL = nil
-        self.sessionId = nil
+    case .hello:
+      // get heartbeat interval and setup ping task
+      if case .hello(let payload) = event.data {
+        self.setupPingTask(
+          forConnectionWithId: self.connectionId.load(ordering: .relaxed),
+          every: .milliseconds(payload.heartbeat_interval)
+        )
       }
-      self.state.store(.noConnection, ordering: .relaxed)
-      self.stateCallback?(.noConnection)
-      await self.connect()
-    case .hello(let hello):
-      logger.debug("Received 'hello'")
-      /// Start heart-beating right-away.
-      self.setupPingTask(
-        forConnectionWithId: self.connectionId.load(ordering: .relaxed),
-        every: .milliseconds(Int64(hello.heartbeat_interval))
-      )
-      logger.trace("Will resume or identify")
-      await self.sendResumeOrIdentify()
-    case .ready(let payload):
-      logger.notice(
-        "Received ready notice. The connection is fully established",
-        metadata: [
-          "connectionId": .stringConvertible(
-            self.connectionId.load(ordering: .relaxed)
-          )
-        ]
-      )
-      await self.onSuccessfulConnection()
-      self.sessionId = payload.session_id
-      self.resumeGatewayURL = payload.resume_gateway_url
-    case .resumed:
-      logger.debug(
-        "Received resume notice. The connection is fully established",
-        metadata: [
-          "connectionId": .stringConvertible(
-            self.connectionId.load(ordering: .relaxed)
-          )
-        ]
-      )
-      await self.onSuccessfulConnection()
     default:
       break
-    }
-  }
-
-  private func getGatewayURL() async -> String {
-    logger.debug("Will try to get Discord gateway url")
-    if self.sequenceNumber != nil,
-      /// If can resume at all
-      let gatewayURL = self.resumeGatewayURL
-    {
-      logger.trace("Got Discord gateway url from 'resumeGatewayURL'")
-      return gatewayURL
-    } else {
-      return DiscordGlobalConfiguration.gatewayURL
     }
   }
 
   private func sendResumeOrIdentify() async {
-    if let sessionId = self.sessionId,
-      let lastSequenceNumber = self.sequenceNumber
-    {
-      self.sendResume(sessionId: sessionId, sequenceNumber: lastSequenceNumber)
+    if let lastSequenceNumber = self.sequenceNumber {
+      self.sendResume(sequenceNumber: lastSequenceNumber)
     } else {
       logger.debug(
         "Can't resume last Discord connection. Will identify",
         metadata: [
-          "sessionId": .stringConvertible(self.sessionId ?? "nil"),
-          "lastSequenceNumber": .stringConvertible(self.sequenceNumber ?? -1),
+          "lastSequenceNumber": .stringConvertible(self.sequenceNumber ?? -1)
         ]
       )
       await self.sendIdentify()
     }
   }
 
-  private func sendResume(sessionId: String, sequenceNumber: Int) {
+  private func sendResume(sequenceNumber: Int) {
     let resume = VoiceGateway.Event(
       opcode: .resume,
       data: .resume(
@@ -530,7 +473,8 @@ extension VoiceGatewayManager {
       return
     }
 
-    let buffer: ByteBuffer
+    var buffer: ByteBuffer
+    let isBinary: Bool
     switch message {
     case .text(let string):
       self.logger.debug(
@@ -539,6 +483,7 @@ extension VoiceGatewayManager {
           "text": .string(string)
         ]
       )
+      isBinary = false
       buffer = ByteBuffer(string: string)
     case .binary(let _buffer):
       self.logger.debug(
@@ -547,21 +492,13 @@ extension VoiceGatewayManager {
           "text": .string(String(buffer: _buffer))
         ]
       )
+      isBinary = true
       buffer = _buffer
     }
 
+    // check if the raw data is a binary message with valid opcode or json message.
     do {
-      let event = try DiscordGlobalConfiguration.decoder.decode(
-        Gateway.Event.self,
-        from: Data(buffer: buffer, byteTransferStrategy: .noCopy)
-      )
-      self.logger.debug(
-        "Decoded event",
-        metadata: [
-          "event": .string("\(event)"),
-          "opcode": .string(event.opcode.description),
-        ]
-      )
+      let event = try self.tryDecodeBufferAsEvent(&buffer, binary: isBinary)
       Task { await self.processEvent(event) }
       for continuation in self.eventsStreamContinuations {
         continuation.yield(event)
@@ -576,6 +513,107 @@ extension VoiceGatewayManager {
       for continuation in self.eventsParseFailureContinuations {
         continuation.yield((error, buffer))
       }
+    }
+  }
+
+  func tryDecodeBufferAsEvent(_ buffer: inout ByteBuffer, binary: Bool) throws
+    -> VoiceGateway.Event
+  {
+    if binary {
+      // https://github.com/Snazzah/davey/blob/master/docs/USAGE.md
+      guard let seq = buffer.readInteger(as: UInt16.self) else {
+        throw DecodingError.dataCorrupted(
+          .init(
+            codingPath: [],
+            debugDescription:
+              "Expected the first 2 bytes of the binary data to be the sequence number, but it couldn't be read as UInt16."
+          )
+        )
+      }
+      self.sequenceNumber = .init(seq)
+
+      guard let opcode = buffer.readInteger(as: UInt8.self),
+        let opcode = VoiceGateway.Opcode(rawValue: opcode)
+      else {
+        throw DecodingError.dataCorrupted(
+          .init(
+            codingPath: [],
+            debugDescription:
+              "Expected the 3rd byte of the binary data to be the opcode, but it couldn't be read as UInt8 or didn't match any known opcode."
+          )
+        )
+      }
+
+      let data: VoiceGateway.Event.Payload?
+      switch opcode {
+      case .mlsExternalSender:
+        data = .mlsExternalSender(Data(buffer: buffer))
+      case .mlsProposals:
+        data = .mlsProposals(Data(buffer: buffer))
+      case .mlsAnnounceCommitTransition:
+        guard let transitionId = buffer.readInteger(as: UInt16.self) else {
+          throw DecodingError.dataCorrupted(
+            .init(
+              codingPath: [],
+              debugDescription:
+                "Expected the first 2 bytes of the binary data after the mlsAnnounceCommitTransition opcode to be the transition ID, but it couldn't be read as UInt16."
+            )
+          )
+        }
+        let commit = Data(buffer: buffer)
+        data = .mlsAnnounceCommitTransition(
+          transitionId: transitionId,
+          commit: commit
+        )
+      case .mlsWelcome:
+        guard let transitionId = buffer.readInteger(as: UInt16.self) else {
+          throw DecodingError.dataCorrupted(
+            .init(
+              codingPath: [],
+              debugDescription:
+                "Expected the first 2 bytes of the binary data after the mlsWelcome opcode to be the transition ID, but it couldn't be read as UInt16."
+            )
+          )
+        }
+        let welcome = Data(buffer: buffer)
+        data = .mlsWelcome(
+          transitionId: transitionId,
+          welcome: welcome
+        )
+      default:
+        throw DecodingError.dataCorrupted(
+          .init(
+            codingPath: [],
+            debugDescription:
+              "Received an opcode \(opcode.description) that is not expected to be binary, but it came as binary."
+          )
+        )
+      }
+      let event = VoiceGateway.Event(
+        opcode: opcode,
+        data: data
+      )
+      self.logger.debug(
+        "Decoded binary event",
+        metadata: [
+          "event": .string("\(event)"),
+          "opcode": .string(event.opcode.description),
+        ]
+      )
+      return event
+    } else {
+      let event = try DiscordGlobalConfiguration.decoder.decode(
+        VoiceGateway.Event.self,
+        from: Data(buffer: buffer, byteTransferStrategy: .noCopy)
+      )
+      self.logger.debug(
+        "Decoded event",
+        metadata: [
+          "event": .string("\(event)"),
+          "opcode": .string(event.opcode.description),
+        ]
+      )
+      return event
     }
   }
 
@@ -646,7 +684,7 @@ extension VoiceGatewayManager {
       let description: String
       switch code {
       case .unknown(let codeNumber):
-        switch GatewayCloseCode(rawValue: codeNumber) {
+        switch VoiceGatewayCloseCode(rawValue: codeNumber) {
         case .some(let discordCode):
           description = "\(discordCode)"
         case .none:
@@ -662,7 +700,7 @@ extension VoiceGatewayManager {
   private nonisolated func canTryReconnect(code: WebSocketErrorCode?) -> Bool {
     switch code {
     case .unknown(let codeNumber):
-      guard let discordCode = GatewayCloseCode(rawValue: codeNumber) else {
+      guard let discordCode = VoiceGatewayCloseCode(rawValue: codeNumber) else {
         return true
       }
       return discordCode.canTryReconnect
@@ -780,18 +818,28 @@ extension VoiceGatewayManager {
         return
       }
       Task {
-        // discordbm tried to turn discord's opcodes into a ws opcode. this only work for heartbeats.
-        // this is really jank. fall back to .text opcode instead
-        //        let opcode: WebSocketOpcode =
-        //          message.opcode ?? .init(
-        //            encodedWebSocketOpcode: message.payload.opcode.rawValue
-        //          )!
         let opcode: WebSocketOpcode =
           message.opcode ?? .text
 
         let data: Data
         do {
-          data = try DiscordGlobalConfiguration.encoder.encode(message.payload)
+          // switch opcodes bc some are sent as binary.
+          switch message.payload.opcode {
+          case .mlsKeyPackage, .mlsCommitWelcome:
+            switch message.payload.data {
+            case .mlsKeyPackage(let payload):
+              data = payload
+            case .mlsCommitWelcome(let payload):
+              data = payload
+            default:
+              /// never happens, here to initialise data for compile time checks.
+              data = Data()
+            }
+          default:
+            data = try DiscordGlobalConfiguration.encoder.encode(
+              message.payload
+            )
+          }
         } catch {
           self.logger.error(
             "Could not encode payload, \(error)",
@@ -912,13 +960,68 @@ extension VoiceGatewayManager {
   }
 
   public func getSessionID() -> String? {
-    return self.sessionId
+    return self.connectionData.sessionID
   }
+}
+
+extension VoiceGatewayManager: DaveSessionDelegate {
+  public func mlsKeyPackage(keyPackage: Data) async {
+    let event = VoiceGateway.Event(
+      opcode: .mlsKeyPackage,
+      data: .mlsKeyPackage(keyPackage)
+    )
+    self.send(
+      message: .init(
+        payload: event,
+        opcode: .binary
+      )
+    )
+  }
+
+  public func mlsCommitWelcome(welcome: Data) async {
+    let event = VoiceGateway.Event(
+      opcode: .mlsCommitWelcome,
+      data: .mlsCommitWelcome(welcome)
+    )
+    self.send(
+      message: .init(
+        payload: event,
+        opcode: .binary
+      )
+    )
+  }
+
+  public func mlsInvalidCommitWelcome(transitionId: UInt16) async {
+    let event = VoiceGateway.Event(
+      opcode: .mlsInvalidCommitWelcome,
+      data: .mlsInvalidCommitWelcome(.init(transitionId: transitionId))
+    )
+    self.send(
+      message: .init(
+        payload: event,
+        opcode: .text
+      )
+    )
+  }
+  
+  public func readyForTransition(transitionId: UInt16) async {
+    let event = VoiceGateway.Event(
+      opcode: .daveTransitionReady,
+      data: .daveTransitionReady(.init(transitionId: transitionId))
+    )
+    self.send(
+      message: .init(
+        payload: event,
+        opcode: .text
+      )
+    )
+  }
+
 }
 
 extension VoiceGatewayManager {
   func addEventsContinuation(
-    _ continuation: AsyncStream<Gateway.Event>.Continuation
+    _ continuation: AsyncStream<VoiceGateway.Event>.Continuation
   ) {
     self.eventsStreamContinuations.append(continuation)
   }

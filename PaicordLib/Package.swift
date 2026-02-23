@@ -150,6 +150,7 @@ let package = Package(
         .product(name: "MultipartKit", package: "multipart-kit"),
         .product(name: "SwiftProtobuf", package: "swift-protobuf"),
         .product(name: "UInt128", package: "UInt128"),
+        .product(name: "DaveKit", package: "DaveKit"),
         .target(name: "DiscordCore"),
         .target(name: "UnstableEnumMacro"),
       ],
