@@ -617,17 +617,55 @@ class MarkdownRendererVM {
             )
             items.append(itemBlock)
           } else if let nestedList = item as? AST.ListNode {
-            var nestedListChildren: [BlockElement] = []
-            for c in nestedList.children {
-              if let blockChild = makeBlock(from: c) {
-                nestedListChildren.append(blockChild)
+            var nestedItems: [BlockElement] = []
+            for item in nestedList.items {
+              if let listItem = item as? AST.ListItemNode {
+                var nestedListItemChildren: [BlockElement] = []
+                for  c in listItem.children {
+                  if let blockChild = makeBlock(from: c) {
+                    nestedListItemChildren.append(blockChild)
+                  }
+                }
+                let itemBlock = BlockElement(
+                  id: makeID(
+                    base: sourceID(for: listItem),
+                    content: nestedListItemChildren.map(\.id).description
+                  ),
+                  nodeType: .listItem,
+                  attributedContent: nil,
+                  isOrdered: nestedList.isOrdered,
+                  startingNumber: nestedList.startNumber,
+                  itemNumber: listItem.listNumber,
+                  codeContent: nil,
+                  language: nil,
+                  level: nestedList.level,
+                  children: nestedListItemChildren,
+                  sourceLocation: listItem.sourceLocation
+                )
+                nestedItems.append(itemBlock)
+              } else {
+                let attr = renderInlinesToNSAttributedString(
+                  nodes: item.children,
+                  baseStyle: .body
+                )
+                let itemBlock = BlockElement(
+                  id: makeID(base: sourceID(for: item), content: attr.string),
+                  nodeType: .listItem,
+                  attributedContent: attr,
+                  isOrdered: nestedList.isOrdered,
+                  startingNumber: nestedList.startNumber,
+                  itemNumber: nil,
+                  codeContent: nil,
+                  language: nil,
+                  level: nestedList.level,
+                  children: nil,
+                  sourceLocation: item.sourceLocation
+                )
+                nestedItems.append(itemBlock)
               }
             }
-            let itemBlock = BlockElement(
-              id: makeID(
-                base: sourceID(for: nestedList),
-                content: nestedListChildren.map(\.id).description
-              ),
+            let nestedListBlock = BlockElement(
+              id: makeID(base: baseIDSeed, content: nestedItems.map(\.id).description),
               nodeType: .list,
               attributedContent: nil,
               isOrdered: nestedList.isOrdered,
@@ -636,10 +674,10 @@ class MarkdownRendererVM {
               codeContent: nil,
               language: nil,
               level: nestedList.level,
-              children: nestedListChildren,
-              sourceLocation: nestedList.sourceLocation
+              children: nestedItems,
+              sourceLocation: node.sourceLocation
             )
-            items.append(itemBlock)
+            items.append(nestedListBlock)
           } else {
             let attr = renderInlinesToNSAttributedString(
               nodes: item.children,
