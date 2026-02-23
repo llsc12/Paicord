@@ -220,7 +220,7 @@ extension VoiceGateway {
     public var media_session_id: String
     public var mode: EncryptionMode?
     public var secretKey: [UInt8]
-    public var daveProtocolVersion: UInt8
+    public var daveProtocolVersion: UInt16
     public var sdp: String?  // not applicable to udp
     public var keyframe_interval: Int?  // not applicable to udp
   }
@@ -260,9 +260,19 @@ extension VoiceGateway {
 
   /// https://docs.discord.food/topics/voice-connections#speaking-structure
   public struct Speaking: Sendable, Codable {
+    public init(speaking: IntBitField<Flag>, ssrc: UInt, delay: UInt? = nil) {
+      self.speaking = speaking
+      self.ssrc = ssrc
+      self.delay = delay
+    }
+    
     public var speaking: IntBitField<Flag>
+    public var ssrc: UInt
+    // present on receive
+    public var user_id: UserSnowflake?
+
+    // send only
     public var delay: UInt? = nil
-    public var ssrc: UInt? = nil
 
     #if Non64BitSystemsCompatibility
       @UnstableEnum<UInt64>

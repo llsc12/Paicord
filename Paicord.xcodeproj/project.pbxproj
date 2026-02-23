@@ -160,6 +160,8 @@
 		AAEEC7222E6515C400EB5FC9 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = AAEEC7212E6515C400EB5FC9 /* KeychainAccess */; };
 		AAEEF5012E9900F60034FA04 /* Default.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEEF5002E9900E50034FA04 /* Default.swift */; };
 		AAFBC52E2F4C946800C5B644 /* VoiceConnectionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFBC52D2F4C945F00C5B644 /* VoiceConnectionStore.swift */; };
+		AAFBC5312F4CA9C000C5B644 /* Copus in Frameworks */ = {isa = PBXBuildFile; productRef = AAFBC5302F4CA9C000C5B644 /* Copus */; };
+		AAFBC5332F4CA9C000C5B644 /* Opus in Frameworks */ = {isa = PBXBuildFile; productRef = AAFBC5322F4CA9C000C5B644 /* Opus */; };
 		AAFC9DDA2EB7DAE300BB8028 /* VariableBlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFC9DD92EB7DAE200BB8028 /* VariableBlurView.swift */; };
 		AAFD41382E92FA43002BC9BE /* Array+safe.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFD41372E92FA42002BC9BE /* Array+safe.swift */; };
 /* End PBXBuildFile section */
@@ -318,6 +320,8 @@
 				AA8ABACA2F2A794E00557278 /* SwiftEmoji in Frameworks */,
 				AAD446A22ED07916006CB07C /* SettingsKit in Frameworks */,
 				579DF34B2E6D9B9800BD8B97 /* SwiftUIX in Frameworks */,
+				AAFBC5312F4CA9C000C5B644 /* Copus in Frameworks */,
+				AAFBC5332F4CA9C000C5B644 /* Opus in Frameworks */,
 				AA47AF622EDF1FF7008A50C9 /* Conditionals in Frameworks */,
 				AA21D2832EAA557C00C75093 /* Sparkle in Frameworks */,
 				AAA9EEFD2F23062B00770CAD /* CodeScanner in Frameworks */,
@@ -1037,6 +1041,8 @@
 				AA8ABACB2F2A794E00557278 /* SwiftEmojiIndex */,
 				AA8ABACE2F2A79B500557278 /* Loupe */,
 				AA8ABAD12F2A7A0800557278 /* MijickCamera */,
+				AAFBC5302F4CA9C000C5B644 /* Copus */,
+				AAFBC5322F4CA9C000C5B644 /* Opus */,
 			);
 			productName = PaiCord;
 			productReference = AA1096DB2E63BE84005BC3D2 /* Paicord.app */;
@@ -1086,6 +1092,7 @@
 				AA8ABAC82F2A794E00557278 /* XCRemoteSwiftPackageReference "SwiftEmoji" */,
 				AA8ABACD2F2A79B500557278 /* XCRemoteSwiftPackageReference "Loupe" */,
 				AA8ABAD02F2A7A0800557278 /* XCRemoteSwiftPackageReference "Camera" */,
+				AAFBC52F2F4CA9C000C5B644 /* XCRemoteSwiftPackageReference "swift-opus" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = AA1096DC2E63BE84005BC3D2 /* Products */;
@@ -1668,6 +1675,14 @@
 				kind = branch;
 			};
 		};
+		AAFBC52F2F4CA9C000C5B644 /* XCRemoteSwiftPackageReference "swift-opus" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/alta/swift-opus.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1778,6 +1793,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AAEEC7202E6515C400EB5FC9 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
 			productName = KeychainAccess;
+		};
+		AAFBC5302F4CA9C000C5B644 /* Copus */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AAFBC52F2F4CA9C000C5B644 /* XCRemoteSwiftPackageReference "swift-opus" */;
+			productName = Copus;
+		};
+		AAFBC5322F4CA9C000C5B644 /* Opus */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AAFBC52F2F4CA9C000C5B644 /* XCRemoteSwiftPackageReference "swift-opus" */;
+			productName = Opus;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

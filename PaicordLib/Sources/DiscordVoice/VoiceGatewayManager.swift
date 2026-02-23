@@ -6,15 +6,16 @@
 //  Copyright © 2026 Lakhan Lothiyi.
 //
 
+import AsyncAlgorithms
 import AsyncHTTPClient
 import Atomics
+import Crypto
 import DaveKit
 import DiscordGateway
 import DiscordModels
 import Foundation
 import Logging
 import NIO
-import Opus
 import WSClient
 
 import enum NIOWebSocket.WebSocketErrorCode
@@ -123,8 +124,8 @@ public actor VoiceGatewayManager {
 
   //MARK: UDP Connection
   /// Created upon ready event receive
-  var udpConnection: VoiceConnection? = nil
-  var udpConnectionTask: Task<Void, any Error>?
+  private var udpConnection: VoiceConnection? = nil
+  private var udpConnectionTask: Task<Void, any Error>?
   /// Once the session description event is received, we can listen.
   var udpListeningTask: Task<Void, any Error>?
 
@@ -327,7 +328,7 @@ public actor VoiceGatewayManager {
 
   // MARK: - Internal event handling and connection management
   // required to manage connection. library users can watch events to get this instead.
-  private var knownSSRCs: [UInt32: UserSnowflake] = [:]
+  private var knownSSRCs: [UInt: UserSnowflake] = [:]
 
   private func processEvent(_ event: VoiceGateway.Event) async {
     if let sequenceNumber = event.sequenceNumber {
@@ -342,6 +343,42 @@ public actor VoiceGatewayManager {
       )
     case .ready(let payload):
       setupUDP(payload)
+    case .sessionDescription(let payload):
+      await self.dave.selectProtocol(
+        protocolVersion: payload.daveProtocolVersion
+      )
+    // listen on udp
+    case .speaking(let payload):
+      self.knownSSRCs[payload.ssrc] = payload.user_id
+    case .clientConnect(let payload):
+      for id in payload.user_ids {
+        await self.dave.addUser(userId: id.rawValue)
+      }
+    case .clientDisconnect(let payload):
+      await self.dave.removeUser(userId: payload.user_id.rawValue)
+    case .davePrepareTransition(let payload):
+      await self.dave.prepareTransition(
+        transitionId: payload.transitionId,
+        protocolVersion: payload.protocolVersion
+      )
+    case .daveExecuteTransition(let payload):
+      await self.dave.executeTransition(transitionId: payload.transitionId)
+    case .davePrepareEpoch(let payload):
+      await self.dave.prepareEpoch(
+        epoch: String(payload.epoch),
+        protocolVersion: payload.protocolVersion
+      )
+    case .mlsExternalSender(let data):
+      await self.dave.mlsExternalSenderPackage(externalSenderPackage: data)
+    case .mlsProposals(let data):
+      await self.dave.mlsProposals(proposals: data)
+    case .mlsAnnounceCommitTransition(let transitionId, let commit):
+      await self.dave.mlsPrepareCommitTransition(
+        transitionId: transitionId,
+        commit: commit
+      )
+    case .mlsWelcome(let transitionId, let welcome):
+      await self.dave.mlsWelcome(transitionId: transitionId, welcome: welcome)
     default:
       break
     }
@@ -388,7 +425,7 @@ public actor VoiceGatewayManager {
                   codecs: [
                     .opusCodec,
                     .h264Codec,
-                    .h265Codec
+                    .h265Codec,
                   ],
                   experiments: nil
                 )
@@ -409,7 +446,6 @@ public actor VoiceGatewayManager {
       }
     }
   }
-
   private func storeConnection(_ connection: VoiceConnection) {
     self.udpConnection = connection
   }

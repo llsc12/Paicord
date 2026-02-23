@@ -79,10 +79,6 @@ let package = Package(
       "1.0.0"..<"5.0.0"
     ),
     .package(
-      url: "https://github.com/alta/swift-opus.git",
-      branch: "main"
-    ),
-    .package(
       url: "https://github.com/llsc12/DaveKit.git",
       branch: "main"
     ),
@@ -137,7 +133,6 @@ let package = Package(
         .product(name: "AsyncHTTPClient", package: "async-http-client"),
         .product(name: "WSClient", package: "swift-websocket"),
         .product(name: "libzstd", package: "zstd"),
-        .product(name: "Opus", package: "swift-opus"),
         .product(name: "DaveKit", package: "DaveKit"),
         .target(name: "DiscordGateway"),
       ],
