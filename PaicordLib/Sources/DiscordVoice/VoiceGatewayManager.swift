@@ -300,6 +300,7 @@ public actor VoiceGatewayManager {
           self.logger.debug(
             "Connected to Discord through web-socket. Will configure"
           )
+          await self.sendResumeOrIdentify()
           self.state.store(.configured, ordering: .relaxed)
           self.stateCallback?(.configured)
 
@@ -376,7 +377,6 @@ public actor VoiceGatewayManager {
       )
 
       guard
-        let udpConnection,
         let mode = payload.mode
       else { return }
 
