@@ -547,7 +547,6 @@ public actor VoiceGatewayManager {
     mode: VoiceGateway.EncryptionMode,
     key: SymmetricKey
   ) {
-    // Start draining channel first
     startDrainingOutgoingChannel()
 
     udpSpeakingTask = Task {
@@ -839,6 +838,13 @@ public actor VoiceGatewayManager {
     connectionBackoff.resetTryCount()
     await self.sendQueue.reset()
     await self.closeWebSocket()
+    // cancel udp connection tasks
+    self.udpConnectionTask?.cancel()
+    self.udpListeningTask?.cancel()
+    self.udpSpeakingTask?.cancel()
+    self.channelDrainTask?.cancel()
+    self.udpConnection = nil
+    self.nextSpeakingPayload = nil
   }
 }
 

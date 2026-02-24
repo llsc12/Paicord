@@ -59,7 +59,7 @@ internal actor VoiceConnection {
       try await onConnect(connection)
     }
   }
-  
+
   /// Asks Discord to give us our IP address and port, punching a hole through our local network's NAT (to the wider internet).
   /// We can then send this IP to discord via voice gateway payload selectProtocol so they know where to send us audio data.
   /// We also keepalive so the route through NAT doesn't collapse.
