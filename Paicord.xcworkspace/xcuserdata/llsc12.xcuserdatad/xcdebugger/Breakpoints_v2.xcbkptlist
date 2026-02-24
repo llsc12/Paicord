@@ -7,32 +7,32 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "84B43BBA-BA2F-45B8-9176-7AEAF325BA43"
+            uuid = "12300A32-4BA5-4DAD-A17E-D9C9351B9DD2"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Paicord/Common/Login/LoginViewModel.swift"
+            filePath = "PaicordLib/Sources/DiscordVoice/VoiceGatewayManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "19"
-            endingLineNumber = "19"
-            landmarkName = "init()"
+            startingLineNumber = "332"
+            endingLineNumber = "332"
+            landmarkName = "connect()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "87CFA371-3835-4845-A475-D49E941DFDC7"
+            uuid = "0454EE44-09AC-4A62-9A8A-4BEE379C2B0C"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Paicord/Common/Login/LoginViewModel.swift"
+            filePath = "PaicordLib/Sources/DiscordVoice/VoiceGatewayManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "28"
-            endingLineNumber = "28"
-            landmarkName = "init()"
+            startingLineNumber = "293"
+            endingLineNumber = "293"
+            landmarkName = "connect()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

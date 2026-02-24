@@ -212,51 +212,56 @@ public actor UserGatewayManager {
 
     await self.sendQueue.reset()
     let gatewayURL = await getGatewayURL()
-    //    #if DEBUGo
+    #if DEBUG
+      let queries: [(String, String)] = [
+        ("v", "\(DiscordGlobalConfiguration.apiVersion)"),
+        ("encoding", "json")
+      ]
+      let decompressorWSExtension: ZstdDecompressorWSExtension
+      do {
+        decompressorWSExtension = try ZstdDecompressorWSExtension(
+          logger: self.logger
+        )
+      } catch {
+        self.logger.critical(
+          "Will not connect because can't create a decompressor. Something is wrong. Please report this failure at https://github.com/DiscordBM/DiscordBM/issues",
+          metadata: ["error": .string(String(reflecting: error))]
+        )
+        return
+      }
+    #else
     let queries: [(String, String)] = [
       ("v", "\(DiscordGlobalConfiguration.apiVersion)"),
       ("encoding", "json"),
       ("compress", "zstd-stream"),
     ]
-    let decompressorWSExtension: ZstdDecompressorWSExtension
-    do {
-      decompressorWSExtension = try ZstdDecompressorWSExtension(
-        logger: self.logger
-      )
-    } catch {
-      self.logger.critical(
-        "Will not connect because can't create a decompressor. Something is wrong. Please report this failure at https://github.com/DiscordBM/DiscordBM/issues",
-        metadata: ["error": .string(String(reflecting: error))]
-      )
-      return
-    }
-    //    #endif
+    #endif
 
-    //    #if DEBUG
-    //    let configuration = WebSocketClientConfiguration(
-    //      maxFrameSize: self.maxFrameSize,
-    //      additionalHeaders: [
-    //        .userAgent: SuperProperties.useragent(ws: false)!,
-    //        .origin: "https://discord.com",
-    //        .cacheControl: "no-cache",
-    //        .acceptLanguage: SuperProperties.GenerateLocaleHeader(),
-    //
-    //      ],
-    //      extensions: []
-    //    )
-    //    #else
-    let configuration = WebSocketClientConfiguration(
-      maxFrameSize: self.maxFrameSize,
-      additionalHeaders: [
-        .userAgent: SuperProperties.useragent(ws: false)!,
-        .origin: "https://discord.com",
-        .cacheControl: "no-cache",
-        .acceptLanguage: SuperProperties.GenerateLocaleHeader(),
+    #if DEBUG
+      let configuration = WebSocketClientConfiguration(
+        maxFrameSize: self.maxFrameSize,
+        additionalHeaders: [
+          .userAgent: SuperProperties.useragent(ws: false)!,
+          .origin: "https://discord.com",
+          .cacheControl: "no-cache",
+          .acceptLanguage: SuperProperties.GenerateLocaleHeader(),
 
-      ],
-      extensions: [.nonNegotiatedExtension { decompressorWSExtension }]
-    )
-    //    #endif
+        ],
+        extensions: []
+      )
+    #else
+      let configuration = WebSocketClientConfiguration(
+        maxFrameSize: self.maxFrameSize,
+        additionalHeaders: [
+          .userAgent: SuperProperties.useragent(ws: false)!,
+          .origin: "https://discord.com",
+          .cacheControl: "no-cache",
+          .acceptLanguage: SuperProperties.GenerateLocaleHeader(),
+
+        ],
+        extensions: [.nonNegotiatedExtension { decompressorWSExtension }]
+      )
+    #endif
 
     logger.trace("Will try to connect to Discord through web-socket")
     let connectionId = self.connectionId.wrappingIncrementThenLoad(

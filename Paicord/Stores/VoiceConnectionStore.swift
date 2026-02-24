@@ -9,9 +9,12 @@
 import AVFoundation
 import Opus
 import PaicordLib
+import Foundation 
 
+@Observable
 final class VoiceConnectionStore: DiscordDataStore {
   init() {
+    // safe afaik bc all it throws for is invalid format
     self.opusEncoder = try! Opus.Encoder(format: Self.opusFormat, application: .voip)
     self.opusDecoder = try! Opus.Decoder(format: Self.opusFormat, application: .voip)
   }
@@ -19,7 +22,7 @@ final class VoiceConnectionStore: DiscordDataStore {
   var gateway: GatewayStore?
   var voiceGateway: VoiceGatewayManager? {
     didSet {
-      if let voiceGateway {
+      if voiceGateway != nil {
         // trigger audio engine setup
         audioEngineSetup()
       } else {
@@ -59,7 +62,11 @@ final class VoiceConnectionStore: DiscordDataStore {
   private var preferredRegion: String?
   private var flags: IntBitField<VoiceStateUpdate.Flags> = []
 
-  private var voiceStatus: GatewayState = .stopped
+  private var voiceStatus: GatewayState = .stopped {
+    didSet {
+      print("[Voice] Voice connection status changed to \(voiceStatus)")
+    }
+  }
   // MARK: - Public methods
 
   func updateVoiceConnection(_ update: VoiceConnectionUpdate) async {
@@ -70,6 +77,7 @@ final class VoiceConnectionStore: DiscordDataStore {
     if case .disconnect = update {
       self.channelId = nil
       self.guildId = nil
+      print("[Voice] Disconnected from voice channel")
       return
     }
     // well at this point we know we want to connect to a new channel.
@@ -79,6 +87,7 @@ final class VoiceConnectionStore: DiscordDataStore {
     self.channelId = channelId
     self.guildId = guildId
 
+    print("[Voice] Attempting to connect to voice channel \(channelId.rawValue) in guild \(guildId?.rawValue ?? "DMs")")
     await gateway?.gateway?.updateVoiceState(
       payload: .init(
         guild_id: guildId,
@@ -151,11 +160,13 @@ final class VoiceConnectionStore: DiscordDataStore {
         let sessionId = await gateway?.gateway?.getSessionID(),
         let userId = gateway?.user.currentUser?.id
       else {
+        print("[Voice] Received voice server update with empty endpoint, disconnecting from voice")
         Task { await voiceGateway?.disconnect() }
         voiceGateway = nil
         return
       }
 
+      print("[Voice] Received voice server update, connecting to voice gateway at endpoint \(endpoint) for guild \(guildId.rawValue) and channel \(channelId.rawValue)")
       self.voiceGateway = VoiceGatewayManager.init(
         connectionData: .init(
           token: payload.token,
@@ -171,6 +182,7 @@ final class VoiceConnectionStore: DiscordDataStore {
           }
         }
       )
+      await self.voiceGateway?.connect()
     }
   }
 
@@ -183,77 +195,97 @@ final class VoiceConnectionStore: DiscordDataStore {
 
   // MARK: - Audio Engine implementation
   private static let opusFormat = AVAudioFormat(
-    opusPCMFormat: .int16,
+    opusPCMFormat: .float32,
     sampleRate: .opus48khz,
     channels: 2
   )!
   private static let pcmFormat = AVAudioFormat(
-    commonFormat: .pcmFormatInt16,
+    commonFormat: .pcmFormatFloat32,
     sampleRate: .opus48khz,
     channels: 2,
-    interleaved: true
+    interleaved: false
   )!
+  @ObservationIgnored
   private let opusEncoder: Opus.Encoder
+  @ObservationIgnored
   private let opusDecoder: Opus.Decoder
 
+  @ObservationIgnored
   private let audioEngine = AVAudioEngine()
+  @ObservationIgnored
   private lazy var inputNode: AVAudioInputNode = {
     return audioEngine.inputNode
   }()
+  @ObservationIgnored
   private lazy var outputNode: AVAudioOutputNode = {
     return audioEngine.outputNode
   }()
 
   // audio player node for playing incoming audio frames
+  @ObservationIgnored
   private let playerNode: AVAudioPlayerNode = AVAudioPlayerNode()
   
+  @ObservationIgnored
   private var incomingAudioTask: Task<Void, Never>? = nil
 
+
   private func audioEngineSetup() {
-    self.audioEngineCleanup()  // cleanup any existing engine before setting up a new one
+    self.audioEngineCleanup()
+    Task { @MainActor in
+      
 
-    // attach player node to engine
-    audioEngine.attach(playerNode)
-    
-    // connect player node to output
-    audioEngine.connect(playerNode, to: outputNode, format: Self.pcmFormat)
-    
-    // start the engine and player node
-    do {
-      try audioEngine.start()
-      playerNode.play()
-    } catch {
-      print("[Voice] Failed to start audio engine: \(error)")
-      return
-    }
-    
-    // make player node schedule buffers as they come in from the gateway in task
-    self.incomingAudioTask = Task {
-      guard let voiceGateway else { return }
+//      if !audioEngine.attachedNodes.contains(playerNode) {
+//        audioEngine.attach(playerNode)
+//      }
+//
+//      let engineOutputFormat = audioEngine.outputNode.inputFormat(forBus: 0)
+//
+//      audioEngine.connect(playerNode, to: audioEngine.mainMixerNode, format: engineOutputFormat)
+//
+//      audioEngine.prepare()
+//      do {
+//        try audioEngine.start()
+//        playerNode.play()
+//      } catch {
+//        print("[Voice] Failed to start audio engine: \(error)")
+//        return
+//      }
 
-      for await opusFrame in await voiceGateway.incomingOpusPackets {
-        if Task.isCancelled { break }
+      incomingAudioTask = Task { [weak self] in
+        guard let self = self, let voiceGateway = self.voiceGateway else { return }
 
-        guard let buffer = try? opusDecoder.decode(opusFrame) else {
-          continue
-        }
+        for await opusFrame in await voiceGateway.incomingOpusPackets {
+          if Task.isCancelled { break }
 
-        await MainActor.run {
-          self.playerNode.scheduleBuffer(buffer, completionHandler: nil)
+          guard let decoded = try? self.opusDecoder.decode(opusFrame) else {
+            continue
+          }
+         
+          print(decoded.format.debugDescription)
+
+//          await MainActor.run {
+//            self.playerNode.scheduleBuffer(bufferToPlay, at: nil, options: [], completionHandler: nil)
+//          }
         }
       }
+
+      print("[Voice] Audio engine started")
     }
   }
-  
+
   private func audioEngineCleanup() {
-    // cancel incoming audio task
-    incomingAudioTask?.cancel()
-    
-    // stop the engine and reset everything
-    audioEngine.stop()
-    playerNode.stop()
-    audioEngine.reset()
-    // remove player node from engine
-    audioEngine.detach(playerNode)
+    Task { @MainActor in
+      // cancel incoming audio task
+      self.incomingAudioTask?.cancel()
+      
+      // stop the engine and reset everything
+      self.audioEngine.stop()
+      self.playerNode.stop()
+      self.audioEngine.reset()
+      // remove player node from engine
+      self.audioEngine.detach(self.playerNode)
+      
+      print("[Voice] Audio engine stopped")
+    }
   }
 }

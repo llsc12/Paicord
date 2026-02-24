@@ -289,8 +289,9 @@ public actor VoiceGatewayManager {
     /// But for proper structured concurrency, this method should never exit (optimally).
     Task {
       do {
+        let url = gatewayURL + queries.makeForURLQuery()
         let closeFrame = try await WebSocketClient.connect(
-          url: gatewayURL + queries.makeForURLQuery(),
+          url: url,
           configuration: configuration,
           eventLoopGroup: self.eventLoopGroup,
           logger: self.logger
@@ -399,6 +400,58 @@ public actor VoiceGatewayManager {
         ssrc: .init(ssrc),
         mode: mode,
         key: key
+      )
+
+      self.send(
+        message: .init(
+          payload: .init(
+            opcode: .voiceBackendVersion,
+            data: .voiceBackendVersion(.init()),
+          ),
+          opcode: .text
+        )
+      )
+
+      guard
+        let discovery = try? await self.udpConnection?.discoverExternalIP(
+          ssrc: .init(self.audioSSRC)
+        )
+      else {
+        // udp discovery failed, disconnect and set state to stopped
+        logger.error(
+          "Failed to discover external IP and port during session description handling"
+        )
+        await self.disconnect()
+        return
+      }
+
+      self.send(
+        message: .init(
+          payload: .init(
+            opcode: .selectProtocol,
+            data: .selectProtocol(
+              .init(
+                protocol: "udp",
+                data: .init(
+                  address: discovery.ip,
+                  port: .init(discovery.port),
+                  mode: payload.mode ?? .aead_aes256_gcm_rtpsize
+                ),
+                rtc_connection_id: self.rtcConnectionID,
+                codecs: [
+                  .opusCodec,
+                  .h264Codec,
+                  .h265Codec,
+                ],
+                experiments: [
+                  "fixed_keyframe_interval",
+                  "keyframe_on_join",
+                ]
+              )
+            )
+          ),
+          opcode: .text
+        )
       )
     case .speaking(let payload):
       self.knownSSRCs[payload.ssrc] = payload.user_id

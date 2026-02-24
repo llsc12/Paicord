@@ -113,6 +113,7 @@ final class GatewayStore {
     presence.setGateway(self)
     messageDrain.setGateway(self)
     switcher.setGateway(self)
+    voice.setGateway(self)
 
     // Update existing channel stores
     for channelStore in channels.values {

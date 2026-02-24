@@ -156,7 +156,7 @@ struct ChannelButton: View {
       }
       .tint(.primary)
     case .guildVoice:
-      textChannelButton { _ in
+      voiceChannelButton { _ in
         HStack {
           Image(systemName: "speaker.wave.2.fill")
             .imageScale(.medium)
@@ -167,7 +167,6 @@ struct ChannelButton: View {
         .padding(.horizontal, 12)
       }
       .tint(.primary)
-      .disabled(true)
     default:
       textChannelButton { _ in
         HStack {
@@ -281,7 +280,7 @@ struct ChannelButton: View {
             await gw.voice.updateVoiceConnection(
               .join(
                 channelId: channel.id,
-                guildId: channel.guild_id!
+                guildId: appState.selectedGuild,
               )
             )
           }

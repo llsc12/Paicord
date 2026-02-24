@@ -6,8 +6,8 @@
 //  Copyright © 2026 Lakhan Lothiyi.
 //
 
-import Foundation
 import DaveKit
+import Foundation
 
 extension VoiceGateway {
 
@@ -31,7 +31,9 @@ extension VoiceGateway {
       self.streams = streams
     }
 
-    public var max_dave_protocol_version: Int = .init(DaveSessionManager.maxSupportedProtocolVersion())
+    public var max_dave_protocol_version: Int = .init(
+      DaveSessionManager.maxSupportedProtocolVersion()
+    )
     public var server_id: GuildSnowflake
     public var channel_id: ChannelSnowflake
     public var user_id: UserSnowflake
@@ -138,10 +140,57 @@ extension VoiceGateway {
         self.port = port
         self.mode = mode
       }
-      
+
       public var address: String
       public var port: Int
       public var mode: EncryptionMode
+    }
+
+    // never really used
+    public init(from decoder: any Decoder) throws {
+      let container = try decoder.container(keyedBy: CodingKeys.self)
+      let `protocol` = try container.decode(String.self, forKey: .protocol)
+      let data = try container.decode(ProtocolData.self, forKey: .data)
+      let rtc_connection_id = try container.decodeIfPresent(
+        String.self,
+        forKey: .rtc_connection_id
+      )
+      let codecs = try container.decodeIfPresent([Codec].self, forKey: .codecs)
+      let experiments = try container.decodeIfPresent(
+        [String].self,
+        forKey: .experiments
+      )
+      self.init(
+        protocol: `protocol`,
+        data: data,
+        rtc_connection_id: rtc_connection_id,
+        codecs: codecs,
+        experiments: experiments
+      )
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+      var container = encoder.container(keyedBy: CodingKeys.self)
+      try container.encode(`protocol`, forKey: .protocol)
+      try container.encode(data, forKey: .data)
+      try container.encode(data.address, forKey: .address)
+      try container.encode(data.port, forKey: .port)
+      try container.encode(data.mode, forKey: .mode)
+      try container.encodeIfPresent(
+        rtc_connection_id,
+        forKey: .rtc_connection_id
+      )
+      try container.encodeIfPresent(codecs, forKey: .codecs)
+      try container.encodeIfPresent(experiments, forKey: .experiments)
+    }
+
+    enum CodingKeys: String, CodingKey {
+      case `protocol` = "protocol"
+      case data
+      case address, port, mode
+      case rtc_connection_id
+      case codecs
+      case experiments
     }
   }
 
@@ -265,7 +314,7 @@ extension VoiceGateway {
       self.ssrc = ssrc
       self.delay = delay
     }
-    
+
     public var speaking: IntBitField<Flag>
     public var ssrc: UInt
     // present on receive
@@ -414,8 +463,13 @@ extension VoiceGateway {
 
   /// https://docs.discord.food/topics/voice-connections#voice-backend-version-structure
   public struct VoiceBackendVersion: Sendable, Codable {
-    public var voice: String
-    public var rtc_worker: String
+    public var voice: String?
+    public var rtc_worker: String?
+
+    public init() {
+      self.voice = nil
+      self.rtc_worker = nil
+    }
   }
 
   public struct DavePrepareTransition: Sendable, Codable {
