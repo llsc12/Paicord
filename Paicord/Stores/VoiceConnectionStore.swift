@@ -262,10 +262,7 @@ final class VoiceConnectionStore: DiscordDataStore {
           }
          
           print(decoded.format.debugDescription)
-
-//          await MainActor.run {
-//            self.playerNode.scheduleBuffer(bufferToPlay, at: nil, options: [], completionHandler: nil)
-//          }
+ 
         }
       }
 

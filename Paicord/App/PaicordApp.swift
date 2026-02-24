@@ -48,13 +48,13 @@ struct PaicordApp: App {
 
   init() {
     console.startIntercepting()
-    #if DEBUG
-      DiscordGlobalConfiguration.makeLogger = { loggerLabel in
-        var logger = Logger(label: loggerLabel)
-        logger.logLevel = .trace
-        return logger
-      }
-    #endif
+//    #if DEBUG
+//      DiscordGlobalConfiguration.makeLogger = { loggerLabel in
+//        var logger = Logger(label: loggerLabel)
+//        logger.logLevel = .trace
+//        return logger
+//      }
+//    #endif
     #if canImport(Sparkle) && !DEBUG
       updaterController = SPUStandardUpdaterController(
         startingUpdater: true,

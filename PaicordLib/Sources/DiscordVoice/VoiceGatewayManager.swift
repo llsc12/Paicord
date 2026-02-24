@@ -267,7 +267,6 @@ public actor VoiceGatewayManager {
     let queries: [(String, String)] = [
       ("v", "\(DiscordGlobalConfiguration.apiVersion)")
     ]
-
     let configuration = WebSocketClientConfiguration(
       maxFrameSize: self.maxFrameSize,
       additionalHeaders: [
@@ -289,7 +288,7 @@ public actor VoiceGatewayManager {
     /// But for proper structured concurrency, this method should never exit (optimally).
     Task {
       do {
-        let url = gatewayURL + queries.makeForURLQuery()
+        let url = gatewayURL + "/" + queries.makeForURLQuery()
         let closeFrame = try await WebSocketClient.connect(
           url: url,
           configuration: configuration,
@@ -358,12 +357,24 @@ public actor VoiceGatewayManager {
     }
 
     switch event.data {
+    case .heartbeatAck:
+      self.lastPongDate = Date()
+      self.unsuccessfulPingsCount = 0
+      logger.trace(
+        "Received heartbeat ack/pong",
+        metadata: [
+          "opcode": .string(event.opcode.description)
+        ]
+      )
     case .hello(let payload):
       self.setupPingTask(
         forConnectionWithId: self.connectionId.load(ordering: .relaxed),
-        every: .milliseconds(payload.heartbeat_interval)
+        every: .milliseconds(payload.heartbeat_interval / 2)
       )
     case .ready(let payload):
+      self.state.store(.connected, ordering: .relaxed)
+      self.stateCallback?(.connected)
+
       self.knownSSRCs[UInt(payload.ssrc)] = self.connectionData.userID
       setupUDP(payload)
     case .sessionDescription(let payload):
@@ -1202,24 +1213,25 @@ extension VoiceGatewayManager {
     every duration: Duration
   ) {
     Task {
-      try? await Task.sleep(for: duration)
-      guard self.connectionId.load(ordering: .relaxed) == connectionId else {
-        self.logger.trace(
-          "Canceled a ping task",
+      // Send the first ping immediately, then loop sleeping between sends.
+      while self.connectionId.load(ordering: .relaxed) == connectionId {
+        self.logger.debug(
+          "Will send automatic ping",
           metadata: [
             "connectionId": .stringConvertible(connectionId)
           ]
         )
-        return/// cancel
+        self.sendPing(forConnectionWithId: connectionId)
+
+        try? await Task.sleep(for: duration)
       }
-      self.logger.debug(
-        "Will send automatic ping",
+
+      self.logger.trace(
+        "Canceled a ping task",
         metadata: [
           "connectionId": .stringConvertible(connectionId)
         ]
       )
-      self.sendPing(forConnectionWithId: connectionId)
-      self.setupPingTask(forConnectionWithId: connectionId, every: duration)
     }
   }
 
@@ -1242,6 +1254,7 @@ extension VoiceGatewayManager {
             .init(seq_ack: self.sequenceNumber)
           )
         ),
+        opcode: .text
       )
     )
     Task {
