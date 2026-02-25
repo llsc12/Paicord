@@ -1,0 +1,19 @@
+import { Palette } from "std-widgets.slint";
+
+//global state
+export { CurrentUserStore } from "Globals/CurrentUserStore.slint";
+
+//state globals
+export { LoginManager } from "State/LoginManager.slint";
+
+export component MainWindow inherits Window {
+    icon: @image-url("images/paicord_icon.png");
+    title: "Paicord";
+
+    Rectangle {
+        background: Palette.background;
+    }
+
+    preferred-height: 720px;
+    preferred-width: 1280px;
+}

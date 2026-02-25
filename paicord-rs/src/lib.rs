@@ -1,1 +1,1 @@
-pub mod user_gateway_manager;
+pub mod discord_gateway;

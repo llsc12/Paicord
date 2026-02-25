@@ -1,13 +1,34 @@
+use std::sync::Arc;
+
 #[swift_bridge::bridge]
 mod ffi {
     extern "Swift" {
-        #[swift_bridge(Sendable)]
         type UserGatewayManager;
-
         async fn user_gateway_manager_new(token: String) -> UserGatewayManager;
-
         async fn connect(self: &UserGatewayManager);
         async fn next_event(self: &UserGatewayManager) -> String;
+    }
+}
+
+#[derive(Clone)]
+pub struct UserGatewayManager {
+    inner: Arc<ffi::UserGatewayManager>,
+}
+
+impl UserGatewayManager {
+    pub async fn new(token: String) -> Self {
+        let manager = ffi::user_gateway_manager_new(token).await;
+        Self {
+            inner: Arc::new(manager),
+        }
+    }
+
+    pub async fn connect(&self) {
+        self.inner.connect().await;
+    }
+
+    pub async fn next_event(&self) -> String {
+        self.inner.next_event().await
     }
 }
 
@@ -34,3 +55,6 @@ mod tests {
         panic!("Connection closed unexpectedly");
     }
 }
+
+unsafe impl Send for ffi::UserGatewayManager {}
+unsafe impl Sync for ffi::UserGatewayManager {}

@@ -3,82 +3,33 @@ use std::{path::PathBuf, process::Command};
 
 fn main() {
     println!("cargo:rerun-if-changed=NULL");
+    println!("cargo:warn=Building PaicordLibBridge via build.rs");
 
-    let bridge_files = vec!["src/user_gateway_manager.rs"];
+    if let Ok(bridge_path) = std::env::var("BRIDGE_PATH") {
+        let dest_file = PathBuf::from(bridge_path).join("libPaicordLibBridge.so");
+        //delete if exists
+        if dest_file.exists() {
+            std::fs::remove_file(&dest_file).unwrap_or_else(|e| {
+                panic!(
+                    "Failed to delete existing bridge library at {:?}: {}",
+                    dest_file, e
+                )
+            });
+        }
+    }
+    let bridge_files = vec![
+        "src/discord_gateway/remote_auth_gateway_manager.rs",
+        "src/discord_gateway/user_gateway_manager.rs",
+    ];
     swift_bridge_build::parse_bridges(bridge_files)
         .write_all_concatenated(swift_bridge_out_dir(), "paicord-rs");
 
     compile_swift();
 
-    println!("cargo:rustc-link-lib=curl");
-    println!("cargo:rustc-link-lib=static=PaicordLibBridge");
+    println!("cargo:rustc-link-lib=dylib=PaicordLibBridge");
     println!(
         "cargo:rustc-link-search={}",
         swift_library_static_lib_dir().to_str().unwrap()
-    );
-    let zlib = pkg_config::Config::new()
-        .cargo_metadata(true)
-        .print_system_libs(false)
-        .probe("zlib");
-    match zlib {
-        Ok(zlib) => {
-            if !zlib.include_paths.is_empty() {
-                let paths = zlib
-                    .include_paths
-                    .iter()
-                    .map(|s| s.display().to_string())
-                    .collect::<Vec<_>>();
-                println!("cargo:include={}", paths.join(","));
-            }
-        }
-        Err(e) => {
-            println!(
-                "cargo:warning=Could not find zlib include paths via pkg-config: {}",
-                e
-            )
-        }
-    }
-
-    let user = std::env::var("USER").unwrap_or("sarah".to_string());
-
-    let swift_lib_path = std::env::var("SWIFT_LIBRARY_PATH").unwrap_or(
-        PathBuf::from("/home/")
-            .join(user)
-            .join(".local/share/swiftly/toolchains/6.2.1/usr/lib/swift_static/linux/")
-            .to_string_lossy()
-            .to_string(),
-    );
-
-    if !std::path::Path::new(&swift_lib_path).exists() {
-        panic!(
-            "Swift library path not found at /usr/lib/swift/linux and SWIFT_LIBRARY_PATH environment variable not set"
-        );
-    }
-
-    println!("cargo:rustc-link-search=native={}", swift_lib_path);
-    for entry in std::fs::read_dir(&swift_lib_path).unwrap() {
-        let path = entry.unwrap().path();
-        if let Some(name) = path.file_name().and_then(|s| s.to_str())
-            && name.ends_with(".a")
-        {
-            let lib_name = name
-                .strip_prefix("lib")
-                .unwrap_or(name)
-                .strip_suffix(".a")
-                .unwrap_or(name);
-            println!("cargo:rustc-link-lib=static={}", lib_name); // Or static= if using Static SDK
-        }
-    }
-
-    println!("cargo:rustc-link-lib=stdc++");
-    println!("cargo:rustc-link-lib=curl");
-
-    #[cfg(any(target_os = "linux", target_os = "android"))]
-    #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
-    println!(
-        "cargo:rustc-link-arg={}{}/swiftrt.o",
-        swift_lib_path,
-        std::env::consts::ARCH
     );
 }
 
@@ -87,12 +38,18 @@ fn compile_swift() {
 
     let mut cmd = Command::new("swiftly");
 
-    #[cfg(target_os = "android")]
-    let toolchain = if cfg!(target_os = "android") && cfg!(target_arch = "aarch64") {
-        ["--swift-sdk", "aarch64-unknown-linux-android"]
+    let target_os = std::env::var("CARGO_CFG_TARGET_OS").unwrap_or_default();
+    let target_arch = std::env::var("CARGO_CFG_TARGET_ARCH").unwrap_or_default();
+
+    let toolchain = if target_os == "android" && target_arch == "aarch64" {
+        ["--swift-sdk", "aarch64-unknown-linux-android29"]
     } else {
-        ["--swift-sdk", "x86_64-unknown-linux-android"]
+        ["--swift-sdk", "x86_64-unknown-linux-android29"]
     };
+
+    if target_os == "android" {
+        cmd.env("ANDROID_NDK_ROOT", "");
+    }
 
     cmd.current_dir(swift_package_dir)
         .args(["run", "swift", "build"])
@@ -106,12 +63,13 @@ fn compile_swift() {
                 .unwrap(),
         ]);
 
-    if is_release_build() {
-        cmd.args(["-c", "release"]);
-    }
-    #[cfg(target_os = "android")]
-    cmd.args(toolchain);
+    // if is_release_build() {
+    //     cmd.args(["-c", "release"]);
+    // }
 
+    if target_os == "android" {
+        cmd.args(toolchain);
+    }
     let exit_status = cmd.spawn().unwrap().wait_with_output().unwrap();
 
     if !exit_status.status.success() {
@@ -154,5 +112,15 @@ fn swift_library_static_lib_dir() -> PathBuf {
         "debug"
     };
 
-    manifest_dir().join(format!("PaicordLibBridge/.build/{}", debug_or_release))
+    let debug_or_release = "debug";
+
+    let target_os = std::env::var("CARGO_CFG_TARGET_OS").unwrap_or_default();
+    if target_os == "android" {
+        manifest_dir().join(format!(
+            "PaicordLibBridge/.build/x86_64-unknown-linux-android29/{}",
+            debug_or_release
+        ))
+    } else {
+        manifest_dir().join(format!("PaicordLibBridge/.build/{}", debug_or_release))
+    }
 }

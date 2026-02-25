@@ -1,0 +1,61 @@
+[package]
+name = "paicord-slint"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["lib", "cdylib"]
+path = "src/lib.rs"
+name = "paicord_lib"
+
+[[bin]]
+path = "src/main.rs"
+name = "paicord"
+
+[dependencies]
+slint = { git = "https://github.com/slint-ui/slint", rev = "6cbe03a", features = ["renderer-femtovg-wgpu", "renderer-femtovg", "renderer-skia", "renderer-skia-opengl", "backend-android-activity-06"] }
+i-slint-core = { git = "https://github.com/slint-ui/slint", rev = "6cbe03a", features = ["std", "experimental-rich-text"] }
+i-slint-common = { git = "https://github.com/slint-ui/slint", rev = "6cbe03a", features = [] }
+paicord-rs = { path = "../paicord-rs" }
+tokio = { version = "1.49.0", features = ["full"] }
+threadpool = "*"
+cacache = { version = "*", default-features = true, features = ["mmap"] }
+image = { version = "0.25.9", features = ["default"] }
+directories = "*"
+reqwest = { version = "0.13.2", features = ["blocking"] }
+fast_image_resize = { version = "6.0.0", features = ["image"] }
+futures = "*"
+openssl = { version = "*", features = ["vendored"] }
+keyring = { version = "3", features = ["apple-native", "windows-native", "sync-secret-service"] }
+persistent-kv = "*"
+qrcode-generator = "*"
+lineartree = "*"
+chrono = "0.4.44"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = { version = "0.2.108" }
+console_error_panic_hook = "0.1.5"
+
+[build-dependencies]
+#slint-build = { version = "1.14.1"  }
+slint-build = { git = "https://github.com/slint-ui/slint", rev = "6cbe03a" }
+pkg-config = "*"
+lucide-slint = "0.564.0"
+
+[package.metadata.android]
+package = "com.rinlovesyou.paicord"
+apk_name = "paicord"
+resources = "resources/"
+assets = "assets/"
+runtime_libs = "android/"
+
+[package.metadata.android.application]
+label = "Paicord"
+icon = "@mipmap/paicord_icon"
+#extract_native_libs = true
+
+[[package.metadata.android.uses_permission]]
+name = "android.permission.INTERNET"
+
+[[package.metadata.android.uses_permission]]
+name = "android.permission.READ_PHONE_STATE"

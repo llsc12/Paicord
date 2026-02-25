@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "PaicordLibBridge",
     products: [
-        .library(name: "PaicordLibBridge", type: .static, targets: ["PaicordLibBridge"])
+        .library(name: "PaicordLibBridge", type: .dynamic, targets: ["PaicordLibBridge"])
     ],
     dependencies: [
         .package(name: "PaicordLib", path: "../../PaicordLib")

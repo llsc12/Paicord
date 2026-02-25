@@ -314,37 +314,6 @@ public enum SuperProperties {
     #endif
   }
 
-  public static func distro() -> String? {
-    #if os(Linux)
-      if let content = try? String(
-        contentsOfFile: "/etc/os-release", encoding: String.Encoding.unicode)
-      {
-        let lines = content.split(separator: "\n")
-        for line in lines {
-          if line.starts(with: "PRETTY_NAME=") {
-            let value = line.replacingOccurrences(of: "PRETTY_NAME=", with: "")
-            return value.trimmingCharacters(in: CharacterSet(charactersIn: "\""))
-          }
-        }
-      }
-      return "Ubuntu"  // i am become canonical
-    #else
-      return nil
-    #endif
-  }
-
-  public static func window_manager() -> String? {
-    #if os(Linux)
-      // if your DE doesn't set this, idk you're a KDE user now.
-      if let wm = ProcessInfo.processInfo.environment["XDG_CURRENT_DESKTOP"] {
-        return wm
-      }
-      return "KDE,unknown"
-    #else
-      return nil
-    #endif
-  }
-
   public static func os_arch() -> String? {
     #if os(macOS) || os(Linux)  // discord only wants to see what arch desktop their client is running on
       #if arch(x86_64)
@@ -430,7 +399,7 @@ public enum SuperProperties {
     return version
   }
 
-  #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS) || os(visionOS)
+  #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS) || os(visionOS) || os(Linux)
     public static func kernel_version() -> String {
       var systemInfo = utsname()
       uname(&systemInfo)
