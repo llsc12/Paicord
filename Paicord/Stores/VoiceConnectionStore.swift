@@ -23,9 +23,11 @@ final class VoiceConnectionStore: DiscordDataStore {
   var voiceGateway: VoiceGatewayManager? {
     didSet {
       if voiceGateway != nil {
+        setupVoiceEventHandling()
         // trigger audio engine setup
         audioEngineSetup()
       } else {
+        self.voiceEventTask?.cancel()
         // shutdown audio engine and release resources, also set status to stopped
         voiceStatus = .stopped
         audioEngineCleanup()
@@ -34,6 +36,8 @@ final class VoiceConnectionStore: DiscordDataStore {
   }
 
   var eventTask: Task<Void, Never>?
+  var voiceEventTask: Task<Void, Never>?
+  var voiceErrorEventTask: Task<Void, Never>?
 
   func setupEventHandling() {
     guard let gateway = gateway?.gateway else { return }
@@ -49,6 +53,25 @@ final class VoiceConnectionStore: DiscordDataStore {
         default:
           break
         }
+      }
+    }
+  }
+  
+  func setupVoiceEventHandling() {
+    guard let voiceGateway = voiceGateway else { return }
+
+    voiceEventTask = Task { @MainActor in
+      for await event in await voiceGateway.events {
+        switch event.data {
+        case .ready(let payload):
+          print("we in yk")
+        default: break
+        }
+      }
+    }
+    voiceErrorEventTask = Task { @MainActor in
+      for await (error, buffer) in await voiceGateway.eventFailures {
+        print("[Voice Error] \(error), \(String(buffer: buffer))")
       }
     }
   }

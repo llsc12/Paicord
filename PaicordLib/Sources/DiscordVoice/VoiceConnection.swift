@@ -33,11 +33,17 @@ internal actor VoiceConnection {
     onConnect:
       @Sendable @escaping (VoiceConnection) async throws -> Void
   ) async throws {
-    let socketAddress = try SocketAddress(ipAddress: host, port: port)
+    let remoteAddress = try SocketAddress(ipAddress: host, port: port)
+
+    let localAddress = try SocketAddress(ipAddress: "0.0.0.0", port: 0)
+
     let server = try await DatagramBootstrap(
       group: NIOSingletons.posixEventLoopGroup
     )
-    .bind(to: socketAddress)
+    .bind(to: localAddress)
+    .flatMap { channel in
+      channel.connect(to: remoteAddress).map { channel }
+    }
     .flatMapThrowing { channel in
       return try NIOAsyncChannel(
         wrappingChannelSynchronously: channel,
@@ -53,7 +59,7 @@ internal actor VoiceConnection {
       let connection = VoiceConnection(
         inbound: inbound,
         outbound: outbound,
-        socketAddress: socketAddress
+        socketAddress: remoteAddress
       )
 
       try await onConnect(connection)
@@ -69,9 +75,10 @@ internal actor VoiceConnection {
     ssrc: UInt32,
   ) async throws -> (ip: String, port: UInt16)? {
     var buffer = ByteBufferAllocator().buffer(capacity: 74)
-    buffer.writeInteger(UInt16(0x1))  // Type (Send)
-    buffer.writeInteger(UInt16(70))  // Length
-    buffer.writeInteger(ssrc)
+    buffer.writeInteger(UInt16(1), endianness: .big)  // Type
+    buffer.writeInteger(UInt16(70), endianness: .big) // Length
+    buffer.writeInteger(ssrc, endianness: .big)       // SSRC
+    buffer.writeBytes(Array(repeating: 0, count: 66)) // Padding
     try await outbound.write(
       AddressedEnvelope(
         remoteAddress: address,
@@ -86,14 +93,14 @@ internal actor VoiceConnection {
 
     let data = discoveryResponse.data
     guard
-      let address = data.getData(at: 6, length: 64),
+      let address = data.getData(at: 8, length: 64),
       let address = String(
         data: address.prefix(
           upTo: address.firstIndex(of: 0) ?? address.endIndex
         ),
         encoding: .utf8,
       ),
-      let port = data.getInteger(at: 70, as: UInt16.self)
+      let port = data.getInteger(at: 72, endianness: .little, as: UInt16.self)
     else {
       return nil
     }

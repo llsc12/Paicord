@@ -392,7 +392,7 @@ public actor VoiceGatewayManager {
         let mode = payload.mode
       else { return }
 
-      let key = SymmetricKey(data: payload.secretKey)
+      let key = SymmetricKey(data: payload.secret_key)
 
       // find ssrc for current user id in connectionData.userID
       guard
@@ -502,63 +502,74 @@ public actor VoiceGatewayManager {
 
   func setupUDP(_ payload: VoiceGateway.Ready) {
     self.udpConnectionTask = Task {
-      try await VoiceConnection.connect(
-        host: payload.ip,
-        port: Int(payload.port)
-      ) { connection in
-        guard
-          let (ip, port) = try await connection.discoverExternalIP(
-            ssrc: payload.ssrc,
-          )
-        else {
-          self.logger.error("Failed to discover external IP and port")
-          return
-        }
+      do {
+        try await VoiceConnection.connect(
+          host: payload.ip,
+          port: Int(payload.port)
+        ) { connection in
+          guard
+            let (ip, port) = try await connection.discoverExternalIP(
+              ssrc: payload.ssrc,
+            )
+          else {
+            self.logger.error("Failed to discover external IP and port")
+            return
+          }
 
-        guard
-          let mode = VoiceGateway.EncryptionMode.supportedCases.first(where: {
-            mode in
-            payload.modes.contains(mode)
-          })
-        else {
-          self.logger.error("No supported crypto modes found")
-          return
-        }
+          guard
+            let mode = VoiceGateway.EncryptionMode.supportedCases.first(where: {
+              mode in
+              payload.modes.contains(mode)
+            })
+          else {
+            self.logger.error("No supported crypto modes found")
+            return
+          }
 
-        self.send(
-          message: .init(
-            payload: .init(
-              opcode: .selectProtocol,
-              data: .selectProtocol(
-                .init(
-                  protocol: "udp",
-                  data: .init(
-                    address: ip,
-                    port: .init(port),
-                    mode: mode
-                  ),
-                  rtc_connection_id: self.rtcConnectionID,
-                  codecs: [
-                    .opusCodec,
-                    .h264Codec,
-                    .h265Codec,
-                  ],
-                  experiments: nil
+          self.send(
+            message: .init(
+              payload: .init(
+                opcode: .selectProtocol,
+                data: .selectProtocol(
+                  .init(
+                    protocol: "udp",
+                    data: .init(
+                      address: ip,
+                      port: .init(port),
+                      mode: mode
+                    ),
+                    rtc_connection_id: self.rtcConnectionID,
+                    codecs: [
+                      .opusCodec,
+                      .h264Codec,
+                      .h265Codec,
+                    ],
+                    experiments: nil
+                  )
                 )
-              )
-            ),
-            opcode: .text
+              ),
+              opcode: .text
+            )
           )
+
+          await self.storeConnection(connection)
+
+          // When this function returns, the UDP connection will be closed, so we
+          // need to keep it alive. Other things will be handled in other tasks.
+          // Luckily, we also need to send keepalive packets to the voice server.
+          // We can accomplish both requirements by awaiting the keepalive task
+          // here.
+          try await connection.keepalive(ssrc: payload.ssrc)
+        }
+      } catch {
+        self.logger.error(
+          "Failed to establish UDP connection",
+          metadata: [
+            "error": .string(String(reflecting: error)),
+            "ip": .string(payload.ip),
+            "port": .stringConvertible(payload.port),
+          ]
         )
-
-        await self.storeConnection(connection)
-
-        // When this function returns, the UDP connection will be closed, so we
-        // need to keep it alive. Other things will be handled in other tasks.
-        // Luckily, we also need to send keepalive packets to the voice server.
-        // We can accomplish both requirements by awaiting the keepalive task
-        // here.
-        try await connection.keepalive(ssrc: payload.ssrc)
       }
     }
   }
@@ -579,15 +590,21 @@ public actor VoiceGatewayManager {
       return
     }
 
-    let key = SymmetricKey(data: description.secretKey)
+    let key = SymmetricKey(data: description.secret_key)
 
     self.udpListeningTask = Task {
       guard let udpConnection = self.udpConnection else {
+        self.logger.error(
+          "UDP connection not established when trying to listen"
+        )
         return
       }
 
       defer {
         // When the UDP listening ends, cancel the UDP connection task
+        self.logger.debug(
+          "UDP listening task ending, cancelling UDP connection task"
+        )
         self.udpConnectionTask?.cancel()
       }
 
