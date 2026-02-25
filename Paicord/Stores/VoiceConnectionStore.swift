@@ -77,6 +77,18 @@ final class VoiceConnectionStore: DiscordDataStore {
     if case .disconnect = update {
       self.channelId = nil
       self.guildId = nil
+      await gateway?.gateway?.updateVoiceState(
+        payload: .init(
+          guild_id: guildId,
+          channel_id: channelId,
+          self_mute: self.isMuted,
+          self_deaf: self.isDeafened,
+          self_video: self.isVideoEnabled,
+          preferred_region: self.preferredRegion,
+          preferred_regions: nil,
+          flags: flags
+        )
+      )
       print("[Voice] Disconnected from voice channel")
       return
     }

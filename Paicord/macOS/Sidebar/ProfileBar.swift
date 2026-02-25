@@ -32,7 +32,7 @@ struct ProfileBar: View {
               member: nil,
               user: user
             )
-            .maxHeight(40)
+            .maxHeight(30)
             .profileAnimated(barHovered)
             .profileShowsAvatarDecoration()
           }
@@ -80,6 +80,21 @@ struct ProfileBar: View {
       }
 
       Spacer()
+      
+      if gw.voice.voiceGateway != nil {
+        Button {
+          Task {
+            await gw.voice.updateVoiceConnection(.disconnect)
+          }
+        } label: {
+          // hang up call
+          Image(systemName: "phone.down.fill")
+            .font(.title2)
+            .padding(5)
+            .background(.ultraThinMaterial)
+            .clipShape(.circle)
+        }
+      }
 
       #if os(macOS)
         Button {
@@ -97,7 +112,7 @@ struct ProfileBar: View {
         // do something
       #endif
     }
-    .padding(10)
+    .padding(8)
     .background {
       if let nameplate = gw.user.currentUser?.collectibles?.nameplate {
         Profile.NameplateView(nameplate: nameplate)

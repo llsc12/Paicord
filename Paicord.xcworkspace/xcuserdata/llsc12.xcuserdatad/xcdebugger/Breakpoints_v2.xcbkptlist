@@ -7,33 +7,47 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "12300A32-4BA5-4DAD-A17E-D9C9351B9DD2"
+            uuid = "6C1944E3-89FE-4438-9F82-61F303396F0D"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "PaicordLib/Sources/DiscordVoice/VoiceGatewayManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "332"
-            endingLineNumber = "332"
-            landmarkName = "connect()"
+            startingLineNumber = "595"
+            endingLineNumber = "595"
+            landmarkName = "listen(description:)"
             landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "0454EE44-09AC-4A62-9A8A-4BEE379C2B0C"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "PaicordLib/Sources/DiscordVoice/VoiceGatewayManager.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "293"
-            endingLineNumber = "293"
-            landmarkName = "connect()"
-            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "6C1944E3-89FE-4438-9F82-61F303396F0D - 8ad8e50fa62fee99"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for closure #1 () async throws -&gt; () in DiscordVoice.VoiceGatewayManager.listen(description: DiscordModels.VoiceGateway.SessionDescription) -&gt; ()"
+                  moduleName = "Paicord.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/llsc12/Documents/GitHub/Paicord/PaicordLib/Sources/DiscordVoice/VoiceGatewayManager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "595"
+                  endingLineNumber = "595">
+               </Location>
+               <Location
+                  uuid = "6C1944E3-89FE-4438-9F82-61F303396F0D - 8ad8e50fa62fee99"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for closure #1 () async throws -&gt; () in DiscordVoice.VoiceGatewayManager.listen(description: DiscordModels.VoiceGateway.SessionDescription) -&gt; ()"
+                  moduleName = "Paicord.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/llsc12/Documents/GitHub/Paicord/PaicordLib/Sources/DiscordVoice/VoiceGatewayManager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "595"
+                  endingLineNumber = "595">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
