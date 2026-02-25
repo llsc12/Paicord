@@ -269,7 +269,7 @@ extension VoiceGateway {
     public var media_session_id: String
     public var mode: EncryptionMode?
     public var secret_key: [UInt8]
-    public var daveProtocolVersion: UInt16
+    public var dave_protocol_version: UInt16
     public var sdp: String?  // not applicable to udp
     public var keyframe_interval: Int?  // not applicable to udp
   }

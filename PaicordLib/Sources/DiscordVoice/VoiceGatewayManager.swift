@@ -379,7 +379,7 @@ public actor VoiceGatewayManager {
       setupUDP(payload)
     case .sessionDescription(let payload):
       await self.dave.selectProtocol(
-        protocolVersion: payload.daveProtocolVersion
+        protocolVersion: UInt16(payload.dave_protocol_version)
       )
 
       self.nextSpeakingPayload = .init(
@@ -394,21 +394,9 @@ public actor VoiceGatewayManager {
 
       let key = SymmetricKey(data: payload.secret_key)
 
-      // find ssrc for current user id in connectionData.userID
-      guard
-        let ssrc = self.knownSSRCs.first(where: {
-          $0.value == self.connectionData.userID
-        })?.key
-      else {
-        self.logger.error(
-          "Failed to find SSRC for current user ID when trying to start speaking",
-        )
-        return
-      }
-
       self.listen(description: payload)
       self.speak(
-        ssrc: .init(ssrc),
+        ssrc: .init(audioSSRC),
         mode: mode,
         key: key
       )
