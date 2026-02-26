@@ -32,7 +32,7 @@ struct ProfileBar: View {
               member: nil,
               user: user
             )
-            .maxHeight(40)
+            .maxHeight(30)
             .profileAnimated(barHovered)
             .profileShowsAvatarDecoration()
           }
@@ -97,7 +97,7 @@ struct ProfileBar: View {
         // do something
       #endif
     }
-    .padding(10)
+    .padding(8)
     .background {
       if let nameplate = gw.user.currentUser?.collectibles?.nameplate {
         Profile.NameplateView(nameplate: nameplate)
