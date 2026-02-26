@@ -159,6 +159,9 @@
 		AAEEC71F2E65120000EB5FC9 /* TokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEEC71E2E6511F800EB5FC9 /* TokenStore.swift */; };
 		AAEEC7222E6515C400EB5FC9 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = AAEEC7212E6515C400EB5FC9 /* KeychainAccess */; };
 		AAEEF5012E9900F60034FA04 /* Default.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEEF5002E9900E50034FA04 /* Default.swift */; };
+		AAFBC52E2F4C946800C5B644 /* VoiceConnectionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFBC52D2F4C945F00C5B644 /* VoiceConnectionStore.swift */; };
+		AAFBC5312F4CA9C000C5B644 /* Copus in Frameworks */ = {isa = PBXBuildFile; productRef = AAFBC5302F4CA9C000C5B644 /* Copus */; };
+		AAFBC5332F4CA9C000C5B644 /* Opus in Frameworks */ = {isa = PBXBuildFile; productRef = AAFBC5322F4CA9C000C5B644 /* Opus */; };
 		AAFC9DDA2EB7DAE300BB8028 /* VariableBlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFC9DD92EB7DAE200BB8028 /* VariableBlurView.swift */; };
 		AAFD41382E92FA43002BC9BE /* Array+safe.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFD41372E92FA42002BC9BE /* Array+safe.swift */; };
 /* End PBXBuildFile section */
@@ -297,6 +300,7 @@
 		AAEB3D942ED60812008BDD1D /* ImpactGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImpactGenerator.swift; sourceTree = "<group>"; };
 		AAEEC71E2E6511F800EB5FC9 /* TokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenStore.swift; sourceTree = "<group>"; };
 		AAEEF5002E9900E50034FA04 /* Default.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Default.swift; sourceTree = "<group>"; };
+		AAFBC52D2F4C945F00C5B644 /* VoiceConnectionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceConnectionStore.swift; sourceTree = "<group>"; };
 		AAFC9DD92EB7DAE200BB8028 /* VariableBlurView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariableBlurView.swift; sourceTree = "<group>"; };
 		AAFD41372E92FA42002BC9BE /* Array+safe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+safe.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -316,6 +320,8 @@
 				AA8ABACA2F2A794E00557278 /* SwiftEmoji in Frameworks */,
 				AAD446A22ED07916006CB07C /* SettingsKit in Frameworks */,
 				579DF34B2E6D9B9800BD8B97 /* SwiftUIX in Frameworks */,
+				AAFBC5312F4CA9C000C5B644 /* Copus in Frameworks */,
+				AAFBC5332F4CA9C000C5B644 /* Opus in Frameworks */,
 				AA47AF622EDF1FF7008A50C9 /* Conditionals in Frameworks */,
 				AA21D2832EAA557C00C75093 /* Sparkle in Frameworks */,
 				AAA9EEFD2F23062B00770CAD /* CodeScanner in Frameworks */,
@@ -978,6 +984,7 @@
 				AABED5A32E7F4DAE005BDD63 /* GuildStore.swift */,
 				AABED59D2E7F4637005BDD63 /* ChannelStore.swift */,
 				AA7B38F32EB50EFD00CA4A3C /* MessageDrainStore.swift */,
+				AAFBC52D2F4C945F00C5B644 /* VoiceConnectionStore.swift */,
 				AABED5A52E7F5148005BDD63 /* SettingsStore.swift */,
 				AAAF797F2ED1E9ED004B5B3F /* ExternalBadgeStore.swift */,
 				AA79479D2EDC7B9400B7A1EE /* PresenceStore.swift */,
@@ -1034,6 +1041,8 @@
 				AA8ABACB2F2A794E00557278 /* SwiftEmojiIndex */,
 				AA8ABACE2F2A79B500557278 /* Loupe */,
 				AA8ABAD12F2A7A0800557278 /* MijickCamera */,
+				AAFBC5302F4CA9C000C5B644 /* Copus */,
+				AAFBC5322F4CA9C000C5B644 /* Opus */,
 			);
 			productName = PaiCord;
 			productReference = AA1096DB2E63BE84005BC3D2 /* Paicord.app */;
@@ -1083,6 +1092,7 @@
 				AA8ABAC82F2A794E00557278 /* XCRemoteSwiftPackageReference "SwiftEmoji" */,
 				AA8ABACD2F2A79B500557278 /* XCRemoteSwiftPackageReference "Loupe" */,
 				AA8ABAD02F2A7A0800557278 /* XCRemoteSwiftPackageReference "Camera" */,
+				AAFBC52F2F4CA9C000C5B644 /* XCRemoteSwiftPackageReference "swift-opus" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = AA1096DC2E63BE84005BC3D2 /* Products */;
@@ -1175,6 +1185,7 @@
 				AA47AF1F2EDEF04F008A50C9 /* AuthorisedAppsSection.swift in Sources */,
 				AA21D2802EAA220300C75093 /* MaskEdgesModifier.swift in Sources */,
 				57F5AF552E7CBDF400AD5674 /* MFAView.swift in Sources */,
+				AAFBC52E2F4C946800C5B644 /* VoiceConnectionStore.swift in Sources */,
 				AA7B38F22EB37F9B00CA4A3C /* PermsHelper.swift in Sources */,
 				AA63EB722EA711D000A5F21D /* EmbedsView.swift in Sources */,
 				AAB50A582E9AD4BB0048E8B0 /* Utilities.swift in Sources */,
@@ -1425,6 +1436,7 @@
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_INTEROP_MODE = objcxx;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
@@ -1488,6 +1500,7 @@
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_INTEROP_MODE = objcxx;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				XROS_DEPLOYMENT_TARGET = 1.0;
@@ -1662,6 +1675,14 @@
 				kind = branch;
 			};
 		};
+		AAFBC52F2F4CA9C000C5B644 /* XCRemoteSwiftPackageReference "swift-opus" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/alta/swift-opus.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1772,6 +1793,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AAEEC7202E6515C400EB5FC9 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
 			productName = KeychainAccess;
+		};
+		AAFBC5302F4CA9C000C5B644 /* Copus */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AAFBC52F2F4CA9C000C5B644 /* XCRemoteSwiftPackageReference "swift-opus" */;
+			productName = Copus;
+		};
+		AAFBC5322F4CA9C000C5B644 /* Opus */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AAFBC52F2F4CA9C000C5B644 /* XCRemoteSwiftPackageReference "swift-opus" */;
+			productName = Opus;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

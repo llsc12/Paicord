@@ -1,4 +1,5 @@
 /// https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway-gateway-close-event-codes
+/// https://docs.discord.food/topics/opcodes-and-status-codes#gateway-close-event-codes
 public enum GatewayCloseCode: UInt16, Sendable, Codable {
   case unknownError = 4000
   case unknownOpcode = 4001
@@ -6,6 +7,7 @@ public enum GatewayCloseCode: UInt16, Sendable, Codable {
   case notAuthenticated = 4003
   case authenticationFailed = 4004
   case alreadyAuthenticated = 4005
+  case sessionNoLongerValid = 4006
   case invalidSequence = 4007
   case rateLimited = 4008
   case sessionTimedOut = 4009
@@ -14,6 +16,8 @@ public enum GatewayCloseCode: UInt16, Sendable, Codable {
   case invalidAPIVersion = 4012
   case invalidIntents = 4013
   case disallowedIntents = 4014
+  case tooManySessions = 4015
+  case connectionRequestCancelled = 4016
 
   public var canTryReconnect: Bool {
     switch self {
@@ -23,6 +27,7 @@ public enum GatewayCloseCode: UInt16, Sendable, Codable {
     case .notAuthenticated: return true
     case .authenticationFailed: return false
     case .alreadyAuthenticated: return true
+    case .sessionNoLongerValid: return true
     case .invalidSequence: return true
     case .rateLimited: return true
     case .sessionTimedOut: return true
@@ -31,6 +36,48 @@ public enum GatewayCloseCode: UInt16, Sendable, Codable {
     case .invalidAPIVersion: return false
     case .invalidIntents: return false
     case .disallowedIntents: return false
+    case .tooManySessions: return false
+    case .connectionRequestCancelled: return false
+    }
+  }
+}
+
+/// https://docs.discord.food/topics/opcodes-and-status-codes#voice-close-event-codes
+/// https://docs.discord.com/developers/topics/opcodes-and-status-codes#voice
+public enum VoiceGatewayCloseCode: UInt16, Sendable, Codable {
+  case unknownOpcode = 4001
+  case decodeError = 4002
+  case notAuthenticated = 4003
+  case authenticationFailed = 4004
+  case alreadyAuthenticated = 4005
+  case sessionNoLongerValid = 4006
+  case sessionTimedOut = 4009
+  case serverNotFound = 4011
+  case unknownProtocol = 4012
+  case disconnected = 4014
+  case voiceServerCrashed = 4015
+  case unknownEncryption = 4016
+  case badRequest = 4020
+  case rateLimited = 4021
+  case callTerminated = 4022
+
+  public var canTryReconnect: Bool {
+    switch self {
+    case .unknownOpcode: return true
+    case .decodeError: return true
+    case .notAuthenticated: return true
+    case .authenticationFailed: return false
+    case .alreadyAuthenticated: return true
+    case .rateLimited: return false
+    case .sessionTimedOut: return true
+    case .sessionNoLongerValid: return true
+    case .serverNotFound: return false
+    case .unknownProtocol: return false
+    case .disconnected: return false
+    case .voiceServerCrashed: return true
+    case .unknownEncryption: return false
+    case .badRequest: return false
+    case .callTerminated: return false
     }
   }
 }
@@ -157,7 +204,8 @@ public enum JSONErrorCode: Sendable, Codable {
   case tagRequiredToCreateForumPostInChannel  // 40067
   case anEntitlementHasAlreadyBeenGrantedForThisResource  // 40074
   case thisInteractionHasHitTheMaximumNumberOfFollowUpMessage  // 40094
-  case cloudflareIsBlockingYourRequestThisCanOftenBeResolvedBySettingProperUserAgent  // 40333
+  case
+    cloudflareIsBlockingYourRequestThisCanOftenBeResolvedBySettingProperUserAgent  // 40333
   case missingAccess  // 50001
   case invalidAccountType  // 50002
   case cannotExecuteActionOnDMChannel  // 50003

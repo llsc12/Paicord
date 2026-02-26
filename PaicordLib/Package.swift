@@ -29,6 +29,10 @@ let package = Package(
       targets: ["DiscordGateway"]
     ),
     .library(
+      name: "DiscordVoice",
+      targets: ["DiscordVoice"]
+    ),
+    .library(
       name: "DiscordModels",
       targets: ["DiscordModels"]
     ),
@@ -74,6 +78,10 @@ let package = Package(
       url: "https://github.com/apple/swift-crypto.git",
       "1.0.0"..<"5.0.0"
     ),
+    .package(
+      url: "https://github.com/llsc12/DaveKit.git",
+      branch: "main"
+    ),
   ],
   targets: [
     .target(
@@ -82,6 +90,7 @@ let package = Package(
         .target(name: "DiscordAuth"),
         .target(name: "DiscordHTTP"),
         .target(name: "DiscordCore"),
+        .target(name: "DiscordVoice"),
         .target(name: "DiscordGateway"),
         .target(name: "DiscordModels"),
         .target(name: "DiscordUtilities"),
@@ -111,9 +120,21 @@ let package = Package(
         .product(name: "AsyncHTTPClient", package: "async-http-client"),
         .product(name: "WSClient", package: "swift-websocket"),
         .product(name: "libzstd", package: "zstd"),
-        .target(name: "DiscordHTTP"),
         .product(name: "Crypto", package: "swift-crypto"),
         .product(name: "_CryptoExtras", package: "swift-crypto"),
+        .target(name: "DiscordHTTP"),
+      ],
+      swiftSettings: swiftSettings
+    ),
+    .target(
+      name: "DiscordVoice",
+      dependencies: [
+        .product(name: "NIOCore", package: "swift-nio"),
+        .product(name: "AsyncHTTPClient", package: "async-http-client"),
+        .product(name: "WSClient", package: "swift-websocket"),
+        .product(name: "libzstd", package: "zstd"),
+        .product(name: "DaveKit", package: "DaveKit"),
+        .target(name: "DiscordGateway"),
       ],
       swiftSettings: swiftSettings
     ),
@@ -122,10 +143,11 @@ let package = Package(
       dependencies: [
         .product(name: "NIOFoundationCompat", package: "swift-nio"),
         .product(name: "MultipartKit", package: "multipart-kit"),
-        .target(name: "DiscordCore"),
-        .target(name: "UnstableEnumMacro"),
         .product(name: "SwiftProtobuf", package: "swift-protobuf"),
         .product(name: "UInt128", package: "UInt128"),
+        .product(name: "DaveKit", package: "DaveKit"),
+        .target(name: "DiscordCore"),
+        .target(name: "UnstableEnumMacro"),
       ],
       swiftSettings: swiftSettings
     ),
@@ -139,7 +161,12 @@ let package = Package(
     .target(
       name: "DiscordAuth",
       dependencies: [
-        .target(name: "DiscordModels")
+        .product(name: "NIOCore", package: "swift-nio"),
+        .product(name: "AsyncHTTPClient", package: "async-http-client"),
+        .product(name: "WSClient", package: "swift-websocket"),
+        .product(name: "Crypto", package: "swift-crypto"),
+        .product(name: "_CryptoExtras", package: "swift-crypto"),
+        .target(name: "DiscordGateway"),
       ],
       swiftSettings: swiftSettings
     ),
@@ -211,9 +238,10 @@ let package = Package(
 
 var featureFlags: [SwiftSetting] {
   [
+    .interoperabilityMode(.Cxx),
     /// https://github.com/apple/swift-evolution/blob/main/proposals/0335-existential-any.md
     /// Require `any` for existential types.
-    .enableUpcomingFeature("ExistentialAny")
+    .enableUpcomingFeature("ExistentialAny"),
     //		.define("DISCORDBM_ENABLE_LOGGING_DURING_DECODE", .when(configuration: .debug)),
   ]
 }

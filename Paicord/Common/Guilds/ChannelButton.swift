@@ -156,7 +156,7 @@ struct ChannelButton: View {
       }
       .tint(.primary)
     case .guildVoice:
-      textChannelButton { _ in
+      voiceChannelButton { _ in
         HStack {
           Image(systemName: "speaker.wave.2.fill")
             .imageScale(.medium)
@@ -167,7 +167,6 @@ struct ChannelButton: View {
         .padding(.horizontal, 12)
       }
       .tint(.primary)
-      .disabled(true)
     default:
       textChannelButton { _ in
         HStack {
@@ -229,6 +228,79 @@ struct ChannelButton: View {
     -> some View
   {
     TextChannelButton(
+      channels: channels,
+      channel: channel
+    ) { hovered in
+      label(hovered)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .lineLimit(1)
+        .background(
+          Group {
+            if hovered {
+              Color.gray.opacity(0.2)
+            } else {
+              Color.clear
+            }
+          }
+          .clipShape(.rounded)
+        )
+        .background(
+          Group {
+            if appState.selectedChannel == channel.id {
+              Color.gray.opacity(0.13)
+            } else {
+              Color.clear
+            }
+          }
+          .clipShape(.rounded)
+        )
+    }
+  }
+
+  struct VoiceChannelButton<Content: View>: View {
+    @Environment(\.appState) var appState
+    @Environment(\.gateway) var gw
+    @Environment(\.guildStore) var guild
+    @State private var isHovered = false
+    var channels: [ChannelSnowflake: DiscordChannel]
+    var channel: DiscordChannel
+    var content: (_ hovered: Bool) -> Content
+
+    var shouldHide: Bool {
+      guard let guild else { return false }
+      return guild.hasPermission(
+        channel: channel,
+        .viewChannel
+      ) == false
+    }
+    var body: some View {
+      if !shouldHide {
+        Button {
+          Task {
+            await gw.voice.updateVoiceConnection(
+              .join(
+                channelId: channel.id,
+                guildId: appState.selectedGuild,
+              )
+            )
+          }
+        } label: {
+          content(isHovered)
+        }
+        .onHover { isHovered = $0 }
+        .buttonStyle(.borderless)
+      }
+    }
+  }
+
+  /// Button that triggers voice channel actions.
+  @ViewBuilder
+  func voiceChannelButton<Content: View>(
+    @ViewBuilder label: @escaping (_ hovered: Bool) -> Content
+  )
+    -> some View
+  {
+    VoiceChannelButton(
       channels: channels,
       channel: channel
     ) { hovered in

@@ -80,6 +80,21 @@ struct ProfileBar: View {
       }
 
       Spacer()
+      
+      if gw.voice.voiceGateway != nil {
+        Button {
+          Task {
+            await gw.voice.updateVoiceConnection(.disconnect)
+          }
+        } label: {
+          // hang up call
+          Image(systemName: "phone.down.fill")
+            .font(.title2)
+            .padding(5)
+            .background(.ultraThinMaterial)
+            .clipShape(.circle)
+        }
+      }
 
       #if os(macOS)
         Button {

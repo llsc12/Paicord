@@ -1,5 +1,5 @@
 {
-  "originHash" : "bfacdd34b4927d43359347cb7517b46411822ef5371dc63508a5a8ed06405338",
+  "originHash" : "1e84c1ae19d6c4c9b1505df266f944c611d8b1021f959593f963fb47406e7b2f",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -71,6 +71,15 @@
       "state" : {
         "revision" : "4331dd50bc1db007db664a23f32e6f3df93d4e1a",
         "version" : "4.0.2"
+      }
+    },
+    {
+      "identity" : "davekit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/llsc12/DaveKit.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "967172de5c8ea2cf1958a6e916704a4c3bdcb9b8"
       }
     },
     {
@@ -152,6 +161,15 @@
       "state" : {
         "revision" : "3498e60218e6003894ff95192d756e238c01f44e",
         "version" : "4.7.1"
+      }
+    },
+    {
+      "identity" : "openssl-package",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/krzyzanowskim/OpenSSL-Package.git",
+      "state" : {
+        "revision" : "4db40e8f0bac4edd7b605cc692b924b558f0d125",
+        "version" : "3.6.1"
       }
     },
     {
@@ -285,8 +303,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-log.git",
       "state" : {
-        "revision" : "ce592ae52f982c847a4efc0dd881cc9eb32d29f2",
-        "version" : "1.6.4"
+        "revision" : "bbd81b6725ae874c69e9b8c8804d462356b55523",
+        "version" : "1.10.1"
       }
     },
     {
@@ -341,6 +359,15 @@
       "state" : {
         "revision" : "bbadd4b853a33fd78c4ae977d17bb2af15eb3f2a",
         "version" : "1.1.0"
+      }
+    },
+    {
+      "identity" : "swift-opus",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/alta/swift-opus.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "6f3cb6bd3ffed1fe5f06d00a962d5c191a50daf8"
       }
     },
     {

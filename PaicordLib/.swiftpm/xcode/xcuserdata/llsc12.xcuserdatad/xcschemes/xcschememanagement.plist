@@ -117,6 +117,11 @@
 			<key>primary</key>
 			<true/>
 		</dict>
+		<key>DiscordVoice</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>GenerateAPIEndpointsExec</key>
 		<dict>
 			<key>primary</key>

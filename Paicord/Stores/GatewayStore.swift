@@ -117,6 +117,7 @@ final class GatewayStore {
     presence.setGateway(self)
     messageDrain.setGateway(self)
     switcher.setGateway(self)
+    voice.setGateway(self)
 
     // Update existing channel stores
     for channelStore in channels.values {
@@ -137,6 +138,8 @@ final class GatewayStore {
     presence = .init()
     messageDrain = .init()
     switcher = .init()
+    voice.cancelEventHandling() // cancel any ongoing voice stuff
+    voice = .init()
     channels = [:]
     guilds = [:]
     subscribedGuilds = []
@@ -153,6 +156,7 @@ final class GatewayStore {
   var presence = PresenceStore()
   var messageDrain = MessageDrainStore()
   var switcher = QuickSwitcherProviderStore()
+  var voice = VoiceConnectionStore()
 
   private var channels: [ChannelSnowflake: ChannelStore] = [:]
   func getChannelStore(for id: ChannelSnowflake, from guild: GuildStore? = nil)
@@ -210,21 +214,6 @@ final class GatewayStore {
   // MARK: - Handlers
 
   private func handleReady(_ data: Gateway.Ready) {
-    // send voice states, temporary until paicord has proper voice handling
-    Task {
-      await self.gateway?.updateVoiceState(
-        payload: .init(
-          guild_id: nil,
-          channel_id: nil,
-          self_mute: true,
-          self_deaf: true,
-          self_video: false,
-          preferred_region: nil,
-          preferred_regions: nil,
-          flags: []
-        )
-      )
-    }
 
     // update user data in account storage
     accounts.updateProfile(for: data.user.id, data.user)
