@@ -44,6 +44,7 @@ class ReadStateStore: DiscordDataStore {
       $0[$1.id] = $1
     }
   }
+  
 
   private func handleMessageAcknowledge(_ ackData: Gateway.MessageAcknowledge) {
 
