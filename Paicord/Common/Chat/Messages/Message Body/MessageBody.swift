@@ -54,7 +54,7 @@ extension MessageCell {
         // Attachments
         let attachments = message.attachments ?? []
         if !attachments.isEmpty {
-          AttachmentsView(attachments: attachments)
+          AttachmentsView(message: message, attachments: attachments)
         }
 
         // Embeds

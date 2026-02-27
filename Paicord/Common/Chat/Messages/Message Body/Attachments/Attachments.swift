@@ -19,12 +19,38 @@ import SwiftUIX
 
 extension MessageCell {
   struct AttachmentsView: View {
+    @Environment(\.appState) var appState
 
+    var message: DiscordChannel.PartialMessage
     var previewableAttachments: [DiscordChannel.Message.Attachment] = []
     var audioAttachments: [DiscordChannel.Message.Attachment] = []
     var fileAttachments: [DiscordChannel.Message.Attachment] = []
 
-    init(attachments: [DiscordChannel.Message.Attachment]) {
+    init(
+      message: DiscordChannel.PartialMessage,
+      attachments: [DiscordChannel.Message.Attachment]
+    ) {
+      self.message = message
+      for att in attachments {
+        if let type = UTType(mimeType: att.content_type ?? ""),
+          AttachmentItemPreview.supportedTypes.contains(type)
+        {
+          previewableAttachments.append(att)
+        } else if let type = UTType(mimeType: att.content_type ?? ""),
+          AttachmentAudioPlayer.supportedTypes.contains(type)
+        {
+          audioAttachments.append(att)
+        } else {
+          fileAttachments.append(att)
+        }
+      }
+    }
+
+    init(
+      message: DiscordChannel.Message,
+      attachments: [DiscordChannel.Message.Attachment]
+    ) {
+      self.message = message.toPartialMessage()
       for att in attachments {
         if let type = UTType(mimeType: att.content_type ?? ""),
           AttachmentItemPreview.supportedTypes.contains(type)
@@ -84,12 +110,21 @@ extension MessageCell {
 
     @ViewBuilder
     var list: some View {
-      ForEach(previewableAttachments) { attachment in
-        AttachmentSizedView(attachment: attachment) {
-          AttachmentItemPreview(
-            attachment: attachment
-          )
+      ForEach(previewableAttachments.indices, id: \.self) { i in
+        let attachment = previewableAttachments[i]
+        Button {
+          appState.attachmentViewerIndex = i
+          appState.attachmentViewerAttachments = previewableAttachments
+          appState.attachmentViewerContextMessage = message
+          appState.showingAttachmentViewer = true
+        } label: {
+          AttachmentSizedView(attachment: attachment) {
+            AttachmentItemPreview(
+              attachment: attachment
+            )
+          }
         }
+        .buttonStyle(.plain)
         .debugRender()
         .debugCompute()
       }
@@ -143,24 +178,48 @@ extension MessageCell {
 
       var attachment: DiscordMedia
 
+      var displayPoster = false
+      func displayMode(asPoster: Bool) -> some View {
+        var copy = self
+        copy.displayPoster = asPoster
+        return copy
+      }
+
       var body: some View {
         switch attachment.type {
         case .png, .jpeg, .jpeg, .webP, .gif:
           ImageView(attachment: attachment)
         case .mpeg4Movie, .quickTimeMovie:
-          VideoView(attachment: attachment)
+          if displayPoster {
+            ImageView(attachment: attachment, needsPoster: true)
+          } else {
+            VideoView(attachment: attachment)
+          }
         default:
           // unknown type. sadly discord can sometimes not provide content type.
           // fields like thumbnail may not always send content type field.
-          ImageView(attachment: attachment)
+          ImageView(attachment: attachment, needsPoster: true)
         }
       }
 
       // preview for image
       struct ImageView: View {
         var attachment: DiscordMedia
+        var needsPoster: Bool = false
         var body: some View {
-          AnimatedImage(url: URL(string: attachment.proxyurl)) {
+          let url: URL? = {
+            if needsPoster {
+              var components = URLComponents(string: attachment.proxyurl)!
+              components.queryItems =
+                (components.queryItems ?? []) + [
+                  URLQueryItem(name: "format", value: "png")
+                ]
+              return components.url
+            } else {
+              return URL(string: attachment.proxyurl)
+            }
+          }()
+          AnimatedImage(url: url) {
             if let placeholder = attachment.placeholder,
               let data = Data(base64Encoded: placeholder)
             {
@@ -849,7 +908,7 @@ extension MessageCell {
         }
       #endif
     }
-    
+
     struct GifvView: View {
       @State private var controller: PlayerController
       private let media: Embed.Media
@@ -990,7 +1049,7 @@ extension MessageCell {
 }
 
 #Preview {
-  MessageCell.AttachmentsView(attachments: [
+  let attachments: [DiscordChannel.Message.Attachment] = [
     .init(
       id: try! .makeFake(),
       filename: "meow.zip",
@@ -1018,26 +1077,25 @@ extension MessageCell {
       waveform: nil,
       flags: nil
     ),
-  ])
+  ]
+  MessageCell.AttachmentsView(
+    message: .init(
+      id: try! .makeFake(),
+      channel_id: try! .makeFake(),
+      content: "gm",
+      timestamp: .init(date: .now),
+      tts: false,
+      mention_everyone: false,
+      mentions: [],
+      mention_roles: [],
+      attachments: attachments,
+      embeds: [],
+      pinned: false,
+      type: .default
+    ),
+    attachments: attachments
+  )
   .padding()
-}
-
-extension DiscordMedia {
-  var type: UTType {
-    if let mimeType = content_type, let type = UTType(mimeType: mimeType) {
-      return type
-    } else {
-      return .data
-    }
-  }
-
-  var aspectRatio: CGFloat? {
-    if let width = self.width, let height = self.height {
-      return width.toCGFloat / height.toCGFloat
-    } else {
-      return nil
-    }
-  }
 }
 
 #if os(iOS)
@@ -1078,8 +1136,24 @@ extension DiscordMedia {
     flags: nil
   )
 
-  MessageCell.AttachmentsView(attachments: [data])
-    .padding()
+  MessageCell.AttachmentsView(
+    message: .init(
+      id: try! .makeFake(),
+      channel_id: try! .makeFake(),
+      content: "gm",
+      timestamp: .init(date: .now),
+      tts: false,
+      mention_everyone: false,
+      mentions: [],
+      mention_roles: [],
+      attachments: [data],
+      embeds: [],
+      pinned: false,
+      type: .default
+    ),
+    attachments: [data]
+  )
+  .padding()
 }
 
 extension SFSpeechRecognizer {

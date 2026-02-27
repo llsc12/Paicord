@@ -37,6 +37,12 @@ final class PaicordAppState {
 
   // MARK: - General
   var showingQuickSwitcher: Bool = false
+  
+  // MARK: - Attachment Viewer
+  var showingAttachmentViewer: Bool = false
+  var attachmentViewerAttachments: [DiscordMedia] = []
+  var attachmentViewerIndex: Int? = nil
+  var attachmentViewerContextMessage: DiscordChannel.PartialMessage? = nil
 
   // MARK: - Selected Guild & Channel Persistence
 
