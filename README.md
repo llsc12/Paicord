@@ -56,3 +56,12 @@ Paicord uses modified versions of [DiscordBM](https://github.com/DiscordBM/Disco
 - [Cyclone](https://github.com/slice/cyclone)
 
 And of course, [Discord Userdoccers and its maintainers](https://docs.discord.food) helped massively with their unofficial documentation and direct help.
+
+## Linux (and android)
+To satisfy our desire for oxidization, for linux, rust is mainly used. The UI is in QtQuick QML because it was the only ui library with decent rust bindings that runs literally everywhere while playing nice with rust. 
+
+### paicord-rs
+this is the crate which facilitates interaction with PaicordLib via [swift-bridge](https://github.com/chinedufn/swift-bridge). It contains its own swift library which is essentially middleware since swift-bridge isn't able to do absolutely everything PaicordLib needs.
+
+### PaicordQt
+this is going to be the frontend of Paicord on non-mac platforms. It's a cmake project so QtCreator can work with it, which is useful for getting the build environment for Qt on android. 
