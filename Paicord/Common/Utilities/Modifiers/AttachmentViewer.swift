@@ -304,6 +304,9 @@ private struct ZoomableImageView: View {
         scrollView.hasHorizontalScroller = false
         scrollView.hasVerticalScroller = false
 
+        scrollView.clipsToBounds = false
+        scrollView.documentView?.clipsToBounds = false
+
         let imageView = SDAnimatedImageView()
         imageView.imageScaling = .scaleProportionallyUpOrDown
 
@@ -319,7 +322,7 @@ private struct ZoomableImageView: View {
           action: #selector(Coordinator.handleDoubleTap(_:))
         )
         doubleTap.numberOfClicksRequired = 2
-        scrollView.addGestureRecognizer(doubleTap)
+        imageView.addGestureRecognizer(doubleTap)
 
         let panGesture = NSPanGestureRecognizer(
           target: context.coordinator,
