@@ -559,7 +559,7 @@ public final class MarkdownTokenizer {
     let startLocation = currentLocation
     var content = ""
 
-    while !isAtEnd && currentChar == "#" && content.count < 6 {
+    while !isAtEnd && currentChar == "#" && content.count < 3 {
       content.append(currentChar)
       advance()
     }
