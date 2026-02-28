@@ -1,0 +1,151 @@
+import {
+    TextEdit,
+    Button,
+    HorizontalBox,
+    VerticalBox,
+    LineEdit, Palette,
+} from "std-widgets.slint";
+import { RoundedImage } from "../RoundedImage.slint";
+import { LoginManagerSlint } from "../../State/LoginManager.slint";
+
+export component LoginView inherits Rectangle {
+    init => {
+        LoginManagerSlint.initialize();
+    }
+
+    property <bool> token_login: false;
+
+    property <string> token_input;
+    property <string> username_input;
+    property <string> password_input;
+
+    HorizontalBox {
+        VerticalBox {
+            alignment: center;
+            Text {
+                horizontal-alignment: center;
+                vertical-alignment: center;
+                text: "Welcome back!";
+                font-size: 16px;
+                font-weight: 450;
+            }
+
+            Text {
+                horizontal-alignment: center;
+                vertical-alignment: center;
+                text: "We're so excited to see you again!";
+            }
+
+            if !token_login: VerticalBox {
+                spacing: 5px;
+                Text {
+                    text: "Email or Phone Number *";
+                }
+
+                LineEdit {
+                    placeholder-text: "Enter your email or phone number...";
+                    changed text => {
+                        username_input = self.text;
+                    }
+                }
+
+                Text {
+                    text: "Password *";
+                }
+
+                LineEdit {
+                    placeholder-text: "Enter your password...";
+                    input-type: password;
+                    changed text => {
+                        password_input = self.text;
+                    }
+                    accepted(text) => {
+                        login_button.clicked();
+                    }
+                }
+
+                Text {
+                    text: "Or, log in with your token";
+                    color: Palette.accent-background;
+                    TouchArea {
+                        mouse-cursor: MouseCursor.pointer;
+                        clicked => {
+                            token_login = true;
+                        }
+                    }
+                }
+            }
+
+            if token_login: VerticalBox {
+                Text {
+                    text: "Token *";
+                }
+
+                LineEdit {
+                    placeholder-text: "Enter your token...";
+                    input-type: password;
+                    changed text => {
+                        token_input = self.text;
+                    }
+                    accepted(text) => {
+                        login_button.clicked();
+                    }
+                }
+
+                Text {
+                    text: "Or, log in with your email and password";
+                    color: Palette.accent-background;
+                    TouchArea {
+                        mouse-cursor: MouseCursor.pointer;
+                        clicked => {
+                            token_login = false;
+                        }
+                    }
+                }
+            }
+
+            login_button := Button {
+                text: "Login";
+                clicked => {
+                    if (token_login) {
+                        LoginManagerSlint.login_token(token_input);
+                    } else {
+                        LoginManagerSlint.login_normal(username_input, password_input);
+                    }
+                }
+            }
+        }
+
+        if LoginManagerSlint.remote_auth_fingerprint != "": VerticalBox {
+            width: 50%;
+            alignment: center;
+
+            if LoginManagerSlint.raUser.username != "": RoundedImage {
+                source: LoginManagerSlint.raUser.avatar;
+                image-width: 200px;
+                image-height: 200px;
+                border-radius: 500px;
+            }
+
+            if LoginManagerSlint.raUser.username == "": Image {
+                vertical-alignment: center;
+                horizontal-alignment: center;
+                source: LoginManagerSlint.qrCode;
+                height: 200px;
+            }
+
+            Text {
+                text: LoginManagerSlint.raUser.username == "" ? "Log in with QR Code" : "Check your phone!";
+                horizontal-alignment: center;
+                font-size: 16px;
+                font-weight: 450;
+            }
+
+            Text {
+                horizontal-alignment: center;
+                text: LoginManagerSlint.raUser.username == "" ? "Scan this with the Paicord or Discord mobile app to log in instantly." : "Logging in as " + LoginManagerSlint.raUser.username;
+                wrap: word-wrap;
+            }
+        }
+    }
+}

@@ -1,3 +1,11 @@
-export global LoginManager {
-    
+import { PartialUserSlint } from "../Models/DiscordUser.slint";
+
+export global LoginManagerSlint {
+    callback initialize();
+    callback login_normal(username: string, password: string);
+    callback login_token(token: string);
+
+    in-out property <string> remote_auth_fingerprint: "";
+    in-out property <image> qrCode: @image-url("../images/paicord_icon.png");
+    in-out property <PartialUserSlint> raUser: { username: "", global_name: "", avatar: @image-url("../images/paicord_icon.png") };
 }

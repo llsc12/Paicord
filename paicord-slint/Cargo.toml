@@ -13,6 +13,7 @@ path = "src/main.rs"
 name = "paicord"
 
 [dependencies]
+anyhow = "*"
 slint = { git = "https://github.com/slint-ui/slint", rev = "6cbe03a", features = ["renderer-femtovg-wgpu", "renderer-femtovg", "renderer-skia", "renderer-skia-opengl", "backend-android-activity-06"] }
 i-slint-core = { git = "https://github.com/slint-ui/slint", rev = "6cbe03a", features = ["std", "experimental-rich-text"] }
 i-slint-common = { git = "https://github.com/slint-ui/slint", rev = "6cbe03a", features = [] }

@@ -1,0 +1,5 @@
+export global AppStateSlint {
+    // Set to true once rust components have initialized. 
+    // Under some rendering backends if this is not set to true, the UI will call ready callbacks before the rust components have initialized.
+    in-out property <bool> ready: false;
+}

@@ -1,0 +1,29 @@
+import { HorizontalBox } from "std-widgets.slint";
+export component RoundedImage inherits HorizontalLayout {
+    in-out property <image> source;
+    in-out property <ImageRendering> image-rendering: ImageRendering.smooth;
+    in-out property <length> image-height: 50px;
+    in-out property <length> image-width: 50px;
+    in-out property <length> border-radius: 0px;
+    in-out property <ImageFit> image-fit: ImageFit.cover;
+    in-out property <LayoutAlignment> image-alignment: LayoutAlignment.center;
+
+    width: image-width;
+    height: image-height;
+
+    VerticalLayout {
+        Rectangle {
+            width: image-width;
+            height: image-height;
+            clip: true;
+            border-radius: border-radius;
+            Image {
+                width: parent.width;
+                height: parent.height;
+                source: source;
+                image-rendering: image-rendering;
+                image-fit: image-fit;
+            }
+        }
+    }
+}

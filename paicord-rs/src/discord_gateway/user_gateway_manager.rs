@@ -1,14 +1,7 @@
 use std::sync::Arc;
+use crate::ffi;
 
-#[swift_bridge::bridge]
-mod ffi {
-    extern "Swift" {
-        type UserGatewayManager;
-        async fn user_gateway_manager_new(token: String) -> UserGatewayManager;
-        async fn connect(self: &UserGatewayManager);
-        async fn next_event(self: &UserGatewayManager) -> String;
-    }
-}
+use crate::discord_models::types::gateway::GatewayEvent;
 
 #[derive(Clone)]
 pub struct UserGatewayManager {
@@ -16,8 +9,8 @@ pub struct UserGatewayManager {
 }
 
 impl UserGatewayManager {
-    pub async fn new(token: String) -> Self {
-        let manager = ffi::user_gateway_manager_new(token).await;
+    pub async fn new<S: AsRef<str>>(token: S) -> Self {
+        let manager = ffi::user_gateway_manager_new(token.as_ref().to_string()).await;
         Self {
             inner: Arc::new(manager),
         }
@@ -27,32 +20,12 @@ impl UserGatewayManager {
         self.inner.connect().await;
     }
 
-    pub async fn next_event(&self) -> String {
-        self.inner.next_event().await
+    pub async fn disconnect(&self) {
+        self.inner.disconnect().await;
     }
-}
 
-#[cfg(test)]
-mod tests {
-    use core::panic;
-    use std::time::Duration;
-
-    static TOKEN: &'static str = include_str!("../test_token.txt");
-
-    use super::ffi;
-
-    #[tokio::test]
-    async fn test_user_gateway_manager() {
-        let manager = ffi::user_gateway_manager_new(TOKEN.to_string()).await;
-        manager.connect().await;
-
-        while let event = manager.next_event().await
-            && !event.is_empty()
-        {
-            println!("Received event: {}", event);
-        }
-
-        panic!("Connection closed unexpectedly");
+    pub async fn next_event(&self) -> GatewayEvent {
+        self.inner.next_event().await
     }
 }
 

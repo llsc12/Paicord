@@ -18,8 +18,15 @@ fn main() {
         }
     }
     let bridge_files = vec![
-        "src/discord_gateway/remote_auth_gateway_manager.rs",
-        "src/discord_gateway/user_gateway_manager.rs",
+        // "src/discord_models/types/shared.rs",
+        // "src/discord_models/types/snowflake.rs",
+        // "src/discord_models/types/gateway.rs",
+        // "src/discord_models/types/user.rs",
+        // "src/discord_gateway/remote_auth_gateway_manager.rs",
+        // "src/discord_gateway/user_gateway_manager.rs",
+        // "src/discord_http/default_discord_client.rs",
+        // "src/discord_http/endpoints/cdn_endpoints.rs",
+        "src/lib.rs",
     ];
     swift_bridge_build::parse_bridges(bridge_files)
         .write_all_concatenated(swift_bridge_out_dir(), "paicord-rs");

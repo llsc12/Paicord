@@ -1,5 +1,6 @@
 use std::{error::Error, sync::{Arc}};
 
+use paicord_rs::discord_models::types::{gateway::GatewayEvent, user::PartialUser};
 use tokio::sync::{RwLock, mpsc};
 
 use crate::state::AppState;
@@ -13,14 +14,14 @@ pub enum PaicordCommand {
     // Login
     InitLogin,
     PendingRemoteInit(String),
-    //PendingTicket(PartialUser),
+    PendingTicket(PartialUser),
     PendingLogin(String),
     RemoteAuthCancel,
     RemoteAuthFinish,
 
     // Gateway
     GatewayLogin(String),
-    //GatewayEvent(GatewayEvent),
+    GatewayEvent(GatewayEvent),
 
     //Guilds
     SelectGuild(String),
@@ -36,7 +37,7 @@ pub struct App {
 }
 
 impl App {
-    pub fn new() -> Result<Self, Box<dyn Error>> {
+    pub fn new() -> anyhow::Result<Self> {
         let (command_sender, mut command_receiver) = mpsc::channel(64);
         let main_window = MainWindow::new()?;
 
@@ -52,7 +53,8 @@ impl App {
                 let mut app_state = app_state.write().await;
                 
                 if let Err(err) = app_state.handle_command(&command).await {
-                    println!("Failed to handle command {:?} with error: {}", command, err);
+                    let msg = err.to_string();
+                    let _ = app_state.handle_command(&PaicordCommand::Panic(msg)).await;
                 }
             }
         });

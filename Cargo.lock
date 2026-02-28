@@ -4220,6 +4220,7 @@ dependencies = [
 name = "paicord-slint"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "cacache",
  "chrono",
  "console_error_panic_hook",
@@ -5754,8 +5755,7 @@ dependencies = [
 
 [[package]]
 name = "swift-bridge"
-version = "0.1.58"
-source = "git+https://github.com/chinedufn/swift-bridge.git#b80238fd55e9ffedfabfafb134bd93b1920ff7f6"
+version = "0.1.59"
 dependencies = [
  "once_cell",
  "swift-bridge-build",
@@ -5765,8 +5765,7 @@ dependencies = [
 
 [[package]]
 name = "swift-bridge-build"
-version = "0.1.58"
-source = "git+https://github.com/chinedufn/swift-bridge.git#b80238fd55e9ffedfabfafb134bd93b1920ff7f6"
+version = "0.1.59"
 dependencies = [
  "proc-macro2",
  "swift-bridge-ir",
@@ -5776,8 +5775,7 @@ dependencies = [
 
 [[package]]
 name = "swift-bridge-ir"
-version = "0.1.58"
-source = "git+https://github.com/chinedufn/swift-bridge.git#b80238fd55e9ffedfabfafb134bd93b1920ff7f6"
+version = "0.1.59"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -5786,8 +5784,7 @@ dependencies = [
 
 [[package]]
 name = "swift-bridge-macro"
-version = "0.1.58"
-source = "git+https://github.com/chinedufn/swift-bridge.git#b80238fd55e9ffedfabfafb134bd93b1920ff7f6"
+version = "0.1.59"
 dependencies = [
  "proc-macro2",
  "quote",

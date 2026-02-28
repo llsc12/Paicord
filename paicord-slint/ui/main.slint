@@ -1,10 +1,13 @@
-import { Palette } from "std-widgets.slint";
+import { Palette, StandardButton } from "std-widgets.slint";
+import { CurrentUserStore } from "Globals/CurrentUserStore.slint";
+import { AppStateSlint } from "State/AppState.slint";
+import { LoginView } from "Common/Login/LoginView.slint";
 
 //global state
-export { CurrentUserStore } from "Globals/CurrentUserStore.slint";
+export { CurrentUserStore, AppStateSlint }
 
 //state globals
-export { LoginManager } from "State/LoginManager.slint";
+export { LoginManagerSlint } from "State/LoginManager.slint";
 
 export component MainWindow inherits Window {
     icon: @image-url("images/paicord_icon.png");
@@ -16,4 +19,8 @@ export component MainWindow inherits Window {
 
     preferred-height: 720px;
     preferred-width: 1280px;
+
+    if CurrentUserStore.id == "" && AppStateSlint.ready: LoginView {
+
+    }
 }
