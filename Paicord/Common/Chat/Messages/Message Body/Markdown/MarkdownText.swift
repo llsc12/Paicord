@@ -217,15 +217,12 @@ struct MarkdownText: View, Equatable {
 
       case .list:
         if let children = block.children {
-          HStack(alignment: .top, spacing: 0) {
-          Text(verbatim: String(repeating: "\t", count: block.level ?? 0))
           VStack(alignment: .leading, spacing: 4) {
             ForEach(children) { child in
               BlockView(block: child)
                 .equatable()
-              }
             }
-          }
+          }.padding(.leading, CGFloat(block.level ?? 0) * AppKitOrUIKitFont.labelFontSize * 2)
         }
 
       case .listItem:
@@ -233,9 +230,9 @@ struct MarkdownText: View, Equatable {
           let converted = AttributedString(attr)
           Text(converted)
         } else if let children = block.children {
-          let level = block.level ?? -1
-          let number = block.itemNumber ?? -1
+          let level = block.level ?? 0
           let ordered = block.isOrdered ?? false
+          let number = block.itemNumber ?? 1
           
           VStack(alignment: .leading, spacing: 4) {
             ForEach(children) { nested in
