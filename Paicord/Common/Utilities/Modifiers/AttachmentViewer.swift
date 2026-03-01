@@ -59,14 +59,15 @@ private struct AttachmentViewerModifier: ViewModifier {
         }
         .animation(.default, value: appState.showingAttachmentViewer)
     #else
-      content.fullScreenCover(isPresented: $appState.showingAttachmentViewer) {
-        AttachmentViewer(
-          contextMessage: $appState.attachmentViewerContextMessage,
-          attachments: $appState.attachmentViewerAttachments,
-          selectedIndex: $appState.attachmentViewerIndex,
-          isPresented: $appState.showingAttachmentViewer
-        )
-      }
+      content
+        .fullScreenCover(isPresented: $appState.showingAttachmentViewer) {
+          AttachmentViewer(
+            contextMessage: appState.attachmentViewerContextMessage,
+            attachments: $appState.attachmentViewerAttachments,
+            selectedIndex: $appState.attachmentViewerIndex,
+            isPresented: $appState.showingAttachmentViewer
+          )
+        }
     #endif
   }
 }
@@ -83,10 +84,12 @@ private struct AttachmentViewer: View {
       TabView(selection: $selectedIndex) {
         ForEach(attachments.indices, id: \.self) { index in
           attachmentItemView(for: attachments[index], isPresented: $isPresented)
+            .ignoresSafeArea(.container)
             .tag(index)
         }
       }
       .tabViewStyle(.page(indexDisplayMode: .never))
+      .ignoresSafeArea(.container)
     #else
       VStack(spacing: 0) {
         if let selectedIndex, attachments.indices.contains(selectedIndex) {
@@ -211,26 +214,27 @@ private struct ZoomableImageView: View {
       func makeUIView(context: Context) -> UIScrollView {
         let scrollView = UIScrollView()
         scrollView.delegate = context.coordinator
-        scrollView.maximumZoomScale = 5.0
+        scrollView.maximumZoomScale = 8.0
         scrollView.minimumZoomScale = 1.0
+        scrollView.zoomScale = 1.0
         scrollView.bouncesZoom = true
+        scrollView.bounces = true
+        scrollView.alwaysBounceHorizontal = false
+        scrollView.alwaysBounceVertical = false
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.showsVerticalScrollIndicator = false
 
         let imageView = SDAnimatedImageView()
         imageView.contentMode = .scaleAspectFit
-        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.isUserInteractionEnabled = true
+        imageView.translatesAutoresizingMaskIntoConstraints = true
+        imageView.frame = .zero
+        imageView.autoresizingMask = []
 
         scrollView.addSubview(imageView)
 
-        NSLayoutConstraint.activate([
-          imageView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
-          imageView.heightAnchor.constraint(equalTo: scrollView.heightAnchor),
-          imageView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
-          imageView.centerYAnchor.constraint(equalTo: scrollView.centerYAnchor),
-        ])
-
         context.coordinator.imageView = imageView
+        context.coordinator.scrollView = scrollView
 
         let doubleTap = UITapGestureRecognizer(
           target: context.coordinator,
@@ -245,7 +249,70 @@ private struct ZoomableImageView: View {
       func updateUIView(_ uiView: UIScrollView, context: Context) {
         if let url = url, context.coordinator.currentURL != url {
           context.coordinator.currentURL = url
-          context.coordinator.imageView?.sd_setImage(with: url)
+          context.coordinator.imageView?.sd_setImage(with: url) {
+            image,
+            _,
+            _,
+            _ in
+            guard let image = image else { return }
+            DispatchQueue.main.async {
+              guard let imageView = context.coordinator.imageView else {
+                return
+              }
+              let bounds = uiView.bounds.size
+              guard bounds.width > 0, bounds.height > 0 else { return }
+
+              let imageSize = image.size
+              let scale = min(
+                bounds.width / imageSize.width,
+                bounds.height / imageSize.height
+              )
+              let fittedSize = CGSize(
+                width: imageSize.width * scale,
+                height: imageSize.height * scale
+              )
+
+              imageView.frame = CGRect(origin: .zero, size: fittedSize)
+              uiView.contentSize = fittedSize
+
+              uiView.minimumZoomScale = 1.0
+              uiView.maximumZoomScale = 8.0
+              uiView.zoomScale = 1.0
+
+              context.coordinator.centerImage(in: uiView)
+            }
+          }
+        } else {
+          if let imageView = context.coordinator.imageView,
+            let image = imageView.image
+          {
+            let bounds = uiView.bounds.size
+            guard bounds.width > 0, bounds.height > 0 else {
+              context.coordinator.centerImage(in: uiView)
+              return
+            }
+
+            let imageSize = image.size
+            let scale = min(
+              bounds.width / imageSize.width,
+              bounds.height / imageSize.height
+            )
+            let fittedSize = CGSize(
+              width: imageSize.width * scale,
+              height: imageSize.height * scale
+            )
+
+            imageView.frame = CGRect(origin: .zero, size: fittedSize)
+            uiView.contentSize = fittedSize
+            uiView.minimumZoomScale = 1.0
+            if uiView.zoomScale < uiView.minimumZoomScale {
+              uiView.zoomScale = uiView.minimumZoomScale
+            }
+
+            context.coordinator.centerImage(in: uiView)
+          } else {
+            context.coordinator.centerImage(in: uiView)
+          }
         }
       }
 
@@ -255,30 +322,88 @@ private struct ZoomableImageView: View {
 
       class Coordinator: NSObject, UIScrollViewDelegate {
         var imageView: SDAnimatedImageView?
+        var scrollView: UIScrollView?
         var currentURL: URL?
 
         func viewForZooming(in scrollView: UIScrollView) -> UIView? {
           return imageView
         }
 
+        func scrollViewDidZoom(_ scrollView: UIScrollView) {
+          centerImage(in: scrollView)
+        }
+
+        func centerImage(in scrollView: UIScrollView) {
+          guard let imageView = imageView else { return }
+
+          let boundsSize = scrollView.bounds.size
+          let contentSize = scrollView.contentSize
+
+          let horizontalPadding = max(
+            (boundsSize.width - contentSize.width) / 2.0,
+            0
+          )
+          let verticalPadding = max(
+            (boundsSize.height - contentSize.height) / 2.0,
+            0
+          )
+          scrollView.contentInset = UIEdgeInsets(
+            top: verticalPadding,
+            left: horizontalPadding,
+            bottom: verticalPadding,
+            right: horizontalPadding
+          )
+
+          var desiredOffset = scrollView.contentOffset
+          let maxOffsetX = max(0, contentSize.width - boundsSize.width)
+          let maxOffsetY = max(0, contentSize.height - boundsSize.height)
+          if contentSize.width <= boundsSize.width {
+            desiredOffset.x = -horizontalPadding
+          } else {
+            desiredOffset.x = min(
+              max(scrollView.contentOffset.x, 0),
+              maxOffsetX
+            )
+          }
+
+          if contentSize.height <= boundsSize.height {
+            desiredOffset.y = -verticalPadding
+          } else {
+            desiredOffset.y = min(
+              max(scrollView.contentOffset.y, 0),
+              maxOffsetY
+            )
+          }
+
+          if desiredOffset != scrollView.contentOffset {
+            DispatchQueue.main.async {
+              scrollView.setContentOffset(desiredOffset, animated: false)
+            }
+          }
+        }
+
         @objc func handleDoubleTap(_ gesture: UITapGestureRecognizer) {
           guard let scrollView = gesture.view as? UIScrollView else { return }
 
-          if scrollView.zoomScale > 1 {
-            scrollView.setZoomScale(1, animated: true)
+          if scrollView.zoomScale > scrollView.minimumZoomScale {
+            scrollView.setZoomScale(scrollView.minimumZoomScale, animated: true)
           } else {
             let point = gesture.location(in: imageView)
-            let scrollSize = scrollView.frame.size
-            let size = CGSize(
-              width: scrollSize.width / 2,
-              height: scrollSize.height / 2
+            let newZoom = min(scrollView.maximumZoomScale, 3.0)
+            let scrollSize = CGSize(
+              width: scrollView.bounds.width / newZoom,
+              height: scrollView.bounds.height / newZoom
             )
-            let origin = CGPoint(
-              x: point.x - size.width / 2,
-              y: point.y - size.height / 2
+
+            var origin = CGPoint(
+              x: point.x - scrollSize.width / 2,
+              y: point.y - scrollSize.height / 2
             )
+            origin.x = max(origin.x, 0)
+            origin.y = max(origin.y, 0)
+
             scrollView.zoom(
-              to: CGRect(origin: origin, size: size),
+              to: CGRect(origin: origin, size: scrollSize),
               animated: true
             )
           }
