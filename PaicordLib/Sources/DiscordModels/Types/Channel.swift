@@ -943,7 +943,8 @@ extension DiscordChannel {
 }
 
 /// https://discord.com/developers/docs/resources/message#embed-object
-public struct Embed: Sendable, Codable, Equatable, Hashable, ValidatablePayload {
+public struct Embed: Sendable, Codable, Equatable, Hashable, ValidatablePayload
+{
 
   /// https://discord.com/developers/docs/resources/message#embed-object-embed-types
   @UnstableEnum<String>
@@ -1025,21 +1026,25 @@ public struct Embed: Sendable, Codable, Equatable, Hashable, ValidatablePayload 
   public struct Media: Sendable, Codable, Equatable, Hashable {
     public var url: DynamicURL
     public var proxy_url: String?
-    public var height: Int?
     public var width: Int?
+    public var height: Int?
     public var placeholder: String?
     public var content_type: String?
 
     public init(
       url: DynamicURL,
       proxy_url: String? = nil,
+      width: Int? = nil,
       height: Int? = nil,
-      width: Int? = nil
+      placeholder: String? = nil,
+      content_type: String? = nil
     ) {
       self.url = url
       self.proxy_url = proxy_url
       self.height = height
       self.width = width
+      self.placeholder = placeholder
+      self.content_type = content_type
     }
   }
 

@@ -54,7 +54,7 @@ extension MessageCell {
         // Attachments
         let attachments = message.attachments ?? []
         if !attachments.isEmpty {
-          AttachmentsView(attachments: attachments)
+          AttachmentsView(message: message, attachments: attachments)
         }
 
         // Embeds
@@ -70,7 +70,6 @@ extension MessageCell {
 
         // Reactions
         let reactions = channelStore.reactions[message.id, default: [:]]
-
         if !reactions.isEmpty {
           ReactionsView(reactions: reactions)
         }
