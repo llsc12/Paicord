@@ -82,7 +82,7 @@ private struct AttachmentViewer: View {
     #if os(iOS)
       TabView(selection: $selectedIndex) {
         ForEach(attachments.indices, id: \.self) { index in
-          attachmentItemView(for: attachments[index])
+          attachmentItemView(for: attachments[index], isPresented: $isPresented)
             .tag(index)
         }
       }
@@ -90,7 +90,10 @@ private struct AttachmentViewer: View {
     #else
       VStack(spacing: 0) {
         if let selectedIndex, attachments.indices.contains(selectedIndex) {
-          attachmentItemView(for: attachments[selectedIndex])
+          attachmentItemView(
+            for: attachments[selectedIndex],
+            isPresented: $isPresented
+          )
         } else {
           Text(verbatim: "")
             .onAppear {
@@ -99,16 +102,18 @@ private struct AttachmentViewer: View {
         }
 
       }
-      .safeAreaPadding(.all, 100)
-      .overlay(alignment: .bottom) {
+      .safeAreaInset(edge: .bottom, spacing: 0) {
         Carousel(attachments: attachments, selectedIndex: $selectedIndex)
-          .padding(.bottom)
+          .padding()
       }
     #endif
   }
 
   @ViewBuilder
-  func attachmentItemView(for attachment: DiscordMedia) -> some View {
+  func attachmentItemView(
+    for attachment: DiscordMedia,
+    isPresented: Binding<Bool>
+  ) -> some View {
     switch attachment.type {
     case .mpeg4Movie, .quickTimeMovie, .mp3, .mpeg4Audio,
       .init(mimeType: "audio/wav", conformingTo: .audio)!,
@@ -116,7 +121,7 @@ private struct AttachmentViewer: View {
       .init(mimeType: "audio/ogg", conformingTo: .audio)!:
       VideoPlayerView(attachment: attachment)
     case .png, .jpeg, .jpeg, .webP, .gif:
-      ZoomableImageView(attachment: attachment)
+      ZoomableImageView(attachment: attachment, isPresented: isPresented)
     default:
       Text("Unsupported attachment type")
     }
@@ -187,12 +192,12 @@ private struct VideoPlayerView: View {
 
 private struct ZoomableImageView: View {
   let attachment: DiscordMedia
-
+  @Binding var isPresented: Bool
   var body: some View {
     #if os(iOS)
       IOSZoomableImageView(attachment: attachment)
     #elseif os(macOS)
-      MacOSZoomableImageView(attachment: attachment)
+      MacOSZoomableImageView(attachment: attachment, isPresented: $isPresented)
     #endif
   }
 
@@ -283,6 +288,7 @@ private struct ZoomableImageView: View {
   #elseif os(macOS)
     struct MacOSZoomableImageView: NSViewRepresentable {
       let attachment: DiscordMedia
+      @Binding var isPresented: Bool
       var url: URL? {
         URL(string: attachment.proxyurl)
       }
@@ -304,17 +310,21 @@ private struct ZoomableImageView: View {
         scrollView.hasHorizontalScroller = false
         scrollView.hasVerticalScroller = false
 
-        scrollView.clipsToBounds = false
-        scrollView.documentView?.clipsToBounds = false
+        let clipView = NoScrollClipView()
+        clipView.drawsBackground = false
+        scrollView.contentView = clipView
 
         let imageView = SDAnimatedImageView()
         imageView.imageScaling = .scaleProportionallyUpOrDown
 
-        scrollView.documentView = imageView
-
-        imageView.autoresizingMask = [.width, .height]
+        let containerView = FlippedView()
+        containerView.wantsLayer = true
+        containerView.layer?.backgroundColor = .clear
+        containerView.addSubview(imageView)
+        scrollView.documentView = containerView
 
         context.coordinator.imageView = imageView
+        context.coordinator.containerView = containerView
         context.coordinator.scrollView = scrollView
 
         let doubleTap = NSClickGestureRecognizer(
@@ -328,7 +338,14 @@ private struct ZoomableImageView: View {
           target: context.coordinator,
           action: #selector(Coordinator.handlePan(_:))
         )
-        scrollView.addGestureRecognizer(panGesture)
+        imageView.addGestureRecognizer(panGesture)
+
+        let backgroundTap = NSClickGestureRecognizer(
+          target: context.coordinator,
+          action: #selector(Coordinator.handleBackgroundTap(_:))
+        )
+        backgroundTap.numberOfClicksRequired = 1
+        scrollView.addGestureRecognizer(backgroundTap)
 
         return scrollView
       }
@@ -339,21 +356,66 @@ private struct ZoomableImageView: View {
           context.coordinator.imageView?.sd_setImage(with: url) {
             [weak nsView, context] image, _, _, _ in
             guard let nsView = nsView,
-              let imageView = context.coordinator.imageView
+              let imageView = context.coordinator.imageView,
+              let containerView = context.coordinator.containerView,
+              let image = image
             else { return }
-            imageView.frame = nsView.bounds
+            DispatchQueue.main.async {
+              let bounds = nsView.bounds.size
+              guard bounds.width > 0, bounds.height > 0 else { return }
+              let imageSize = image.size
+              let scale = min(
+                bounds.width / imageSize.width,
+                bounds.height / imageSize.height
+              )
+              let fittedSize = CGSize(
+                width: imageSize.width * scale,
+                height: imageSize.height * scale
+              )
+              // Make the container fill the scroll view so the image can be centered
+              containerView.frame = CGRect(origin: .zero, size: bounds)
+              // Center the image within the container (FlippedView: y=0 is top)
+              let originX = (bounds.width - fittedSize.width) / 2
+              let originY = (bounds.height - fittedSize.height) / 2
+              imageView.frame = CGRect(
+                origin: CGPoint(x: originX, y: originY),
+                size: fittedSize
+              )
+            }
           }
         }
       }
 
       func makeCoordinator() -> Coordinator {
-        Coordinator()
+        Coordinator(isPresented: $isPresented)
       }
 
       class Coordinator: NSObject {
         var imageView: NSImageView?
+        var containerView: NSView?
         var scrollView: NSScrollView?
         var currentURL: URL?
+        var isPresented: Binding<Bool>
+
+        init(isPresented: Binding<Bool>) {
+          self.isPresented = isPresented
+        }
+
+        @objc func handleDismissalTap() {
+          isPresented.wrappedValue = false
+        }
+
+        @objc func handleBackgroundTap(_ gesture: NSClickGestureRecognizer) {
+          guard
+            let imageView = imageView,
+            let containerView = containerView
+          else { return }
+          // Convert click into the container (document) view's coordinate space
+          let clickInContainer = gesture.location(in: containerView)
+          if !imageView.frame.contains(clickInContainer) {
+            isPresented.wrappedValue = false
+          }
+        }
 
         @objc func handleDoubleTap(_ gesture: NSClickGestureRecognizer) {
           guard let scrollView = scrollView else { return }
@@ -364,47 +426,130 @@ private struct ZoomableImageView: View {
             var point = gesture.location(in: scrollView)
             point.y = scrollView.bounds.height - point.y
             let newMag: CGFloat = 3.0
-
             scrollView.animator().setMagnification(newMag, centeredAt: point)
           }
         }
 
         @objc func handlePan(_ gesture: NSPanGestureRecognizer) {
-          guard let scrollView = scrollView, let imageView = imageView else {
-            return
+          guard let scrollView = scrollView,
+            let imageView = imageView
+          else { return }
+          let mag = scrollView.magnification
+          guard mag > 1.0 else { return }
+
+          let imageFrame = imageView.frame
+          let visibleDocWidth = scrollView.contentView.bounds.width
+          let visibleDocHeight = scrollView.contentView.bounds.height
+
+          let fitsX = imageFrame.width <= visibleDocWidth
+          let minScrollX: CGFloat
+          let maxScrollX: CGFloat
+          if fitsX {
+            let center = imageFrame.midX - visibleDocWidth / 2
+            minScrollX = center
+            maxScrollX = center
+          } else {
+            minScrollX = imageFrame.minX
+            maxScrollX = imageFrame.maxX - visibleDocWidth
           }
+          let fitsY = imageFrame.height <= visibleDocHeight
+          let minScrollY: CGFloat
+          let maxScrollY: CGFloat
+          if fitsY {
+            let center = imageFrame.midY - visibleDocHeight / 2
+            minScrollY = center
+            maxScrollY = center
+          } else {
+            minScrollY = imageFrame.minY
+            maxScrollY = imageFrame.maxY - visibleDocHeight
+          }
+
           switch gesture.state {
           case .began, .changed:
             let translation = gesture.translation(in: scrollView)
-
-            let scale = 1.0 / scrollView.magnification
+            let scale = 1.0 / mag
             let currentOrigin = scrollView.contentView.bounds.origin
-            let newOrigin = CGPoint(
-              x: currentOrigin.x - translation.x * scale,
-              y: currentOrigin.y + translation.y * scale
+            let newX = min(
+              max(minScrollX, currentOrigin.x - translation.x * scale),
+              maxScrollX
             )
-
-            scrollView.contentView.scroll(to: newOrigin)
+            let newY = min(
+              max(minScrollY, currentOrigin.y - translation.y * scale),
+              maxScrollY
+            )
+            scrollView.contentView.scroll(to: CGPoint(x: newX, y: newY))
             gesture.setTranslation(.zero, in: scrollView)
           default:
-            let contentSize = imageView.frame.size
-            let visibleSize = scrollView.contentView.bounds.size
-            let maxX = max(0, contentSize.width - visibleSize.width)
-            let maxY = max(0, contentSize.height - visibleSize.height)
             let currentOrigin = scrollView.contentView.bounds.origin
-            let clampedX = min(max(0, currentOrigin.x), maxX)
-            let clampedY = min(max(0, currentOrigin.y), maxY)
-            let clampedOrigin = CGPoint(x: clampedX, y: clampedY)
+            let clampedOrigin = CGPoint(
+              x: min(max(minScrollX, currentOrigin.x), maxScrollX),
+              y: min(max(minScrollY, currentOrigin.y), maxScrollY)
+            )
             if clampedOrigin != currentOrigin {
               NSView.animate(
-                withDuration: 0.3,
+                withDuration: 0.2,
                 delay: 0,
-                options: .curveEaseInOut
+                options: .curveEaseOut
               ) {
                 scrollView.contentView.bounds.origin = clampedOrigin
               }
             }
           }
+        }
+      }
+    }
+
+    class FlippedView: NSView {
+      override var isFlipped: Bool { true }
+    }
+
+    class NoScrollClipView: NSClipView {
+      override func scrollWheel(with event: NSEvent) {
+        guard let docView = documentView else {
+          super.scrollWheel(with: event)
+          return
+        }
+
+        let imageFrame = docView.subviews.first?.frame ?? docView.frame
+        let visibleW = bounds.width
+        let visibleH = bounds.height
+
+        let widthDiff = visibleW - imageFrame.width
+        let minScrollX: CGFloat
+        let maxScrollX: CGFloat
+
+        if widthDiff >= 0 {
+          let desiredX = imageFrame.midX - visibleW / 2
+          minScrollX = desiredX
+          maxScrollX = desiredX
+        } else {
+          minScrollX = imageFrame.minX
+          maxScrollX = imageFrame.maxX - visibleW
+        }
+
+        let heightDiff = visibleH - imageFrame.height
+        let minScrollY: CGFloat
+        let maxScrollY: CGFloat
+
+        if heightDiff >= 0 {
+          let desiredY = imageFrame.midY - visibleH / 2
+          minScrollY = desiredY
+          maxScrollY = desiredY
+        } else {
+          minScrollY = imageFrame.minY
+          maxScrollY = imageFrame.maxY - visibleH
+        }
+
+        let currentOrigin = bounds.origin
+
+        let dx = event.scrollingDeltaX
+        let dy = event.scrollingDeltaY
+
+        let newX = min(max(currentOrigin.x - dx, minScrollX), maxScrollX)
+        let newY = min(max(currentOrigin.y - dy, minScrollY), maxScrollY)
+
+        if newX != currentOrigin.x || newY != currentOrigin.y {
+          scroll(to: NSPoint(x: newX, y: newY))
         }
       }
     }
