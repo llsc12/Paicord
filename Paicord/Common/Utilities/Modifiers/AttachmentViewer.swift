@@ -10,6 +10,7 @@ import AVFoundation
 import AVKit
 import PaicordLib
 import SDWebImageSwiftUI
+@_spi(Advanced) import SwiftUIIntrospect
 import SwiftUIX
 
 #if os(macOS)
@@ -60,7 +61,7 @@ private struct AttachmentViewerModifier: ViewModifier {
         .animation(.default, value: appState.showingAttachmentViewer)
     #else
       content
-        .fullScreenCover(isPresented: $appState.showingAttachmentViewer) {
+        .sheet(isPresented: $appState.showingAttachmentViewer) {
           AttachmentViewer(
             contextMessage: appState.attachmentViewerContextMessage,
             attachments: $appState.attachmentViewerAttachments,
