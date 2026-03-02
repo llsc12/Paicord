@@ -40,8 +40,7 @@ impl Hash for Snowflake {
 
 impl From<String> for Snowflake {
     fn from(id: String) -> Self {
-        let inner = id.parse::<u64>().unwrap_or(0);
-        Snowflake::new(inner)
+        Self::from(&id)
     }
 }
 
@@ -61,7 +60,7 @@ impl From<&str> for Snowflake {
 
 impl From<u64> for Snowflake {
     fn from(id: u64) -> Self {
-        Snowflake::new(id)
+        Self::from(&id)
     }
 }
 

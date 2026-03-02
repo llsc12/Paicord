@@ -154,7 +154,6 @@ pub(crate) mod ffi {
         
     }
     
-    #[derive(Debug)]
     enum GatewayPayloadRust {
         Ready(ReadyPayloadRust),
     }

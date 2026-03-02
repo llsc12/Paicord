@@ -1,3 +1,5 @@
+import { PartialUserSlint } from "../Models/DiscordUser.slint";
+
 export global CurrentUserStore {
-    in-out property <string> id: "";
+    in-out property <PartialUserSlint> current_user;
 }

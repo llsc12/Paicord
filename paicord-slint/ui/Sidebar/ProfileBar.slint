@@ -1,0 +1,40 @@
+import { HorizontalBox, VerticalBox } from "std-widgets.slint";
+import { RoundedImage } from "../Common/RoundedImage.slint";
+import { CurrentUserStore } from "../Globals/CurrentUserStore.slint";
+import { PartialUserSlint } from "../Models/DiscordUser.slint";
+export component ProfileBar inherits Rectangle {
+    property <PartialUserSlint> user: CurrentUserStore.current_user;
+
+    HorizontalBox {
+        spacing: 8px;
+        RoundedImage {
+            source: user.avatar;
+            border-radius: 500px;
+            image-width: 40px;
+            image-height: 40px;
+            width: 10%;
+        }
+
+        VerticalBox {
+            padding-left: 0px;
+            spacing: 4px;
+            VerticalBox {
+                padding: 0px;
+                spacing: 0px;
+                Text {
+                    text: user.global_name;
+                    font-size: 14px;
+                }
+
+                Text {
+                    text: user.username;
+                    font-size: 10px;
+                }
+            }
+
+            // Text {
+            //     text: user.status;
+            // }
+        }
+    }
+}

@@ -3,6 +3,7 @@ use crate::ffi::ReadyPayloadRust;
 
 pub use ffi::GatewayEventRust as GatewayEvent;
 pub use ffi::GatewayPayloadRust as GatewayPayload;
+pub use ffi::ReadyPayloadRust as ReadyPayload;
 
 impl std::fmt::Debug for ReadyPayloadRust {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

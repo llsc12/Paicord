@@ -2,6 +2,7 @@ import { Palette, StandardButton } from "std-widgets.slint";
 import { CurrentUserStore } from "Globals/CurrentUserStore.slint";
 import { AppStateSlint } from "State/AppState.slint";
 import { LoginView } from "Common/Login/LoginView.slint";
+import { LargeBaseplate } from "Baseplates/LargeBaseplate.slint";
 
 //global state
 export { CurrentUserStore, AppStateSlint }
@@ -20,7 +21,7 @@ export component MainWindow inherits Window {
     preferred-height: 720px;
     preferred-width: 1280px;
 
-    if CurrentUserStore.id == "" && AppStateSlint.ready: LoginView {
+    if CurrentUserStore.current_user.id == "" && AppStateSlint.ready: LoginView { }
 
-    }
+    if CurrentUserStore.current_user.id != "" && AppStateSlint.ready: LargeBaseplate { }
 }

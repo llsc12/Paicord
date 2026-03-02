@@ -76,6 +76,29 @@ impl From<UserPayload> for PartialUser {
     }
 }
 
+impl From<&DiscordUser> for PartialUser {
+    fn from(value: &DiscordUser) -> Self {
+        Self::new(
+            value.id,
+            Some(value.username.clone()),
+            Some(value.discriminator.clone()),
+            value.global_name.clone(),
+            value.avatar.clone(),
+            value.banner.clone(),
+            value.pronouns.clone(),
+            value.bot,
+            value.system,
+            value.accent_color,
+        )
+    }
+}
+
+impl From<DiscordUser> for PartialUser {
+    fn from(value: DiscordUser) -> Self {
+        Self::from(&value)
+    }
+}
+
 impl std::fmt::Debug for DiscordUser {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("DiscordUserRust")

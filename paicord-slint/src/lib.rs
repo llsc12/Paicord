@@ -1,6 +1,7 @@
 pub mod state;
 pub mod app;
 pub mod images;
+pub mod models;
 
 #[cfg_attr(target_os = "android", link(name = "c++_shared"))]
 unsafe extern "C" {}

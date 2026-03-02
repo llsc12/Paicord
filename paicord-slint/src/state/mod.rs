@@ -4,16 +4,19 @@ use directories::ProjectDirs;
 use slint::{ComponentHandle, ToSharedString, Weak};
 use tokio::sync::mpsc;
 
-use crate::{app::{AppStateSlint, MainWindow, PaicordCommand}, images::ImageMangler, state::{gateway_manager::GatewayManager, login_manager::LoginManager}};
+use crate::{app::{AppStateSlint, MainWindow, PaicordCommand}, images::ImageMangler, state::{current_user_manager::CurrentUserManager, gateway_manager::GatewayManager, login_manager::LoginManager}};
 
 pub mod login_manager;
 pub mod gateway_manager;
+pub mod current_user_manager;
 
 pub struct AppState {
     login_manager: LoginManager,
     gateway_manager: GatewayManager,
+    current_user_manager: CurrentUserManager,
     image_mangler: ImageMangler,
     project_dirs: ProjectDirs,
+    
 
     ui: Weak<MainWindow>,
     command_sender: mpsc::Sender<PaicordCommand>
@@ -25,6 +28,7 @@ impl AppState {
         let state = Self {
             login_manager: LoginManager::new(sender.clone(), ui.clone())?,
             gateway_manager: GatewayManager::new(sender.clone(), ui.clone())?,
+            current_user_manager: CurrentUserManager::new(sender.clone(), ui.clone())?,
 
             image_mangler: ImageMangler::new(ui.clone(), paths.cache_dir()),
 
@@ -71,6 +75,7 @@ impl AppState {
 
             PaicordCommand::GatewayEvent(event) => {
                 self.gateway_manager.handle_event(event).await?;
+                self.current_user_manager.handle_event(event, &self.image_mangler).await?;
             }
 
             PaicordCommand::Panic(msg) => {

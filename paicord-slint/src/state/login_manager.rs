@@ -98,6 +98,19 @@ impl LoginManager {
 
                         let _ = command_sender.try_send(PaicordCommand::PendingTicket(user.into()));
                     }
+
+                    RemoteAuthOpcode::PendingLogin => {
+                        let Some(ticket) = event.ticket else {
+                            manager.disconnect().await;
+                            let _ = command_sender.try_send(PaicordCommand::Panic(
+                                "No ticket received in PendingLogin".to_string(),
+                            ));
+                            break;
+                        };
+
+                        let _ =
+                            command_sender.try_send(PaicordCommand::PendingLogin(ticket.to_string()));
+                    }
                     _ => {}
                 }
             }
@@ -189,6 +202,7 @@ impl LoginManager {
         self.ui.upgrade_in_event_loop(move |ui| {
             let login_manager_slint = ui.global::<LoginManagerSlint>();
             login_manager_slint.set_raUser(PartialUserSlint {
+                id: "".into(),
                 avatar: slint::Image::from_rgba8_premultiplied(image),
                 global_name: global_name.into(),
                 username: username.into(),
@@ -198,11 +212,16 @@ impl LoginManager {
         Ok(())
     }
 
-    pub async fn pending_login<S: AsRef<str>>(&mut self, token: S) -> anyhow::Result<()> {
-        let token = token.as_ref().to_string();
-        self.command_sender
-            .try_send(PaicordCommand::GatewayLogin(token))
-            .map_err(|e| anyhow!(e))?;
+    pub async fn pending_login<S: AsRef<str>>(&mut self, ticket: S) -> anyhow::Result<()> {
+        let ticket = ticket.as_ref().to_string();
+        //TODO: switch paicord-rs to anyhow errors
+        let Ok(token) = self.remote_auth_gateway_manager.exchange_default(ticket).await else {
+            bail!("Failed to exchange ticket for token");
+        };
+
+        println!("Received token: {}", token);
+
+        let _ = self.command_sender.try_send(PaicordCommand::GatewayLogin(token));
 
         Ok(())
     }
