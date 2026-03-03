@@ -16,7 +16,17 @@ internal actor VoiceConnection {
   let address: SocketAddress
   let inbound: NIOAsyncChannelInboundStream<AddressedEnvelope<ByteBuffer>>
   let outbound: NIOAsyncChannelOutboundWriter<AddressedEnvelope<ByteBuffer>>
-
+  lazy var inboundStream: AsyncStream<ByteBuffer> = {
+    AsyncStream { continuation in
+      Task {
+        for try await envelope in inbound {
+          continuation.yield(envelope.data)
+        }
+        continuation.finish()
+      }
+    }
+  }()
+  
   private init(
     inbound: NIOAsyncChannelInboundStream<AddressedEnvelope<ByteBuffer>>,
     outbound: NIOAsyncChannelOutboundWriter<AddressedEnvelope<ByteBuffer>>,
@@ -86,12 +96,11 @@ internal actor VoiceConnection {
       )
     )
 
-    var iterator = inbound.makeAsyncIterator()
-    guard let discoveryResponse = try await iterator.next() else {
+    var iterator = inboundStream.makeAsyncIterator()
+    guard let data = await iterator.next() else {
       return nil
     }
-
-    let data = discoveryResponse.data
+    
     guard
       let address = data.getData(at: 8, length: 64),
       let address = String(

@@ -388,66 +388,14 @@ public actor VoiceGatewayManager {
         delay: 0
       )
 
-      guard
-        let mode = payload.mode
-      else { return }
-
-      let key = SymmetricKey(data: payload.secret_key)
-
       self.listen(description: payload)
-      self.speak(
-        ssrc: .init(audioSSRC),
-        mode: mode,
-        key: key
-      )
+      self.speak(description: payload)
 
       self.send(
         message: .init(
           payload: .init(
             opcode: .voiceBackendVersion,
             data: .voiceBackendVersion(.init()),
-          ),
-          opcode: .text
-        )
-      )
-
-      guard
-        let discovery = try? await self.udpConnection?.discoverExternalIP(
-          ssrc: .init(self.audioSSRC)
-        )
-      else {
-        // udp discovery failed, disconnect and set state to stopped
-        logger.error(
-          "Failed to discover external IP and port during session description handling"
-        )
-        await self.disconnect()
-        return
-      }
-
-      self.send(
-        message: .init(
-          payload: .init(
-            opcode: .selectProtocol,
-            data: .selectProtocol(
-              .init(
-                protocol: "udp",
-                data: .init(
-                  address: discovery.ip,
-                  port: .init(discovery.port),
-                  mode: payload.mode ?? .aead_aes256_gcm_rtpsize
-                ),
-                rtc_connection_id: self.rtcConnectionID,
-                codecs: [
-                  .opusCodec,
-                  .h264Codec,
-                  .h265Codec,
-                ],
-                experiments: [
-                  "fixed_keyframe_interval",
-                  "keyframe_on_join",
-                ]
-              )
-            )
           ),
           opcode: .text
         )
@@ -596,8 +544,8 @@ public actor VoiceGatewayManager {
         self.udpConnectionTask?.cancel()
       }
 
-      for try await envelope in udpConnection.inbound {
-        guard let packet = RTPPacket(rawValue: envelope.data) else {
+      for try await data in await udpConnection.inboundStream {
+        guard let packet = RTPPacket(rawValue: data) else {
           continue
         }
 
@@ -612,11 +560,17 @@ public actor VoiceGatewayManager {
 
   /// Writes Opus data out through UDP.
   private func speak(
-    ssrc: UInt32,
-    mode: VoiceGateway.EncryptionMode,
-    key: SymmetricKey
+    description: VoiceGateway.SessionDescription
   ) {
     startDrainingOutgoingChannel()
+    guard let mode = description.mode,
+      VoiceGateway.EncryptionMode.supportedCases.contains(mode)
+    else {
+      logger.error(
+        "Unsupported crypto mode: \(description.mode?.rawValue ?? "nil")"
+      )
+      return
+    }
 
     udpSpeakingTask = Task {
       var sequence: UInt16 = 0
@@ -646,12 +600,14 @@ public actor VoiceGatewayManager {
           self.nextSpeakingPayload = nil
         }
 
+        let key = SymmetricKey(data: description.secret_key)
+
         if let frame {
           await sendPacket(
             frame: frame,
             sequence: sequence,
             timestamp: timestamp,
-            ssrc: ssrc,
+            ssrc: .init(audioSSRC),
             mode: mode,
             key: key
           )
@@ -659,7 +615,7 @@ public actor VoiceGatewayManager {
           await sendSilence(
             sequence: sequence,
             timestamp: timestamp,
-            ssrc: ssrc,
+            ssrc: .init(audioSSRC),
             mode: mode,
             key: key
           )
@@ -973,7 +929,7 @@ extension VoiceGatewayManager {
   private func processBinaryData(
     _ message: WebSocketMessage,
     forConnectionWithId connectionId: UInt
-  ) {
+  ) async {
     guard self.connectionId.load(ordering: .relaxed) == connectionId else {
       return
     }
@@ -1004,7 +960,7 @@ extension VoiceGatewayManager {
     // check if the raw data is a binary message with valid opcode or json message.
     do {
       let event = try self.tryDecodeBufferAsEvent(&buffer, binary: isBinary)
-      Task { await self.processEvent(event) }
+      await self.processEvent(event)
       for continuation in self.eventsStreamContinuations {
         continuation.yield(event)
       }
