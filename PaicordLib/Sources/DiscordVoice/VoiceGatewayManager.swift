@@ -1288,16 +1288,20 @@ extension VoiceGatewayManager {
           // switch opcodes bc some are sent as binary.
           switch message.payload.opcode {
           case .mlsKeyPackage, .mlsCommitWelcome:
+            // get payload
             switch message.payload.data {
-            case .mlsKeyPackage(let payload):
-              data = payload
-            case .mlsCommitWelcome(let payload):
-              data = payload
+            case .mlsKeyPackage(let payload),
+              .mlsCommitWelcome(let payload):
+              // opcode + payload
+              var frame = Data([message.payload.opcode.rawValue])
+              frame.append(payload)
+              data = frame
             default:
-              /// never happens, here to initialise data for compile time checks.
+              /// never called, here to initialise data for compile time checks.
               data = Data()
             }
           default:
+            // json payload, encode
             data = try DiscordGlobalConfiguration.encoder.encode(
               message.payload
             )

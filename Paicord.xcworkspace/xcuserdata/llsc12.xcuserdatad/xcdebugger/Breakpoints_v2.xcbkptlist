@@ -14,8 +14,8 @@
             filePath = "PaicordLib/Sources/DiscordVoice/VoiceGatewayManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "879"
-            endingLineNumber = "879"
+            startingLineNumber = "878"
+            endingLineNumber = "878"
             landmarkName = "sendResumeOrIdentify()"
             landmarkType = "7">
             <Actions>
