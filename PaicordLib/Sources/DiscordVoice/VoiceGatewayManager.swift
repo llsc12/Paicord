@@ -372,8 +372,7 @@ public actor VoiceGatewayManager {
         every: .milliseconds(payload.heartbeat_interval / 2)
       )
     case .ready(let payload):
-      self.state.store(.connected, ordering: .relaxed)
-      self.stateCallback?(.connected)
+      await self.onSuccessfulConnection()
 
       self.knownSSRCs[UInt(payload.ssrc)] = self.connectionData.userID
       setupUDP(payload)
@@ -391,15 +390,15 @@ public actor VoiceGatewayManager {
       self.listen(description: payload)
       self.speak(description: payload)
 
-      self.send(
-        message: .init(
-          payload: .init(
-            opcode: .voiceBackendVersion,
-            data: .voiceBackendVersion(.init()),
-          ),
-          opcode: .text
-        )
-      )
+//      self.send(
+//        message: .init(
+//          payload: .init(
+//            opcode: .voiceBackendVersion,
+//            data: .voiceBackendVersion(.init()),
+//          ),
+//          opcode: .text
+//        )
+//      )
     case .speaking(let payload):
       self.knownSSRCs[payload.ssrc] = payload.user_id
     case .clientConnect(let payload):
