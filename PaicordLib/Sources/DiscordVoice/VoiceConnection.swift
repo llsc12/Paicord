@@ -16,17 +16,11 @@ internal actor VoiceConnection {
   let address: SocketAddress
   let inbound: NIOAsyncChannelInboundStream<AddressedEnvelope<ByteBuffer>>
   let outbound: NIOAsyncChannelOutboundWriter<AddressedEnvelope<ByteBuffer>>
-  lazy var inboundStream: AsyncStream<ByteBuffer> = {
-    AsyncStream { continuation in
-      Task {
-        for try await envelope in inbound {
-          continuation.yield(envelope.data)
-        }
-        continuation.finish()
-      }
-    }
-  }()
-  
+  let audioStream: AsyncStream<ByteBuffer>
+  private let audioContinuation: AsyncStream<ByteBuffer>.Continuation
+  var discoveryContinuation:
+    CheckedContinuation<(ip: String, port: UInt16)?, Never>?
+
   private init(
     inbound: NIOAsyncChannelInboundStream<AddressedEnvelope<ByteBuffer>>,
     outbound: NIOAsyncChannelOutboundWriter<AddressedEnvelope<ByteBuffer>>,
@@ -35,6 +29,47 @@ internal actor VoiceConnection {
     self.inbound = inbound
     self.outbound = outbound
     self.address = socketAddress
+
+    var continuation: AsyncStream<ByteBuffer>.Continuation!
+    self.audioStream = AsyncStream { continuation = $0 }
+    self.audioContinuation = continuation
+
+    Task {
+      for try await envelope in inbound {
+        await handleIncoming(envelope.data)
+      }
+      audioContinuation.finish()
+    }
+  }
+
+  private func handleIncoming(_ data: ByteBuffer) {
+    // Check packet type first
+    if let type: UInt16 = data.getInteger(at: 0, endianness: .big),
+      type == 2,
+      let continuation = discoveryContinuation
+    {
+
+      discoveryContinuation = nil
+
+      if let addressData = data.getData(at: 8, length: 64),
+        let address = String(
+          data: addressData.prefix(
+            upTo: addressData.firstIndex(of: 0) ?? addressData.endIndex
+          ),
+          encoding: .utf8
+        ),
+        let port = data.getInteger(at: 72, endianness: .little, as: UInt16.self)
+      {
+
+        continuation.resume(returning: (address, port))
+        return
+      }
+
+      continuation.resume(returning: nil)
+      return
+    }
+
+    audioContinuation.yield(data)
   }
 
   static func connect(
@@ -84,11 +119,13 @@ internal actor VoiceConnection {
   func discoverExternalIP(
     ssrc: UInt32,
   ) async throws -> (ip: String, port: UInt16)? {
+    guard self.discoveryContinuation == nil else { return nil }
+
     var buffer = ByteBufferAllocator().buffer(capacity: 74)
     buffer.writeInteger(UInt16(1), endianness: .big)  // Type
-    buffer.writeInteger(UInt16(70), endianness: .big) // Length
-    buffer.writeInteger(ssrc, endianness: .big)       // SSRC
-    buffer.writeBytes(Array(repeating: 0, count: 66)) // Padding
+    buffer.writeInteger(UInt16(70), endianness: .big)  // Length
+    buffer.writeInteger(ssrc, endianness: .big)  // SSRC
+    buffer.writeBytes(Array(repeating: 0, count: 66))  // Padding
     try await outbound.write(
       AddressedEnvelope(
         remoteAddress: address,
@@ -96,24 +133,9 @@ internal actor VoiceConnection {
       )
     )
 
-    var iterator = inboundStream.makeAsyncIterator()
-    guard let data = await iterator.next() else {
-      return nil
+    return await withCheckedContinuation { continuation in
+      self.discoveryContinuation = continuation
     }
-    
-    guard
-      let address = data.getData(at: 8, length: 64),
-      let address = String(
-        data: address.prefix(
-          upTo: address.firstIndex(of: 0) ?? address.endIndex
-        ),
-        encoding: .utf8,
-      ),
-      let port = data.getInteger(at: 72, endianness: .little, as: UInt16.self)
-    else {
-      return nil
-    }
-    return (ip: address, port: port)
   }
 
   func send(buffer: ByteBuffer) async throws {
@@ -126,14 +148,24 @@ internal actor VoiceConnection {
   }
 
   /// Start sending keepalive packets at regular intervals, keeping the connection alive.
+  var keepaliveCounter: UInt32 = 0
   func keepalive(ssrc: UInt32) async throws {
+    // 13 37 CA FE [keepaliveCounter]
+    // Discord will reply with:
+    // 13 37 F0 0D [keepaliveCounter]
+    // but we dont care lol
     for await _ in AsyncTimerSequence(
       interval: Self.keepaliveInterval,
       clock: .continuous
     ) {
-      var buffer: ByteBuffer = ByteBufferAllocator().buffer(capacity: 4)
-      buffer.writeInteger(ssrc, endianness: .big)
+      self.keepaliveCounter += 1
+
+      var buffer: ByteBuffer = ByteBufferAllocator().buffer(capacity: 8)
+      buffer.writeInteger(UInt16(0x1337), endianness: .big)
+      buffer.writeInteger(UInt16(0xCAFE), endianness: .big)
+      buffer.writeInteger(keepaliveCounter, endianness: .little)
       try await send(buffer: buffer)
     }
   }
 }
+

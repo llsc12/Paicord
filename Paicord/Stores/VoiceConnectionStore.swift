@@ -7,18 +7,24 @@
 //
 
 import AVFoundation
+import Foundation
 import Opus
 import PaicordLib
-import Foundation 
 
 @Observable
 final class VoiceConnectionStore: DiscordDataStore {
   init() {
     // safe afaik bc all it throws for is invalid format
-    self.opusEncoder = try! Opus.Encoder(format: Self.opusFormat, application: .voip)
-    self.opusDecoder = try! Opus.Decoder(format: Self.opusFormat, application: .voip)
+    self.opusEncoder = try! Opus.Encoder(
+      format: Self.opusFormat,
+      application: .voip
+    )
+    self.opusDecoder = try! Opus.Decoder(
+      format: Self.opusFormat,
+      application: .voip
+    )
   }
-  
+
   var gateway: GatewayStore?
   var voiceGateway: VoiceGatewayManager? {
     didSet {
@@ -56,7 +62,7 @@ final class VoiceConnectionStore: DiscordDataStore {
       }
     }
   }
-  
+
   func setupVoiceEventHandling() {
     guard let voiceGateway = voiceGateway else { return }
 
@@ -122,7 +128,9 @@ final class VoiceConnectionStore: DiscordDataStore {
     self.channelId = channelId
     self.guildId = guildId
 
-    print("[Voice] Attempting to connect to voice channel \(channelId.rawValue) in guild \(guildId?.rawValue ?? "DMs")")
+    print(
+      "[Voice] Attempting to connect to voice channel \(channelId.rawValue) in guild \(guildId?.rawValue ?? "DMs")"
+    )
     await gateway?.gateway?.updateVoiceState(
       payload: .init(
         guild_id: guildId,
@@ -195,13 +203,17 @@ final class VoiceConnectionStore: DiscordDataStore {
         let sessionId = await gateway?.gateway?.getSessionID(),
         let userId = gateway?.user.currentUser?.id
       else {
-        print("[Voice] Received voice server update with empty endpoint, disconnecting from voice")
+        print(
+          "[Voice] Received voice server update with empty endpoint, disconnecting from voice"
+        )
         Task { await voiceGateway?.disconnect() }
         voiceGateway = nil
         return
       }
 
-      print("[Voice] Received voice server update, connecting to voice gateway at endpoint \(endpoint) for guild \(guildId.rawValue) and channel \(channelId.rawValue)")
+      print(
+        "[Voice] Received voice server update, connecting to voice gateway at endpoint \(endpoint) for guild \(guildId.rawValue) and channel \(channelId.rawValue)"
+      )
       self.voiceGateway = VoiceGatewayManager.init(
         connectionData: .init(
           token: payload.token,
@@ -259,64 +271,71 @@ final class VoiceConnectionStore: DiscordDataStore {
   // audio player node for playing incoming audio frames
   @ObservationIgnored
   private let playerNode: AVAudioPlayerNode = AVAudioPlayerNode()
-  
+
   @ObservationIgnored
   private var incomingAudioTask: Task<Void, Never>? = nil
 
-
   private func audioEngineSetup() {
     self.audioEngineCleanup()
+
     Task { @MainActor in
-      
+      if !audioEngine.attachedNodes.contains(playerNode) {
+        audioEngine.attach(playerNode)
+      }
 
-//      if !audioEngine.attachedNodes.contains(playerNode) {
-//        audioEngine.attach(playerNode)
-//      }
-//
-//      let engineOutputFormat = audioEngine.outputNode.inputFormat(forBus: 0)
-//
-//      audioEngine.connect(playerNode, to: audioEngine.mainMixerNode, format: engineOutputFormat)
-//
-//      audioEngine.prepare()
-//      do {
-//        try audioEngine.start()
-//        playerNode.play()
-//      } catch {
-//        print("[Voice] Failed to start audio engine: \(error)")
-//        return
-//      }
+      audioEngine.connect(
+        playerNode,
+        to: audioEngine.mainMixerNode,
+        format: Self.pcmFormat
+      )
 
-      incomingAudioTask = Task { [weak self] in
-        guard let self = self, let voiceGateway = self.voiceGateway else { return }
-
-        for await opusFrame in await voiceGateway.incomingOpusPackets {
-          if Task.isCancelled { break }
-
-          guard let decoded = try? self.opusDecoder.decode(opusFrame) else {
-            continue
-          }
-         
-          print(decoded.format.debugDescription)
- 
-        }
+      audioEngine.prepare()
+      do {
+        try audioEngine.start()
+        playerNode.play()
+      } catch {
+        print("[Voice] Failed to start audio engine: \(error)")
+        return
       }
 
       print("[Voice] Audio engine started")
+      print("[Voice] Player node format: \(Self.pcmFormat)")
+      print(
+        "[Voice] Engine output format: \(audioEngine.outputNode.outputFormat(forBus: 0))"
+      )
+
+      guard let voiceGateway = self.voiceGateway else {
+        print("[Voice] No voice gateway when starting incoming audio task")
+        return
+      }
+
+      incomingAudioTask = Task { [weak self] in
+        for await opusFrame in await voiceGateway.incomingOpusChannel {
+          guard let self else { break }
+          if Task.isCancelled { break }
+
+          do {
+            let decoded = try self.opusDecoder.decode(opusFrame)
+            self.playerNode.scheduleBuffer(decoded, completionHandler: nil)
+          } catch {
+            print("[Voice OPUS] Frame decode error: \(error)")
+          }
+        }
+      }
     }
   }
 
   private func audioEngineCleanup() {
+    incomingAudioTask?.cancel()
+    incomingAudioTask = nil
+
     Task { @MainActor in
-      // cancel incoming audio task
-      self.incomingAudioTask?.cancel()
-      
-      // stop the engine and reset everything
-      self.audioEngine.stop()
-      self.playerNode.stop()
-      self.audioEngine.reset()
-      // remove player node from engine
-      self.audioEngine.detach(self.playerNode)
-      
+      playerNode.stop()
+      audioEngine.stop()
+      audioEngine.reset()
+      if audioEngine.attachedNodes.contains(playerNode) {
+        audioEngine.detach(playerNode)
+      }
       print("[Voice] Audio engine stopped")
     }
   }

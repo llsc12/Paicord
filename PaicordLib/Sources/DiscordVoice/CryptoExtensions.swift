@@ -76,51 +76,47 @@ extension VoiceGateway.EncryptionMode {
 
   func encrypt(
     buffer: consuming Data,
-    using key: SymmetricKey
+    using key: SymmetricKey,
+    additionalData: Data,
+    sequence: UInt32? = nil
   ) -> (ciphertext: Data, tag: Data, nonceSuffix: Data)? {
 
-    var nonceSuffixValue = UInt32.random(in: .min ... .max)
+    let nonceSuffixValue: UInt32 = sequence ?? .random(in: .min ... .max)
     var beNonceSuffix = nonceSuffixValue.bigEndian
-    let nonceSuffix = withUnsafeBytes(of: &beNonceSuffix) {
-      Data($0)
-    }
+    let nonceSuffix = withUnsafeBytes(of: &beNonceSuffix) { Data($0) }
 
-    var nonce = Data(repeating: 0, count: nonceLength)
-    nonce.replaceSubrange(
-      nonce.count - nonceSuffix.count..<nonce.count,
+    var nonceData = Data(repeating: 0, count: nonceLength)
+    nonceData.replaceSubrange(
+      nonceData.count - nonceSuffix.count..<nonceData.count,
       with: nonceSuffix
     )
 
     switch self {
-
     case .aead_aes256_gcm_rtpsize:
-      guard let aesNonce = try? AES.GCM.Nonce(data: nonce) else {
+      guard let aesNonce = try? AES.GCM.Nonce(data: nonceData) else {
         return nil
       }
-
-      guard let sealed = try? AES.GCM.seal(
-        buffer,
-        using: key,
-        nonce: aesNonce
-      ) else {
-        return nil
-      }
-
+      guard
+        let sealed = try? AES.GCM.seal(
+          buffer,
+          using: key,
+          nonce: aesNonce,
+          authenticating: additionalData
+        )
+      else { return nil }
       return (sealed.ciphertext, sealed.tag, nonceSuffix)
 
     case .aead_xchacha20_poly1305_rtpsize:
-      guard let chachaNonce = try? ChaChaPoly.Nonce(data: nonce) else {
+      guard let chachaNonce = try? ChaChaPoly.Nonce(data: nonceData) else {
         return nil
       }
-
-      guard let sealed = try? ChaChaPoly.seal(
-        buffer,
-        using: key,
-        nonce: chachaNonce
-      ) else {
-        return nil
-      }
-
+      guard
+        let sealed = try? ChaChaPoly.seal(
+          buffer,
+          using: key,
+          nonce: chachaNonce
+        )
+      else { return nil }
       return (sealed.ciphertext, sealed.tag, nonceSuffix)
 
     default:

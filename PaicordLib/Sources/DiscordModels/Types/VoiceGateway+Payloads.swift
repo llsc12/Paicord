@@ -473,32 +473,32 @@ extension VoiceGateway {
   }
 
   public struct DavePrepareTransition: Sendable, Codable {
-    public var transitionId: UInt16
-    public var protocolVersion: UInt16
+    public var transition_id: UInt16
+    public var protocol_version: UInt16
   }
 
   public struct DaveCommitTransition: Sendable, Codable {
-    public var transitionId: UInt16
+    public var transition_id: UInt16
   }
 
   public struct DavePrepareEpoch: Sendable, Codable {
     public var epoch: UInt32
-    public var protocolVersion: UInt16
+    public var protocol_version: UInt16
   }
 
   public struct DaveTransitionReady: Sendable, Codable {
-    public init(transitionId: UInt16) {
-      self.transitionId = transitionId
+    public init(transition_id: UInt16) {
+      self.transition_id = transition_id
     }
 
-    public var transitionId: UInt16
+    public var transition_id: UInt16
   }
 
   public struct DaveMLSInvalidCommitWelcome: Sendable, Codable {
-    public init(transitionId: UInt16) {
-      self.transitionId = transitionId
+    public init(transition_id: UInt16) {
+      self.transition_id = transition_id
     }
 
-    public var transitionId: UInt16
+    public var transition_id: UInt16
   }
 }

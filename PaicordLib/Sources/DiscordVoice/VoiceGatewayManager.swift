@@ -151,11 +151,7 @@ public actor VoiceGatewayManager {
   }
 
   private let outgoingOpusChannel = AsyncChannel<Data>()
-  private let incomingOpusChannel = AsyncChannel<Data>()
-
-  public var incomingOpusPackets: AsyncChannel<Data> {
-    incomingOpusChannel
-  }
+  public let incomingOpusChannel = AsyncChannel<Data>()
 
   //MARK: Send queue
 
@@ -390,15 +386,15 @@ public actor VoiceGatewayManager {
       self.listen(description: payload)
       self.speak(description: payload)
 
-//      self.send(
-//        message: .init(
-//          payload: .init(
-//            opcode: .voiceBackendVersion,
-//            data: .voiceBackendVersion(.init()),
-//          ),
-//          opcode: .text
-//        )
-//      )
+      self.send(
+        message: .init(
+          payload: .init(
+            opcode: .voiceBackendVersion,
+            data: .voiceBackendVersion(.init()),
+          ),
+          opcode: .text
+        )
+      )
     case .speaking(let payload):
       self.knownSSRCs[payload.ssrc] = payload.user_id
     case .clientConnect(let payload):
@@ -409,15 +405,15 @@ public actor VoiceGatewayManager {
       await self.dave.removeUser(userId: payload.user_id.rawValue)
     case .davePrepareTransition(let payload):
       await self.dave.prepareTransition(
-        transitionId: payload.transitionId,
-        protocolVersion: payload.protocolVersion
+        transitionId: payload.transition_id,
+        protocolVersion: payload.protocol_version
       )
     case .daveExecuteTransition(let payload):
-      await self.dave.executeTransition(transitionId: payload.transitionId)
+      await self.dave.executeTransition(transitionId: payload.transition_id)
     case .davePrepareEpoch(let payload):
       await self.dave.prepareEpoch(
         epoch: String(payload.epoch),
-        protocolVersion: payload.protocolVersion
+        protocolVersion: payload.protocol_version
       )
     case .mlsExternalSender(let data):
       await self.dave.mlsExternalSenderPackage(externalSenderPackage: data)
@@ -543,10 +539,13 @@ public actor VoiceGatewayManager {
         self.udpConnectionTask?.cancel()
       }
 
-      for try await data in await udpConnection.inboundStream {
+      print("[VoiceGW] Started listening for voice data packets")
+      for await data in udpConnection.audioStream {
         guard let packet = RTPPacket(rawValue: data) else {
+          print("[VoiceGW] Packet decode failed")
           continue
         }
+        print("[VoiceGW] Voice data packet received")
 
         await self.processIncomingVoicePacket(
           packet,
@@ -578,6 +577,24 @@ public actor VoiceGatewayManager {
       let clock = ContinuousClock()
       let interval: Duration = .milliseconds(20)
 
+      let key = SymmetricKey(data: description.secret_key)
+
+      let silenceTailCount = 5
+      var silenceFramesRemaining = 0
+
+      for _ in 1...3 {
+        await sendSilence(
+          sequence: sequence,
+          timestamp: timestamp,
+          ssrc: .init(audioSSRC),
+          mode: mode,
+          key: key
+        )
+        timestamp &+= 960
+        sequence &+= 1
+        try? await clock.sleep(for: interval)
+      }
+
       while !Task.isCancelled {
         let start = clock.now
 
@@ -588,20 +605,17 @@ public actor VoiceGatewayManager {
           frame = pendingOpusFrames.removeFirst()
         }
 
-        if frame != nil, let payload = self.nextSpeakingPayload {
-          // we're going to start talking, send any pending speaking payloads first.
-          self.send(
-            message: .init(
-              payload: .init(opcode: .speaking, data: .speaking(payload)),
-              opcode: .text
-            )
-          )
-          self.nextSpeakingPayload = nil
-        }
-
-        let key = SymmetricKey(data: description.secret_key)
-
         if let frame {
+          if let payload = self.nextSpeakingPayload {
+            self.send(
+              message: .init(
+                payload: .init(opcode: .speaking, data: .speaking(payload)),
+                opcode: .text
+              )
+            )
+            self.nextSpeakingPayload = nil
+          }
+
           await sendPacket(
             frame: frame,
             sequence: sequence,
@@ -610,7 +624,9 @@ public actor VoiceGatewayManager {
             mode: mode,
             key: key
           )
-        } else {
+          silenceFramesRemaining = silenceTailCount
+
+        } else if silenceFramesRemaining > 0 {
           await sendSilence(
             sequence: sequence,
             timestamp: timestamp,
@@ -618,11 +634,35 @@ public actor VoiceGatewayManager {
             mode: mode,
             key: key
           )
+          silenceFramesRemaining -= 1
+
+          if silenceFramesRemaining == 0 {
+            let ssrc = audioSSRC
+            self.send(
+              message: .init(
+                payload: .init(
+                  opcode: .speaking,
+                  data: .speaking(.init(speaking: [], ssrc: ssrc, delay: 0))
+                ),
+                opcode: .text
+              )
+            )
+            self.nextSpeakingPayload = .init(
+              speaking: [.voice],
+              ssrc: ssrc,
+              delay: 0
+            )
+          }
+
+        } else {
+          timestamp &+= 960
+          sequence &+= 1
+          try? await clock.sleep(until: start + interval)
+          continue
         }
 
         timestamp &+= 960
         sequence &+= 1
-
         try? await clock.sleep(until: start + interval)
       }
     }
@@ -668,58 +708,61 @@ public actor VoiceGatewayManager {
     mode: VoiceGateway.EncryptionMode,
     key: SymmetricKey
   ) async {
-
-    guard let udpConnection = self.udpConnection else {
-      return
-    }
-
-    guard
-      let encrypted = mode.encrypt(
-        buffer: frame,
-        using: key
-      )
-    else {
-      logger.error("Voice encryption failed")
-      return
-    }
+    guard let udpConnection = self.udpConnection else { return }
 
     let headerPacket = RTPPacket(
       payloadType: .dynamic(.init(VoiceGateway.Codec.opusCodec.payload_type)),
       sequence: sequence,
       timestamp: timestamp,
       ssrc: ssrc,
-      payload: ByteBuffer()  // empty for now
+      payload: ByteBuffer()
     )
-
     var headerBuffer = headerPacket.rawValue
-
     guard let headerBytes = headerBuffer.readBytes(length: 12) else {
       logger.error("Failed to extract RTP header")
       return
     }
+    let headerData = Data(headerBytes)
+
+    let daveEncrypted: Data
+    do {
+      daveEncrypted = try await self.dave.encrypt(
+        ssrc: ssrc,
+        data: frame,
+        mediaType: .audio
+      )
+    } catch {
+      logger.error(
+        "DAVE encryption failed",
+        metadata: ["error": .string(String(reflecting: error))]
+      )
+      return
+    }
+    
+    guard
+      let encrypted = mode.encrypt(
+        buffer: daveEncrypted,
+        using: key,
+        additionalData: headerData,
+        sequence: .init(sequence)
+      )
+    else {
+      logger.error("Symmetric voice encryption failed")
+      return
+    }
 
     var packet = ByteBuffer()
-
     packet.writeBytes(headerBytes)
     packet.writeBytes(encrypted.ciphertext)
     packet.writeBytes(encrypted.tag)
     packet.writeBytes(encrypted.nonceSuffix)
 
-    // dave encrypt
-
     do {
-      let daveEncrypted = try await self.dave.encrypt(
-        ssrc: ssrc,
-        data: .init(buffer: packet, byteTransferStrategy: .noCopy),
-        mediaType: .audio
-      )
-      try await udpConnection.send(buffer: .init(data: daveEncrypted))
+      try await udpConnection.send(buffer: packet)
     } catch {
       logger.error(
-        "Failed to send voice packet",
-        metadata: [
-          "error": .string(String(reflecting: error))
-        ]
+        "Failed to send UDP voice packet",
+        metadata: ["error": .string(String(reflecting: error))]
       )
     }
   }
@@ -785,9 +828,10 @@ public actor VoiceGatewayManager {
 
     await incomingOpusChannel.send(data)
   }
-
   public func sendOpusFrame(_ frame: Data) {
-
+    Task {
+      await outgoingOpusChannel.send(frame)
+    }
   }
 
   // MARK: - Gateway actions
@@ -1460,7 +1504,7 @@ extension VoiceGatewayManager: DaveSessionDelegate {
   public func mlsInvalidCommitWelcome(transitionId: UInt16) async {
     let event = VoiceGateway.Event(
       opcode: .mlsInvalidCommitWelcome,
-      data: .mlsInvalidCommitWelcome(.init(transitionId: transitionId))
+      data: .mlsInvalidCommitWelcome(.init(transition_id: transitionId))
     )
     self.send(
       message: .init(
@@ -1473,7 +1517,7 @@ extension VoiceGatewayManager: DaveSessionDelegate {
   public func readyForTransition(transitionId: UInt16) async {
     let event = VoiceGateway.Event(
       opcode: .daveTransitionReady,
-      data: .daveTransitionReady(.init(transitionId: transitionId))
+      data: .daveTransitionReady(.init(transition_id: transitionId))
     )
     self.send(
       message: .init(
