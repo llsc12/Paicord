@@ -402,6 +402,7 @@ public actor VoiceGatewayManager {
         await self.dave.addUser(userId: id.rawValue)
       }
     case .clientDisconnect(let payload):
+      self.knownSSRCs = self.knownSSRCs.filter { $0.value != payload.user_id }
       await self.dave.removeUser(userId: payload.user_id.rawValue)
     case .davePrepareTransition(let payload):
       await self.dave.prepareTransition(
@@ -506,54 +507,6 @@ public actor VoiceGatewayManager {
   }
   private func storeConnection(_ connection: VoiceConnection) {
     self.udpConnection = connection
-  }
-
-  /// Start listening for incoming audio packets on the UDP connection.
-  private func listen(
-    description: VoiceGateway.SessionDescription,
-  ) {
-    guard let encryption = description.mode,
-      VoiceGateway.EncryptionMode.supportedCases.contains(encryption)
-    else {
-      logger.error(
-        "Unsupported crypto mode: \(description.mode?.rawValue ?? "nil")"
-      )
-      return
-    }
-
-    let key = SymmetricKey(data: description.secret_key)
-
-    self.udpListeningTask = Task {
-      guard let udpConnection = self.udpConnection else {
-        self.logger.error(
-          "UDP connection not established when trying to listen"
-        )
-        return
-      }
-
-      defer {
-        // When the UDP listening ends, cancel the UDP connection task
-        self.logger.debug(
-          "UDP listening task ending, cancelling UDP connection task"
-        )
-        self.udpConnectionTask?.cancel()
-      }
-
-      print("[VoiceGW] Started listening for voice data packets")
-      for await data in udpConnection.audioStream {
-        guard let packet = RTPPacket(rawValue: data) else {
-          print("[VoiceGW] Packet decode failed")
-          continue
-        }
-        print("[VoiceGW] Voice data packet received")
-
-        await self.processIncomingVoicePacket(
-          packet,
-          mode: encryption,
-          key: key
-        )
-      }
-    }
   }
 
   /// Writes Opus data out through UDP.
@@ -738,7 +691,7 @@ public actor VoiceGatewayManager {
       )
       return
     }
-    
+
     guard
       let encrypted = mode.encrypt(
         buffer: daveEncrypted,
@@ -767,11 +720,68 @@ public actor VoiceGatewayManager {
     }
   }
 
+  public func sendOpusFrame(_ frame: Data) {
+    Task {
+      await outgoingOpusChannel.send(frame)
+    }
+  }
+
+  /// Start listening for incoming audio packets on the UDP connection.
+  private func listen(
+    description: VoiceGateway.SessionDescription,
+  ) {
+    guard let encryption = description.mode,
+      VoiceGateway.EncryptionMode.supportedCases.contains(encryption)
+    else {
+      logger.error(
+        "Unsupported crypto mode: \(description.mode?.rawValue ?? "nil")"
+      )
+      return
+    }
+
+    let key = SymmetricKey(data: description.secret_key)
+
+    self.udpListeningTask = Task {
+      guard let udpConnection = self.udpConnection else {
+        self.logger.error(
+          "UDP connection not established when trying to listen"
+        )
+        return
+      }
+
+      defer {
+        // When the UDP listening ends, cancel the UDP connection task
+        self.logger.debug(
+          "UDP listening task ending, cancelling UDP connection task"
+        )
+        self.udpConnectionTask?.cancel()
+      }
+
+      print("[VoiceGW] Started listening for voice data packets")
+      for await data in udpConnection.audioStream {
+        if let packet = RTPPacket(rawValue: data) {
+          print("[VoiceGW] Voice data packet received")
+          print(packet)
+          await self.processIncomingVoicePacket(
+            packet,
+            rawPayload: data,
+            mode: encryption,
+            key: key
+          )
+        } else {
+          print("[VoiceGW] Failed to parse incoming packet.")
+          continue
+        }
+      }
+    }
+  }
+
   /// Process an incoming voice packet. Voice packets are RTP packets that are encrypted
   /// using the selected crypto mode and key, E2EE encrypted using Dave, and then encoded
   /// using OPUS.
   private func processIncomingVoicePacket(
     _ packet: RTPPacket,
+    rawPayload: ByteBuffer,
     mode: VoiceGateway.EncryptionMode,
     key: SymmetricKey
   ) async {
@@ -792,14 +802,15 @@ public actor VoiceGatewayManager {
 
       extensionLength = length
     }
-
+    print("[VoiceGW] Raw payload for decryption:", rawPayload)
     guard
       var data = mode.decrypt(
-        buffer: packet.payload,
+        fullPacket: .init(buffer: rawPayload, byteTransferStrategy: .noCopy),
         with: key,
+        hasExtension: packet.extension
       )
     else {
-      return
+      return print("[VoiceGW] Failed to decrypt RTP packet")
     }
 
     if let extensionLength {
@@ -827,11 +838,6 @@ public actor VoiceGatewayManager {
     }
 
     await incomingOpusChannel.send(data)
-  }
-  public func sendOpusFrame(_ frame: Data) {
-    Task {
-      await outgoingOpusChannel.send(frame)
-    }
   }
 
   // MARK: - Gateway actions

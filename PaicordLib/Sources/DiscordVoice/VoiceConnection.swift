@@ -158,13 +158,12 @@ internal actor VoiceConnection {
       interval: Self.keepaliveInterval,
       clock: .continuous
     ) {
-      self.keepaliveCounter += 1
-
       var buffer: ByteBuffer = ByteBufferAllocator().buffer(capacity: 8)
       buffer.writeInteger(UInt16(0x1337), endianness: .big)
       buffer.writeInteger(UInt16(0xCAFE), endianness: .big)
       buffer.writeInteger(keepaliveCounter, endianness: .little)
       try await send(buffer: buffer)
+      self.keepaliveCounter += 1
     }
   }
 }

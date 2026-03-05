@@ -22,55 +22,52 @@ extension VoiceGateway.EncryptionMode {
   }
 
   func decrypt(
-    buffer: consuming ByteBuffer,
+    fullPacket: Data,
     with key: SymmetricKey,
+    hasExtension: Bool
   ) -> Data? {
-    guard
-      let rtpNonce = buffer.readBytes(length: rtpNonceLength),
-      let ciphertext = buffer.readData(
-        length: buffer.readableBytes - tagLength
-      ),
-      let tag = buffer.readData(length: tagLength)
-    else {
-      return nil
-    }
+    let aadSize = hasExtension ? 16 : 12
+    let rtpHeaderAAD = fullPacket.prefix(aadSize)
 
-    var nonce = Data(repeating: 0, count: nonceLength)
-    nonce.replaceSubrange(
-      nonce.count - rtpNonce.count..<nonce.count,
-      with: rtpNonce
-    )
+    let rtpNonceSuffix = fullPacket.suffix(4)
+    let tagSize = 16
+
+    let ciphertextStart = aadSize
+    let ciphertextEnd = fullPacket.count - tagSize - 4
+
+    guard ciphertextEnd > ciphertextStart else { return nil }
+
+    let ciphertext = fullPacket[ciphertextStart..<ciphertextEnd]
+    let tag = fullPacket[ciphertextEnd..<(ciphertextEnd + tagSize)]
+
+    var nonceData = Data(repeating: 0, count: self.nonceLength)
+    nonceData.replaceSubrange(0..<4, with: rtpNonceSuffix)
 
     switch self {
     case .aead_aes256_gcm_rtpsize:
-      guard
-        let nonce = try? AES.GCM.Nonce(data: nonce),
+      guard let nonce = try? AES.GCM.Nonce(data: nonceData),
         let box = try? AES.GCM.SealedBox(
           nonce: nonce,
           ciphertext: ciphertext,
           tag: tag
         )
-      else {
-        return nil
-      }
-      return try? AES.GCM.open(box, using: key)
+      else { return nil }
+
+      return try? AES.GCM.open(box, using: key, authenticating: rtpHeaderAAD)
 
     case .aead_xchacha20_poly1305_rtpsize:
-      guard
-        let nonce = try? ChaChaPoly.Nonce(data: nonce),
+      guard let nonce = try? ChaChaPoly.Nonce(data: nonceData),
         let box = try? ChaChaPoly.SealedBox(
           nonce: nonce,
           ciphertext: ciphertext,
           tag: tag
         )
-      else {
-        return nil
-      }
-      return try? ChaChaPoly.open(box, using: key)
+      else { return nil }
+
+      return try? ChaChaPoly.open(box, using: key, authenticating: rtpHeaderAAD)
+
     default:
-      fatalError(
-        "[Voice Crypto] Unsupported deprecated encryption mode: \(self)"
-      )
+      return nil
     }
   }
 
