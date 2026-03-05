@@ -760,8 +760,6 @@ public actor VoiceGatewayManager {
       print("[VoiceGW] Started listening for voice data packets")
       for await data in udpConnection.audioStream {
         if let packet = RTPPacket(rawValue: data) {
-          print("[VoiceGW] Voice data packet received")
-          print(packet)
           await self.processIncomingVoicePacket(
             packet,
             rawPayload: data,
@@ -769,7 +767,6 @@ public actor VoiceGatewayManager {
             key: key
           )
         } else {
-          print("[VoiceGW] Failed to parse incoming packet.")
           continue
         }
       }
@@ -802,7 +799,6 @@ public actor VoiceGatewayManager {
 
       extensionLength = length
     }
-    print("[VoiceGW] Raw payload for decryption:", rawPayload)
     guard
       var data = mode.decrypt(
         fullPacket: .init(buffer: rawPayload, byteTransferStrategy: .noCopy),

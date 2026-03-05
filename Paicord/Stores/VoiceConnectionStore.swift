@@ -252,6 +252,7 @@ final class VoiceConnectionStore: DiscordDataStore {
     channels: 2,
     interleaved: false
   )!
+
   @ObservationIgnored
   private let opusEncoder: Opus.Encoder
   @ObservationIgnored
@@ -279,9 +280,7 @@ final class VoiceConnectionStore: DiscordDataStore {
     self.audioEngineCleanup()
 
     Task { @MainActor in
-      if !audioEngine.attachedNodes.contains(playerNode) {
-        audioEngine.attach(playerNode)
-      }
+      audioEngine.attach(playerNode)
 
       audioEngine.connect(
         playerNode,
@@ -289,42 +288,51 @@ final class VoiceConnectionStore: DiscordDataStore {
         format: Self.pcmFormat
       )
 
-      audioEngine.prepare()
       do {
+        audioEngine.prepare()
         try audioEngine.start()
         playerNode.play()
       } catch {
-        print("[Voice] Failed to start audio engine: \(error)")
+        print("[Voice] Failed to start audio engine:", error)
         return
       }
+    }
 
-      print("[Voice] Audio engine started")
-      print("[Voice] Player node format: \(Self.pcmFormat)")
-      print(
-        "[Voice] Engine output format: \(audioEngine.outputNode.outputFormat(forBus: 0))"
-      )
+    guard let voiceGateway = self.voiceGateway else { return }
 
-      guard let voiceGateway = self.voiceGateway else {
-        print("[Voice] No voice gateway when starting incoming audio task")
-        return
-      }
+    incomingAudioTask = Task.detached(priority: .userInitiated) { [weak self] in
+      guard let self else { return }
 
-      incomingAudioTask = Task { [weak self] in
-        for await opusFrame in await voiceGateway.incomingOpusChannel {
-          guard let self else { break }
-          if Task.isCancelled { break }
+      for await opusFrame in await voiceGateway.incomingOpusChannel {
+        if Task.isCancelled { break }
+        do {
+          let decoded = try self.opusDecoder.decode(opusFrame)
+          // manually de-interleave
+          guard
+            let converted = AVAudioPCMBuffer(
+              pcmFormat: Self.pcmFormat,
+              frameCapacity: decoded.frameLength
+            )
+          else { continue }
+          converted.frameLength = decoded.frameLength
 
-          do {
-            let decoded = try self.opusDecoder.decode(opusFrame)
-            self.playerNode.scheduleBuffer(decoded, completionHandler: nil)
-          } catch {
-            print("[Voice OPUS] Frame decode error: \(error)")
+          let src = decoded.floatChannelData![0]
+          let dstL = converted.floatChannelData![0]
+          let dstR = converted.floatChannelData![1]
+          for i in 0..<Int(decoded.frameLength) {
+            dstL[i] = src[i * 2]
+            dstR[i] = src[i * 2 + 1]
           }
+
+          await MainActor.run {
+            self.playerNode.scheduleBuffer(converted)
+          }
+        } catch {
+          print("[Voice OPUS] Frame decode error:", error)
         }
       }
     }
   }
-
   private func audioEngineCleanup() {
     incomingAudioTask?.cancel()
     incomingAudioTask = nil
