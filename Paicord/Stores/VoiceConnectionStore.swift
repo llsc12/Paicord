@@ -19,10 +19,6 @@ final class VoiceConnectionStore: DiscordDataStore {
       format: Self.opusFormat,
       application: .voip
     )
-    self.opusDecoder = try! Opus.Decoder(
-      format: Self.opusFormat,
-      application: .voip
-    )
   }
 
   var gateway: GatewayStore?
@@ -34,9 +30,15 @@ final class VoiceConnectionStore: DiscordDataStore {
         audioEngineSetup()
       } else {
         self.voiceEventTask?.cancel()
+        self.voiceErrorEventTask?.cancel()
         // shutdown audio engine and release resources, also set status to stopped
         voiceStatus = .stopped
         audioEngineCleanup()
+
+        // clear up state, reinit encoder.
+        try? self.opusEncoder.reset()
+        self.usersSpeakingState.removeAll()
+        self.knownSSRCs.removeAll()
       }
     }
   }
@@ -70,9 +72,9 @@ final class VoiceConnectionStore: DiscordDataStore {
       for await event in await voiceGateway.events {
         switch event.data {
         case .clientDisconnect(let payload):
-          handleClientDisconnect(payload)
+          await handleClientDisconnect(payload)
         case .speaking(let payload):
-          
+          await handleSpeaking(payload)
         default: break
         }
       }
@@ -93,15 +95,18 @@ final class VoiceConnectionStore: DiscordDataStore {
   private var isVideoEnabled: Bool = false
   private var preferredRegion: String?
   private var flags: IntBitField<VoiceStateUpdate.Flags> = []
-  
+
   // if in a vc, this contains our speaking state and other ppl's speaking state.
-  private var usersSpeakingState: [UserSnowflake: IntBitField<VoiceGateway.Speaking.Flag>] = [:]
+  var usersSpeakingState:
+    [UserSnowflake: IntBitField<VoiceGateway.Speaking.Flag>] = [:]
+  private var knownSSRCs: [UInt: UserSnowflake] = [:]
 
   private var voiceStatus: GatewayState = .stopped {
     didSet {
       print("[Voice] Voice connection status changed to \(voiceStatus)")
     }
   }
+
   // MARK: - Public methods
 
   func updateVoiceConnection(_ update: VoiceConnectionUpdate) async {
@@ -238,33 +243,37 @@ final class VoiceConnectionStore: DiscordDataStore {
       await self.voiceGateway?.connect()
     }
   }
-  
-  private func handleClientDisconnect(_ payload: VoiceGateway.ClientDisconnect) {
+
+  private func handleClientDisconnect(_ payload: VoiceGateway.ClientDisconnect)
+    async
+  {
     // someone other than us left the voice channel.
+    let id = payload.user_id
+    let ssrc = self.knownSSRCs.first(where: { $0.value == id })?.key
+    if let ssrc {
+      await removeIncomingStreamIfPresent(ssrc: .init(ssrc))
+    }
   }
-  
-  private func handleSpeaking(_ payload: VoiceGateway.Speaking) {
+
+  private func handleSpeaking(_ payload: VoiceGateway.Speaking) async {
     // someone started or stopped speaking, we can use this to show speaking indicators.
     let ssrc = payload.ssrc
-    
+
     if let id = payload.user_id {
+      self.knownSSRCs[ssrc] = id
       self.usersSpeakingState[id] = payload.speaking
     }
-    
-    if payload.speaking.isEmpty {
-      print("[Voice] \(payload.user_id?.rawValue ?? "Unknown User") stopped speaking")
-    } else {
-      print(
-        "[Voice] \(payload.user_id?.rawValue ?? "Unknown User") started speaking"
-      )
-    }
+    await ensureIncomingStreamExists(ssrc: .init(ssrc))
   }
 
   func cancelEventHandling() {
     // overrides default impl of protocol
     eventTask?.cancel()
     eventTask = nil
-    Task { await voiceGateway?.disconnect() }
+    Task {
+      await voiceGateway?.disconnect()
+      voiceGateway = nil
+    }
   }
 
   // MARK: - Audio Engine implementation
@@ -282,8 +291,7 @@ final class VoiceConnectionStore: DiscordDataStore {
 
   @ObservationIgnored
   private let opusEncoder: Opus.Encoder
-  @ObservationIgnored
-  private let opusDecoder: Opus.Decoder
+  // NOTE: decoder is now created per-SSRC
 
   @ObservationIgnored
   private let audioEngine = AVAudioEngine()
@@ -296,29 +304,44 @@ final class VoiceConnectionStore: DiscordDataStore {
     return audioEngine.outputNode
   }()
 
-  // audio player node for playing incoming audio frames
+  // one incoming audio stream per user's audio ssrc to mix.
+  private final class IncomingStream {
+    let ssrc: UInt32
+    let decoder: Opus.Decoder
+    let playerNode: AVAudioPlayerNode
+
+    init(ssrc: UInt32) {
+      self.ssrc = ssrc
+      // safe afaik bc all it throws for is invalid format
+      self.decoder = try! Opus.Decoder(
+        format: VoiceConnectionStore.opusFormat,
+        application: .voip
+      )
+      self.playerNode = AVAudioPlayerNode()
+    }
+  }
+
   @ObservationIgnored
-  private let playerNode: AVAudioPlayerNode = AVAudioPlayerNode()
+  private var incomingStreamsBySSRC: [UInt32: IncomingStream] = [:]
 
   @ObservationIgnored
   private var incomingAudioTask: Task<Void, Never>? = nil
+
+  @ObservationIgnored
+  private let dummyPlayerNode = AVAudioPlayerNode()
+
+  @ObservationIgnored
+  private var dummyNodeAttached: Bool = false
 
   private func audioEngineSetup() {
     self.audioEngineCleanup()
 
     Task { @MainActor in
-      audioEngine.attach(playerNode)
-
-      audioEngine.connect(
-        playerNode,
-        to: audioEngine.mainMixerNode,
-        format: Self.pcmFormat
-      )
+      self.ensureDummyNodeAttached()
 
       do {
         audioEngine.prepare()
         try audioEngine.start()
-        playerNode.play()
       } catch {
         print("[Voice] Failed to start audio engine:", error)
         return
@@ -329,15 +352,25 @@ final class VoiceConnectionStore: DiscordDataStore {
 
     incomingAudioTask = Task.detached(priority: .userInitiated) { [weak self] in
       guard let self else { return }
-      let player = self.playerNode
 
       for await rtpPacket in await voiceGateway.incomingAudioChannel {
         if Task.isCancelled { break }
+
+        let ssrc = rtpPacket.ssrc
+        self.ensureIncomingStreamExists(ssrc: ssrc)
+
+        guard
+          let stream = self.incomingStreamsBySSRC[ssrc]
+        else {
+          continue
+        }
+
         do {
           let opusFrame = rtpPacket.payload
-          let decoded = try self.opusDecoder.decode(
+          let decoded = try stream.decoder.decode(
             .init(buffer: opusFrame, byteTransferStrategy: .noCopy)
           )
+
           // manually de-interleave.
           guard
             let converted = AVAudioPCMBuffer(
@@ -356,25 +389,81 @@ final class VoiceConnectionStore: DiscordDataStore {
           }
 
           Task {
-           await player.scheduleBuffer(converted)
+            await stream.playerNode.scheduleBuffer(converted)
           }
         } catch {
-          print("[Voice OPUS] Frame decode error:", error)
+          print("[Voice OPUS] Frame decode error for ssrc \(ssrc):", error)
         }
       }
     }
   }
+
+  private func ensureDummyNodeAttached() {
+    guard !dummyNodeAttached else { return }
+
+    audioEngine.attach(dummyPlayerNode)
+    audioEngine.connect(
+      dummyPlayerNode,
+      to: audioEngine.mainMixerNode,
+      format: Self.pcmFormat
+    )
+
+    dummyNodeAttached = true
+  }
+
+  private func ensureIncomingStreamExists(ssrc: UInt32) {
+    if incomingStreamsBySSRC[ssrc] != nil { return }
+
+    let stream = IncomingStream(ssrc: ssrc)
+    incomingStreamsBySSRC[ssrc] = stream
+
+    audioEngine.attach(stream.playerNode)
+    audioEngine.connect(
+      stream.playerNode,
+      to: audioEngine.mainMixerNode,
+      format: Self.pcmFormat
+    )
+    stream.playerNode.play()
+
+    print("[Voice] Created incoming stream for ssrc \(ssrc)")
+  }
+
+  private func removeIncomingStreamIfPresent(ssrc: UInt32) {
+    guard let stream = incomingStreamsBySSRC.removeValue(forKey: ssrc) else {
+      return
+    }
+
+    stream.playerNode.stop()
+
+    if audioEngine.attachedNodes.contains(stream.playerNode) {
+      audioEngine.detach(stream.playerNode)
+    }
+
+    print("[Voice] Removed incoming stream for ssrc \(ssrc)")
+  }
+
   private func audioEngineCleanup() {
     incomingAudioTask?.cancel()
     incomingAudioTask = nil
 
     Task { @MainActor in
-      playerNode.stop()
+      for (ssrc, stream) in incomingStreamsBySSRC {
+        stream.playerNode.stop()
+        if audioEngine.attachedNodes.contains(stream.playerNode) {
+          audioEngine.detach(stream.playerNode)
+        }
+        print("[Voice] Removed incoming stream for ssrc=\(ssrc) (cleanup)")
+      }
+      incomingStreamsBySSRC.removeAll()
+
+      dummyPlayerNode.stop()
+      if audioEngine.attachedNodes.contains(dummyPlayerNode) {
+        audioEngine.detach(dummyPlayerNode)
+      }
+      dummyNodeAttached = false
+
       audioEngine.stop()
       audioEngine.reset()
-      if audioEngine.attachedNodes.contains(playerNode) {
-        audioEngine.detach(playerNode)
-      }
       print("[Voice] Audio engine stopped")
     }
   }
