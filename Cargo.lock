@@ -5757,6 +5757,7 @@ dependencies = [
 [[package]]
 name = "swift-bridge"
 version = "0.1.59"
+source = "git+https://github.com/chinedufn/swift-bridge.git#e527dc7454bebbfab537d842990bf3a1672e676c"
 dependencies = [
  "once_cell",
  "swift-bridge-build",
@@ -5767,6 +5768,7 @@ dependencies = [
 [[package]]
 name = "swift-bridge-build"
 version = "0.1.59"
+source = "git+https://github.com/chinedufn/swift-bridge.git#e527dc7454bebbfab537d842990bf3a1672e676c"
 dependencies = [
  "proc-macro2",
  "swift-bridge-ir",
@@ -5777,6 +5779,7 @@ dependencies = [
 [[package]]
 name = "swift-bridge-ir"
 version = "0.1.59"
+source = "git+https://github.com/chinedufn/swift-bridge.git#e527dc7454bebbfab537d842990bf3a1672e676c"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -5786,6 +5789,7 @@ dependencies = [
 [[package]]
 name = "swift-bridge-macro"
 version = "0.1.59"
+source = "git+https://github.com/chinedufn/swift-bridge.git#e527dc7454bebbfab537d842990bf3a1672e676c"
 dependencies = [
  "proc-macro2",
  "quote",

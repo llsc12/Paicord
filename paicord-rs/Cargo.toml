@@ -4,14 +4,14 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-swift-bridge = { path = "/home/sarah/Documents/github/swift-bridge/", features = ["async"]}
-#swift-bridge = { git = "https://github.com/chinedufn/swift-bridge.git", features = ["async"] }
+#swift-bridge = { path = "/home/sarah/Documents/github/swift-bridge/", features = ["async"]}
+swift-bridge = { git = "https://github.com/chinedufn/swift-bridge.git", features = ["async"] }
 
 chrono = "*"
 
 [build-dependencies]
-swift-bridge-build = { path = "/home/sarah/Documents/github/swift-bridge/crates/swift-bridge-build" }
-#swift-bridge-build = { git = "https://github.com/chinedufn/swift-bridge.git" }
+#swift-bridge-build = { path = "/home/sarah/Documents/github/swift-bridge/crates/swift-bridge-build" }
+swift-bridge-build = { git = "https://github.com/chinedufn/swift-bridge.git" }
 pkg-config = "*"
 
 [dev-dependencies]
