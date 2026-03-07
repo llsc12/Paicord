@@ -17,90 +17,91 @@ export global ChannelStore {
 
     in-out property <DiscordChannel> current_channel;
 
-    //in-out property <[DiscordMessage]> messages;
+    in-out property <[DiscordMessage]> messages;
 
-    in-out property <[DiscordMessage]> messages: [
-        {
-            id: "0",
-            content: @markdown("Loading messages..."),
-            guild_id: "0",
-            channel_id: "0",
-            author: {
-                id: "0",
-                name: "Loading...",
-                avatar: {
-                    url: "bruh",
-                    image: @image-url("../images/paicord_icon.png"),
-                    loaded: true,
-                },
-                has_role_color: false,
-                role_color: Colors.aliceblue,
-            },
-            timestamp: "yesteday at 12:00 PM",
-            edited_timestamp: "",
-            referenced_message: {
-                id: "0",
-                channel_id: "0",
-                guild_id: "0",
-                author: {
-                    id: "0",
-                    name: "Loading...",
-                    avatar: {
-                        url: "bruh",
-                        image: @image-url("../images/paicord_icon.png"),
-                        loaded: true,
-                    },
-                    has_role_color: false,
-                    role_color: Colors.aliceblue,
-                },
-                content: @markdown("Loading..."),
-                timestamp: "yesteday at 12:00 PM",
-                edited_timestamp: "",
-             },
-            kind: DiscordMessageKind.Default,
-        },
-        {
-            id: "0",
-            content: @markdown("Loading messages..."),
-            guild_id: "0",
-            channel_id: "0",
-            author: {
-                id: "0",
-                name: "Loadingaaaaaa...",
-                avatar: {
-                    url: "bruh",
-                    image: @image-url("../images/paicord_icon.png"),
-                    loaded: true,
-                },
-                has_role_color: false,
-                role_color: Colors.aliceblue,
-            },
-            timestamp: "yesteday at 12:00 PM",
-            edited_timestamp: "",
-            referenced_message: {
-                id: "0",
-                channel_id: "0",
-                guild_id: "0",
-                author: {
-                    id: "0",
-                    name: "Loading...",
-                    avatar: {
-                        url: "bruh",
-                        image: @image-url("../images/paicord_icon.png"),
-                        loaded: true,
-                    },
-                    has_role_color: false,
-                    role_color: Colors.aliceblue,
-                },
-                content: @markdown("Loading..."),
-                timestamp: "yesteday at 12:00 PM",
-                edited_timestamp: "",
-             },
-            kind: DiscordMessageKind.Default,
-        }
-    ];
+    // in-out property <[DiscordMessage]> messages: [
+    //     {
+    //         id: "0",
+    //         content: @markdown("Loading messages..."),
+    //         guild_id: "0",
+    //         channel_id: "0",
+    //         author: {
+    //             id: "0",
+    //             name: "Loading...",
+    //             avatar: {
+    //                 url: "bruh",
+    //                 image: @image-url("../images/paicord_icon.png"),
+    //                 loaded: true,
+    //             },
+    //             has_role_color: false,
+    //             role_color: Colors.aliceblue,
+    //         },
+    //         timestamp: "yesteday at 12:00 PM",
+    //         edited_timestamp: "",
+    //         referenced_message: {
+    //             id: "0",
+    //             channel_id: "0",
+    //             guild_id: "0",
+    //             author: {
+    //                 id: "0",
+    //                 name: "Loading...",
+    //                 avatar: {
+    //                     url: "bruh",
+    //                     image: @image-url("../images/paicord_icon.png"),
+    //                     loaded: true,
+    //                 },
+    //                 has_role_color: false,
+    //                 role_color: Colors.aliceblue,
+    //             },
+    //             content: @markdown("Loading..."),
+    //             timestamp: "yesteday at 12:00 PM",
+    //             edited_timestamp: "",
+    //          },
+    //         kind: DiscordMessageKind.Default,
+    //     },
+    //     {
+    //         id: "0",
+    //         content: @markdown("Loading messages..."),
+    //         guild_id: "0",
+    //         channel_id: "0",
+    //         author: {
+    //             id: "0",
+    //             name: "Loadingaaaaaa...",
+    //             avatar: {
+    //                 url: "bruh",
+    //                 image: @image-url("../images/paicord_icon.png"),
+    //                 loaded: true,
+    //             },
+    //             has_role_color: false,
+    //             role_color: Colors.aliceblue,
+    //         },
+    //         timestamp: "yesteday at 12:00 PM",
+    //         edited_timestamp: "",
+    //         referenced_message: {
+    //             id: "0",
+    //             channel_id: "0",
+    //             guild_id: "0",
+    //             author: {
+    //                 id: "0",
+    //                 name: "Loading...",
+    //                 avatar: {
+    //                     url: "bruh",
+    //                     image: @image-url("../images/paicord_icon.png"),
+    //                     loaded: true,
+    //                 },
+    //                 has_role_color: false,
+    //                 role_color: Colors.aliceblue,
+    //             },
+    //             content: @markdown("Loading..."),
+    //             timestamp: "yesteday at 12:00 PM",
+    //             edited_timestamp: "",
+    //          },
+    //         kind: DiscordMessageKind.Default,
+    //     }
+    // ];
 
     callback select_channel(id: string);
+    callback send_message(content: string);
 
     public function select_channel_slint(channel: DiscordChannel) {
         self.current_channel = channel;

@@ -54,7 +54,7 @@ export component ChatView inherits Rectangle {
             height: 74px;
             key-pressed(event) => {
                 if event.text == Key.Return && !event.modifiers.shift {
-                    //CurrentGuildStore.send_message(self.text);
+                    ChannelStore.send_message(self.text);
                     self.text = "";
                     
                     accept

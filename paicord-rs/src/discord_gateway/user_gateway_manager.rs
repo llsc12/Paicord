@@ -46,6 +46,10 @@ impl UserGatewayManager {
         }
     }
 
+    pub async fn send_message(&self, channel: SnowflakeRust, content: String) {
+        self.inner.send_message(channel, content).await;
+    }
+
     pub async fn request_guild_members_chunk(&self, guild_id: SnowflakeRust, user_ids: &Vec<Snowflake>) {
         self.inner.request_guild_members_chunk(guild_id, user_ids.iter().map(|id| id.get_raw()).collect()).await;
     }

@@ -112,6 +112,16 @@ impl GatewayManager {
 
         user_gateway_manager.request_guild_members_chunk(guild_id.clone(), user_ids).await;
     }
+
+    async fn handle_send_message(&mut self, channel: Snowflake, content: String) -> anyhow::Result<()> {
+        let Some(user_gateway_manager) = &self.user_gateway_manager else {
+            bail!("No user gateway manager available for sending message");
+        };
+
+        user_gateway_manager.send_message(channel, content).await;
+
+        Ok(())
+    }
 }
 
 impl PaicordManager for GatewayManager {
@@ -141,6 +151,10 @@ impl PaicordManager for GatewayManager {
 
             PaicordCommand::RequestGuildMembersChunk { guild_id, user_ids } => {
                 self.request_guild_members_chunk(guild_id, user_ids).await;
+            }
+
+            PaicordCommand::SendMessage { channel, content } => {
+                self.handle_send_message(*channel, content.clone()).await?;
             }
 
             PaicordCommand::Panic(_) => {

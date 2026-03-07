@@ -481,6 +481,8 @@ pub(crate) mod ffi {
             user_ids: Vec<u64>,
         );
 
+        async fn send_message(self: &UserGatewayManager, channel: SnowflakeRust, content: String);
+
         // Remote Auth Gateway Manager
         type RemoteAuthGatewayManager;
         fn remote_auth_gateway_manager_new() -> RemoteAuthGatewayManager;

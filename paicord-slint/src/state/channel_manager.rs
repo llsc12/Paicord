@@ -6,7 +6,11 @@ use std::{
 use anyhow::bail;
 use paicord_rs::{
     discord_models::types::{
-        channel::DiscordChannel, gateway::{GatewayEvent, GatewayPayload, GuildMembersChunkPayload, PartialMessage}, guild::{Guild, PartialMember}, permission::Role, snowflake::Snowflake
+        channel::DiscordChannel,
+        gateway::{GatewayEvent, GatewayPayload, GuildMembersChunkPayload, PartialMessage},
+        guild::{Guild, PartialMember},
+        permission::Role,
+        snowflake::Snowflake,
     },
     markdown::DiscordMarkdownParser,
 };
@@ -17,7 +21,8 @@ use crate::{
     app::{ChannelStore, DiscordMessageSlint, MainWindow, PaicordCommand},
     images::ImageMangler,
     models::{channel_list_model::ChannelListModel, message_list_model::MessageListModel},
-    state::PaicordManager, utils,
+    state::PaicordManager,
+    utils,
 };
 
 pub struct ChannelManager {
@@ -57,11 +62,16 @@ impl ChannelManager {
         let command_sender = manager.command_sender.clone();
 
         manager.ui.upgrade_in_event_loop(move |ui| {
-            ui.global::<ChannelStore>()
-                .on_select_channel(move |channel_id| {
-                    let _ = command_sender
-                        .try_send(PaicordCommand::SelectChannel(channel_id.to_string().into()));
-                });
+            let channel_store = ui.global::<ChannelStore>();
+            let c1 = command_sender.clone();
+            channel_store.on_select_channel(move |channel_id| {
+                let _ = c1.try_send(PaicordCommand::SelectChannel(channel_id.to_string().into()));
+            });
+
+            let c2 = command_sender.clone();
+            channel_store.on_send_message(move |content| {
+                let _ = c2.try_send(PaicordCommand::RequestSendMessage(content.to_string()));
+            });
         })?;
 
         let ui = manager.ui.clone();
@@ -128,7 +138,8 @@ impl ChannelManager {
             return Ok(());
         }
 
-        if let Some(message) = self.messages
+        if let Some(message) = self
+            .messages
             .iter_mut()
             .find(|m| m.id == partial_message.id)
         {
@@ -159,7 +170,11 @@ impl ChannelManager {
         Ok(())
     }
 
-    async fn handle_list_messages(&mut self, messages: &Vec<PartialMessage>, image_mangler: &ImageMangler) -> anyhow::Result<()> {
+    async fn handle_list_messages(
+        &mut self,
+        messages: &Vec<PartialMessage>,
+        image_mangler: &ImageMangler,
+    ) -> anyhow::Result<()> {
         let Some(current_channel) = &self.current_channel else {
             bail!("No channel selected");
         };
@@ -217,7 +232,8 @@ impl ChannelManager {
                 .iter()
                 .filter(|m| m.author.as_ref().map(|a| a.id) == Some(user.id))
             {
-                self.add_message(message, &Some(member.clone()), guild_roles).await?;
+                self.add_message(message, &Some(member.clone()), guild_roles)
+                    .await?;
             }
         }
 
@@ -232,6 +248,19 @@ impl ChannelManager {
         match data {
             _ => {}
         }
+
+        Ok(())
+    }
+
+    async fn handle_request_send_message(&mut self, content: &String) -> anyhow::Result<()> {
+        let Some(current_channel) = &self.current_channel else {
+            return Ok(());
+        };
+
+        self.command_sender.try_send(PaicordCommand::SendMessage {
+            channel: current_channel.id,
+            content: content.to_owned(),
+        })?;
 
         Ok(())
     }
@@ -263,13 +292,22 @@ impl PaicordManager for ChannelManager {
             PaicordCommand::MessageCreated {
                 partial_message,
                 stored_member,
-                guild_roles
+                guild_roles,
             } => {
-                self.add_message(partial_message, stored_member, guild_roles).await?;
+                self.add_message(partial_message, stored_member, guild_roles)
+                    .await?;
             }
 
-            PaicordCommand::GuildMembersChunk { members, guild_roles } => {
-                self.handle_guild_members_chunk(members, guild_roles).await?;
+            PaicordCommand::GuildMembersChunk {
+                members,
+                guild_roles,
+            } => {
+                self.handle_guild_members_chunk(members, guild_roles)
+                    .await?;
+            }
+
+            PaicordCommand::RequestSendMessage(content) => {
+                self.handle_request_send_message(content).await?;
             }
             _ => {}
         }

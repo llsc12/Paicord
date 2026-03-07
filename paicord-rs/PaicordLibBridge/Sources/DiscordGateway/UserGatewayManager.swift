@@ -74,6 +74,19 @@ extension UserGatewayManager {
             )
         )
     }
+
+    func send_message(channel: SnowflakeRust, content: RustString) async {
+        let nonce: MessageSnowflake = try! .makeFake(date: .now)
+        do {
+            try await self.client.createMessage(
+                channelId: ChannelSnowflake(channel.inner),
+                payload: .init(
+                    content: content.toString(), nonce: .string(nonce.rawValue))
+            ).guardSuccess()
+        } catch {
+            print("Failed to send message")
+        }
+    }
 }
 
 class BridgedMessageVec {

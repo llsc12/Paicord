@@ -24,11 +24,14 @@ pub enum PaicordCommand {
     // Gateway
     GatewayLogin(String),
     GatewayEvent(GatewayEvent),
+    SendMessage {
+        channel: Snowflake,
+        content: String,
+    },
 
     //Guilds
     SelectGuild(Snowflake),
     GuildSelected(Guild),
-    SendMessage(String),
     MessageCreated {
         partial_message: PartialMessage,
         stored_member: Option<PartialMember>,
@@ -47,6 +50,7 @@ pub enum PaicordCommand {
         guild_id: Snowflake,
         user_ids: Vec<Snowflake>,
     },
+    RequestSendMessage(String),
 
     Panic(String),
 }
