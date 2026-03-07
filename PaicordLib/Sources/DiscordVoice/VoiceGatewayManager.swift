@@ -397,7 +397,7 @@ public actor VoiceGatewayManager {
         )
       }
       self.knownSSRCs[payload.ssrc] = payload.user_id
-    case .clientConnect(let payload):
+    case .clientsConnect(let payload):
       for id in payload.user_ids {
         await self.dave.addUser(userId: id.rawValue)
       }
