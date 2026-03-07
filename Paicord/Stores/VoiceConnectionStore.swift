@@ -302,6 +302,7 @@ final class VoiceConnectionStore: DiscordDataStore {
 
     incomingAudioTask = Task.detached(priority: .userInitiated) { [weak self] in
       guard let self else { return }
+      let player = self.playerNode
 
       for await opusFrame in await voiceGateway.incomingOpusChannel {
         if Task.isCancelled { break }
@@ -324,9 +325,7 @@ final class VoiceConnectionStore: DiscordDataStore {
             dstR[i] = src[i * 2 + 1]
           }
 
-          await MainActor.run {
-            self.playerNode.scheduleBuffer(converted)
-          }
+          player.scheduleBuffer(converted, completionHandler: nil)
         } catch {
           print("[Voice OPUS] Frame decode error:", error)
         }

@@ -12,16 +12,15 @@ A  native Discord client written in Swift using SwiftUI, with a goal of feature 
 
 ---
 
-Paicord currently supports sending messages, replying to messages, uploading files and photos, it has partial Discord-flavoured markdown support, partial reactions support, partial embeds support etc.
+## Progress
 
-This list is not exhaustive but the goal for Paicord is to have parity with the official Discord client, excluding unfavourable things like upselling of services. A real feature/todo list will be made eventually. 
+Paicord has support for core chat features, like partial markdown, attachments and embeds with support for file uploads, editing, replying and deleting messages, and more! 
+
+Paicord aims for feature parity! By default, the more difficult features are targeted first. Whilst this leaves many smaller features unimplemented at first, it helps keep momentum going! [Click here for a rough feature list!](Feature Checklist.md)
 
 > [!WARNING]
 >
 > As all third-party clients and client mods do, using Paicord is a violation of Discord ToS! Whilst Paicord ensures to pretend to be Discord as close as possible, the risk of account bans is ever-present. Beware! 
-
-## Cross-platform
-We have subprojects in the works to port the client to other platforms natively too! Keep an eye out on the repo or join the [Discord Server](https://discord.gg/fqhPGHPyaK)!
 
 ## Installing
 
@@ -47,6 +46,39 @@ If you've enjoyed using Paicord, I would apprecate a [sponsor](https://github.co
  </picture>
 </a>
 
+## FAQ
+
+<details>
+<summary><b>Is this client allowed by Discord?</b></summary>
+Third-party clients are not officially supported by Discord.  
+Use at your own risk.
+</details>
+
+<details>
+<summary><b>Does this support plugins?</b></summary>
+No, but plugin-like functionality will eventually make it into Paicord cleanly. Extra features must be implemented in a minimalistic way as to not cause clutter. As of writing, Paicord is still early in the works and focus is only on feature parity, not extras.
+</details>
+
+<details>
+<summary><b>Will this be maintained?</b></summary>
+I mean I use Discord a lot, plus this is quite a lot of fun thus far.
+It really depends on motivation and community support. Paicord is still a hobby project and I balance it with my education. 
+At a minimum, Paicord shouldn't break easily even with inconsistent maintainence.
+</details>
+
+<details>
+<summary><b>Where's token login support?</b></summary>
+Will never be implemented, using the same token on two clients like the one you took the token from is more dangerous. I think it's using them both at the same time that creates the risk of bans. Discord could also compare super-properties against prior sessions I guess. Use the normal login methods, they're much safer.
+</details>
+
+<details>
+<summary><b>What about theming support?</b></summary>
+This information only applies to the SwiftUI application.<br>
+That's in the works! Paicord will let you set custom colors or materials on various interface elements. There will also be pre-made alternative interface layouts. It won't be as flexible as CSS, but it should hopefully allow for some tasteful customisation!
+</details>
+
+Any other questions? Join the [Discord server]()!
+
 ## References
 
 Paicord uses modified versions of [DiscordBM](https://github.com/DiscordBM/DiscordBM) and [SwiftMarkdownParser](https://github.com/sciasxp/SwiftMarkdownParser). These other references are mentioned since I read their code to learn from others.
@@ -57,5 +89,5 @@ Paicord uses modified versions of [DiscordBM](https://github.com/DiscordBM/Disco
 
 And of course, [Discord Userdoccers and its maintainers](https://docs.discord.food) helped massively with their unofficial documentation and direct help.
 
-For voice, work from [SwiftDiscordAudio/DiscordAudioKit](https://github.com/SwiftDiscordAudio/DiscordAudioKit) was used for reference a lot, and also uses [these RTP packet models etc.](https://github.com/SwiftDiscordAudio/DiscordAudioKit/tree/main/Sources/DiscordRTP) too. Paicord relies on [DaveKit](https://github.com/SwiftDiscordAudio/DaveKit) for voice too!
+For voice, work from [SwiftDiscordAudio/DiscordAudioKit](https://github.com/SwiftDiscordAudio/DiscordAudioKit) was used for reference a lot, and also uses [these RTP packet models etc.](https://github.com/SwiftDiscordAudio/DiscordAudioKit/tree/main/Sources/DiscordRTP) too. Paicord relies on a fork of [DaveKit](https://github.com/SwiftDiscordAudio/DaveKit) for voice too! 
 
