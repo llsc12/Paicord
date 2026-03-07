@@ -277,6 +277,16 @@ extension VoiceGateway {
   /// https://docs.discord.food/topics/voice-connections#session-update-structure-(send)
   /// https://docs.discord.food/topics/voice-connections#session-update-structure-(receive)
   public struct SessionUpdate: Sendable, Codable {
+    public init(
+      codecs: [Codec]
+    ) {
+      self.codecs = codecs
+      self.audio_codec = nil
+      self.video_codec = nil
+      self.media_session_id = nil
+      self.keyframe_interval = nil
+    }
+    
     // send properties
     public var codecs: [Codec]?
 
@@ -313,6 +323,16 @@ extension VoiceGateway {
       self.speaking = speaking
       self.ssrc = ssrc
       self.delay = delay
+    }
+    
+    package init(
+      speaking: IntBitField<Flag>,
+      ssrc: UInt,
+      user_id: UserSnowflake
+    ) {
+      self.speaking = speaking
+      self.ssrc = ssrc
+      self.user_id = user_id
     }
 
     public var speaking: IntBitField<Flag>
@@ -386,10 +406,23 @@ extension VoiceGateway {
 
   /// https://docs.discord.food/topics/voice-connections#video-structure
   public struct Video: Sendable, Codable {
+    public init(
+      audio_ssrc: UInt,
+      video_ssrc: UInt,
+      rtx_ssrc: UInt,
+      streams: [Stream]? = nil
+    ) {
+      self.audio_ssrc = audio_ssrc
+      self.video_ssrc = video_ssrc
+      self.rtx_ssrc = rtx_ssrc
+      self.streams = streams
+      self.user_id = nil
+    }
+
     public var audio_ssrc: UInt
     public var video_ssrc: UInt
     public var rtx_ssrc: UInt
-    public var streams: [Stream]?  // sent by client only
+    public var streams: [Stream]?
     public var user_id: UserSnowflake?  // sent by server only
   }
 

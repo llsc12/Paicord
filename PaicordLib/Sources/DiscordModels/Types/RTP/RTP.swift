@@ -16,7 +16,7 @@ import NIOCore
 
 /// Represents a Real-time Transport Protocol (RTP) packet used for audio streaming.
 /// https://datatracker.ietf.org/doc/html/rfc3550#section-5.1
-public struct RTPPacket: RawRepresentable {
+public struct RTPPacket: Sendable, RawRepresentable {
   // MARK: - First byte
 
   /// This field identifies the version of RTP.  The version defined by
@@ -150,7 +150,7 @@ public struct RTPPacket: RawRepresentable {
   public let csrcs: [UInt32]
 
   /// Remaining payload data
-  public let payload: ByteBuffer
+  public var payload: ByteBuffer
   
   public init(
     payloadType: RTPType,

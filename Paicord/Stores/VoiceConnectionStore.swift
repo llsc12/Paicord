@@ -71,6 +71,14 @@ final class VoiceConnectionStore: DiscordDataStore {
         switch event.data {
         case .ready(let payload):
           print("we in yk")
+        case .speaking(let payload):
+          if payload.speaking.isEmpty {
+            print("[Voice] \(payload.user_id?.rawValue ?? "Unknown User") stopped speaking")
+          } else {
+            print(
+              "[Voice] \(payload.user_id?.rawValue ?? "Unknown User") started speaking"
+            )
+          }
         default: break
         }
       }
@@ -304,11 +312,14 @@ final class VoiceConnectionStore: DiscordDataStore {
       guard let self else { return }
       let player = self.playerNode
 
-      for await opusFrame in await voiceGateway.incomingOpusChannel {
+      for await rtpPacket in await voiceGateway.incomingAudioChannel {
         if Task.isCancelled { break }
         do {
-          let decoded = try self.opusDecoder.decode(opusFrame)
-          // manually de-interleave
+          let opusFrame = rtpPacket.payload
+          let decoded = try self.opusDecoder.decode(
+            .init(buffer: opusFrame, byteTransferStrategy: .noCopy)
+          )
+          // manually de-interleave.
           guard
             let converted = AVAudioPCMBuffer(
               pcmFormat: Self.pcmFormat,

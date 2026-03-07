@@ -607,11 +607,10 @@ extension UserGatewayManager {
         )
       )
     )
-    let opcode = Gateway.Opcode.identify
     self.send(
       message: .init(
         payload: resume,
-        opcode: .init(encodedWebSocketOpcode: opcode.rawValue)!
+        opcode: .text
       )
     )
 

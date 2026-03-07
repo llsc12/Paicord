@@ -1,7 +1,7 @@
 /// https://github.com/SwiftDiscordAudio/DiscordAudioKit/blob/main/Sources/DiscordRTP/RTPType.swift
 
 /// https://www.iana.org/assignments/rtp-parameters/rtp-parameters.xhtml#rtp-parameters-1
-public enum RTPType: RawRepresentable {
+public enum RTPType: Sendable, RawRepresentable {
   case pcmu
   case gsm
   case g723
@@ -24,14 +24,14 @@ public enum RTPType: RawRepresentable {
   case h263
   case dynamic(UInt8)
 
-  public enum DVI4SampleRate {
+  public enum DVI4SampleRate: Sendable {
     case `8000`
     case `16000`
     case `11025`
     case `22050`
   }
 
-  public enum l16Channels: Int {
+  public enum l16Channels: Int, Sendable {
     case mono = 1
     case stereo = 2
   }

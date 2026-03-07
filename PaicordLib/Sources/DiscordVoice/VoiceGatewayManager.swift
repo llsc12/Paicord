@@ -150,8 +150,10 @@ public actor VoiceGatewayManager {
     })?.key ?? 0
   }
 
-  private let outgoingOpusChannel = AsyncChannel<Data>()
-  public let incomingOpusChannel = AsyncChannel<Data>()
+  /// Outgoing channel only takes Opus frames, rtp packet forming and encryption is handled automatically
+  private let outgoingAudioChannel = AsyncChannel<Data>()
+  /// Incoming channel for you to iterate over. The payload is modified to contain a decrypted Opus frame.
+  public let incomingAudioChannel = AsyncChannel<RTPPacket>()
 
   //MARK: Send queue
 
@@ -386,22 +388,21 @@ public actor VoiceGatewayManager {
       self.listen(description: payload)
       self.speak(description: payload)
 
-      self.send(
-        message: .init(
-          payload: .init(
-            opcode: .voiceBackendVersion,
-            data: .voiceBackendVersion(.init()),
-          ),
-          opcode: .text
-        )
-      )
+      self.requestVoiceBackendVersion()
     case .speaking(let payload):
+      if let id = payload.user_id {
+        self.didEmitSpeaking[id] = (
+          didEmit: !payload.speaking.isEmpty, remainingSilenceFrames: 5,
+          lastKnownFlags: payload.speaking
+        )
+      }
       self.knownSSRCs[payload.ssrc] = payload.user_id
     case .clientConnect(let payload):
       for id in payload.user_ids {
         await self.dave.addUser(userId: id.rawValue)
       }
     case .clientDisconnect(let payload):
+      self.didEmitSpeaking.removeValue(forKey: payload.user_id)
       self.knownSSRCs = self.knownSSRCs.filter { $0.value != payload.user_id }
       await self.dave.removeUser(userId: payload.user_id.rawValue)
     case .davePrepareTransition(let payload):
@@ -535,6 +536,8 @@ public actor VoiceGatewayManager {
       let silenceTailCount = 5
       var silenceFramesRemaining = 0
 
+      // send like 3 silence frames to ensure discord knows we connected.
+      // otherwise discord wont send us audio data.
       for _ in 1...3 {
         await sendSilence(
           sequence: sequence,
@@ -560,16 +563,27 @@ public actor VoiceGatewayManager {
 
         if let frame {
           if let payload = self.nextSpeakingPayload {
-            self.send(
-              message: .init(
-                payload: .init(opcode: .speaking, data: .speaking(payload)),
-                opcode: .text
-              )
-            )
+            self.updateSpeaking(payload: payload)
             self.nextSpeakingPayload = nil
+
+            // emit speaking event for ourselves, so application layer can use gateway events for speaking indicators.
+            self.eventsStreamContinuations.forEach {
+              $0.yield(
+                .init(
+                  opcode: .speaking,
+                  data: .speaking(
+                    .init(
+                      speaking: payload.speaking,
+                      ssrc: self.audioSSRC,
+                      user_id: self.connectionData.userID,
+                    )
+                  )
+                )
+              )
+            }
           }
 
-          await sendPacket(
+          await sendOpusPacket(
             frame: frame,
             sequence: sequence,
             timestamp: timestamp,
@@ -590,21 +604,20 @@ public actor VoiceGatewayManager {
           silenceFramesRemaining -= 1
 
           if silenceFramesRemaining == 0 {
-            let ssrc = audioSSRC
-            self.send(
-              message: .init(
-                payload: .init(
+            self.eventsStreamContinuations.forEach {
+              $0.yield(
+                .init(
                   opcode: .speaking,
-                  data: .speaking(.init(speaking: [], ssrc: ssrc, delay: 0))
-                ),
-                opcode: .text
+                  data: .speaking(
+                    .init(
+                      speaking: [],
+                      ssrc: self.audioSSRC,
+                      user_id: self.connectionData.userID,
+                    )
+                  )
+                )
               )
-            )
-            self.nextSpeakingPayload = .init(
-              speaking: [.voice],
-              ssrc: ssrc,
-              delay: 0
-            )
+            }
           }
 
         } else {
@@ -631,7 +644,7 @@ public actor VoiceGatewayManager {
     // Discord Opus silence frame
     let silence = Data([0xF8, 0xFF, 0xFE])
 
-    await sendPacket(
+    await sendOpusPacket(
       frame: silence,
       sequence: sequence,
       timestamp: timestamp,
@@ -643,7 +656,7 @@ public actor VoiceGatewayManager {
 
   private func startDrainingOutgoingChannel() {
     channelDrainTask = Task {
-      for await frame in outgoingOpusChannel {
+      for await frame in outgoingAudioChannel {
         pendingOpusFrames.append(frame)
 
         if pendingOpusFrames.count > 5 {
@@ -653,7 +666,7 @@ public actor VoiceGatewayManager {
     }
   }
 
-  func sendPacket(
+  func sendOpusPacket(
     frame: Data,
     sequence: UInt16,
     timestamp: UInt32,
@@ -720,12 +733,6 @@ public actor VoiceGatewayManager {
     }
   }
 
-  public func sendOpusFrame(_ frame: Data) {
-    Task {
-      await outgoingOpusChannel.send(frame)
-    }
-  }
-
   /// Start listening for incoming audio packets on the UDP connection.
   private func listen(
     description: VoiceGateway.SessionDescription,
@@ -773,6 +780,12 @@ public actor VoiceGatewayManager {
     }
   }
 
+  var didEmitSpeaking:
+    [UserSnowflake: (
+      didEmit: Bool, remainingSilenceFrames: UInt8,
+      lastKnownFlags: IntBitField<VoiceGateway.Speaking.Flag>
+    )] = [:]
+
   /// Process an incoming voice packet. Voice packets are RTP packets that are encrypted
   /// using the selected crypto mode and key, E2EE encrypted using Dave, and then encoded
   /// using OPUS.
@@ -782,7 +795,8 @@ public actor VoiceGatewayManager {
     mode: VoiceGateway.EncryptionMode,
     key: SymmetricKey
   ) async {
-    var buffer = packet.payload
+    var packet = packet
+    var buffer = packet.payload  // copy for reading
     // First, decrypt the RTP packet payload
 
     var extensionLength: UInt16?
@@ -833,36 +847,147 @@ public actor VoiceGatewayManager {
       return
     }
 
-    await incomingOpusChannel.send(data)
+    // fake speaking indicator logic based on whether the opus frame is a silence frame or not.
+    // makes application layer easier to implement speaking indicators.
+    if let userID = self.knownSSRCs[.init(packet.ssrc)] {
+      // check if the packet opus frame is silence, if so, set speaking to false after 5 consecutive silence frames.
+      let current =
+        didEmitSpeaking[userID] ?? (
+          didEmit: false, remainingSilenceFrames: 0, lastKnownFlags: .init()
+        )
+      let silenceFrame = Data([0xF8, 0xFF, 0xFE])
+
+      if data == silenceFrame {
+        if !current.didEmit {
+          didEmitSpeaking[userID] = current
+        } else {
+          if current.remainingSilenceFrames > 0 {
+            didEmitSpeaking[userID] = (
+              didEmit: true,
+              remainingSilenceFrames: current.remainingSilenceFrames - 1,
+              lastKnownFlags: current.lastKnownFlags
+            )
+          } else {
+            didEmitSpeaking[userID] = (
+              didEmit: false,
+              remainingSilenceFrames: 0,
+              lastKnownFlags: current.lastKnownFlags
+            )
+
+            self.eventsStreamContinuations.forEach {
+              $0.yield(
+                .init(
+                  opcode: .speaking,
+                  data: .speaking(
+                    .init(
+                      speaking: [],
+                      ssrc: .init(packet.ssrc),
+                      user_id: .init(userID)
+                    )
+                  )
+                )
+              )
+            }
+          }
+        }
+      } else {
+        didEmitSpeaking[userID] = (
+          didEmit: true,
+          remainingSilenceFrames: 5,
+          lastKnownFlags: current.lastKnownFlags
+        )
+
+        if !current.didEmit {
+          self.eventsStreamContinuations.forEach {
+            $0.yield(
+              .init(
+                opcode: .speaking,
+                data: .speaking(
+                  .init(
+                    speaking: current.lastKnownFlags.isEmpty
+                      ? [.voice] : current.lastKnownFlags,
+                    ssrc: .init(packet.ssrc),
+                    user_id: .init(userID)
+                  )
+                )
+              )
+            )
+          }
+        }
+      }
+    }
+
+    // modify packet payload to be decrypted frame, easier for application to use with bundled ssrc and other data.
+    packet.payload = ByteBuffer(data: data)
+    await incomingAudioChannel.send(packet)
   }
 
   // MARK: - Gateway actions
 
-  //  /// https://discord.com/developers/docs/topics/gateway-events#update-presence
-  //  public func updatePresence(payload: Gateway.Identify.Presence) {
-  //    self.send(
-  //      message: .init(
-  //        payload: .init(
-  //          opcode: .presenceUpdate,
-  //          data: .requestPresenceUpdate(payload)
-  //        ),
-  //        opcode: .text
-  //      )
-  //    )
-  //  }
-  //
-  //  /// https://discord.com/developers/docs/topics/gateway-events#update-voice-state
-  //  public func updateVoiceState(payload: VoiceStateUpdate) {
-  //    self.send(
-  //      message: .init(
-  //        payload: .init(
-  //          opcode: .voiceStateUpdate,
-  //          data: .requestVoiceStateUpdate(payload)
-  //        ),
-  //        opcode: .text
-  //      )
-  //    )
-  //  }
+  /// https://docs.discord.food/topics/voice-connections#simulcasting
+  public func mediaSinkWants(payload: VoiceGateway.MediaSinkWants) {
+    self.send(
+      message: .init(
+        payload: .init(
+          opcode: .mediaSinkWants,
+          data: .mediaSinkWants(payload)
+        ),
+        opcode: .text
+      )
+    )
+  }
+
+  /// https://docs.discord.food/topics/voice-connections#video
+  public func updateVideo(payload: VoiceGateway.Video) {
+    self.send(
+      message: .init(
+        payload: .init(
+          opcode: .video,
+          data: .video(payload)
+        ),
+        opcode: .text
+      )
+    )
+  }
+
+  /// https://docs.discord.food/topics/voice-connections#session-updates
+  public func updateSession(payload: VoiceGateway.SessionUpdate) {
+    self.send(
+      message: .init(
+        payload: .init(
+          opcode: .sessionUpdate,
+          data: .sessionUpdate(payload)
+        ),
+        opcode: .text
+      )
+    )
+  }
+
+  /// https://docs.discord.food/topics/voice-connections#speaking
+  public func updateSpeaking(payload: VoiceGateway.Speaking) {
+    self.send(
+      message: .init(
+        payload: .init(
+          opcode: .speaking,
+          data: .speaking(payload)
+        ),
+        opcode: .text
+      )
+    )
+  }
+
+  /// https://docs.discord.food/topics/voice-connections#voice-backend-version
+  public func requestVoiceBackendVersion() {
+    self.send(
+      message: .init(
+        payload: .init(
+          opcode: .voiceBackendVersion,
+          data: .voiceBackendVersion(.init())
+        ),
+        opcode: .text
+      )
+    )
+  }
 
   // MARK: End of Gateway actions -
 
@@ -946,11 +1071,10 @@ extension VoiceGatewayManager {
         )
       )
     )
-    let opcode = Gateway.Opcode.identify
     self.send(
       message: .init(
         payload: resume,
-        opcode: .init(encodedWebSocketOpcode: opcode.rawValue)!
+        opcode: .text
       )
     )
 
