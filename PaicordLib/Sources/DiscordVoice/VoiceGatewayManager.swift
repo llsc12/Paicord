@@ -133,6 +133,8 @@ public actor VoiceGatewayManager {
   private var pendingOpusFrames: [Data] = []
   private var channelDrainTask: Task<Void, Never>?
 
+  private var recvBuffer = ReceiveBuffer(targetFrames: 5, maxFrames: 50)
+
   /// This contains the speaking payload to send next when there is data to send over UDP.
   public var nextSpeakingPayload: VoiceGateway.Speaking? = nil
 
@@ -405,6 +407,11 @@ public actor VoiceGatewayManager {
       self.didEmitSpeaking.removeValue(forKey: payload.user_id)
       self.knownSSRCs = self.knownSSRCs.filter { $0.value != payload.user_id }
       await self.dave.removeUser(userId: payload.user_id.rawValue)
+
+      self.recvBuffer.removeStreamsNotIn(
+        allowedSSRCs: Set(self.knownSSRCs.keys.map { UInt32($0) })
+      )
+
     case .davePrepareTransition(let payload):
       await self.dave.prepareTransition(
         transitionId: payload.transition_id,
@@ -919,7 +926,63 @@ public actor VoiceGatewayManager {
 
     // modify packet payload to be decrypted frame, easier for application to use with bundled ssrc and other data.
     packet.payload = ByteBuffer(data: data)
-    await incomingAudioChannel.send(packet)
+
+    await forwardBuffered(packet)
+  }
+
+  private func forwardBuffered(_ packet: RTPPacket) async {
+    recvBuffer.push(packet)
+
+    while let next = recvBuffer.popIfReady(ssrc: packet.ssrc) {
+      await incomingAudioChannel.send(next)
+    }
+  }
+
+  private struct ReceiveBuffer {
+    struct Stream {
+      var queue: [RTPPacket] = []
+      var started: Bool = false
+    }
+
+    let targetFrames: Int
+    let maxFrames: Int
+    var streams: [UInt32: Stream] = [:]
+
+    init(targetFrames: Int, maxFrames: Int) {
+      self.targetFrames = targetFrames
+      self.maxFrames = maxFrames
+    }
+
+    mutating func push(_ packet: RTPPacket) {
+      var stream = streams[packet.ssrc] ?? Stream()
+
+      stream.queue.append(packet)
+
+      if stream.queue.count > maxFrames {
+        let overflow = stream.queue.count - maxFrames
+        stream.queue.removeFirst(overflow)
+      }
+
+      if !stream.started, stream.queue.count >= targetFrames {
+        stream.started = true
+      }
+
+      streams[packet.ssrc] = stream
+    }
+
+    mutating func popIfReady(ssrc: UInt32) -> RTPPacket? {
+      guard var stream = streams[ssrc] else { return nil }
+      guard stream.started else { return nil }
+      guard !stream.queue.isEmpty else { return nil }
+
+      let pkt = stream.queue.removeFirst()
+      streams[ssrc] = stream
+      return pkt
+    }
+
+    mutating func removeStreamsNotIn(allowedSSRCs: Set<UInt32>) {
+      streams = streams.filter { allowedSSRCs.contains($0.key) }
+    }
   }
 
   // MARK: - Gateway actions
@@ -1040,6 +1103,10 @@ public actor VoiceGatewayManager {
     self.channelDrainTask?.cancel()
     self.udpConnection = nil
     self.nextSpeakingPayload = nil
+
+    self.recvBuffer = ReceiveBuffer(targetFrames: 5, maxFrames: 50)
+    self.knownSSRCs = [:]
+    self.didEmitSpeaking = [:]
   }
 }
 
