@@ -384,8 +384,8 @@ extension VoiceGateway {
     public var seq_ack: Int?
   }
 
-  /// https://docs.discord.food/topics/voice-connections#example-client-connect
-  public struct ClientConnect: Sendable, Codable {
+  /// https://docs.discord.food/topics/voice-connections#clients-connect-structure
+  public struct ClientsConnect: Sendable, Codable {
     public var user_ids: [UserSnowflake]
   }
 

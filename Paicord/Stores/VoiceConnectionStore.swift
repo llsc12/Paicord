@@ -69,16 +69,10 @@ final class VoiceConnectionStore: DiscordDataStore {
     voiceEventTask = Task { @MainActor in
       for await event in await voiceGateway.events {
         switch event.data {
-        case .ready(let payload):
-          print("we in yk")
+        case .clientDisconnect(let payload):
+          handleClientDisconnect(payload)
         case .speaking(let payload):
-          if payload.speaking.isEmpty {
-            print("[Voice] \(payload.user_id?.rawValue ?? "Unknown User") stopped speaking")
-          } else {
-            print(
-              "[Voice] \(payload.user_id?.rawValue ?? "Unknown User") started speaking"
-            )
-          }
+          
         default: break
         }
       }
@@ -90,7 +84,8 @@ final class VoiceConnectionStore: DiscordDataStore {
     }
   }
 
-  // state
+  // MARK: - State
+  // our own voice state stuff
   private var channelId: ChannelSnowflake?
   private var guildId: GuildSnowflake?
   private var isMuted: Bool = false
@@ -98,6 +93,9 @@ final class VoiceConnectionStore: DiscordDataStore {
   private var isVideoEnabled: Bool = false
   private var preferredRegion: String?
   private var flags: IntBitField<VoiceStateUpdate.Flags> = []
+  
+  // if in a vc, this contains our speaking state and other ppl's speaking state.
+  private var usersSpeakingState: [UserSnowflake: IntBitField<VoiceGateway.Speaking.Flag>] = [:]
 
   private var voiceStatus: GatewayState = .stopped {
     didSet {
@@ -240,6 +238,27 @@ final class VoiceConnectionStore: DiscordDataStore {
       await self.voiceGateway?.connect()
     }
   }
+  
+  private func handleClientDisconnect(_ payload: VoiceGateway.ClientDisconnect) {
+    // someone other than us left the voice channel.
+  }
+  
+  private func handleSpeaking(_ payload: VoiceGateway.Speaking) {
+    // someone started or stopped speaking, we can use this to show speaking indicators.
+    let ssrc = payload.ssrc
+    
+    if let id = payload.user_id {
+      self.usersSpeakingState[id] = payload.speaking
+    }
+    
+    if payload.speaking.isEmpty {
+      print("[Voice] \(payload.user_id?.rawValue ?? "Unknown User") stopped speaking")
+    } else {
+      print(
+        "[Voice] \(payload.user_id?.rawValue ?? "Unknown User") started speaking"
+      )
+    }
+  }
 
   func cancelEventHandling() {
     // overrides default impl of protocol
@@ -336,7 +355,9 @@ final class VoiceConnectionStore: DiscordDataStore {
             dstR[i] = src[i * 2 + 1]
           }
 
-          player.scheduleBuffer(converted, completionHandler: nil)
+          Task {
+           await player.scheduleBuffer(converted)
+          }
         } catch {
           print("[Voice OPUS] Frame decode error:", error)
         }

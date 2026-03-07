@@ -28,7 +28,7 @@ public struct VoiceGateway: Sendable, Codable {
     case hello = 8  // r
     case resumed = 9  // r
     // signal opcode deprecated, but its 10 jsyk ykyk
-    case clientConnect = 11  // r
+    case clientsConnect = 11  // r
     case video = 12  // r
     case clientDisconnect = 13  // r
     case sessionUpdate = 14  // s r
@@ -62,7 +62,7 @@ public struct VoiceGateway: Sendable, Codable {
       case .resume: return "resume"
       case .hello: return "hello"
       case .resumed: return "resumed"
-      case .clientConnect: return "clientConnect"
+      case .clientsConnect: return "clientsConnect"
       case .video: return "video"
       case .clientDisconnect: return "clientDisconnect"
       case .sessionUpdate: return "sessionUpdate"
@@ -105,7 +105,7 @@ public struct VoiceGateway: Sendable, Codable {
       case resume(Resume)
       case hello(Hello)
       case resumed
-      case clientConnect(ClientConnect)
+      case clientsConnect(ClientsConnect)
       case video(Video)
       case clientDisconnect(ClientDisconnect)
       case sessionUpdate(SessionUpdate)
@@ -216,8 +216,8 @@ public struct VoiceGateway: Sendable, Codable {
         self.data = .speaking(try decodeData())
       case .heartbeatAck:
         self.data = .heartbeatAck(try decodeData())
-      case .clientConnect:
-        self.data = .clientConnect(try decodeData())
+      case .clientsConnect:
+        self.data = .clientsConnect(try decodeData())
       case .video:
         self.data = .video(try decodeData())
       case .clientDisconnect:
@@ -265,7 +265,7 @@ public struct VoiceGateway: Sendable, Codable {
 
       switch self.opcode {
       case .ready, .sessionDescription, .heartbeatAck, .hello, .resumed,
-        .clientConnect, .video, .clientDisconnect:
+        .clientsConnect, .video, .clientDisconnect:
         throw EncodingError.notSupposedToBeSent(
           message:
             "`\(self.opcode.rawValue)` opcode is supposed to never be sent."
