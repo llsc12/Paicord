@@ -300,6 +300,8 @@ public struct VoiceGateway: Sendable, Codable {
         try container.encode(payload, forKey: .data)
       case .voiceBackendVersion(let payload):
         try container.encode(payload, forKey: .data)
+      case .daveTransitionReady(let payload):
+        try container.encode(payload, forKey: .data)
       default:
         throw EncodingError.notSupposedToBeSent(
           message: "'\(self)' data is supposed to never be sent."
