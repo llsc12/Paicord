@@ -6,6 +6,8 @@ import { LargeBaseplate } from "Baseplates/LargeBaseplate.slint";
 
 //global state
 export { CurrentUserStore, AppStateSlint }
+export { GuildStore } from "Globals/GuildStore.slint";
+export { ChannelStore } from "Globals/ChannelStore.slint";
 
 //state globals
 export { LoginManagerSlint } from "State/LoginManager.slint";
@@ -24,4 +26,8 @@ export component MainWindow inherits Window {
     if CurrentUserStore.current_user.id == "" && AppStateSlint.ready: LoginView { }
 
     if CurrentUserStore.current_user.id != "" && AppStateSlint.ready: LargeBaseplate { }
+
+    // LargeBaseplate {
+        
+    // }
 }

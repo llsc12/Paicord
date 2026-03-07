@@ -8,12 +8,13 @@ let package = Package(
         .library(name: "PaicordLibBridge", type: .dynamic, targets: ["PaicordLibBridge"])
     ],
     dependencies: [
-        .package(name: "PaicordLib", path: "../../PaicordLib")
+        .package(name: "PaicordLib", path: "../../PaicordLib"),
+        .package(name: "DiscordMarkdownParser", path: "../../DiscordMarkdownParser")
     ],
     targets: [
         .target(
             name: "PaicordLibBridge",
-            dependencies: ["PaicordLib"],
+            dependencies: ["PaicordLib", "DiscordMarkdownParser"],
             path: "Sources",
         )
     ]

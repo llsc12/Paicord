@@ -1,0 +1,73 @@
+import {
+    ScrollView,
+    VerticalBox,
+    ListView,
+    Palette,
+    StandardListView,
+    StandardTableView,
+    StyleMetrics,
+    Button,
+} from "std-widgets.slint";
+import { GuildStore } from "../../Globals/GuildStore.slint";
+import { IconDisplay, IconSet } from "../../Libraries/lucide.slint";
+import { RoundedImage } from "../RoundedImage.slint";
+
+export component GuildScrollBar inherits ScrollView {
+    in-out property <brush> background: transparent;
+    Rectangle {
+        width: 100%;
+        height: 100%;
+        background: root.background;
+    }
+
+    box := VerticalBox {
+        list := ListView {
+            horizontal-scrollbar-policy: ScrollBarPolicy.always-off;
+            vertical-scrollbar-policy: ScrollBarPolicy.always-off;
+
+            property <string> selected_guild_id: "69420";
+
+            for folder in GuildStore.guild_folders: Rectangle {
+                border-radius: 8px;
+                property <bool> hovered: touchArea.has-hover;
+                property <bool> selected: folder.id == selected_guild_id;
+
+                background: (selected || hovered) ? Palette.alternate-background : transparent;
+
+                HorizontalLayout {
+                    padding: 4px;
+                    spacing: 4px;
+                    alignment: center;
+
+                    if folder.is_folder: IconDisplay {
+                        icon: folder.expanded ? IconSet.FolderOpen : IconSet.Folder;
+                        width: 45px;
+                        height: 45px;
+                        stroke: folder.has_color ? folder.color : Palette.foreground;
+                    }
+
+                    if !folder.is_folder: RoundedImage {
+                        source: folder.icon.image;
+                        cache-rendering-hint: true;
+                        image-width: 45px;
+                        image-height: 45px;
+                        border-radius: 12px;
+                        image-rendering: ImageRendering.smooth;
+                    }
+                }
+
+                touchArea := TouchArea {
+                    clicked => {
+                        if folder.is_folder {
+                            folder.expanded = !folder.expanded;
+                        }
+                        if !folder.is_folder {
+                            selected_guild_id = folder.id;
+                            GuildStore.current_guild = folder;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

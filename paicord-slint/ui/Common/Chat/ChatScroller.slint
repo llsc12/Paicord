@@ -1,0 +1,44 @@
+import { ListView, ScrollView } from "std-widgets.slint";
+import { MessageView } from "Messages/MessageView.slint";
+import { ChannelStore } from "../../Globals/ChannelStore.slint";
+// import { CurrentGuildStore } from "../../Globals/CurrentGuildStore.slint";
+// import { MessageView } from "MessageView.slint";
+// import { ImageAttachment } from "../../Globals/CurrentGuildStore.slint";
+export component ChatScroller inherits ScrollView {
+    //callback show-image(images: [ImageAttachment], index: int);
+    lv := ListView {
+        horizontal-scrollbar-policy: ScrollBarPolicy.always-off;
+        vertical-scrollbar-policy: ScrollBarPolicy.always-on;
+        for message in ChannelStore.messages: MessageView {
+            // show-image(images, index) => {
+            //     root.show-image(images, index)
+            // }
+            message: message;
+        }
+    }
+
+    property <int> timer-clicked: 0;
+    function scroll-to-bottom() {
+        lv.viewport-y = -100000px;
+        timer-clicked = 0;
+        scroll-timer.running = true;
+    }
+
+    scroll-timer := Timer {
+        running: true;
+        interval: 2ms;
+        triggered => {
+            lv.viewport-y = -100000px;
+            if timer-clicked < 1 {
+                timer-clicked += 1;
+            } else {
+                self.running = false;
+            }
+        }
+    }
+
+    property <int> message_count: ChannelStore.messages.length;
+    changed message_count => {
+        self.scroll-to-bottom();
+    }
+}

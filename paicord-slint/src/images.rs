@@ -3,7 +3,7 @@ use std::{
 };
 
 use fast_image_resize::Resizer;
-use image::{DynamicImage, ImageFormat};
+use image::{DynamicImage, ImageFormat, buffer};
 use slint::{Image, Rgba8Pixel, SharedPixelBuffer, Weak};
 use threadpool::ThreadPool;
 
@@ -27,47 +27,6 @@ impl ImageMangler {
             placeholder: Self::load_default_image(include_bytes!("../ui/images/paicord_icon.png")),
         }
     }
-
-    // pub fn get(&self, url: &str, width: u32, height: u32, use_cache: bool) -> Image {
-    //     let url = url.to_string();
-    //     if url.is_empty() {
-    //         return slint::Image::default();
-    //     }
-
-    //     let cache_key = url.replace("/", "_").replace(":", "_");
-
-    //     if use_cache {
-    //         if let Some(dyn_image) = self.cache_get(&cache_key) {
-    //             let buffer = dynamic_to_buffer(&dyn_image);
-    //             return slint::Image::from_rgba8_premultiplied(buffer.clone());
-    //         }
-    //     }
-
-    //     let images = self.clone();
-    //     let ui = self.window.clone();
-    //     // let Ok(image_data) = reqwest::get(url).await else {
-    //     //     return slint::Image::from_rgba8_premultiplied(self.placeholder.lock().unwrap().clone());
-    //     // };
-
-    //     let Ok(image_data) = reqwest::blocking::get(url) else {
-    //         return slint::Image::from_rgba8_premultiplied(self.placeholder.lock().unwrap().clone());
-    //     };
-
-    //     let Ok(bytes) = image_data.bytes() else {
-    //         return slint::Image::from_rgba8_premultiplied(self.placeholder.lock().unwrap().clone());
-    //     };
-
-    //     if let Ok(dyn_image) = image::load_from_memory(&bytes) {
-    //         let dyn_image = resize(dyn_image, width, height);
-    //         if use_cache {
-    //             images.cache_set(&cache_key, &dyn_image);
-    //         }
-    //         let buffer = dynamic_to_buffer(&dyn_image);
-    //         return slint::Image::from_rgba8_premultiplied(buffer.clone());
-    //     }
-
-    //     slint::Image::from_rgba8_premultiplied(self.placeholder.lock().unwrap().clone())
-    // }
 
     pub async fn get<S: AsRef<str>>(
         &self,
@@ -124,25 +83,38 @@ impl ImageMangler {
         url: S,
         width: u32,
         height: u32,
+        cache: bool,
         set_image: F,
     ) -> slint::Image
     where
         F: Fn(MainWindow, slint::Image) + Send + 'static,
     {
+        let buffer = self.lazy_get_buffer(url, width, height, cache, set_image);
+        slint::Image::from_rgba8_premultiplied(buffer)
+    }
+
+    pub fn lazy_get_buffer<F, S: AsRef<str>>(
+        &self,
+        url: S,
+        width: u32,
+        height: u32,
+        cache: bool,
+        set_image: F,
+    ) -> SharedPixelBuffer<Rgba8Pixel>
+    where
+        F: Fn(MainWindow, slint::Image) + Send + 'static,
+    {
         let url = url.as_ref().to_string();
         if url.is_empty() {
-            return slint::Image::from_rgba8_premultiplied(
-                self.placeholder.lock().unwrap().clone(),
-            );
+            return self.placeholder.lock().unwrap().clone()
         }
         let cache_key = url.replace("/", "_").replace(":", "_");
 
-        if let Some(mut dyn_image) = self.cache_get(&cache_key) {
+        if cache && let Some(mut dyn_image) = self.cache_get(&cache_key) {
             if width != dyn_image.width() || height != dyn_image.height() {
                 dyn_image = resize(dyn_image, width, height);
             }
-
-            return dynamic_to_slint(&dyn_image);
+            return dynamic_to_buffer(&dyn_image);
         }
 
         let images = self.clone();
@@ -160,23 +132,19 @@ impl ImageMangler {
                 if width != dyn_image.width() || height != dyn_image.height() {
                     dyn_image = resize(dyn_image, width, height);
                 }
-                images.cache_set(&cache_key, &dyn_image);
+                if cache {
+                    images.cache_set(&cache_key, &dyn_image);
+                }
                 let buffer = dynamic_to_buffer(&dyn_image);
                 ui.upgrade_in_event_loop(move |ui| {
-                    let image = slint::Image::from_rgba8_premultiplied(buffer);
+                    let image = slint::Image::from_rgba8_premultiplied(buffer.clone());
                     set_image(ui, image);
                 })
                 .unwrap();
-                //images.cache_set(&cache_key, &dyn_image);
-                // let buffer = dynamic_to_buffer(&dyn_image);
-                // ui.upgrade_in_event_loop(move |ui| {
-                //     let image = slint::Image::from_rgba8_premultiplied(buffer.clone());
-                //     set_image(ui, image);
-                // }).unwrap();
             }
         });
 
-        slint::Image::from_rgba8_premultiplied(self.placeholder.lock().unwrap().clone())
+        self.placeholder.lock().unwrap().clone()
     }
 
     fn cache_get(&self, key: &str) -> Option<DynamicImage> {

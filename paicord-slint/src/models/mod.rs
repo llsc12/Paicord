@@ -1,1 +1,9 @@
+pub mod channel_list_model;
+pub mod discord_channel;
+pub mod discord_message;
+pub mod guild_folder;
+pub mod guild_list_model;
+pub mod lazy_image;
+pub mod message_list_model;
+pub mod slint_tree;
 pub mod user;

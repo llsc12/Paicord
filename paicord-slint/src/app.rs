@@ -1,6 +1,7 @@
 use std::{error::Error, sync::{Arc}};
 
-use paicord_rs::discord_models::types::{gateway::GatewayEvent, user::PartialUser};
+use directories::ProjectDirs;
+use paicord_rs::discord_models::types::{channel::DiscordChannel, gateway::{GatewayEvent, PartialMessage}, guild::{Guild, PartialMember}, permission::Role, snowflake::Snowflake, user::PartialUser};
 use tokio::sync::{RwLock, mpsc};
 
 use crate::state::AppState;
@@ -9,10 +10,11 @@ pub type AppStatePtr = Arc<RwLock<AppState>>;
 
 slint::include_modules!();
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub enum PaicordCommand {
     // Login
     InitLogin,
+    InitializeLoginManager(String),
     PendingRemoteInit(String),
     PendingTicket(PartialUser),
     PendingLogin(String),
@@ -24,9 +26,27 @@ pub enum PaicordCommand {
     GatewayEvent(GatewayEvent),
 
     //Guilds
-    SelectGuild(String),
-    SelectChannel(String),
+    SelectGuild(Snowflake),
+    GuildSelected(Guild),
     SendMessage(String),
+    MessageCreated {
+        partial_message: PartialMessage,
+        stored_member: Option<PartialMember>,
+        guild_roles: Vec<Role>,
+    },
+    GuildMembersChunk {
+        members: Vec<PartialMember>,
+        guild_roles: Vec<Role>,
+    },
+    
+    //Channels
+    SelectChannel(Snowflake),
+    ChannelSelected(DiscordChannel),
+    ListMessages(Vec<PartialMessage>),
+    RequestGuildMembersChunk {
+        guild_id: Snowflake,
+        user_ids: Vec<Snowflake>,
+    },
 
     Panic(String),
 }

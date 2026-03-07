@@ -2,7 +2,7 @@ use paicord_rs::{discord_http::endpoints::cdn_endpoints::{self, CDNEndpoint}, di
 use slint::{ComponentHandle, Weak};
 use tokio::sync::mpsc;
 
-use crate::{app::{CurrentUserStore, MainWindow, PaicordCommand, PartialUserSlint}, images::ImageMangler};
+use crate::{app::{CurrentUserStore, MainWindow, PaicordCommand, PartialUserSlint}, images::ImageMangler, state::PaicordManager};
 
 pub struct CurrentUserManager {
     command_sender: mpsc::Sender<PaicordCommand>,
@@ -46,7 +46,7 @@ impl CurrentUserManager {
         Ok(())
     }
 
-    pub async fn handle_event(&mut self, event: &GatewayEvent, image_mangler: &ImageMangler) -> anyhow::Result<()> {
+    async fn handle_event(&mut self, event: &GatewayEvent, image_mangler: &ImageMangler) -> anyhow::Result<()> {
         let Some(data) = &event.data else {
             return Ok(());
         };
@@ -55,13 +55,27 @@ impl CurrentUserManager {
             GatewayPayload::Ready(ready) => {
                 self.handle_ready(ready, image_mangler).await?;
             }
+            _ => {}
         }
 
         Ok(())
     }
 
-    pub async fn handle_ready(&mut self, ready: &ReadyPayload, image_mangler: &ImageMangler) -> anyhow::Result<()> {
+    async fn handle_ready(&mut self, ready: &ReadyPayload, image_mangler: &ImageMangler) -> anyhow::Result<()> {
         self.set_current_user(ready.user.clone().into(), image_mangler).await?;
+        Ok(())
+    }
+}
+
+impl PaicordManager for CurrentUserManager {
+    async fn handle_command(&mut self, command: &PaicordCommand, image_mangler: &ImageMangler) -> anyhow::Result<()> {
+        match command {
+            PaicordCommand::GatewayEvent(event) => {
+                self.handle_event(event, image_mangler).await?;
+            }
+            _ => {}
+        }
+
         Ok(())
     }
 }

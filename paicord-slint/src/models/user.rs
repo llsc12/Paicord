@@ -1,4 +1,4 @@
-use paicord_rs::discord_models::types::user::PartialUser;
+use paicord_rs::discord_models::types::{guild::PartialMember, user::PartialUser};
 
 use crate::app::PartialUserSlint;
 

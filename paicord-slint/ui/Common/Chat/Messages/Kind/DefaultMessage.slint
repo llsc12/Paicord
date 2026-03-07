@@ -1,0 +1,48 @@
+import {
+    DiscordMessageSlint as DiscordMessage,
+    DiscordMessageKindSlint as DiscordMessageKind,
+} from "../../../../Models/DiscordMessage.slint";
+import { RoundedImage } from "../../../RoundedImage.slint";
+import { VerticalBox, StyleMetrics, Palette } from "std-widgets.slint";
+
+export component DefaultMessage inherits Rectangle {
+    in-out property <DiscordMessage> message;
+    HorizontalLayout {
+        spacing: StyleMetrics.layout-spacing;
+        RoundedImage {
+            image-alignment: center;
+            source: message.author.avatar.image;
+            border-radius: 500px;
+            image-width: 40px;
+            image-height: 40px;
+        }
+
+        VerticalLayout {
+            alignment: start;
+            HorizontalLayout {
+                spacing: StyleMetrics.layout-spacing;
+                alignment: start;
+                Text {
+                    vertical-alignment: center;
+                    text: message.author.name;
+                    font-weight: 500;
+                    font-size: 14px;
+                    color: message.author.has_role_color ? message.author.role_color : Colors.white;
+                }
+
+                Text {
+                    vertical-alignment: center;
+                    text: message.timestamp;
+                    font-size: 11px;
+                    color: Palette.foreground.darker(0.4);
+                }
+            }
+
+            StyledText {
+                text: message.content;
+                font-size: 14px;
+                wrap: TextWrap.word-wrap;
+            }
+        }
+    }
+}

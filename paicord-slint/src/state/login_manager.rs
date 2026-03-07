@@ -5,7 +5,7 @@ use directories::ProjectDirs;
 use paicord_rs::{
     discord_gateway::remote_auth_gateway_manager::{RemoteAuthGatewayManager, RemoteAuthOpcode},
     discord_http::endpoints::cdn_endpoints::{self, CDNEndpoint},
-    discord_models::types::user::PartialUser,
+    discord_models::types::{gateway::GatewayEvent, user::PartialUser},
 };
 use persistent_kv::{Config, PersistentKeyValueStore};
 use qrcode_generator::QrCodeEcc;
@@ -15,7 +15,7 @@ use tokio::sync::mpsc;
 use crate::{
     app::{LoginManagerSlint, MainWindow, PaicordCommand, PartialUserSlint},
     images::ImageMangler,
-    state::gateway_manager::GatewayManager,
+    state::{PaicordManager, gateway_manager::GatewayManager},
 };
 
 pub struct LoginManager {
@@ -25,12 +25,15 @@ pub struct LoginManager {
     ui: Weak<MainWindow>,
 
     fingerprint: Option<String>,
+    dirs: ProjectDirs,
 }
 
 impl LoginManager {
     pub fn new(
         command_sender: mpsc::Sender<PaicordCommand>,
         ui: Weak<MainWindow>,
+
+        dirs: ProjectDirs,
     ) -> anyhow::Result<Self> {
         let s = command_sender.clone();
         ui.upgrade_in_event_loop(move |ui| {
@@ -49,20 +52,20 @@ impl LoginManager {
 
         let login_manager = Self {
             remote_auth_gateway_manager: RemoteAuthGatewayManager::new(),
-            fingerprint: None,
             command_sender,
             ui,
+            fingerprint: None,
+            dirs,
         };
 
         Ok(login_manager)
     }
 
-    pub async fn initialize(
+    pub async fn initialize<S: AsRef<str>>(
         &mut self,
-        dirs: &ProjectDirs,
-        gateway_manager: &GatewayManager,
+        fingerprint: S,
     ) -> anyhow::Result<()> {
-        self.fingerprint_setup(dirs, gateway_manager).await?;
+        self.fingerprint_setup(fingerprint).await?;
 
         self.remote_auth_gateway_manager.connect().await;
 
@@ -132,13 +135,12 @@ impl LoginManager {
         Ok(())
     }
 
-    async fn fingerprint_setup(
+    async fn fingerprint_setup<S: AsRef<str>>(
         &mut self,
-        dirs: &ProjectDirs,
-        gateway_manager: &GatewayManager,
+        fingerprint: S,
     ) -> anyhow::Result<()> {
         let store: PersistentKeyValueStore<String, String> =
-            PersistentKeyValueStore::new(dirs.data_dir(), Config::default())
+            PersistentKeyValueStore::new(self.dirs.data_dir(), Config::default())
                 .map_err(|e| anyhow!(e))?;
 
         if let Some(fingerprint) = store.get("Authentication.Fingerprint") {
@@ -146,10 +148,7 @@ impl LoginManager {
             return Ok(());
         }
 
-        self.fingerprint = gateway_manager
-            .unauthenticated_client
-            .get_fingerprint()
-            .await;
+        self.fingerprint = Some(fingerprint.as_ref().to_string());
 
         if let Some(ref fingerprint) = self.fingerprint {
             store
@@ -222,6 +221,39 @@ impl LoginManager {
         println!("Received token: {}", token);
 
         let _ = self.command_sender.try_send(PaicordCommand::GatewayLogin(token));
+
+        Ok(())
+    }
+}
+
+impl PaicordManager for LoginManager {
+    async fn handle_command(&mut self, command: &PaicordCommand, image_mangler: &ImageMangler) -> anyhow::Result<()> {
+        match command {
+            PaicordCommand::InitializeLoginManager(fingerprint) => {
+                self.initialize(fingerprint).await?;
+            }
+
+            PaicordCommand::PendingRemoteInit(fingerprint) => {
+                self.pending_remote_init(fingerprint)?;
+            }
+
+            PaicordCommand::PendingTicket(user) => {
+                self.pending_ticket(user, image_mangler).await?;
+            }
+
+            PaicordCommand::PendingLogin(ticket) => {
+                self.pending_login(ticket).await?;
+            }
+
+            PaicordCommand::RemoteAuthFinish => {
+                self.disconnect().await?;
+            }
+
+            PaicordCommand::RemoteAuthCancel => {
+                self.disconnect().await?;
+            }
+            _ => {}
+        }
 
         Ok(())
     }

@@ -1,0 +1,16 @@
+import { GuildFolderSlint } from "../Models/GuildFolder.slint";
+import { LazyImage } from "../Models/LazyImage.slint";
+
+export global GuildStore {
+    in-out property <[GuildFolderSlint]> guild_folders;
+    in-out property <GuildFolderSlint> current_guild;
+
+    in-out property <bool> has_banner;
+    in-out property <image> banner;
+
+    callback select_guild(id: string);
+
+    changed current_guild => {
+        select_guild(current_guild.id)
+    }
+}

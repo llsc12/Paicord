@@ -80,3 +80,6 @@ extension DiscordTimestampRust {
         self.inner = timestamp.date.timeIntervalSince1970
     }
 }
+
+extension BridgedRustError: Error {}
+extension BridgedRustError: @unchecked Sendable {}

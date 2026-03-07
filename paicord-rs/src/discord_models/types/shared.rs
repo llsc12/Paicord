@@ -1,8 +1,51 @@
-use crate::ffi;
+use chrono::{DateTime, Local, TimeZone, offset::LocalResult};
 
-pub use ffi::DiscordColorRust as DiscordColor;
-pub use ffi::DiscordLocaleRust as DiscordLocale;
-pub use ffi::DiscordTimestampRust as DiscordTimestamp;
+use crate::{discord_models::types::gateway::PartialMessage, ffi};
+
+pub type DiscordColor = ffi::DiscordColorRust;
+pub type DiscordLocale = ffi::DiscordLocaleRust;
+pub type DiscordTimestamp = ffi::DiscordTimestampRust;
+
+impl DiscordColor {
+    pub fn as_rgb(&self) -> (u8, u8, u8) {
+        let red = self.inner >> 16;
+        let green = (self.inner >> 8) & 0x00FF;
+        let blue = self.inner & 0x0000FF;
+
+        (red as u8, green as u8, blue as u8)
+    }
+}
+
+impl Default for DiscordColor {
+    fn default() -> Self {
+        Self { inner: 0 }
+    }
+}
+
+impl DiscordTimestamp {
+    pub fn as_datetime(&self) -> LocalResult<DateTime<Local>> {
+        let millis = (self.inner * 1000.0) as i64;
+        chrono::Local.timestamp_millis_opt(millis)
+    }
+
+    pub fn to_string(&self, message: &PartialMessage) -> String {
+        let now = Local::now();
+
+        let datetime = match self.as_datetime() {
+            LocalResult::Single(dt) => dt,
+            LocalResult::Ambiguous(dt1, _) => dt1,
+            LocalResult::None => now.clone()
+        };
+
+        if datetime.date_naive() == now.date_naive() {
+            datetime.format("%-I:%M %p").to_string()
+        } else if datetime.date_naive() == (now - chrono::Duration::days(1)).date_naive() {
+            format!("Yesterday at {}", datetime.format("%-I:%M %p"))
+        } else {
+            datetime.format("%m/%d/%Y at %-I:%M %p").to_string()
+        }
+    }
+}
 
 impl std::fmt::Debug for DiscordColor {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -53,3 +96,6 @@ impl std::fmt::Debug for DiscordTimestamp {
         f.debug_struct("DiscordTimestampRust").field("inner", &self.inner).finish()
     }
 }
+
+unsafe impl Send for ffi::BridgedRustError {}
+unsafe impl Sync for ffi::BridgedRustError {}

@@ -1,0 +1,14 @@
+import { LazyImage } from "./LazyImage.slint";
+
+export struct GuildFolderSlint {
+    id: string,
+    name: string,
+    expanded: bool,
+    is_folder: bool,
+    icon: LazyImage,
+
+    banner: LazyImage,
+    
+    has_color: bool,
+    color: brush,
+}

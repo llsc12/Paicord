@@ -1,5 +1,11 @@
 import { PartialUserSlint } from "../Models/DiscordUser.slint";
 
 export global CurrentUserStore {
-    in-out property <PartialUserSlint> current_user;
+   in-out property <PartialUserSlint> current_user;
+    // in-out property <PartialUserSlint> current_user: {
+    //     id: "a",
+    //     username: "Loading...",
+    //     global_name: "Loading...",
+    //     avatar: @image-url("../images/paicord_icon.png")
+    // };
 }

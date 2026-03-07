@@ -1,6 +1,65 @@
+import { GuildScrollBar } from "../Common/Guilds/GuildScrollBar.slint";
+import { Palette } from "std-widgets.slint";
+import { ChannelScrollBar } from "../Common/Guilds/ChannelScrollBar.slint";
+import { ChatView } from "../Common/Chat/ChatView.slint";
 import { ProfileBar } from "../Sidebar/ProfileBar.slint";
-export component LargeBaseplate inherits Rectangle {
-    ProfileBar {
-        
+
+component Splitter inherits TouchArea {
+    width: 4px;
+    mouse-cursor: ew-resize;
+
+    rec := Rectangle {
+        width: 100%;
+        height: 100%;
+        background: root.has-hover ? Palette.border : transparent;
+        animate background {
+            duration: 0.25s;
+            easing: ease-in-out;
+        }
     }
+}
+
+export component LargeBaseplate inherits Rectangle {
+    GridLayout {
+        guilds := GuildScrollBar {
+            col: 0;
+            row: 1;
+            width: 74px;
+        }
+
+        channels := ChannelScrollBar {
+            col: 1;
+            row: 1;
+
+            width: channelSplit.x - guilds.width + channelSplit.width;
+        }
+
+        chat := ChatView {
+            col: 3;
+            rowspan: 2;
+            // show-image(images, index) => {
+            //     gallery.show(images, index);
+            // }
+        }
+
+        ProfileBar {
+            height: 74px;
+            colspan: 2;
+            row: 2;
+        }
+    }
+
+    channelSplit := Splitter {
+        y: 0;
+        x: guilds.width + 150px - self.width;
+        height: channels.height;
+
+        moved => {
+            self.x = min((guilds.width + 292px) - self.width, max((guilds.width + 74px), self.x + self.mouse-x - self.pressed-x));
+        }
+    }
+
+    // gallery := Gallery {
+    //     visible: false;
+    // }
 }

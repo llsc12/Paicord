@@ -2,6 +2,7 @@ pub mod state;
 pub mod app;
 pub mod images;
 pub mod models;
+pub mod utils;
 
 #[cfg_attr(target_os = "android", link(name = "c++_shared"))]
 unsafe extern "C" {}
@@ -15,9 +16,9 @@ pub async fn main() {
     //     }
     // }
 
-    // unsafe {
-    //     std::env::set_var("SLINT_ENABLE_EXPERIMENTAL_FEATURES", "1");
-    // }
+    unsafe {
+        std::env::set_var("SLINT_ENABLE_EXPERIMENTAL_FEATURES", "1");
+    }
 
     run_app().unwrap();
 }

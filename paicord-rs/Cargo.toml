@@ -7,6 +7,8 @@ edition = "2024"
 swift-bridge = { path = "/home/sarah/Documents/github/swift-bridge/", features = ["async"]}
 #swift-bridge = { git = "https://github.com/chinedufn/swift-bridge.git", features = ["async"] }
 
+chrono = "*"
+
 [build-dependencies]
 swift-bridge-build = { path = "/home/sarah/Documents/github/swift-bridge/crates/swift-bridge-build" }
 #swift-bridge-build = { git = "https://github.com/chinedufn/swift-bridge.git" }

@@ -4,7 +4,7 @@
 use std::path::PathBuf;
 
 fn main() {
-    //println!("cargo:rerun-if-changed=NULL");
+    println!("cargo:rerun-if-changed=NULL");
     let config = slint_build::CompilerConfiguration::new();
     slint_build::compile_with_config("ui/main.slint", config).unwrap();
 
@@ -17,7 +17,7 @@ fn main() {
             .join(if target_os == "android" {
                 "/home/sarah/.swiftpm/swift-sdks/swift-6.2-RELEASE-android-24-0.1.artifactbundle/swift-6.2-release-android-24-sdk/android-27d-sysroot/usr/lib/swift/android/"
             } else {
-                "/home/sarah/.local/share/swiftly/toolchains/main-snapshot-2026-02-23/usr/lib/swift_static/linux/"
+                "/home/sarah/.local/share/swiftly/toolchains/6.2.3/usr/lib/swift_static/linux/"
             })
             .to_string_lossy()
             .to_string(),

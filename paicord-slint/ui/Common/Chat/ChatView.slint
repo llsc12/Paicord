@@ -1,0 +1,67 @@
+import {
+    VerticalBox,
+    Palette,
+    TextEdit,
+    HorizontalBox,
+    GridBox,
+} from "std-widgets.slint";
+import { ChannelStore } from "../../Globals/ChannelStore.slint";
+import { IconDisplay } from "../../Libraries/lucide.slint";
+import { DiscordChannelSlint as DiscordChannel, DiscordChannelKindSlint as DiscordChannelKind } from "../../Models/DiscordChannel.slint";
+import { ChatScroller } from "ChatScroller.slint";
+
+export component ChatView inherits Rectangle {
+    property <DiscordChannel> channel: ChannelStore.current_channel;
+    //callback show-image(images: [ImageAttachment], index: int);
+
+    VerticalBox {
+        spacing: 4px;
+        HorizontalBox {
+            padding: 0;
+            spacing: 4px;
+            IconDisplay {
+                icon: ChannelStore.channel_kind_to_icon(channel.kind, channel.expanded);
+                width: 16px;
+                height: 16px;
+                stroke: Palette.foreground;
+                stroke-width: 1.0;
+            }
+
+            Text {
+                text: ChannelStore.current_channel.name;
+                font-size: 14px;
+                font-weight: 450;
+                vertical-alignment: center;
+            }
+        }
+
+        if channel.topic != "": Text {
+            text: channel.topic;
+            font-size: 10px;
+            color: Palette.alternate-foreground;
+            overflow: TextOverflow.elide;
+        }
+
+        chatScroller := ChatScroller {
+            // show-image(images, index) => {
+            //     root.show-image(images, index)
+            // }
+        }
+
+        TextEdit {
+            placeholder-text: "Message " + ChannelStore.current_channel.name + "...";
+            wrap: TextWrap.word-wrap;
+            height: 74px;
+            key-pressed(event) => {
+                if event.text == Key.Return && !event.modifiers.shift {
+                    //CurrentGuildStore.send_message(self.text);
+                    self.text = "";
+                    
+                    accept
+                } else {
+                    reject
+                }
+            }
+        }
+    }
+}

@@ -5,13 +5,13 @@ use crate::{
 
 use crate::ffi;
 
-pub use ffi::AvatarDecorationRust as AvatarDecoration;
-pub use ffi::CollectiblesRust as Collectibles;
-pub use ffi::ColorPaletteRust as ColorPalette;
-pub use ffi::DiscordUserRust as DiscordUser;
-pub use ffi::NameplateRust as Nameplate;
-pub use ffi::PremiumKindRust as PremiumKind;
-pub use ffi::PrimaryGuildRust as PrimaryGuild;
+pub type AvatarDecoration = ffi::AvatarDecorationRust;
+pub type Collectibles = ffi::CollectiblesRust;
+pub type ColorPalette = ffi::ColorPaletteRust;
+pub type DiscordUser = ffi::DiscordUserRust;
+pub type Nameplate = ffi::NameplateRust;
+pub type PremiumKind = ffi::PremiumKindRust;
+pub type PrimaryGuild = ffi::PrimaryGuildRust;
 
 #[derive(Clone, Debug)]
 pub struct PartialUser {
@@ -55,6 +55,16 @@ impl PartialUser {
             bot,
             system,
             accent_color,
+        }
+    }
+
+    pub fn get_display_name(&self) -> Option<String> {
+        if let Some(global_name) = &self.global_name {
+            Some(global_name.clone())
+        } else if let Some(username) = &self.username {
+            Some(username.clone())
+        } else {
+            None
         }
     }
 }

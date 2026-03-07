@@ -2,7 +2,7 @@ use std::hash::Hash;
 
 use crate::ffi;
 
-pub use ffi::SnowflakeRust as Snowflake;
+pub type Snowflake = ffi::SnowflakeRust;
 
 impl std::fmt::Debug for Snowflake {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

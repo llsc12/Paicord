@@ -1,0 +1,16 @@
+import { DiscordMessageSlint as DiscordMessage, DiscordMessageKindSlint as DiscordMessageKind } from "../../../Models/DiscordMessage.slint";
+import { DefaultMessage } from "Kind/DefaultMessage.slint";
+import { Palette, VerticalBox } from "std-widgets.slint";
+
+export component MessageView inherits VerticalBox {
+    in-out property <DiscordMessage> message;
+
+    if message.kind == DiscordMessageKind.Default: DefaultMessage {
+        message: message;
+        background: touch.has-hover ? Palette.background.brighter(0.4) : Palette.background;
+
+        touch := TouchArea {
+
+        }
+    }
+}

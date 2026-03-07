@@ -1,0 +1,92 @@
+import { ScrollView, VerticalBox, ListView, Palette, StyleMetrics } from "std-widgets.slint";
+import { DiscordChannelSlint as DiscordChannel, DiscordChannelKindSlint as DiscordChannelKind } from "../../Models/DiscordChannel.slint";
+import { ChannelStore } from "../../Globals/ChannelStore.slint";
+import { IconDisplay, IconSet } from "../../Libraries/lucide.slint";
+import { GuildStore } from "../../Globals/GuildStore.slint";
+export component ChannelScrollBar inherits ScrollView {
+    in-out property <brush> background: transparent;
+    Rectangle {
+        width: 100%;
+        height: 100%;
+        background: root.background;
+    }
+
+    box := VerticalBox {
+        Text {
+            text: GuildStore.current_guild.name;
+            vertical-alignment: center;
+            font-size: 16px;
+            font-weight: 450;
+        }
+
+        if GuildStore.has_banner: Image {
+            source: GuildStore.banner;
+            cache-rendering-hint: true;
+            image-fit: cover;
+            height: 64px;
+        }
+
+        list := ListView {
+            horizontal-scrollbar-policy: ScrollBarPolicy.always-off;
+            vertical-scrollbar-policy: ScrollBarPolicy.as-needed;
+
+            property <string> selected_channel_id: "69420";
+            
+            for i in ChannelStore.channels.length: Rectangle {
+                property <DiscordChannel> channel: ChannelStore.channels[i];
+                property <bool> selected: channel.id == selected_channel_id;
+                property <bool> hovered: touchArea.has-hover;
+
+                border-radius: 8px;
+
+                background: (hovered || selected) && channel.kind != DiscordChannelKind.GuildCategory ? Palette.alternate-background : transparent;
+
+                VerticalBox {
+                    alignment: center;
+                    padding-top: channel.kind == DiscordChannelKind.GuildCategory ? StyleMetrics.layout-padding * 2 : StyleMetrics.layout-padding;
+                    padding-bottom: channel.kind == DiscordChannelKind.GuildCategory ? 2px : StyleMetrics.layout-padding;
+                    HorizontalLayout {
+                        spacing: 4px;
+                        alignment: start;
+
+                        if channel.kind != DiscordChannelKind.GuildCategory: IconDisplay {
+                            icon: ChannelStore.channel_kind_to_icon(channel.kind, channel.expanded);
+                            width: 20px;
+                            height: 20px;
+                            stroke: Palette.foreground;
+                            stroke-width: 1.0;
+                        }
+
+                        Text {
+                            text: channel.name;
+                            vertical-alignment: center;
+                            overflow: elide;
+                            font-size: channel.kind == DiscordChannelKind.GuildCategory ? 14px : 16px;
+                            color: (hovered || selected) ? Palette.foreground : Palette.foreground.darker(0.4);
+                        }
+
+                        if channel.kind == DiscordChannelKind.GuildCategory: IconDisplay {
+                            icon: ChannelStore.channel_kind_to_icon(channel.kind, channel.expanded);
+                            width: 16px;
+                            height: 16px;
+                            stroke: Palette.foreground.darker(0.4);
+                            stroke-width: 1.0;
+                        }
+                    }
+                }
+
+                touchArea := TouchArea {
+                    clicked => {
+                        if channel.kind == DiscordChannelKind.GuildCategory {
+                            ChannelStore.channels[i].expanded = !ChannelStore.channels[i].expanded;
+                        }
+                        if channel.kind != DiscordChannelKind.GuildCategory && selected_channel_id != ChannelStore.channels[i].id {
+                            selected_channel_id = ChannelStore.channels[i].id;
+                            ChannelStore.select_channel_slint(ChannelStore.channels[i]);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

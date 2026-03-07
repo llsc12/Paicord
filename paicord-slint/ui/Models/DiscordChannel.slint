@@ -1,0 +1,27 @@
+import { Icon } from "../Libraries/lucide.slint";
+
+export enum DiscordChannelKindSlint {
+    GuildText,
+    Dm,
+    GuildVoice,
+    GroupDm,
+    GuildCategory,
+    GuildAnnouncement,
+    GuildStore,
+    AnnouncementThread,
+    PublicThread,
+    PrivateThread,
+    GuildStageVoice,
+    GuildDirectory,
+    GuildForum,
+    GuildMedia,
+    Undocumented,
+}
+
+export struct DiscordChannelSlint {
+    id: string,
+    name: string,
+    kind: DiscordChannelKindSlint,
+    topic: string,
+    expanded: bool,
+}
