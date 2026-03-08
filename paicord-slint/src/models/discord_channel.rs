@@ -29,7 +29,7 @@ impl From<&DiscordChannel> for DiscordChannelSlint {
             name: value.name.clone().unwrap_or("Unknown Channel".to_string()).into(),
             topic: value.topic.clone().unwrap_or_default().into(),
             kind: value.kind.clone().unwrap_or(DiscordChannelKind::GuildText).into(),
-            expanded: false,
+            expanded: value.kind == Some(DiscordChannelKind::GuildCategory),
             ..Default::default()
         }
     }
