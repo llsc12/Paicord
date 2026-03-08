@@ -36,27 +36,4 @@ fn main() {
             std::env::consts::ARCH
         );
     }
-
-
-    // let target_dir = std::env::var("CARGO_TARGET_DIR").unwrap_or_else(|_| "target".to_string());
-    // let profile = std::env::var("PROFILE").unwrap_or_else(|_| "debug".to_string());
-
-    // let bridge_path = PathBuf::from("../paicord-rs/PaicordLibBridge/.build/debug/libPaicordLibBridge.so");
-
-    // if !bridge_path.exists() {
-    //     panic!(
-    //         "Bridge library not found at {:?}. Make sure to build the paicord-rs crate first.",
-    //         bridge_path
-    //     );
-    // }
-
-    // let dest_dir = PathBuf::from(&target_dir).join(&profile);
-    // let dest_file = dest_dir.join("libPaicordLibBridge.so");
-
-    // std::fs::copy(&bridge_path, &dest_file).unwrap_or_else(|e| {
-    //     panic!(
-    //         "Failed to copy bridge library from {:?} to {:?}: {}",
-    //         bridge_path, dest_file, e
-    //     )
-    // });
 }

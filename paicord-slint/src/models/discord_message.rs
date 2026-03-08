@@ -7,6 +7,7 @@ use paicord_rs::{
     },
     markdown::DiscordMarkdownParser,
 };
+use slint::{ModelRc, VecModel};
 
 use crate::{
     app::{
@@ -102,6 +103,19 @@ impl DiscordMessageSlint {
             bail!("PartialMessage is missing author");
         };
 
+        let mut image_attachments = Vec::new();
+
+        for attachment in &partial_message.attachments {
+            if let Some(width) = &attachment.width
+                && let Some(height) = &attachment.height
+            {
+                let mut lazy_image = LazyImage::from_url(attachment.proxy_url.clone());
+                lazy_image.width = *width;
+                lazy_image.height = *height;
+                image_attachments.push(lazy_image);
+            };
+        }
+
         let s = Self {
             content: utils::parse_markdown_to_slint(
                 partial_message
@@ -112,6 +126,12 @@ impl DiscordMessageSlint {
                 markdown_parser,
             )
             .await?,
+            empty: partial_message.content.is_none()
+                || partial_message
+                    .content
+                    .as_ref()
+                    .map(|c| c.is_empty())
+                    .unwrap_or(true),
             kind: partial_message.kind.into(),
             author: MessageAuthorSlint::from_partial_message(
                 partial_message,
@@ -149,6 +169,7 @@ impl DiscordMessageSlint {
                 .map(|t| t.to_string(partial_message))
                 .unwrap_or_default()
                 .into(),
+            image_attachments: VecModel::from_slice(&image_attachments),
             ..Default::default()
         };
         Ok(s)

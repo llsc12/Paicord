@@ -79,20 +79,16 @@ export struct ReferencedMessageSlint {
     edited_timestamp: string,
 }
 
-export struct ImageAttachment {
-    image: LazyImage,
-    width: int,
-    height: int,
-}
-
 export struct DiscordMessageSlint {
     id: string,
     channel_id: string,
     guild_id: string,
     author: MessageAuthorSlint,
     content: styled-text,
+    empty: bool,
     timestamp: string,
     edited_timestamp: string,
     referenced_message: ReferencedMessageSlint,
     kind: DiscordMessageKindSlint,
+    image_attachments: [LazyImage],
 }

@@ -4,25 +4,14 @@ import { Icon, IconSet } from "../Libraries/lucide.slint";
 
 export global ChannelStore {
     in-out property <[DiscordChannel]> channels;
-    // in-out property <[DiscordChannel]> channels: [
-    //     {
-    //         id: "1",
-    //         name: "bruh",
-    //     },
-    //     {
-    //         id: "2",
-    //         name: "cuh",
-    //     }
-    // ];
-
     in-out property <DiscordChannel> current_channel;
-
     in-out property <[DiscordMessage]> messages;
 
     // in-out property <[DiscordMessage]> messages: [
     //     {
     //         id: "0",
     //         content: @markdown("Loading messages..."),
+    //         empty: true,
     //         guild_id: "0",
     //         channel_id: "0",
     //         author: {
@@ -58,6 +47,16 @@ export global ChannelStore {
     //             edited_timestamp: "",
     //          },
     //         kind: DiscordMessageKind.Default,
+    //         image_attachments: [
+    //             {
+    //                 url: "bruh",
+    //                 loaded: true,
+    //                 image: @image-url("../images/image2.png"),
+    //                 width: 1794,
+    //                 height: 977,
+    //             },
+                
+    //         ],
     //     },
     //     {
     //         id: "0",

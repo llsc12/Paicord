@@ -49,6 +49,37 @@ impl MessageListModel {
             messages.set_row_data(index, original_message);
         });
     }
+
+    fn lazy_load_attachments(&self, message: &mut DiscordMessageSlint) {
+        for (index, mut attachment) in message.image_attachments.iter().enumerate() {
+            if attachment.loaded {
+                continue;
+            }
+
+            let message_id = message.id.to_string();
+            let url = attachment.url.to_string();
+
+            let image = self.image_mangler.lazy_get(url, attachment.width as u32, attachment.height as u32, false, move |ui, image| {
+                let store = ui.global::<ChannelStore>();
+                let messages = store.get_messages();
+
+                let Some((msg_index, mut original_message)) = messages.iter().enumerate().find(|(_, m)| m.id.to_string() == message_id) else {
+                    return;
+                };
+
+                let Some(mut image_attachment) = original_message.image_attachments.row_data(index) else {
+                    return;
+                };
+
+                image_attachment.image = image;
+                image_attachment.loaded = true;
+                original_message.image_attachments.set_row_data(index, image_attachment);
+            });
+            attachment.image = image;
+            attachment.loaded = true;
+            message.image_attachments.set_row_data(index, attachment);
+        }
+    }
 }
 
 impl Model for MessageListModel {
@@ -103,6 +134,7 @@ impl Model for MessageListModel {
         };
 
         self.lazy_load_avatar(&mut message);
+        self.lazy_load_attachments(&mut message);
 
         Some(message.clone())
     }

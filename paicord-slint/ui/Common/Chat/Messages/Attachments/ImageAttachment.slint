@@ -1,0 +1,200 @@
+import { LazyImage } from "../../../../Models/LazyImage.slint";
+import { RoundedImage } from "../../../RoundedImage.slint";
+import { StyleMetrics } from "std-widgets.slint";
+
+export component ImageGrid inherits VerticalLayout {
+    in property <[LazyImage]> images;
+    property <length> max_image_width: 500px;
+    property <length> max_image_height: 300px;
+
+    if images.length == 1: RoundedImage {
+        property <float> aspect_ratio: images[0].width / images[0].height;
+        property <length> display_width: aspect_ratio > 1 ? max_image_width : max_image_height * aspect_ratio;
+        property <length> display_height: aspect_ratio > 1 ? max_image_width / aspect_ratio : max_image_height;
+        source: images[0].image;
+        image-width: display_width;
+        image-height: display_height;
+        border-radius: 8px;
+    }
+
+    if images.length == 2: HorizontalLayout {
+        spacing: StyleMetrics.layout-spacing;
+        for i in 2: RoundedImage {
+            image-width: max_image_width / 2 - (parent.spacing / 2);
+            image-height: self.image-width;
+            border-radius: 8px;
+            source: images[i].image;
+        }
+    }
+
+    if images.length == 3: HorizontalLayout {
+        spacing: StyleMetrics.layout-spacing;
+
+        RoundedImage {
+            source: images[0].image;
+            image-width: max_image_width * 2 / 3 - (parent.spacing / 2);
+            image-height: max_image_height;
+            border-radius: 8px;
+        }
+
+        VerticalLayout {
+            spacing: StyleMetrics.layout-spacing;
+            for i in 2: RoundedImage {
+                source: images[i + 1].image;
+                image-width: max_image-width / 3 - (parent.spacing / 2);
+                image-height: max_image-height / 2 - (parent.spacing / 2);
+                border-radius: 8px;
+            }
+        }
+    }
+
+    if images.length == 4: GridLayout {
+        spacing: StyleMetrics.layout-spacing;
+        for i in 4: RoundedImage {
+            source: images[i].image;
+            image-width: max_image_width / 2 - (parent.spacing / 2);
+            image-height: max_image_height / 2 - (parent.spacing / 2);
+            border-radius: 8px;
+            row: i / 2;
+        }
+    }
+
+    if images.length == 5: VerticalLayout {
+        spacing: StyleMetrics.layout-spacing;
+        HorizontalLayout {
+            spacing: StyleMetrics.layout-spacing;
+            for i in 2: RoundedImage {
+                source: images[i].image;
+                image-width: max_image_width / 2 - (parent.spacing / 2);
+                image-height: max_image_height * 2 / 3 - (parent.spacing / 2);
+                border-radius: 8px;
+            }
+        }
+
+        HorizontalLayout {
+            spacing: StyleMetrics.layout-spacing;
+            for i in 3: RoundedImage {
+                source: images[i + 2].image;
+                image-width: max_image_width / 3 - (parent.spacing / 1.5);
+                image-height: max_image_height / 2 - (parent.spacing / 2);
+                border-radius: 8px;
+            }
+        }
+    }
+
+    if images.length == 6: GridLayout {
+        spacing: StyleMetrics.layout-spacing;
+        for i in 6: RoundedImage {
+            source: images[i].image;
+            image-width: max_image_width / 3 - (parent.spacing / 2);
+            image-height: max_image_height / 2 - (parent.spacing / 2);
+            border-radius: 8px;
+            row: i / 3;
+        }
+    }
+
+    if images.length == 7: VerticalLayout {
+        spacing: StyleMetrics.layout-spacing;
+        RoundedImage {
+            source: images[0].image;
+            image-width: max_image_width;
+            image-height: max_image_height * 2 / 3 - (parent.spacing / 2);
+            border-radius: 8px;
+        }
+
+        GridLayout {
+            spacing: StyleMetrics.layout-spacing;
+            for i in 6: RoundedImage {
+                source: images[i + 1].image;
+                image-width: max_image_width / 3 - (parent.spacing / 1.5);
+                image-height: max_image_height / 3 - (parent.spacing / 2);
+                border-radius: 8px;
+                row: i / 3;
+            }
+        }
+    }
+
+    if images.length == 8: VerticalLayout {
+        spacing: StyleMetrics.layout-spacing;
+        HorizontalLayout {
+            spacing: StyleMetrics.layout-spacing;
+            for i in 2: RoundedImage {
+                source: images[i].image;
+                image-width: max_image_width / 2 - (parent.spacing / 2);
+                image-height: max_image_height * 2 / 3 - (parent.spacing / 2);
+                border-radius: 8px;
+            }
+        }
+
+        GridLayout {
+            spacing: StyleMetrics.layout-spacing;
+            for i in 6: RoundedImage {
+                source: images[i + 2].image;
+                image-width: max_image_width / 3 - (parent.spacing / 1.5);
+                image-height: max_image_height / 3 - (parent.spacing / 2);
+                border-radius: 8px;
+                row: i / 3;
+            }
+        }
+    }
+
+    if images.length == 9: VerticalLayout {
+        spacing: StyleMetrics.layout-spacing;
+        HorizontalLayout {
+            spacing: StyleMetrics.layout-spacing;
+
+            RoundedImage {
+                source: images[0].image;
+                image-width: max_image_width * 2 / 3 - (parent.spacing / 2);
+                image-height: max_image_height;
+                border-radius: 8px;
+            }
+
+            VerticalLayout {
+                spacing: StyleMetrics.layout-spacing;
+                for i in 2: RoundedImage {
+                    source: images[i + 1].image;
+                    image-width: max_image-width / 3 - (parent.spacing / 2);
+                    image-height: max_image-height / 2 - (parent.spacing / 2);
+                    border-radius: 8px;
+                }
+            }
+        }
+
+        GridLayout {
+            spacing: StyleMetrics.layout-spacing;
+            for i in 6: RoundedImage {
+                source: images[i + 3].image;
+                image-width: max_image_width / 3 - (parent.spacing / 1.5);
+                image-height: max_image_height / 3 - (parent.spacing / 2);
+                border-radius: 8px;
+                row: i / 3;
+            }
+        }
+    }
+
+    if images.length == 10: VerticalLayout {
+        spacing: StyleMetrics.layout-spacing;
+        GridLayout {
+            spacing: StyleMetrics.layout-spacing;
+            for i in 4: RoundedImage {
+                source: images[i].image;
+                image-width: max_image_width / 2 - (parent.spacing / 2);
+                image-height: max_image_height / 2 - (parent.spacing / 2);
+                border-radius: 8px;
+                row: i / 2;
+            }
+        }
+
+        GridLayout {
+            spacing: StyleMetrics.layout-spacing;
+            for i in 6: RoundedImage {
+                source: images[i + 4].image;
+                image-width: max_image_width / 3 - (parent.spacing / 2);
+                image-height: max_image_height / 3 - (parent.spacing / 2);
+                border-radius: 8px;
+                row: i / 3;
+            }
+        }
+    }
+}

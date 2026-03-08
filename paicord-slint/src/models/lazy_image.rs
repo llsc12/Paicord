@@ -8,3 +8,6 @@ impl LazyImage {
         }
     }
 }
+
+unsafe impl Send for LazyImage {}
+unsafe impl Sync for LazyImage {}

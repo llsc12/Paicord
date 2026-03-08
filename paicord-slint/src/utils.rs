@@ -120,6 +120,10 @@ pub async fn parse_markdown_to_slint<S: AsRef<str>>(
     content: S,
     markdown_parser: &DiscordMarkdownParser,
 ) -> anyhow::Result<StyledText> {
+    if content.as_ref().is_empty() {
+        return Ok(StyledText::default());
+    }
+    
     match markdown_parser
         .parse_ast(content.as_ref().to_string())
         .await

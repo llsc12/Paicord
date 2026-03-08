@@ -4,6 +4,7 @@ import {
 } from "../../../../Models/DiscordMessage.slint";
 import { RoundedImage } from "../../../RoundedImage.slint";
 import { VerticalBox, StyleMetrics, Palette } from "std-widgets.slint";
+import { ImageGrid } from "../Attachments/ImageAttachment.slint";
 
 export component DefaultMessage inherits Rectangle {
     in-out property <DiscordMessage> message;
@@ -38,10 +39,14 @@ export component DefaultMessage inherits Rectangle {
                 }
             }
 
-            StyledText {
+            if !message.empty: StyledText {
                 text: message.content;
                 font-size: 14px;
                 wrap: TextWrap.word-wrap;
+            }
+
+            if message.image_attachments.length > 0: ImageGrid {
+                images: message.image_attachments;
             }
         }
     }
