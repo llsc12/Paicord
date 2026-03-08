@@ -140,24 +140,17 @@ impl GuildManager {
         &mut self,
         chunk: &GuildMembersChunkPayload,
     ) -> anyhow::Result<()> {
-        println!("Received guild members chunk");
         let Some(current_guild_id) = self.current_guild_id else {
             return Ok(());
         };
-
-        println!("Current guild id: {}", current_guild_id.get_description());
 
         let Some(guild) = self.guilds.get(&current_guild_id) else {
             return Ok(());
         };
 
-        println!("Chunk guild id: {}", chunk.guild_id.get_description());
-
         if chunk.guild_id != current_guild_id {
             return Ok(());
         }
-
-        println!("Processing guild members chunk with {} members", chunk.members.len());
 
         for member in &chunk.members {
             let Some(user) = &member.user else {
@@ -181,17 +174,22 @@ impl GuildManager {
             return Ok(());
         };
 
+        self.members.clear();
+        for member in guild.get_members() {
+            if let Some(user) = &member.user {
+                self.members.insert(user.id, member.clone());
+            }
+        }
+
         self.command_sender
             .try_send(PaicordCommand::GuildSelected(guild.clone()))?;
 
         self.current_guild_id = Some(guild.id);
 
-        //let slint_guild = guild.clone().into();
         let has_banner = guild.banner.is_some();
 
         self.ui.upgrade_in_event_loop(move |ui| {
             let guild_store = ui.global::<GuildStore>();
-            //guild_store.set_current_guild(slint_guild);
             guild_store.set_has_banner(has_banner);
         })?;
 

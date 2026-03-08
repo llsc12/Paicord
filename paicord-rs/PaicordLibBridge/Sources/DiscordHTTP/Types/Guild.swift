@@ -38,6 +38,15 @@ class BridgedGuild {
     func get_role(index: UInt) -> RoleRust {
         return RoleRust(role: self.guild.roles[Int(index)])
     }
+
+    func member_count() -> UInt {
+        return UInt(self.guild.members?.count ?? 0)
+    }
+
+    func get_member(index: UInt) -> BridgedPartialMember {
+        let member = self.guild.members![Int(index)]
+        return BridgedPartialMember(member: member.toPartialMember())
+    }
 }
 
 class BridgedPartialMember {

@@ -40,6 +40,10 @@ impl Guild {
     pub fn get_roles(&self) -> Vec<Role> {
         (0..self.guild.role_count()).map(|i| self.guild.get_role(i)).collect()
     }
+
+    pub fn get_members(&self) -> Vec<PartialMember> {
+        (0..self.guild.member_count()).map(|i| self.guild.get_member(i)).map(PartialMember::new).collect()
+    }
 }
 
 #[derive(Clone, Debug)]

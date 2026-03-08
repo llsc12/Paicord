@@ -220,7 +220,6 @@ impl ChannelManager {
         members: &Vec<PartialMember>,
         guild_roles: &Vec<Role>,
     ) -> anyhow::Result<()> {
-        println!("CHUNK?? HELLO??");
         let messages = self.messages.clone();
 
         for member in members {

@@ -218,6 +218,8 @@ pub(crate) mod ffi {
         fn get_channel(self: &BridgedGuild, index: usize) -> BridgedDiscordChannel;
         fn role_count(self: &BridgedGuild) -> usize;
         fn get_role(self: &BridgedGuild, index: usize) -> RoleRust;
+        fn member_count(self: &BridgedGuild) -> usize;
+        fn get_member(self: &BridgedGuild, index: usize) -> BridgedPartialMember;
 
         type BridgedGuildFolderVec;
         fn len(self: &BridgedGuildFolderVec) -> usize;
