@@ -21,34 +21,23 @@ pub fn fetch_user_avatar_url(
 ) -> Option<String> {
     let id = fetch_user_id(member.clone(), user.clone())?;
 
-    if member.as_ref().is_some_and(|m| m.avatar.is_some())
-        || user.as_ref().is_some_and(|u| u.avatar.is_some())
-    {
-        if let Some(guild_id) = guild_id
-            && let Some(avatar) = member.as_ref().and_then(|m| m.avatar.clone())
-        {
-            return Some(cdn_endpoints::get_cdn_url(
-                cdn_endpoints::CDNEndpoint::GuildMemberAvatar {
-                    guild_id,
-                    user_id: id,
-                    avatar,
-                },
-            ));
-        } else if let Some(avatar) = user.as_ref().and_then(|u| u.avatar.clone()) {
-            return Some(cdn_endpoints::get_cdn_url(
-                cdn_endpoints::CDNEndpoint::UserAvatar {
-                    user_id: id,
-                    avatar,
-                },
-            ));
-        }
+    if let Some(avatar) = member.as_ref().and_then(|m| m.avatar.clone()) && let Some(guild_id) = guild_id {
+        return Some(cdn_endpoints::get_cdn_url(
+            cdn_endpoints::CDNEndpoint::GuildMemberAvatar {
+                guild_id,
+                user_id: id,
+                avatar,
+            },
+        ));
+    } else if let Some(avatar) = user.as_ref().and_then(|u| u.avatar.clone()) {
+        return Some(cdn_endpoints::get_cdn_url(
+            cdn_endpoints::CDNEndpoint::UserAvatar { user_id: id, avatar },
+        ));
     } else {
         return Some(cdn_endpoints::get_cdn_url(
             cdn_endpoints::CDNEndpoint::DefaultUserAvatar { user_id: id },
         ));
     }
-
-    None
 }
 
 pub fn fetch_user_id(

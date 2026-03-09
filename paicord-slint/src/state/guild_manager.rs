@@ -129,6 +129,7 @@ impl GuildManager {
                 stored_member: member,
                 referenced_member,
                 guild_roles,
+                guild_id: self.current_guild_id,
             })?;
 
         Ok(())
@@ -182,7 +183,7 @@ impl GuildManager {
             self.members.insert(user.id, member.clone());
         }
 
-        self.command_sender.try_send(PaicordCommand::GuildMembersChunk { members: chunk.members.clone(), guild_roles: guild.get_roles() })?;
+        self.command_sender.try_send(PaicordCommand::GuildMembersChunk { members: chunk.members.clone(), guild_roles: guild.get_roles(), guild_id: Some(current_guild_id) })?;
 
         Ok(())
     }

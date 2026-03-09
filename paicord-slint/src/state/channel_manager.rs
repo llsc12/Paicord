@@ -131,6 +131,7 @@ impl ChannelManager {
         guild_member: &Option<PartialMember>,
         referenced_member: &Option<PartialMember>,
         guild_roles: &Vec<Role>,
+        guild_id: &Option<Snowflake>,
     ) -> anyhow::Result<()> {
         let Some(current_channel) = &self.current_channel else {
             return Ok(());
@@ -158,7 +159,7 @@ impl ChannelManager {
             &partial_message,
             guild_member.as_ref(),
             referenced_member.as_ref(),
-            current_channel.guild_id.as_ref(),
+            guild_id.as_ref(),
             &self.markdown_parser,
         )
         .await?;
@@ -231,6 +232,7 @@ impl ChannelManager {
         &mut self,
         members: &Vec<PartialMember>,
         guild_roles: &Vec<Role>,
+        guild_id: &Option<Snowflake>,
     ) -> anyhow::Result<()> {
         let messages = self.messages.clone();
 
@@ -261,6 +263,7 @@ impl ChannelManager {
                     &Some(member.clone()),
                     &referenced_member.cloned(),
                     guild_roles,
+                    guild_id,
                 )
                 .await?;
             }
@@ -323,12 +326,14 @@ impl PaicordManager for ChannelManager {
                 stored_member,
                 referenced_member,
                 guild_roles,
+                guild_id
             } => {
                 self.add_message(
                     partial_message,
                     stored_member,
                     referenced_member,
                     guild_roles,
+                    guild_id,
                 )
                 .await?;
             }
@@ -336,8 +341,9 @@ impl PaicordManager for ChannelManager {
             PaicordCommand::GuildMembersChunk {
                 members,
                 guild_roles,
+                guild_id,
             } => {
-                self.handle_guild_members_chunk(members, guild_roles)
+                self.handle_guild_members_chunk(members, guild_roles, guild_id)
                     .await?;
             }
 

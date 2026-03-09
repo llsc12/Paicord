@@ -37,10 +37,12 @@ pub enum PaicordCommand {
         stored_member: Option<PartialMember>,
         referenced_member: Option<PartialMember>,
         guild_roles: Vec<Role>,
+        guild_id: Option<Snowflake>,
     },
     GuildMembersChunk {
         members: Vec<PartialMember>,
         guild_roles: Vec<Role>,
+        guild_id: Option<Snowflake>,
     },
     
     //Channels
