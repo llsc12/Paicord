@@ -36,7 +36,7 @@ impl MessageListModel {
 
         let message_id = message.id.to_string();
 
-        message.author.avatar.image = self.image_mangler.lazy_get(message.author.avatar.url.to_string(), 128, 128, false, move |ui, image| {
+        message.author.avatar.image = self.image_mangler.lazy_get(message.author.avatar.url.to_string(), 128, 128, true, move |ui, image| {
             let store = ui.global::<ChannelStore>();
             let messages = store.get_messages();
 
