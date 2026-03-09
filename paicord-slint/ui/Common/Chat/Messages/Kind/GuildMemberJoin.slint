@@ -1,0 +1,41 @@
+import {
+    DiscordMessageSlint as DiscordMessage,
+    DiscordMessageKindSlint as DiscordMessageKind,
+} from "../../../../Models/DiscordMessage.slint";
+import { LazyImage } from "../../../../Models/LazyImage.slint";
+import { RoundedImage } from "../../../RoundedImage.slint";
+import { VerticalBox, StyleMetrics, Palette } from "std-widgets.slint";
+import { ImageGrid } from "../Attachments/ImageAttachment.slint";
+import { IconDisplay, IconSet } from "../../../../Libraries/lucide.slint";
+
+export component GuildMemberJoinView inherits VerticalBox {
+    in-out property <DiscordMessage> message;
+
+    alignment: center;
+
+    HorizontalLayout {
+        alignment: start;
+        spacing: StyleMetrics.layout-spacing;
+        IconDisplay {
+            icon: IconSet.ArrowRight;
+            width: 20px;
+            height: 20px;
+            stroke: Palette.accent-background;
+            stroke-width: 1.0;
+        }
+
+        StyledText {
+            text: message.content;
+            color: Palette.foreground.darker(0.4);
+            font-size: 14px;
+            vertical-alignment: center;
+        }
+
+        Text {
+            text: message.timestamp;
+            color: Palette.foreground.darker(0.4);
+            font-size: 12px;
+            vertical-alignment: center;
+        }
+    }
+}

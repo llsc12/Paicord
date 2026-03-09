@@ -10,7 +10,6 @@ import { ImageGrid } from "../Attachments/ImageAttachment.slint";
 export component DefaultMessage inherits Rectangle {
     in-out property <DiscordMessage> message;
     in-out property <bool> has-hover: false;
-    background: has-hover || touch.has-hover ? Palette.background.brighter(0.2) : Palette.background;
     callback show-image(images: [LazyImage], index: int);
 
     HorizontalLayout {
@@ -63,9 +62,5 @@ export component DefaultMessage inherits Rectangle {
             }
 
         }
-    }
-
-    touch := TouchArea {
-        z: -1;
     }
 }

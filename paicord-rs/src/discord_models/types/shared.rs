@@ -97,5 +97,11 @@ impl std::fmt::Debug for DiscordTimestamp {
     }
 }
 
+impl Default for DiscordTimestamp {
+    fn default() -> Self {
+        Self { inner: 0.0 }
+    }
+}
+
 unsafe impl Send for ffi::BridgedRustError {}
 unsafe impl Sync for ffi::BridgedRustError {}

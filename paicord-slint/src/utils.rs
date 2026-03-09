@@ -3,8 +3,12 @@ use i_slint_core::styled_text::StyledText;
 use paicord_rs::{
     discord_http::endpoints::cdn_endpoints,
     discord_models::types::{
-        gateway::PartialMessage, guild::PartialMember, permission::Role, shared::DiscordColor,
-        snowflake::Snowflake, user::PartialUser,
+        gateway::PartialMessage,
+        guild::PartialMember,
+        permission::Role,
+        shared::{DiscordColor, DiscordTimestamp},
+        snowflake::Snowflake,
+        user::PartialUser,
     },
     markdown::{AstDocumentNode, AstNode, AstNodeType, DiscordMarkdownParser},
 };
@@ -126,14 +130,48 @@ pub async fn parse_markdown_to_slint<S: AsRef<str>>(
 
     //hack, don't know why consecutive linebreaks aren't working properly, this is a temporary workaround
     let content = content.as_ref().to_string().replace("\n", " \n ");
-    
-    match markdown_parser
-        .parse_ast(content)
-        .await
-    {
+
+    match markdown_parser.parse_ast(content).await {
         Ok(ast) => Ok(ast_to_styled_text(ast)),
         Err(err) => Err(anyhow::anyhow!("Failed to parse markdown: {}", err)),
     }
+}
+
+pub fn get_welcome_message<S: AsRef<str>>(
+    mesage: &PartialMessage,
+    author_name: S,
+    timestamp: &DiscordTimestamp,
+) -> String {
+    let author_name = author_name.as_ref();
+
+    let timestamp = timestamp.inner;
+
+    let millis = (timestamp * 1000.0) as i64;
+
+    let factor = ((millis % 13) + 13) % 13;
+
+    let messages = [
+        "**AUTHOR** joined the party.",
+        "**AUTHOR** is here.",
+        "Welcome, **AUTHOR**. We hope you brought pizza.",
+        "A wild **AUTHOR** appeared.",
+        "**AUTHOR** just landed.",
+        "**AUTHOR** just slid into the server.",
+        "**AUTHOR** just showed up!",
+        "Welcome **AUTHOR**. Say hi!",
+        "**AUTHOR** hopped into the server",
+        "Everyone welcome **AUTHOR**!",
+        "Glad you're here, **AUTHOR**.",
+        "Good to see you, **AUTHOR**.",
+        "Yay you made it, **AUTHOR**!",
+    ];
+
+    let index = match factor as u64 {
+        0..=12 => factor as usize,
+        _ => 0,
+    };
+
+    messages[index].replace("AUTHOR", author_name)
 }
 
 struct CustomStyledText {
@@ -182,9 +220,7 @@ fn ast_to_styled_text(ast: AstDocumentNode) -> StyledText {
     let idk = CustomStyledText {
         paragraphs: idk_vec,
     };
-    // idk_vec.push(Idk { paragraphs });
 
-    //StyledText::parse_interpolated::<Idk>(&text, &idk_vec).unwrap()
     unsafe { std::mem::transmute(idk) }
 }
 

@@ -105,6 +105,22 @@ impl DiscordMessageSlint {
 
         let mut image_attachments = Vec::new();
 
+        let author =
+            MessageAuthorSlint::from_partial_message(partial_message, guild_member, guild_id)?;
+
+        let content = match partial_message.kind {
+            DiscordMessageKind::GuildMemberJoin => utils::get_welcome_message(
+                partial_message,
+                &author.name,
+                &partial_message.timestamp.clone().unwrap_or_default(),
+            ),
+            _ => partial_message
+                .content
+                .as_ref()
+                .cloned()
+                .unwrap_or_default(),
+        };
+
         for attachment in &partial_message.attachments {
             if let Some(width) = &attachment.width
                 && let Some(height) = &attachment.height
@@ -118,11 +134,7 @@ impl DiscordMessageSlint {
 
         let s = Self {
             content: utils::parse_markdown_to_slint(
-                partial_message
-                    .content
-                    .as_ref()
-                    .cloned()
-                    .unwrap_or_default(),
+                content,
                 markdown_parser,
             )
             .await?,
@@ -133,11 +145,7 @@ impl DiscordMessageSlint {
                     .map(|c| c.is_empty())
                     .unwrap_or(true),
             kind: partial_message.kind.into(),
-            author: MessageAuthorSlint::from_partial_message(
-                partial_message,
-                guild_member,
-                guild_id,
-            )?,
+            author,
             channel_id: partial_message.channel_id.get_description().into(),
             guild_id: partial_message
                 .guild_id

@@ -1,22 +1,62 @@
-import { DiscordMessageSlint as DiscordMessage, DiscordMessageKindSlint as DiscordMessageKind } from "../../../Models/DiscordMessage.slint";
+import {
+    DiscordMessageSlint as DiscordMessage,
+    DiscordMessageKindSlint as DiscordMessageKind,
+} from "../../../Models/DiscordMessage.slint";
 import { LazyImage } from "../../../Models/LazyImage.slint";
 import { DefaultMessage } from "Kind/DefaultMessage.slint";
 import { Palette, VerticalBox } from "std-widgets.slint";
+import { GuildMemberJoinView } from "Kind/GuildMemberJoin.slint";
 
-export component MessageView inherits VerticalBox {
+export component MessageView inherits Rectangle {
     in-out property <DiscordMessage> message;
-
+    in-out property <bool> has-hover: false;
     callback show-image(images: [LazyImage], index: int);
 
-    if message.kind == DiscordMessageKind.Default: DefaultMessage {
-        message: message;
-        
+    background: has-hover || touch.has-hover ? Palette.background.brighter(0.2) : Palette.background;
 
-        show-image(images, index) => {
-            root.show-image(images, index);
+    VerticalBox {
+        if message.kind == DiscordMessageKind.Default: DefaultMessage {
+            message: message;
+            show-image(images, index) => {
+                root.show-image(images, index);
+            }
+
+            changed has-hover => {
+                root.has-hover = self.has-hover;
+            }
         }
 
-        // touch := TouchArea {
-        // }
+        if message.kind == DiscordMessageKind.GuildMemberJoin: GuildMemberJoinView {
+            message: message;
+        }
     }
+
+    touch := TouchArea {
+        z: -1;
+    }
+
+    // Rectangle {
+    //     in-out property <bool> has-hover: false;
+    //     background: has-hover || touch.has-hover ? Palette.background.brighter(0.2) : Palette.background;
+    //     VerticalLayout {
+    //         if message.kind == DiscordMessageKind.Default: DefaultMessage {
+    //             message: message;
+    //             show-image(images, index) => {
+    //                 root.show-image(images, index);
+    //             }
+
+    //             changed has-hover => {
+    //                 has-hover = self.has-hover;
+    //             }
+    
+    //         // touch := TouchArea {
+    //         // }
+    //     }
+    //         if message.kind == DiscordMessageKind.GuildMemberJoin: GuildMemberJoinView { }
+    //     }
+
+    //     touch := TouchArea {
+    //         z: -1;
+    //     }
+    // }
 }
