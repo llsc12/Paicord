@@ -161,7 +161,8 @@ public enum SuperProperties {
       return
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/\(Self.webkitVer()) (KHTML, like Gecko) discord/\(Self.client_version()) Chrome/\(Self.chromeVer()) Electron/\(Self.browser_version()) Safari/\(Self.webkitVer())"
     #elseif os(Linux)
-      return "Linux"
+      return
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/\(Self.webkitVer()) (KHTML, like Gecko) discord/\(Self.client_version()) Chrome/\(Self.chromeVer()) Electron/\(Self.browser_version()) Safari/\(Self.webkitVer())"
     #elseif os(iOS) || os(watchOS) || os(tvOS) || os(visionOS)
       if ws { return nil }  // no useragent when identifying browser_user_agent key in ws
       return
@@ -286,17 +287,17 @@ public enum SuperProperties {
   public static func distro() -> String? {
     #if os(Linux)
       if let content = try? String(
-        contentsOfFile: "/etc/os-release", encoding: String.Encoding.unicode)
+        contentsOfFile: "/etc/os-release", encoding: String.Encoding.utf8)
       {
         let lines = content.split(separator: "\n")
         for line in lines {
           if line.starts(with: "PRETTY_NAME=") {
             let value = line.replacingOccurrences(of: "PRETTY_NAME=", with: "")
-            return value.trimmingCharacters(in: CharacterSet(charactersIn: "\""))
+            return "\\\(value)\\"
           }
         }
       }
-      return "Ubuntu"  // i am become canonical
+      return "\"Ubuntu\""  // i am become canonical
     #else
       return nil
     #endif
@@ -357,7 +358,7 @@ public enum SuperProperties {
     case "Mac OS X":
       return "0.0.372"
     case "Linux":
-      return "0.0.117"
+      return "0.0.127"
     default:
       return "0.0.372"
     }
@@ -370,7 +371,7 @@ public enum SuperProperties {
     case "Mac OS X":
       return 485097
     case "Linux":
-      return 475491
+      return 507104
     default:
       return nil
     }
@@ -382,12 +383,12 @@ public enum SuperProperties {
 
   public static func launch_signature() -> String? {
     #if os(macOS) || os(Linux)
-        return _launch_signature.uuidString.lowercased()
+      return _launch_signature.uuidString.lowercased()
     #elseif os(iOS) || os(watchOS)
-        // TODO: ios follows a different format, using an integer. not sure how this is generated yet.
-        // for now, i was told its safe to use macos one instead.
-            //    return nil
-        return _launch_signature.uuidString.lowercased()
+      // TODO: ios follows a different format, using an integer. not sure how this is generated yet.
+      // for now, i was told its safe to use macos one instead.
+      //    return nil
+      return _launch_signature.uuidString.lowercased()
     #else
       return nil
     #endif

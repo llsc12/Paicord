@@ -104,7 +104,10 @@ extension Gateway {
           String.self,
           forKey: .device
         )
-        self.distro = try container.decode(String.self, forKey: .distro)
+        self.distro = try container.decodeIfPresent(
+          String.self,
+          forKey: .distro
+        )
         self.release_channel = try container.decodeIfPresent(
           String.self,
           forKey: .release_channel
