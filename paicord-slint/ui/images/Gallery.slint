@@ -1,0 +1,147 @@
+import { HorizontalBox, StyleMetrics } from "std-widgets.slint";
+import { RoundedImage } from "../Common/RoundedImage.slint";
+import { IconDisplay, IconSet } from "../Libraries/lucide.slint";
+import { LazyImage } from "../Models/LazyImage.slint";
+
+export component Gallery inherits Rectangle {
+    in-out property <[LazyImage]> images: [];
+    in-out property <int> current_index;
+    in-out property <LazyImage> current_image: images[current_index];
+
+    in-out property <float> aspect_ratio: current_image.width / current_image.height;
+    property <length> display_width: aspect_ratio > 1 ? max_image-width : max_image-height * aspect_ratio;
+    property <length> display_height: aspect_ratio > 1 ? max_image-width / aspect_ratio : max_image-height;
+
+    keyFocus := FocusScope {
+        focus-changed-event(reason) => {
+            self.focus();
+        }
+        key-pressed(event) => {
+            if event.text == Key.RightArrow {
+                root.change_index(root.current_index + 1);
+            } else if event.text == Key.LeftArrow {
+                root.change_index(root.current_index - 1);
+            } else if event.text == Key.Escape {
+                root.visible = false;
+            }
+            accept
+        }
+    }
+
+    public function show(images: [LazyImage], index: int) {
+        self.images = images;
+        self.current_index = index;
+        self.visible = true;
+        keyFocus.focus();
+    }
+
+    function change_index(new_index: int) {
+        //wrap around
+        if new_index < 0 {
+            current_index = images.length - 1;
+        } else if new_index >= images.length {
+            current_index = 0;
+        } else {
+            current_index = new_index;
+        }
+    }
+
+    Rectangle {
+        //semi transparent black background
+        width: parent.width;
+        height: parent.height;
+        background: #000000D0;
+        TouchArea {
+            clicked => {
+                // current_index = 0;
+                // images = [];
+                root.visible = false;
+            }
+        }
+    }
+
+    property <length> max_image-height: self.height * 0.8;
+    property <length> max_image-width: self.height * 0.8;
+
+    if images.length > 1: VerticalLayout {
+        alignment: center;
+        IconDisplay {
+            icon: IconSet.ArrowLeft;
+            width: 45px;
+            TouchArea {
+                mouse-cursor: MouseCursor.pointer;
+                clicked => {
+                    root.change_index(current_index - 1)
+                }
+            }
+        }
+    }
+
+    if images.length > 1: HorizontalLayout {
+        alignment: end;
+        VerticalLayout {
+            alignment: center;
+            IconDisplay {
+                icon: IconSet.ArrowRight;
+                width: 45px;
+                TouchArea {
+                    mouse-cursor: MouseCursor.pointer;
+
+                    clicked => {
+                        root.change_index(current_index + 1)
+                    }
+                }
+            }
+        }
+    }
+
+    HorizontalLayout {
+        alignment: center;
+        width: parent.width;
+        height: parent.height;
+        VerticalLayout {
+            spacing: StyleMetrics.layout-spacing;
+            alignment: center;
+            Image {
+                source: current_image.image;
+                image-fit: ImageFit.fill;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+
+                width: display_width;
+                height: display_height;
+
+                cache-rendering-hint: true;
+                image-rendering: ImageRendering.smooth;
+
+                TouchArea { }
+            }
+
+            if images.length > 1: HorizontalLayout {
+                spacing: StyleMetrics.layout-spacing;
+                alignment: center;
+                for i in images.length: Rectangle {
+                    RoundedImage {
+                        source: images[i].image;
+                        cache-rendering-hint: true;
+                        image-width: 50px;
+                        image-height: 50px;
+                        border-radius: 8px;
+                        image-rendering: ImageRendering.smooth;
+                    }
+
+                    Rectangle {
+                        background: i == current_index ? transparent : #00000080;
+                    }
+
+                    TouchArea {
+                        mouse-cursor: pointer;
+                        clicked => {
+                            root.change_index(i);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

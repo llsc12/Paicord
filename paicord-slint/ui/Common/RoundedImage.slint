@@ -7,6 +7,10 @@ export component RoundedImage inherits HorizontalLayout {
     in-out property <length> border-radius: 0px;
     in-out property <ImageFit> image-fit: ImageFit.cover;
     in-out property <LayoutAlignment> image-alignment: LayoutAlignment.center;
+    in-out property <bool> clickable: false;
+    in-out property <MouseCursor> cursor: MouseCursor.pointer;
+    in-out property <bool> has-hover: false;
+    callback clicked;
 
     width: image-width;
     height: image-height;
@@ -26,6 +30,16 @@ export component RoundedImage inherits HorizontalLayout {
                 source: source;
                 image-rendering: image-rendering;
                 image-fit: image-fit;
+            }
+
+            if clickable: TouchArea {
+                mouse-cursor: cursor;
+                clicked => {
+                    root.clicked();
+                }
+                changed has-hover => {
+                    root.has-hover = self.has-hover;
+                }
             }
         }
     }

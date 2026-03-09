@@ -1,18 +1,18 @@
 import { ListView, ScrollView } from "std-widgets.slint";
 import { MessageView } from "Messages/MessageView.slint";
 import { ChannelStore } from "../../Globals/ChannelStore.slint";
-// import { CurrentGuildStore } from "../../Globals/CurrentGuildStore.slint";
-// import { MessageView } from "MessageView.slint";
-// import { ImageAttachment } from "../../Globals/CurrentGuildStore.slint";
+import { LazyImage } from "../../Models/LazyImage.slint";
+
 export component ChatScroller inherits ScrollView {
+    callback show-image(images: [LazyImage], index: int);
     //callback show-image(images: [ImageAttachment], index: int);
     lv := ListView {
         horizontal-scrollbar-policy: ScrollBarPolicy.always-off;
         vertical-scrollbar-policy: ScrollBarPolicy.always-on;
         for message in ChannelStore.messages: MessageView {
-            // show-image(images, index) => {
-            //     root.show-image(images, index)
-            // }
+            show-image(images, index) => {
+                root.show-image(images, index)
+            }
             message: message;
         }
     }

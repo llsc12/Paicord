@@ -1,16 +1,22 @@
 import { DiscordMessageSlint as DiscordMessage, DiscordMessageKindSlint as DiscordMessageKind } from "../../../Models/DiscordMessage.slint";
+import { LazyImage } from "../../../Models/LazyImage.slint";
 import { DefaultMessage } from "Kind/DefaultMessage.slint";
 import { Palette, VerticalBox } from "std-widgets.slint";
 
 export component MessageView inherits VerticalBox {
     in-out property <DiscordMessage> message;
 
+    callback show-image(images: [LazyImage], index: int);
+
     if message.kind == DiscordMessageKind.Default: DefaultMessage {
         message: message;
-        background: touch.has-hover ? Palette.background.brighter(0.4) : Palette.background;
+        
 
-        touch := TouchArea {
-
+        show-image(images, index) => {
+            root.show-image(images, index);
         }
+
+        // touch := TouchArea {
+        // }
     }
 }

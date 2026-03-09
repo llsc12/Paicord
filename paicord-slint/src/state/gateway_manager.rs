@@ -118,7 +118,7 @@ impl GatewayManager {
             bail!("No user gateway manager available for sending message");
         };
 
-        user_gateway_manager.send_message(channel, content).await;
+        user_gateway_manager.send_message(channel, content.trim().to_string()).await;
 
         Ok(())
     }

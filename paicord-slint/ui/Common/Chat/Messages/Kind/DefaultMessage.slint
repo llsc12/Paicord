@@ -2,12 +2,17 @@ import {
     DiscordMessageSlint as DiscordMessage,
     DiscordMessageKindSlint as DiscordMessageKind,
 } from "../../../../Models/DiscordMessage.slint";
+import { LazyImage } from "../../../../Models/LazyImage.slint";
 import { RoundedImage } from "../../../RoundedImage.slint";
 import { VerticalBox, StyleMetrics, Palette } from "std-widgets.slint";
 import { ImageGrid } from "../Attachments/ImageAttachment.slint";
 
 export component DefaultMessage inherits Rectangle {
     in-out property <DiscordMessage> message;
+    in-out property <bool> has-hover: false;
+    background: has-hover || touch.has-hover ? Palette.background.brighter(0.2) : Palette.background;
+    callback show-image(images: [LazyImage], index: int);
+
     HorizontalLayout {
         spacing: StyleMetrics.layout-spacing;
         RoundedImage {
@@ -47,7 +52,20 @@ export component DefaultMessage inherits Rectangle {
 
             if message.image_attachments.length > 0: ImageGrid {
                 images: message.image_attachments;
+
+                show-image(images, index) => {
+                    root.show-image(images, index)
+                }
+
+                changed has-hover => {
+                    root.has-hover = self.has-hover;
+                }
             }
+
         }
+    }
+
+    touch := TouchArea {
+        z: -1;
     }
 }

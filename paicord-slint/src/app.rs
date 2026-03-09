@@ -1,10 +1,10 @@
 use std::{error::Error, sync::{Arc}};
 
 use directories::ProjectDirs;
-use paicord_rs::discord_models::types::{channel::DiscordChannel, gateway::{GatewayEvent, PartialMessage}, guild::{Guild, PartialMember}, permission::Role, snowflake::Snowflake, user::PartialUser};
+use paicord_rs::{discord_models::types::{channel::DiscordChannel, gateway::{GatewayEvent, PartialMessage}, guild::{Guild, PartialMember}, permission::Role, snowflake::Snowflake, user::PartialUser}, markdown::DiscordMarkdownParser};
 use tokio::sync::{RwLock, mpsc};
 
-use crate::state::AppState;
+use crate::{state::AppState, utils};
 
 pub type AppStatePtr = Arc<RwLock<AppState>>;
 

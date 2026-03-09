@@ -123,9 +123,12 @@ pub async fn parse_markdown_to_slint<S: AsRef<str>>(
     if content.as_ref().is_empty() {
         return Ok(StyledText::default());
     }
+
+    //hack, don't know why consecutive linebreaks aren't working properly, this is a temporary workaround
+    let content = content.as_ref().to_string().replace("\n", " \n ");
     
     match markdown_parser
-        .parse_ast(content.as_ref().to_string())
+        .parse_ast(content)
         .await
     {
         Ok(ast) => Ok(ast_to_styled_text(ast)),
@@ -143,13 +146,11 @@ fn ast_to_styled_text(ast: AstDocumentNode) -> StyledText {
 
     for doc_node in ast.children {
         match doc_node.node_type {
-            // AstNodeType::LineBreak => {
-            //     current_paragraph += 1;
-            // }
             AstNodeType::Paragraph => {
                 for child in doc_node.children {
                     if child.node_type == AstNodeType::LineBreak {
                         current_paragraph += 1;
+                        continue;
                     }
                     let Some(mut child_paragraph) = ast_to_styled_text_paragraph(&child) else {
                         continue;

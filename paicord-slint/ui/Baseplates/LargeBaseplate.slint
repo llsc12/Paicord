@@ -3,6 +3,7 @@ import { Palette } from "std-widgets.slint";
 import { ChannelScrollBar } from "../Common/Guilds/ChannelScrollBar.slint";
 import { ChatView } from "../Common/Chat/ChatView.slint";
 import { ProfileBar } from "../Sidebar/ProfileBar.slint";
+import { Gallery } from "../images/Gallery.slint";
 
 component Splitter inherits TouchArea {
     width: 4px;
@@ -37,9 +38,9 @@ export component LargeBaseplate inherits Rectangle {
         chat := ChatView {
             col: 3;
             rowspan: 2;
-            // show-image(images, index) => {
-            //     gallery.show(images, index);
-            // }
+            show-image(images, index) => {
+                gallery.show(images, index);
+            }
         }
 
         ProfileBar {
@@ -59,7 +60,7 @@ export component LargeBaseplate inherits Rectangle {
         }
     }
 
-    // gallery := Gallery {
-    //     visible: false;
-    // }
+    gallery := Gallery {
+        visible: false;
+    }
 }

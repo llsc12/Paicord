@@ -7,6 +7,10 @@ export component ImageGrid inherits VerticalLayout {
     property <length> max_image_width: 500px;
     property <length> max_image_height: 300px;
 
+    in-out property <bool> has-hover: false;
+
+    callback show-image(images: [LazyImage], index: int);
+
     if images.length == 1: RoundedImage {
         property <float> aspect_ratio: images[0].width / images[0].height;
         property <length> display_width: aspect_ratio > 1 ? max_image_width : max_image_height * aspect_ratio;
@@ -15,6 +19,14 @@ export component ImageGrid inherits VerticalLayout {
         image-width: display_width;
         image-height: display_height;
         border-radius: 8px;
+
+        clickable: true;
+        clicked => {
+            root.show-image(images, 0);
+        }
+        changed has-hover => {
+            root.has-hover = self.has-hover;
+        }
     }
 
     if images.length == 2: HorizontalLayout {
@@ -24,6 +36,13 @@ export component ImageGrid inherits VerticalLayout {
             image-height: self.image-width;
             border-radius: 8px;
             source: images[i].image;
+            clickable: true;
+            clicked => {
+                root.show-image(images, i);
+            }
+            changed has-hover => {
+                root.has-hover = self.has-hover;
+            }
         }
     }
 
@@ -35,6 +54,13 @@ export component ImageGrid inherits VerticalLayout {
             image-width: max_image_width * 2 / 3 - (parent.spacing / 2);
             image-height: max_image_height;
             border-radius: 8px;
+            clickable: true;
+            clicked => {
+                root.show-image(images, 0);
+            }
+            changed has-hover => {
+                root.has-hover = self.has-hover;
+            }
         }
 
         VerticalLayout {
@@ -44,6 +70,13 @@ export component ImageGrid inherits VerticalLayout {
                 image-width: max_image-width / 3 - (parent.spacing / 2);
                 image-height: max_image-height / 2 - (parent.spacing / 2);
                 border-radius: 8px;
+                clickable: true;
+                clicked => {
+                    root.show-image(images, i + 1);
+                }
+                changed has-hover => {
+                    root.has-hover = self.has-hover;
+                }
             }
         }
     }
@@ -56,6 +89,13 @@ export component ImageGrid inherits VerticalLayout {
             image-height: max_image_height / 2 - (parent.spacing / 2);
             border-radius: 8px;
             row: i / 2;
+            clickable: true;
+            clicked => {
+                root.show-image(images, i);
+            }
+            changed has-hover => {
+                root.has-hover = self.has-hover;
+            }
         }
     }
 
@@ -68,6 +108,13 @@ export component ImageGrid inherits VerticalLayout {
                 image-width: max_image_width / 2 - (parent.spacing / 2);
                 image-height: max_image_height * 2 / 3 - (parent.spacing / 2);
                 border-radius: 8px;
+                clickable: true;
+                clicked => {
+                    root.show-image(images, i);
+                }
+                changed has-hover => {
+                    root.has-hover = self.has-hover;
+                }
             }
         }
 
@@ -78,6 +125,13 @@ export component ImageGrid inherits VerticalLayout {
                 image-width: max_image_width / 3 - (parent.spacing / 1.5);
                 image-height: max_image_height / 2 - (parent.spacing / 2);
                 border-radius: 8px;
+                clickable: true;
+                clicked => {
+                    root.show-image(images, i + 2);
+                }
+                changed has-hover => {
+                    root.has-hover = self.has-hover;
+                }
             }
         }
     }
@@ -90,6 +144,13 @@ export component ImageGrid inherits VerticalLayout {
             image-height: max_image_height / 2 - (parent.spacing / 2);
             border-radius: 8px;
             row: i / 3;
+            clickable: true;
+            clicked => {
+                root.show-image(images, i);
+            }
+            changed has-hover => {
+                root.has-hover = self.has-hover;
+            }
         }
     }
 
@@ -100,6 +161,13 @@ export component ImageGrid inherits VerticalLayout {
             image-width: max_image_width;
             image-height: max_image_height * 2 / 3 - (parent.spacing / 2);
             border-radius: 8px;
+            clickable: true;
+            clicked => {
+                root.show-image(images, 0);
+            }
+            changed has-hover => {
+                root.has-hover = self.has-hover;
+            }
         }
 
         GridLayout {
@@ -110,6 +178,13 @@ export component ImageGrid inherits VerticalLayout {
                 image-height: max_image_height / 3 - (parent.spacing / 2);
                 border-radius: 8px;
                 row: i / 3;
+                clickable: true;
+                clicked => {
+                    root.show-image(images, i + 1);
+                }
+                changed has-hover => {
+                    root.has-hover = self.has-hover;
+                }
             }
         }
     }
@@ -123,6 +198,13 @@ export component ImageGrid inherits VerticalLayout {
                 image-width: max_image_width / 2 - (parent.spacing / 2);
                 image-height: max_image_height * 2 / 3 - (parent.spacing / 2);
                 border-radius: 8px;
+                clickable: true;
+                clicked => {
+                    root.show-image(images, i);
+                }
+                changed has-hover => {
+                    root.has-hover = self.has-hover;
+                }
             }
         }
 
@@ -134,6 +216,13 @@ export component ImageGrid inherits VerticalLayout {
                 image-height: max_image_height / 3 - (parent.spacing / 2);
                 border-radius: 8px;
                 row: i / 3;
+                clickable: true;
+                clicked => {
+                    root.show-image(images, i + 2);
+                }
+                changed has-hover => {
+                    root.has-hover = self.has-hover;
+                }
             }
         }
     }
@@ -148,6 +237,13 @@ export component ImageGrid inherits VerticalLayout {
                 image-width: max_image_width * 2 / 3 - (parent.spacing / 2);
                 image-height: max_image_height;
                 border-radius: 8px;
+                clickable: true;
+                clicked => {
+                    root.show-image(images, 0);
+                }
+                changed has-hover => {
+                    root.has-hover = self.has-hover;
+                }
             }
 
             VerticalLayout {
@@ -157,6 +253,13 @@ export component ImageGrid inherits VerticalLayout {
                     image-width: max_image-width / 3 - (parent.spacing / 2);
                     image-height: max_image-height / 2 - (parent.spacing / 2);
                     border-radius: 8px;
+                    clickable: true;
+                    clicked => {
+                        root.show-image(images, i + 1);
+                    }
+                    changed has-hover => {
+                        root.has-hover = self.has-hover;
+                    }
                 }
             }
         }
@@ -169,6 +272,13 @@ export component ImageGrid inherits VerticalLayout {
                 image-height: max_image_height / 3 - (parent.spacing / 2);
                 border-radius: 8px;
                 row: i / 3;
+                clickable: true;
+                clicked => {
+                    root.show-image(images, i + 3);
+                }
+                changed has-hover => {
+                    root.has-hover = self.has-hover;
+                }
             }
         }
     }
@@ -183,6 +293,13 @@ export component ImageGrid inherits VerticalLayout {
                 image-height: max_image_height / 2 - (parent.spacing / 2);
                 border-radius: 8px;
                 row: i / 2;
+                clickable: true;
+                clicked => {
+                    root.show-image(images, i);
+                }
+                changed has-hover => {
+                    root.has-hover = self.has-hover;
+                }
             }
         }
 
@@ -194,6 +311,13 @@ export component ImageGrid inherits VerticalLayout {
                 image-height: max_image_height / 3 - (parent.spacing / 2);
                 border-radius: 8px;
                 row: i / 3;
+                clickable: true;
+                clicked => {
+                    root.show-image(images, i + 4);
+                }
+                changed has-hover => {
+                    root.has-hover = self.has-hover;
+                }
             }
         }
     }

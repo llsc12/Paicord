@@ -9,10 +9,11 @@ import { ChannelStore } from "../../Globals/ChannelStore.slint";
 import { IconDisplay } from "../../Libraries/lucide.slint";
 import { DiscordChannelSlint as DiscordChannel, DiscordChannelKindSlint as DiscordChannelKind } from "../../Models/DiscordChannel.slint";
 import { ChatScroller } from "ChatScroller.slint";
+import { LazyImage } from "../../Models/LazyImage.slint";
 
 export component ChatView inherits Rectangle {
     property <DiscordChannel> channel: ChannelStore.current_channel;
-    //callback show-image(images: [ImageAttachment], index: int);
+    callback show-image(images: [LazyImage], index: int);
 
     VerticalBox {
         spacing: 4px;
@@ -43,9 +44,9 @@ export component ChatView inherits Rectangle {
         }
 
         chatScroller := ChatScroller {
-            // show-image(images, index) => {
-            //     root.show-image(images, index)
-            // }
+            show-image(images, index) => {
+                root.show-image(images, index)
+            }
         }
 
         TextEdit {
