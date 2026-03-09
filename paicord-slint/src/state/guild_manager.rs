@@ -97,30 +97,23 @@ impl GuildManager {
         );
 
         let member = member_id.and_then(|id| self.members.get(&id)).cloned();
-        let referenced_member = partial_message.referenced_message.as_ref().and_then(|referenced| {
-            let ref_member_id = utils::fetch_user_id(
-                referenced.member.clone(),
-                referenced.author.as_ref().map(PartialUser::from),
-            )?;
+        let referenced_member =
+            partial_message
+                .referenced_message
+                .as_ref()
+                .and_then(|referenced| {
+                    let ref_member_id = utils::fetch_user_id(
+                        referenced.member.clone(),
+                        referenced.author.as_ref().map(PartialUser::from),
+                    )?;
 
-            self.members.get(&ref_member_id).cloned()
-        });
-
-        if member.is_none() && member_id.is_some() && let Some(current_guild_id) = self.current_guild_id {
-            let mut ids = Vec::new();
-            if let Some(id) = member_id {
-                ids.push(id);
-            }
-
-            if referenced_member.is_none() && let Some(ref_member_id) = referenced_member.as_ref().and_then(|m| m.user.as_ref().map(|u| u.id)) {
-                ids.push(ref_member_id);
-            }
-
-            self.command_sender.try_send(PaicordCommand::RequestGuildMembersChunk { guild_id: current_guild_id, user_ids: ids })?;
-        }
+                    self.members.get(&ref_member_id).cloned()
+                });
 
         let mut guild_roles = Vec::new();
-        if let Some(guild_id) = self.current_guild_id && let Some(guild) = self.guilds.get(&guild_id) {
+        if let Some(guild_id) = self.current_guild_id
+            && let Some(guild) = self.guilds.get(&guild_id)
+        {
             guild_roles = guild.get_roles().clone();
         }
         self.command_sender
@@ -183,7 +176,12 @@ impl GuildManager {
             self.members.insert(user.id, member.clone());
         }
 
-        self.command_sender.try_send(PaicordCommand::GuildMembersChunk { members: chunk.members.clone(), guild_roles: guild.get_roles(), guild_id: Some(current_guild_id) })?;
+        self.command_sender
+            .try_send(PaicordCommand::GuildMembersChunk {
+                members: chunk.members.clone(),
+                guild_roles: guild.get_roles(),
+                guild_id: Some(current_guild_id),
+            })?;
 
         Ok(())
     }
