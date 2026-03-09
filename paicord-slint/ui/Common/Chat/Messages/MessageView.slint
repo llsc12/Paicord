@@ -15,7 +15,7 @@ export component MessageView inherits Rectangle {
     background: has-hover || touch.has-hover ? Palette.background.brighter(0.2) : Palette.background;
 
     VerticalBox {
-        if message.kind == DiscordMessageKind.Default: DefaultMessage {
+        if message.kind == DiscordMessageKind.Default || message.kind == DiscordMessageKind.Reply: DefaultMessage {
             message: message;
             show-image(images, index) => {
                 root.show-image(images, index);
@@ -34,29 +34,4 @@ export component MessageView inherits Rectangle {
     touch := TouchArea {
         z: -1;
     }
-
-    // Rectangle {
-    //     in-out property <bool> has-hover: false;
-    //     background: has-hover || touch.has-hover ? Palette.background.brighter(0.2) : Palette.background;
-    //     VerticalLayout {
-    //         if message.kind == DiscordMessageKind.Default: DefaultMessage {
-    //             message: message;
-    //             show-image(images, index) => {
-    //                 root.show-image(images, index);
-    //             }
-
-    //             changed has-hover => {
-    //                 has-hover = self.has-hover;
-    //             }
-    
-    //         // touch := TouchArea {
-    //         // }
-    //     }
-    //         if message.kind == DiscordMessageKind.GuildMemberJoin: GuildMemberJoinView { }
-    //     }
-
-    //     touch := TouchArea {
-    //         z: -1;
-    //     }
-    // }
 }

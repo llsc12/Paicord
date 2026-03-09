@@ -85,14 +85,6 @@ pub fn get_message_color(
 
     let mut c = None;
 
-    // if let Some(guild_member) = guild_member {
-    //     c = get_member_color(guild_member, guild_roles);
-    // }
-
-    // if c.is_none() && let Some(member) = partial_message.member.as_ref() {
-    //     c = get_member_color(member, guild_roles);
-    // }
-
     if let Some(member) = if let Some(guild_member) = guild_member {
         Some(guild_member)
     } else if let Some(member) = partial_message.member.as_ref() {

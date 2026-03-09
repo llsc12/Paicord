@@ -11,6 +11,7 @@ use paicord_rs::{
         guild::{Guild, PartialMember},
         permission::Role,
         snowflake::Snowflake,
+        user::PartialUser,
     },
     markdown::DiscordMarkdownParser,
 };
@@ -128,6 +129,7 @@ impl ChannelManager {
         &mut self,
         partial_message: &PartialMessage,
         guild_member: &Option<PartialMember>,
+        referenced_member: &Option<PartialMember>,
         guild_roles: &Vec<Role>,
     ) -> anyhow::Result<()> {
         let Some(current_channel) = &self.current_channel else {
@@ -155,15 +157,25 @@ impl ChannelManager {
         let mut slint_message = DiscordMessageSlint::from_partial(
             &partial_message,
             guild_member.as_ref(),
+            referenced_member.as_ref(),
             current_channel.guild_id.as_ref(),
             &self.markdown_parser,
         )
         .await?;
 
-        let color = utils::get_message_color(partial_message, guild_member, guild_roles);
+        let author_color = utils::get_message_color(partial_message, guild_member, guild_roles);
 
-        slint_message.author.has_role_color = color.is_some();
-        slint_message.author.role_color = utils::discord_color_to_slint(color.unwrap_or_default());
+        slint_message.author.has_role_color = author_color.is_some();
+        slint_message.author.role_color =
+            utils::discord_color_to_slint(author_color.unwrap_or_default());
+
+        if let Some(referenced_message) = &partial_message.referenced_message {
+            let referenced_color =
+                utils::get_message_color(referenced_message, referenced_member, guild_roles);
+            slint_message.referenced_message.author.has_role_color = referenced_color.is_some();
+            slint_message.referenced_message.author.role_color =
+                utils::discord_color_to_slint(referenced_color.unwrap_or_default());
+        }
 
         self.message_queue_sender.try_send(slint_message)?;
 
@@ -231,8 +243,26 @@ impl ChannelManager {
                 .iter()
                 .filter(|m| m.author.as_ref().map(|a| a.id) == Some(user.id))
             {
-                self.add_message(message, &Some(member.clone()), guild_roles)
-                    .await?;
+                let referenced_member =
+                    if let Some(referenced_message) = &message.referenced_message {
+                        if let Some(referenced_user) = &referenced_message.author {
+                            members
+                                .iter()
+                                .find(|m| m.user.as_ref().map(|u| u.id) == Some(referenced_user.id))
+                        } else {
+                            None
+                        }
+                    } else {
+                        None
+                    };
+
+                self.add_message(
+                    message,
+                    &Some(member.clone()),
+                    &referenced_member.cloned(),
+                    guild_roles,
+                )
+                .await?;
             }
         }
 
@@ -291,10 +321,16 @@ impl PaicordManager for ChannelManager {
             PaicordCommand::MessageCreated {
                 partial_message,
                 stored_member,
+                referenced_member,
                 guild_roles,
             } => {
-                self.add_message(partial_message, stored_member, guild_roles)
-                    .await?;
+                self.add_message(
+                    partial_message,
+                    stored_member,
+                    referenced_member,
+                    guild_roles,
+                )
+                .await?;
             }
 
             PaicordCommand::GuildMembersChunk {

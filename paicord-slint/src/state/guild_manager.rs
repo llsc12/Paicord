@@ -97,6 +97,14 @@ impl GuildManager {
         );
 
         let member = member_id.and_then(|id| self.members.get(&id)).cloned();
+        let referenced_member = partial_message.referenced_message.as_ref().and_then(|referenced| {
+            let ref_member_id = utils::fetch_user_id(
+                referenced.member.clone(),
+                referenced.author.as_ref().map(PartialUser::from),
+            )?;
+
+            self.members.get(&ref_member_id).cloned()
+        });
 
         let mut guild_roles = Vec::new();
         if let Some(guild_id) = self.current_guild_id && let Some(guild) = self.guilds.get(&guild_id) {
@@ -106,6 +114,7 @@ impl GuildManager {
             .try_send(PaicordCommand::MessageCreated {
                 partial_message,
                 stored_member: member,
+                referenced_member,
                 guild_roles,
             })?;
 

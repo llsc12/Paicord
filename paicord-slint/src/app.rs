@@ -35,6 +35,7 @@ pub enum PaicordCommand {
     MessageCreated {
         partial_message: PartialMessage,
         stored_member: Option<PartialMember>,
+        referenced_member: Option<PartialMember>,
         guild_roles: Vec<Role>,
     },
     GuildMembersChunk {

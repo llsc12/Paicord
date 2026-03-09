@@ -96,6 +96,7 @@ impl DiscordMessageSlint {
     pub async fn from_partial(
         partial_message: &PartialMessage,
         guild_member: Option<&PartialMember>,
+        referenced_member: Option<&PartialMember>,
         guild_id: Option<&Snowflake>,
         markdown_parser: &DiscordMarkdownParser,
     ) -> anyhow::Result<Self> {
@@ -164,6 +165,7 @@ impl DiscordMessageSlint {
                 ReferencedMessageSlint::from_partial(
                     referenced_message,
                     guild_member,
+                    referenced_member,
                     guild_id,
                     markdown_parser,
                 )
@@ -188,6 +190,7 @@ impl ReferencedMessageSlint {
     pub async fn from_partial(
         partial_message: &PartialMessage,
         guild_member: Option<&PartialMember>,
+        referenced_member: Option<&PartialMember>,
         guild_id: Option<&Snowflake>,
         markdown_parser: &DiscordMarkdownParser,
     ) -> anyhow::Result<Self> {
@@ -195,19 +198,21 @@ impl ReferencedMessageSlint {
             bail!("PartialMessage is missing author");
         };
 
+        let content = partial_message
+            .content
+            .as_ref()
+            .cloned()
+            .unwrap_or_default().replace("\n", " ");
+
         let s = Self {
             content: utils::parse_markdown_to_slint(
-                partial_message
-                    .content
-                    .as_ref()
-                    .cloned()
-                    .unwrap_or_default(),
+                content,
                 markdown_parser,
             )
             .await?,
             author: MessageAuthorSlint::from_partial_message(
                 partial_message,
-                guild_member,
+                referenced_member,
                 guild_id,
             )?,
             channel_id: partial_message.channel_id.get_description().into(),

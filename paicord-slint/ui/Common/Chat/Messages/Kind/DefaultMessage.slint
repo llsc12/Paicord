@@ -6,61 +6,96 @@ import { LazyImage } from "../../../../Models/LazyImage.slint";
 import { RoundedImage } from "../../../RoundedImage.slint";
 import { VerticalBox, StyleMetrics, Palette } from "std-widgets.slint";
 import { ImageGrid } from "../Attachments/ImageAttachment.slint";
+import { IconDisplay, IconSet } from "../../../../Libraries/lucide.slint";
 
 export component DefaultMessage inherits Rectangle {
     in-out property <DiscordMessage> message;
     in-out property <bool> has-hover: false;
     callback show-image(images: [LazyImage], index: int);
 
-    HorizontalLayout {
+    VerticalLayout {
         spacing: StyleMetrics.layout-spacing;
-        RoundedImage {
-            image-alignment: center;
-            source: message.author.avatar.image;
-            border-radius: 500px;
-            image-width: 40px;
-            image-height: 40px;
-        }
-
-        VerticalLayout {
+        if message.referenced-message.id != "": HorizontalLayout {
+            spacing: StyleMetrics.layout-spacing;
             alignment: start;
-            HorizontalLayout {
-                spacing: StyleMetrics.layout-spacing;
+            IconDisplay {
+                icon: IconSet.CornerUpRight;
+                width: 40px;
+                height: 16px;
+                stroke-width: 1.0;
+            }
+
+            RoundedImage {
+                source: message.referenced-message.author.avatar.image;
+                image-width: 16px;
+                image-height: 16px;
+                border-radius: 500px;
+            }
+
+            Text {
+                text: "@" + message.referenced-message.author.name;
+                font-size: 13px;
+                color: message.referenced-message.author.has_role_color ? message.referenced-message.author.role_color : Colors.white;
+                vertical-alignment: center;
+            }
+
+            StyledText {
+                text: message.referenced-message.content;
+                font-size: 13px;
+                vertical-alignment: center;
+                wrap: TextWrap.no-wrap;
+                overflow: elide;
+            }
+        }
+        HorizontalLayout {
+            spacing: StyleMetrics.layout-spacing;
+            RoundedImage {
+                image-alignment: center;
+                source: message.author.avatar.image;
+                border-radius: 500px;
+                image-width: 40px;
+                image-height: 40px;
+            }
+
+            VerticalLayout {
                 alignment: start;
-                Text {
-                    vertical-alignment: center;
-                    text: message.author.name;
-                    font-weight: 500;
+                HorizontalLayout {
+                    spacing: StyleMetrics.layout-spacing;
+                    alignment: start;
+                    Text {
+                        vertical-alignment: center;
+                        text: message.author.name;
+                        font-weight: 500;
+                        font-size: 14px;
+                        color: message.author.has_role_color ? message.author.role_color : Colors.white;
+                    }
+
+                    Text {
+                        vertical-alignment: center;
+                        text: message.timestamp;
+                        font-size: 11px;
+                        color: Palette.foreground.darker(0.4);
+                    }
+                }
+
+                if !message.empty: StyledText {
+                    text: message.content;
                     font-size: 14px;
-                    color: message.author.has_role_color ? message.author.role_color : Colors.white;
+                    wrap: TextWrap.word-wrap;
                 }
 
-                Text {
-                    vertical-alignment: center;
-                    text: message.timestamp;
-                    font-size: 11px;
-                    color: Palette.foreground.darker(0.4);
-                }
-            }
+                if message.image_attachments.length > 0: ImageGrid {
+                    images: message.image_attachments;
 
-            if !message.empty: StyledText {
-                text: message.content;
-                font-size: 14px;
-                wrap: TextWrap.word-wrap;
-            }
+                    show-image(images, index) => {
+                        root.show-image(images, index)
+                    }
 
-            if message.image_attachments.length > 0: ImageGrid {
-                images: message.image_attachments;
-
-                show-image(images, index) => {
-                    root.show-image(images, index)
-                }
-
-                changed has-hover => {
-                    root.has-hover = self.has-hover;
+                    changed has-hover => {
+                        root.has-hover = self.has-hover;
+                    }
                 }
             }
-
         }
     }
 }
