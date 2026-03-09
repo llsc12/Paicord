@@ -98,12 +98,10 @@ impl PartialMember {
 
     pub fn get_display_name(&self) -> Option<String> {
         if let Some(nick) = &self.nick {
-            Some(nick.clone())
-        } else if let Some(user) = &self.user {
-            user.username.clone()
-        } else {
-            None
+            return Some(nick.clone());
         }
+
+        None
     }
 }
 

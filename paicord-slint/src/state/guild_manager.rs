@@ -106,6 +106,19 @@ impl GuildManager {
             self.members.get(&ref_member_id).cloned()
         });
 
+        if member.is_none() && member_id.is_some() && let Some(current_guild_id) = self.current_guild_id {
+            let mut ids = Vec::new();
+            if let Some(id) = member_id {
+                ids.push(id);
+            }
+
+            if referenced_member.is_none() && let Some(ref_member_id) = referenced_member.as_ref().and_then(|m| m.user.as_ref().map(|u| u.id)) {
+                ids.push(ref_member_id);
+            }
+
+            self.command_sender.try_send(PaicordCommand::RequestGuildMembersChunk { guild_id: current_guild_id, user_ids: ids })?;
+        }
+
         let mut guild_roles = Vec::new();
         if let Some(guild_id) = self.current_guild_id && let Some(guild) = self.guilds.get(&guild_id) {
             guild_roles = guild.get_roles().clone();

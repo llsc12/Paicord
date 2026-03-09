@@ -69,3 +69,9 @@ impl From<&u64> for Snowflake {
         Snowflake::new(*id)
     }
 }
+
+impl Default for Snowflake {
+    fn default() -> Self {
+        Snowflake { inner: 0 }
+    }
+}
