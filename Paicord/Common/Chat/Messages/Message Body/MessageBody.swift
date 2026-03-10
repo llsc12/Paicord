@@ -70,10 +70,7 @@ extension MessageCell {
 
         // Reactions
         let reactions = channelStore.reactions[message.id, default: [:]]
-
-        if !reactions.isEmpty {
-          ReactionsView(reactions: reactions)
-        }
+        ReactionsView(reactions: reactions)
 
         if let msgSnapshot = message.partialMessageForSnapshot() {
           VStack(alignment: .leading, spacing: 4) {

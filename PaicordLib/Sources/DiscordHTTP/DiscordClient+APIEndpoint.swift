@@ -2707,8 +2707,16 @@ extension DiscordClient {
   ) async throws -> DiscordClientResponse<DiscordChannel> {
     let endpoint = APIEndpoint.createDm
     return try await self.send(
-      request: .init(to: endpoint),
-      payload: payload
+      request: .init(
+        to: endpoint,
+        headers: [
+          "X-Context-Properties":
+            SuperProperties.GenerateContextPropertiesHeader(
+              context: .createDM
+            )
+        ]
+      ),
+      payload: payload,
     )
   }
 

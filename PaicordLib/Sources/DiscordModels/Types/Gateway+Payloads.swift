@@ -1846,6 +1846,8 @@ extension Gateway {
       case type  // the type hint
     }
 
+    
+    /// https://docs.discord.food/resources/user-settings-proto#user-settings-proto-type
     @UnstableEnum<UInt>
     public enum Kind: Sendable, Codable {
       case preloaded  // 1

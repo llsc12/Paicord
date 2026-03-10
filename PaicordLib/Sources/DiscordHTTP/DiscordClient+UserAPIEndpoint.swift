@@ -594,6 +594,29 @@ extension DiscordClient {
     return try await self.send(request: .init(to: endpoint))
   }
 
+  @inlinable
+  public func getUserSettingsProto(
+    type: Gateway.UserSettingsProto.Kind
+  ) async throws -> DiscordClientResponse<UserSettingsProtoResponse> {
+    let endpoint = UserAPIEndpoint.getUserSettingsProto(type: type)
+    return try await self.send(request: .init(to: endpoint))
+  }
+
+  /// Modifies the requester's user settings protobuf for the specified type. Fires a User Settings Proto Update and User Settings Update Gateway event.
+  /// https://docs.discord.food/resources/user-settings-proto#modify-user-settings-proto
+  /// - Parameters:
+  ///   - type: The type of user settings proto being modified.
+  ///   - payload: The new user settings proto data for the specified type.
+  /// - Returns: The updated user settings proto for the specified type, and whether or not it was discarded.
+  @inlinable
+  public func modifyUserSettingsProto(
+    type: Gateway.UserSettingsProto.Kind,
+    payload: Payloads.ModifyUserSettingsProto
+  ) async throws -> DiscordClientResponse<UserSettingsProtoResponse> {
+    let endpoint = UserAPIEndpoint.modifyUserSettingsProto(type: type)
+    return try await self.send(request: .init(to: endpoint))
+  }
+
   /// Creates attachment URLs to upload the intended attachments directly to Discord's GCP storage bucket.
   /// https://docs.discord.food/resources/message#create-attachments
   @inlinable
@@ -626,7 +649,7 @@ extension DiscordClient {
     let endpoint = UserAPIEndpoint.createRemoteAuthSession
     return try await self.send(request: .init(to: endpoint), payload: payload)
   }
-  
+
   /// Finishes a remote auth session. This ends the remote auth session by sending an authentication token to the desktop client.
   /// https://docs.discord.food/remote-authentication/mobile#finish-remote-auth
   @inlinable
@@ -636,7 +659,7 @@ extension DiscordClient {
     let endpoint = UserAPIEndpoint.finishRemoteAuthSession
     return try await self.send(request: .init(to: endpoint), payload: payload)
   }
-  
+
   /// Cancels a remote auth session. This ends the remote auth session without sending an authentication token.
   /// https://docs.discord.food/remote-authentication/mobile#cancel-remote-auth
   @inlinable
@@ -646,7 +669,7 @@ extension DiscordClient {
     let endpoint = UserAPIEndpoint.cancelRemoteAuthSession
     return try await self.send(request: .init(to: endpoint), payload: payload)
   }
-  
+
   /// Exchange a remote auth ticket for an encrypted authentication token.
   /// https://docs.discord.food/remote-authentication/mobile#cancel-remote-auth
   @inlinable

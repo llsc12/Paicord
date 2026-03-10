@@ -18,6 +18,10 @@ import UInt128
   import Bionic
 #endif
 
+#if canImport(Playgrounds)
+  import Playgrounds
+#endif
+
 // Discord clients send a horrific header containing your host machine information,
 // this is used for anti-abuse systems. It is sent at IDENTIFY in gateway and with all API requests as
 // the `X-Super-Properties` header. This extension adds the extra data. The definition only has initializer
@@ -141,6 +145,7 @@ public enum SuperProperties {
 
   public enum ContextPropertyContext {
     case createMessage
+    case createDM
   }
   public static func GenerateContextPropertiesHeader(
     context: ContextPropertyContext
@@ -148,6 +153,7 @@ public enum SuperProperties {
     let dict: [String: Any] =
       switch context {
       case .createMessage: ["location": "chat_input"]
+      case .createDM: [:]
       }
     let data = try! JSONSerialization.data(withJSONObject: dict, options: [])
     return data.base64EncodedString()
@@ -455,3 +461,9 @@ extension UUID {
     return UUID.init(finalUInt)
   }
 }
+
+#if canImport(Playgrounds)
+#Playground {
+  SuperProperties.GenerateContextPropertiesHeader(context: .createDM)
+}
+#endif

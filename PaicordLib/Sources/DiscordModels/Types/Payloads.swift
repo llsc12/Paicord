@@ -3152,4 +3152,12 @@ public enum Payloads {
     
     public func validate() -> [ValidationFailure] {}
   }
+  
+  /// https://docs.discord.food/resources/user-settings-proto#json-params
+  public struct ModifyUserSettingsProto: Sendable, Codable, ValidatablePayload {
+    public var settings: DiscordModels.UserSettingsProto
+    public var required_data_version: UInt32 // get this from within the last fetched proto
+    
+    public func validate() -> [ValidationFailure] {}
+  }
 }

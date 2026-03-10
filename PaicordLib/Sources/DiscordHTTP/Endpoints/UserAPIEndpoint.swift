@@ -127,7 +127,15 @@ public enum UserAPIEndpoint: Endpoint {
     withMutualFriendsCount: Bool,
     guildId: GuildSnowflake?
   )
-  
+
+  // MARK: - User Settings
+  case getUserSettingsProto(
+    type: Gateway.UserSettingsProto.Kind
+  )
+  case modifyUserSettingsProto(
+    type: Gateway.UserSettingsProto.Kind
+  )
+
   // MARK: - Remote Authentication
   case createRemoteAuthSession
   case finishRemoteAuthSession
@@ -199,7 +207,7 @@ public enum UserAPIEndpoint: Endpoint {
       .createUserInvite,
       .revokeUserInvites:
       suffix = "users/@me/invites"
-      
+
     // MARK: - Messages
     case .createAttachments(let channelId):
       suffix = "channels/\(channelId.rawValue)/attachments"
@@ -284,8 +292,13 @@ public enum UserAPIEndpoint: Endpoint {
       let queryString =
         queryItems.isEmpty ? "" : "?" + queryItems.joined(separator: "&")
       suffix = "users/\(userId.rawValue)/profile\(queryString)"
-      
-      // MARK: - Remote Authentication
+
+    // MARK: - User Settings
+    case .getUserSettingsProto(let type):
+      suffix = "users/@me/settings-proto/\(type.rawValue.description)"
+    case .modifyUserSettingsProto(let type):
+      suffix = "users/@me/settings-proto/\(type.rawValue.description)"
+    // MARK: - Remote Authentication
     case .createRemoteAuthSession:
       suffix = "users/@me/remote-auth"
     case .finishRemoteAuthSession:
@@ -427,6 +440,10 @@ public enum UserAPIEndpoint: Endpoint {
       let queryString =
         queryItems.isEmpty ? "" : "?" + queryItems.joined(separator: "&")
       suffix = "users/\(userId.rawValue)/profile\(queryString)"
+    case .getUserSettingsProto(let type):
+      suffix = "users/@me/settings-proto/\(type.rawValue.description)"
+    case .modifyUserSettingsProto(let type):
+      suffix = "users/@me/settings-proto/\(type.rawValue.description)"
     case .createRemoteAuthSession:
       suffix = "users/@me/remote-auth"
     case .finishRemoteAuthSession:
@@ -492,6 +509,8 @@ public enum UserAPIEndpoint: Endpoint {
     case .getStickerPack: return .GET
     case .getStickerGuild: return .GET
     case .getUserProfile: return .GET
+    case .getUserSettingsProto: return .GET
+    case .modifyUserSettingsProto: return .PATCH
     case .createRemoteAuthSession: return .POST
     case .finishRemoteAuthSession: return .POST
     case .cancelRemoteAuthSession: return .POST
@@ -551,6 +570,8 @@ public enum UserAPIEndpoint: Endpoint {
     case .getStickerPack: return false
     case .getStickerGuild: return true
     case .getUserProfile: return true
+    case .getUserSettingsProto: return true
+    case .modifyUserSettingsProto: return true
     case .createRemoteAuthSession: return true
     case .finishRemoteAuthSession: return true
     case .cancelRemoteAuthSession: return true
@@ -610,10 +631,12 @@ public enum UserAPIEndpoint: Endpoint {
     case .getStickerPack: return false
     case .getStickerGuild: return true
     case .getUserProfile: return true
+    case .getUserSettingsProto: return true
+    case .modifyUserSettingsProto: return true
     case .createRemoteAuthSession: return true
     case .finishRemoteAuthSession: return true
     case .cancelRemoteAuthSession: return true
-      case .exchangeRemoteAuthTicket: return false
+    case .exchangeRemoteAuthTicket: return false
     case .__DO_NOT_USE_THIS_CASE:
       fatalError(
         "If the case name wasn't already clear enough: '__DO_NOT_USE_THIS_CASE' MUST NOT be used"
@@ -694,6 +717,10 @@ public enum UserAPIEndpoint: Endpoint {
         params.append("guild_id=\(guildId.rawValue)")
       }
       return params
+    case .getUserSettingsProto(let type):
+      return [type.rawValue.description]
+    case .modifyUserSettingsProto(let type):
+      return [type.rawValue.description]
     case .createRemoteAuthSession: return []
     case .finishRemoteAuthSession: return []
     case .cancelRemoteAuthSession: return []
@@ -729,8 +756,8 @@ public enum UserAPIEndpoint: Endpoint {
     case .getUserInvites: return 52
     case .createUserInvite: return 53
     case .revokeUserInvites: return 54
-    case .createAttachments: return  50
-    case .deleteAttachment: return  51
+    case .createAttachments: return 50
+    case .deleteAttachment: return 51
     case .getRelationships: return 55
     case .sendFriendRequest: return 56
     case .createRelationship: return 57
@@ -755,6 +782,8 @@ public enum UserAPIEndpoint: Endpoint {
     case .getStickerPack: return 92
     case .getStickerGuild: return 93
     case .getUserProfile: return 101
+    case .getUserSettingsProto: return 115
+    case .modifyUserSettingsProto: return 116
     case .createRemoteAuthSession: return 120
     case .finishRemoteAuthSession: return 121
     case .cancelRemoteAuthSession: return 122
@@ -858,6 +887,10 @@ public enum UserAPIEndpoint: Endpoint {
     ):
       return
         "getUserProfile(userId: \(userId.rawValue), withMutualGuilds: \(withMutualGuilds), withMutualFriends: \(withMutualFriends), withMutualFriendsCount: \(withMutualFriendsCount), guildId: \(guildId?.rawValue ?? "nil"))"
+    case .getUserSettingsProto(let type):
+      return "getUserSettingsProto(type: \(type.rawValue.description))"
+    case .modifyUserSettingsProto(let type):
+      return "modifyUserSettingsProto(type: \(type.rawValue.description))"
     case .createRemoteAuthSession: return "createRemoteAuthSession"
     case .finishRemoteAuthSession: return "finishRemoteAuthSession"
     case .cancelRemoteAuthSession: return "cancelRemoteAuthSession"
@@ -866,12 +899,6 @@ public enum UserAPIEndpoint: Endpoint {
       fatalError(
         "If the case name wasn't already clear enough: '__DO_NOT_USE_THIS_CASE' MUST NOT be used"
       )
-    }
-  }
-
-  public var specialisedRatelimit: (maxRequests: Int, for: Duration)? {
-    switch self {
-    default: return nil
     }
   }
 }

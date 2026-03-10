@@ -73,8 +73,18 @@ class SettingsStore: DiscordDataStore {
       userSettings = settings
     }
     // get frecency settings from api
+    guard let gateway else { return }
     Task {
-      let res = gateway?.client.getUserInvites()
+      do {
+        let res = try await gateway.client.getUserSettingsProto(type: .frecency)
+        try res.guardSuccess()
+        let frecencyProto = try res.decode()
+        if case let .frecency(proto) = frecencyProto.settings {
+          frecencySettings = proto
+        }
+      } catch {
+        print("[Settings] Failed to fetch initial frecency settings: \(error)")
+      }
     }
   }
 
