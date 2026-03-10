@@ -327,20 +327,20 @@ public enum SuperProperties {
   public static func client_version() -> String {
     switch Gateway.Identify.ConnectionProperties.__defaultOS {
     case "iOS", "watchOS":
-      return "310.3"
+      return "318.0"
     case "Mac OS X":
-      return "0.0.372"
+      return "0.0.379"
     default:
-      return "0.0.372"
+      return "0.0.379"
     }
   }
 
   public static func client_build_number() -> Int? {
     switch Gateway.Identify.ConnectionProperties.__defaultOS {
     case "iOS", "watchOS":
-      return 91102
+      return 94578
     case "Mac OS X":
-      return 485097
+      return 507104
     default:
       return nil
     }
@@ -354,10 +354,8 @@ public enum SuperProperties {
     #if os(macOS)
       return _launch_signature.uuidString.lowercased()
     #elseif os(iOS) || os(watchOS)
-      // TODO: ios follows a different format, using an integer. not sure how this is generated yet.
-      // for now, i was told its safe to use macos one instead.
-      //    return nil
-      return _launch_signature.uuidString.lowercased()
+      // discord's iOS client stubbed this with the current date in nanoseconds.
+      return String(Int64(Date.now.timeIntervalSince1970 * 1_000_000_000))
     #else
       return nil
     #endif

@@ -1,4 +1,4 @@
-// swift-tools-version: 5.10
+// swift-tools-version: 6.2
 
 import CompilerPluginSupport
 import PackageDescription
@@ -41,6 +41,9 @@ let package = Package(
       targets: ["DiscordAuth"]
     ),
   ],
+  traits: [
+    "Non64BitSystemsCompatibility"
+  ],
   dependencies: [
     .package(url: "https://github.com/apple/swift-nio.git", from: "2.49.0"),
     .package(url: "https://github.com/apple/swift-log.git", from: "1.5.2"),
@@ -54,10 +57,7 @@ let package = Package(
       url: "https://github.com/apple/swift-syntax.git",
       "509.0.0"..<"603.0.0"
     ),
-    .package(
-      url: "https://github.com/adam-fowler/compress-nio.git",
-      from: "1.3.0"
-    ),
+    .package(url: "https://github.com/facebook/zstd.git", from: "1.5.7"),
     .package(
       url: "https://github.com/hummingbird-project/swift-websocket.git",
       from: "1.2.0"
@@ -70,7 +70,10 @@ let package = Package(
       url: "https://github.com/Jitsusama/UInt128.git",
       branch: "master"
     ),
-    .package(url: "https://github.com/apple/swift-crypto.git", "1.0.0" ..< "5.0.0"),
+    .package(
+      url: "https://github.com/apple/swift-crypto.git",
+      "1.0.0"..<"5.0.0"
+    ),
   ],
   targets: [
     .target(
@@ -107,11 +110,11 @@ let package = Package(
         .product(name: "NIOCore", package: "swift-nio"),
         .product(name: "AsyncHTTPClient", package: "async-http-client"),
         .product(name: "WSClient", package: "swift-websocket"),
-        .product(name: "CompressNIO", package: "compress-nio"),
+        .product(name: "libzstd", package: "zstd"),
         .target(name: "DiscordHTTP"),
         .product(name: "Crypto", package: "swift-crypto"),
         .product(name: "_CryptoExtras", package: "swift-crypto"),
-],
+      ],
       swiftSettings: swiftSettings
     ),
     .target(
@@ -139,13 +142,6 @@ let package = Package(
         .target(name: "DiscordModels")
       ],
       swiftSettings: swiftSettings
-    ),
-    .target(
-      name: "CZlib",
-      dependencies: [],
-      linkerSettings: [
-        .linkedLibrary("z")
-      ]
     ),
     .plugin(
       name: "GenerateAPIEndpoints",
@@ -217,33 +213,11 @@ var featureFlags: [SwiftSetting] {
   [
     /// https://github.com/apple/swift-evolution/blob/main/proposals/0335-existential-any.md
     /// Require `any` for existential types.
-    .enableUpcomingFeature("ExistentialAny"),
-
-    /// https://github.com/apple/swift-evolution/blob/main/proposals/0274-magic-file.md
-    /// Nicer `#file`.
-    .enableUpcomingFeature("ConciseMagicFile"),
-
-    /// https://github.com/apple/swift-evolution/blob/main/proposals/0286-forward-scan-trailing-closures.md
-    /// This one shouldn't do much to be honest, but shouldn't hurt as well.
-    .enableUpcomingFeature("ForwardTrailingClosures"),
-
-    /// https://github.com/apple/swift-evolution/blob/main/proposals/0354-regex-literals.md
-    /// `BareSlashRegexLiterals` not enabled since we don't use regex anywhere.
-
-    /// https://github.com/apple/swift-evolution/blob/main/proposals/0384-importing-forward-declared-objc-interfaces-and-protocols.md
-    /// `ImportObjcForwardDeclarations` not enabled because it's objc-related.
-  ]
-}
-
-var experimentalFeatureFlags: [SwiftSetting] {
-  [
-    /// `DiscordBM` passes the `complete` level.
-    ///
-    /// `minimal` / `targeted` / `complete`
-    .enableExperimentalFeature("StrictConcurrency=complete")
+    .enableUpcomingFeature("ExistentialAny")
+    //		.define("DISCORDBM_ENABLE_LOGGING_DURING_DECODE", .when(configuration: .debug)),
   ]
 }
 
 var swiftSettings: [SwiftSetting] {
-  featureFlags + experimentalFeatureFlags
+  featureFlags
 }

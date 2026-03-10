@@ -638,11 +638,19 @@ class DiscordModelsTests: XCTestCase {
 
 private struct CodableContainer: Codable {
 
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   enum UnstableEnumCodableTester: Codable {
     case a  // 12
     case h  // 100
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   var some: UnstableEnumCodableTester

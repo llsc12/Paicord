@@ -1,4 +1,4 @@
-@_spi(UserInstallableApps) import DiscordModels
+import DiscordModels
 import XCTest
 
 class DecodeOrNilTests: XCTestCase {

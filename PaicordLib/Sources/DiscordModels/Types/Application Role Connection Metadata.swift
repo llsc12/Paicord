@@ -4,7 +4,11 @@ public struct ApplicationRoleConnectionMetadata: Sendable, Codable, Equatable,
 {
 
   /// https://discord.com/developers/docs/resources/application-role-connection-metadata#application-role-connection-metadata-object-application-role-connection-metadata-type
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum Kind: Sendable, Codable {
     case integerLessThanOrEqual  // 1
     case integerGreaterThanOrEqual  // 2
@@ -14,7 +18,11 @@ public struct ApplicationRoleConnectionMetadata: Sendable, Codable, Equatable,
     case dateTimeGreaterThanOrEqual  // 6
     case booleanEqual  // 7
     case booleanNotEqual  // 8
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   public var type: Kind

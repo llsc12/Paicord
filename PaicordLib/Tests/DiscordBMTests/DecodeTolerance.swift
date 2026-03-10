@@ -1,11 +1,12 @@
 /// Must not import `DiscordModels` as `@testable` to make sure
 /// these tests are run using `public` declarations.
-@_spi(UserInstallableApps) import DiscordModels
+import DiscordModels
 import XCTest
 
 class DecodeToleranceTests: XCTestCase {
 
-  typealias IntegrationKindConfiguration = DiscordApplication.IntegrationKindConfiguration
+  typealias IntegrationKindConfiguration = DiscordApplication
+    .IntegrationKindConfiguration
   typealias IntegrationKind = DiscordApplication.IntegrationKind
 
   /// Test that collections of raw-representable codable enums
@@ -80,7 +81,10 @@ class DecodeToleranceTests: XCTestCase {
 
     do {
       let text = #"{"value":["BadFeature"]}"#
-      _ = try JSONDecoder().decode(TestContainer<[Guild.Feature]>.self, from: Data(text.utf8))
+      _ = try JSONDecoder().decode(
+        TestContainer<[Guild.Feature]>.self,
+        from: Data(text.utf8)
+      )
     }
 
     do {
@@ -123,7 +127,9 @@ class DecodeToleranceTests: XCTestCase {
     let value = try XCTUnwrap(container.value)
 
     XCTAssertEqual(value.count, 2)
-    let firstOAuthInstallParams = try XCTUnwrap(value.values.first?.oauth2_install_params)
+    let firstOAuthInstallParams = try XCTUnwrap(
+      value.values.first?.oauth2_install_params
+    )
     XCTAssertGreaterThan(firstOAuthInstallParams.permissions.rawValue, 0)
   }
 }

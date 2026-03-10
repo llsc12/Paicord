@@ -1,12 +1,12 @@
 # Paicord
 
-A new Discord client written in SwiftUI, with a goal of feature parity with customisation and Quality-of-Life additions!
+A  native Discord client written in Swift using SwiftUI, with a goal of feature parity with customisation and Quality-of-Life additions!
 
  [![GitHub Release](https://img.shields.io/github/v/release/llsc12/Paicord?include_prereleases)](https://github.com/llsc12/Paicord/releases) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/llsc12/paicord/build.yml) [![GitHub License](https://img.shields.io/github/license/llsc12/Paicord)](https://github.com/llsc12/Paicord/blob/main/LICENSE) [![Discord](https://img.shields.io/discord/1417976730303463436?style=flat&label=discord)](https://discord.gg/fqhPGHPyaK) ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/llsc12/paicord/total)
 
 > [!NOTE]
 >
-> Paicord is still in development! Expect a number of issues or unimplemented features. If you encounter a bug, please create an issue! There was previously a note about MFA support, however MFA has been updated to support SMS and backup codes in addition to the already existing TOTP support, alongside QR Code logins.
+> Paicord is still in development! Expect a number of issues or unimplemented features. If you encounter a bug, please create an issue!
 
 <img width="371" height="298" alt="screenshot of Paicord" src="https://github.com/user-attachments/assets/d6b73ecb-c008-412e-9715-5817954f93f2" />
 
@@ -20,13 +20,16 @@ This list is not exhaustive but the goal for Paicord is to have parity with the 
 >
 > As all third-party clients and client mods do, using Paicord is a violation of Discord ToS! Whilst Paicord ensures to pretend to be Discord as close as possible, the risk of account bans is ever-present. Beware! 
 
+## Cross-platform
+We have subprojects in the works to port the client to other platforms natively too! Keep an eye out on the repo or join the [Discord Server](https://discord.gg/fqhPGHPyaK)!
+
 ## Installing
 
-There nightly releases of Paicord built from source when source successfully compiles.
+These downloads are nightly releases of Paicord, built from source.
 
-| iOS (17.0+)                                                  | macOS (14.0+)                                                |
-| ------------------------------------------------------------ | ------------------------------------------------------------ |
-| [Download iOS Artifact](https://nightly.link/llsc12/Paicord/workflows/build/main/Paicord-iOS) | [Download macOS Artifact](https://nightly.link/llsc12/Paicord/workflows/build/main/Paicord-macOS) |
+| iOS (17.0+)                                                  | macOS (14.0+)                                                | Linux |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| [Download iOS Artifact](https://nightly.link/llsc12/Paicord/workflows/build/main/Paicord-iOS) | [Download macOS Artifact](https://nightly.link/llsc12/Paicord/workflows/build/main/Paicord-macOS) | TBA |
 
 
 ## Sponsoring

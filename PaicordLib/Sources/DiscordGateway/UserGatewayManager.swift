@@ -212,15 +212,15 @@ public actor UserGatewayManager: GatewayManager {
 
     await self.sendQueue.reset()
     let gatewayURL = await getGatewayURL()
-//    #if DEBUGo
+    //    #if DEBUGo
     let queries: [(String, String)] = [
       ("v", "\(DiscordGlobalConfiguration.apiVersion)"),
       ("encoding", "json"),
-      ("compress", "zlib-stream"),
+      ("compress", "zstd-stream"),
     ]
-    let decompressorWSExtension: ZlibDecompressorWSExtension
+    let decompressorWSExtension: ZstdDecompressorWSExtension
     do {
-      decompressorWSExtension = try ZlibDecompressorWSExtension(
+      decompressorWSExtension = try ZstdDecompressorWSExtension(
         logger: self.logger
       )
     } catch {
@@ -230,21 +230,21 @@ public actor UserGatewayManager: GatewayManager {
       )
       return
     }
-//    #endif
+    //    #endif
 
-//    #if DEBUG
-//    let configuration = WebSocketClientConfiguration(
-//      maxFrameSize: self.maxFrameSize,
-//      additionalHeaders: [
-//        .userAgent: SuperProperties.useragent(ws: false)!,
-//        .origin: "https://discord.com",
-//        .cacheControl: "no-cache",
-//        .acceptLanguage: SuperProperties.GenerateLocaleHeader(),
-//
-//      ],
-//      extensions: []
-//    )
-//    #else
+    //    #if DEBUG
+    //    let configuration = WebSocketClientConfiguration(
+    //      maxFrameSize: self.maxFrameSize,
+    //      additionalHeaders: [
+    //        .userAgent: SuperProperties.useragent(ws: false)!,
+    //        .origin: "https://discord.com",
+    //        .cacheControl: "no-cache",
+    //        .acceptLanguage: SuperProperties.GenerateLocaleHeader(),
+    //
+    //      ],
+    //      extensions: []
+    //    )
+    //    #else
     let configuration = WebSocketClientConfiguration(
       maxFrameSize: self.maxFrameSize,
       additionalHeaders: [
@@ -256,7 +256,7 @@ public actor UserGatewayManager: GatewayManager {
       ],
       extensions: [.nonNegotiatedExtension { decompressorWSExtension }]
     )
-//    #endif
+    //    #endif
 
     logger.trace("Will try to connect to Discord through web-socket")
     let connectionId = self.connectionId.wrappingIncrementThenLoad(
@@ -525,9 +525,12 @@ extension UserGatewayManager {
       )
       /// Sends the update time spent session id payload every 30 minutes, but also on connect too.
       self.sendUpdateTimeSpentSessionID(
-        forConnectionWithId: self.connectionId.load(ordering: .relaxed))
+        forConnectionWithId: self.connectionId.load(ordering: .relaxed)
+      )
       self.setupUpdateTimeSpentSessionID(
-        forConnectionWithId: self.connectionId.load(ordering: .relaxed), every: .minutes(30))
+        forConnectionWithId: self.connectionId.load(ordering: .relaxed),
+        every: .minutes(30)
+      )
       logger.trace("Will resume or identify")
       await self.sendResumeOrIdentify()
     case .ready(let payload):
@@ -820,7 +823,10 @@ extension UserGatewayManager {
       )
       self.sendPing(forConnectionWithId: connectionId)
       self.sendUpdateTimeSpentSessionID(forConnectionWithId: connectionId)
-      self.setupUpdateTimeSpentSessionID(forConnectionWithId: connectionId, every: duration)
+      self.setupUpdateTimeSpentSessionID(
+        forConnectionWithId: connectionId,
+        every: duration
+      )
     }
   }
 
@@ -879,7 +885,9 @@ extension UserGatewayManager {
     }
   }
 
-  private func sendUpdateTimeSpentSessionID(forConnectionWithId connectionId: UInt) {
+  private func sendUpdateTimeSpentSessionID(
+    forConnectionWithId connectionId: UInt
+  ) {
     logger.trace(
       "Will send session time spent update",
       metadata: [
@@ -1075,5 +1083,40 @@ extension UserGatewayManager {
     _ continuation: AsyncStream<(any Error, ByteBuffer)>.Continuation
   ) {
     self.eventsParseFailureContinuations.append(continuation)
+  }
+}
+
+//MARK: - GatewayState
+/// Represents the current state of the gateway connection lifecycle.
+public enum GatewayState: Int, Sendable, AtomicValue, CustomStringConvertible {
+  /// The gateway manager has been intentionally stopped and will not reconnect.
+  case stopped
+  /// No active connection exists; the gateway is disconnected and idle.
+  case noConnection
+  /// The gateway is in the process of establishing a connection.
+  case connecting
+  /// The gateway connection is established at the protocol level, but not yet fully ready (awaiting identification/resume).
+  case configured
+  /// The gateway has successfully connected, identified/resumed, and is fully ready to send/receive events.
+  case connected
+
+  public var description: String {
+    switch self {
+    case .stopped: return "stopped"
+    case .noConnection: return "noConnection"
+    case .connecting: return "connecting"
+    case .configured: return "configured"
+    case .connected: return "connected"
+    }
+  }
+}
+
+// MARK: - +Gateway.Opcode
+extension Gateway.Opcode {
+  var isSentForConnectionEstablishment: Bool {
+    switch self {
+    case .identify, .resume: true
+    default: false
+    }
   }
 }

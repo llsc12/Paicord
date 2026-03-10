@@ -7,7 +7,7 @@ import SwiftSyntaxMacros
 ///
 /// This is supposed to be used with enums that are supposed to be raw-representable.
 /// The macro accepts one and only one of these types as a generic argument:
-/// `String`, `Int`, `UInt`. More types can be added on demand.
+/// `String`, `Int`, `UInt`, `UInt8`, `UInt64`. More types can be added on demand.
 /// The generic argument represents the `RawValue` of a `RawRepresentable` type.
 /// You can manually declare the raw value of a case, using a comment in front of it like so:
 /// ```swift
@@ -52,7 +52,63 @@ public struct UnstableEnum: MemberMacro {
     }
 
     let members = enumDecl.memberBlock.members
-    let caseDecls = members.compactMap { $0.decl.as(EnumCaseDeclSyntax.self) }
+    let caseDecls = try members.compactMap { item -> EnumCaseDeclSyntax? in
+      let decl = item.decl
+      switch decl.kind {
+      case .enumCaseDecl:
+        return decl.as(EnumCaseDeclSyntax.self)
+      case .ifConfigDecl:
+        let ifConfig = decl.as(IfConfigDeclSyntax.self)!
+        let clauses = ifConfig.clauses
+        guard clauses.count == 2 else {
+          throw MacroError.expectedExactly2ClausesInIfConfigClause
+        }
+        func clauseAsEnumCaseDecl(_ clause: IfConfigClauseSyntax)
+          -> EnumCaseDeclSyntax?
+        {
+          clause.elements?
+            .as(MemberBlockItemListSyntax.self)?
+            .first?
+            .decl
+            .as(EnumCaseDeclSyntax.self)
+        }
+        guard
+          let firstEnumDeclSyntax = clauseAsEnumCaseDecl(clauses.first!),
+          let secondEnumDeclSyntax = clauseAsEnumCaseDecl(clauses.last!)
+        else {
+          throw MacroError.expectedEnumDeclSyntaxesInIfConfigClause
+        }
+        guard
+          let firstElements = firstEnumDeclSyntax.elements.first,
+          let secondElements = secondEnumDeclSyntax.elements.first,
+          firstElements.name.identifier?.name == "__undocumented",
+          secondElements.name.identifier?.name == "__undocumented"
+        else {
+          throw MacroError.expectedTheUndocumentedEnumInIfConfigEnumDecl
+        }
+        guard
+          let firstParameter = firstElements.parameterClause?.parameters.first,
+          let secondParameter = secondElements.parameterClause?.parameters
+            .first,
+          let firstRawType = RawKind(
+            rawValue: firstParameter.trimmedDescription
+          ),
+          let secondRawType = RawKind(
+            rawValue: secondParameter.trimmedDescription
+          )
+        else {
+          throw MacroError.invalidRawValueTypeInIfConfigClause
+        }
+        if firstRawType == rawType {
+          return firstEnumDeclSyntax
+        } else if secondRawType == rawType {
+          return secondEnumDeclSyntax
+        } else {
+          throw MacroError.noCasesMatchTheRawValueTypeInIfConfigClause
+        }
+      default: return nil
+      }
+    }
     let elements = caseDecls.flatMap { $0.elements }
 
     let (cases, hasError) = elements.makeCases(
@@ -80,7 +136,7 @@ public struct UnstableEnum: MemberMacro {
         throw MacroError
           .enumSeemsToHaveIntValuesButGenericArgumentSpecifiesString
       }
-    case .Int, .UInt:
+    case .Int, .UInt, .UInt8, .UInt64, .Int64:
       /// All values must be integer
       if !values.allSatisfy({ Int($0.filter({ $0 != "_" })) != nil }) {
         throw MacroError.intEnumMustOnlyHaveIntValues

@@ -59,24 +59,39 @@ public struct Interaction: Sendable, Codable {
   }
 
   /// https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-type
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum Kind: Sendable, Codable {
     case ping  // 1
     case applicationCommand  // 2
     case messageComponent  // 3
     case applicationCommandAutocomplete  // 4
     case modalSubmit  // 5
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   /// https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-context-types
-  @_spi(UserInstallableApps)
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum ContextKind: Sendable, Codable {
     case guild  // 0
     case botDm  // 1
     case privateChannel  // 2
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   /// https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-application-command-data-structure
@@ -234,6 +249,7 @@ public struct Interaction: Sendable, Codable {
   public struct ModalSubmit: Sendable, Codable {
     public var custom_id: String
     public var components: [ActionRow]
+    public var resolved: Interaction.ApplicationCommand.ResolvedData?
   }
 
   /// https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data
@@ -292,11 +308,7 @@ public struct Interaction: Sendable, Codable {
   public var guild_locale: DiscordLocale?
   public var app_permissions: StringBitField<Permission>?
   public var entitlements: [Entitlement]
-  @_spi(UserInstallableApps)
-  /// No @DecodeOrNil because there is a manual init(from:)
   public var authorizing_integration_owners: [DiscordApplication.IntegrationKind: AnySnowflake]?
-  @_spi(UserInstallableApps)
-  /// No @DecodeOrNil because there is a manual init(from:)
   public var context: ContextKind?
 
   @available(
@@ -491,7 +503,10 @@ extension Interaction {
       return nil
     }
 
-    public static func == (lhs: Interaction.ComponentSwitch, rhs: Interaction.ComponentSwitch)
+    public static func == (
+      lhs: Interaction.ComponentSwitch,
+      rhs: Interaction.ComponentSwitch
+    )
       -> Bool
     {
       switch (lhs, rhs) {
@@ -550,7 +565,11 @@ extension Interaction {
 
     /// https://discord.com/developers/docs/interactions/message-components#component-object-component-types
     /// https://docs.discord.food/resources/components#component-type
-    @UnstableEnum<Int>
+    #if Non64BitSystemsCompatibility
+      @UnstableEnum<Int64>
+    #else
+      @UnstableEnum<Int>
+    #endif
     public enum Kind: Sendable, Codable {
       case actionRow  // 1
       case button  // 2
@@ -572,21 +591,36 @@ extension Interaction {
       case separator  // 14
       case contentInventoryEntry  // 16
       case container  // 17
-      case __undocumented(Int)
+      #if Non64BitSystemsCompatibility
+        case __undocumented(Int64)
+      #else
+        case __undocumented(Int)
+      #endif
     }
 
     /// https://discord.com/developers/docs/interactions/message-components#button-object-button-structure
-    public struct Button: Sendable, Codable, Equatable, Hashable, ValidatablePayload {
+    public struct Button: Sendable, Codable, Equatable, Hashable,
+      ValidatablePayload
+    {
 
       /// https://discord.com/developers/docs/interactions/message-components#button-object-button-styles
-      @UnstableEnum<Int>
+      #if Non64BitSystemsCompatibility
+        @UnstableEnum<Int64>
+      #else
+        @UnstableEnum<Int>
+      #endif
       public enum Style: Sendable, Codable {
         case primary  // 1
         case secondary  // 2
         case success  // 3
         case danger  // 4
         case link  // 5
-        case __undocumented(Int)
+        case premium  // 6
+        #if Non64BitSystemsCompatibility
+          case __undocumented(Int64)
+        #else
+          case __undocumented(Int)
+        #endif
       }
 
       /// The same as ``Style``, but has no `link`.
@@ -596,6 +630,7 @@ extension Interaction {
         case secondary
         case success
         case danger
+        case premium
 
         /// This case serves as a way of discouraging exhaustive switch statements
         case __DO_NOT_USE_THIS_CASE
@@ -606,6 +641,7 @@ extension Interaction {
           case .secondary: return .secondary
           case .success: return .success
           case .danger: return .danger
+          case .premium: return .premium
           case .__DO_NOT_USE_THIS_CASE:
             fatalError(
               "If the case name wasn't already clear enough: '__DO_NOT_USE_THIS_CASE' MUST NOT be used"
@@ -620,6 +656,7 @@ extension Interaction {
           case .success: self = .success
           case .danger: self = .danger
           case .link: return nil
+          case .premium: self = .premium
           case .__undocumented: return nil
           }
         }
@@ -629,6 +666,7 @@ extension Interaction {
       public var label: String?
       public var emoji: Emoji?
       public var custom_id: String?
+      public var sku_id: SKUSnowflake?
       public var url: String?
       public var disabled: Bool?
 
@@ -637,12 +675,14 @@ extension Interaction {
         style: NonLinkStyle,
         label: String,
         custom_id: String,
+        sku_id: SKUSnowflake? = nil,
         disabled: Bool? = nil
       ) {
         self.style = style.toStyle()
         self.label = label
         self.emoji = nil
         self.custom_id = custom_id
+        self.sku_id = sku_id
         self.disabled = disabled
       }
 
@@ -651,12 +691,14 @@ extension Interaction {
         style: NonLinkStyle,
         emoji: Emoji,
         custom_id: String,
+        sku_id: SKUSnowflake? = nil,
         disabled: Bool? = nil
       ) {
         self.style = style.toStyle()
         self.label = nil
         self.emoji = emoji
         self.custom_id = custom_id
+        self.sku_id = sku_id
         self.disabled = disabled
       }
 
@@ -666,12 +708,14 @@ extension Interaction {
         label: String,
         emoji: Emoji,
         custom_id: String,
+        sku_id: SKUSnowflake? = nil,
         disabled: Bool? = nil
       ) {
         self.style = style.toStyle()
         self.label = label
         self.emoji = emoji
         self.custom_id = custom_id
+        self.sku_id = sku_id
         self.disabled = disabled
       }
 
@@ -679,12 +723,14 @@ extension Interaction {
       public init(
         label: String,
         url: String,
+        sku_id: SKUSnowflake? = nil,
         disabled: Bool? = nil
       ) {
         self.style = .link
         self.label = label
         self.emoji = nil
         self.url = url
+        self.sku_id = sku_id
         self.disabled = disabled
       }
 
@@ -692,12 +738,14 @@ extension Interaction {
       public init(
         emoji: Emoji,
         url: String,
+        sku_id: SKUSnowflake? = nil,
         disabled: Bool? = nil
       ) {
         self.style = .link
         self.label = nil
         self.emoji = emoji
         self.url = url
+        self.sku_id = sku_id
         self.disabled = disabled
       }
 
@@ -706,12 +754,14 @@ extension Interaction {
         label: String,
         emoji: Emoji,
         url: String,
+        sku_id: SKUSnowflake? = nil,
         disabled: Bool? = nil
       ) {
         self.style = .link
         self.label = label
         self.emoji = emoji
         self.url = url
+        self.sku_id = sku_id
         self.disabled = disabled
       }
 
@@ -731,7 +781,9 @@ extension Interaction {
     {
 
       /// https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure
-      public struct Option: Sendable, Codable, Equatable, Hashable, ValidatablePayload {
+      public struct Option: Sendable, Codable, Equatable, Hashable,
+        ValidatablePayload
+      {
         public var label: String
         public var value: String
         public var description: String?
@@ -844,7 +896,9 @@ extension Interaction {
     }
 
     /// https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure
-    public struct ChannelSelectMenu: Sendable, Codable, Equatable, Hashable, ValidatablePayload {
+    public struct ChannelSelectMenu: Sendable, Codable, Equatable, Hashable,
+      ValidatablePayload
+    {
       public var custom_id: String
       public var channel_types: [DiscordChannel.Kind]?
       public var placeholder: String?
@@ -898,7 +952,9 @@ extension Interaction {
     }
 
     /// https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure
-    public struct SelectMenu: Sendable, Codable, Equatable, Hashable, ValidatablePayload {
+    public struct SelectMenu: Sendable, Codable, Equatable, Hashable,
+      ValidatablePayload
+    {
       public var custom_id: String
       public var placeholder: String?
       public var default_values: [DefaultValue]?
@@ -955,14 +1011,24 @@ extension Interaction {
     }
 
     /// https://discord.com/developers/docs/interactions/message-components#text-inputs
-    public struct TextInput: Sendable, Codable, Equatable, Hashable, ValidatablePayload {
+    public struct TextInput: Sendable, Codable, Equatable, Hashable,
+      ValidatablePayload
+    {
 
       /// https://discord.com/developers/docs/interactions/message-components#text-inputs-text-input-styles
-      @UnstableEnum<Int>
+      #if Non64BitSystemsCompatibility
+        @UnstableEnum<Int64>
+      #else
+        @UnstableEnum<Int>
+      #endif
       public enum Style: Sendable, Codable {
         case short  // 1
         case paragraph  // 2
-        case __undocumented(Int)
+        #if Non64BitSystemsCompatibility
+          case __undocumented(Int64)
+        #else
+          case __undocumented(Int)
+        #endif
       }
 
       public var custom_id: String
@@ -1022,7 +1088,9 @@ extension Interaction {
       }
     }
 
-    public enum Component: Sendable, Codable, Equatable, Hashable, ValidatablePayload {
+    public enum Component: Sendable, Codable, Equatable, Hashable,
+      ValidatablePayload
+    {
       case button(Button)
       case stringSelect(StringSelectMenu)
       case textInput(TextInput)

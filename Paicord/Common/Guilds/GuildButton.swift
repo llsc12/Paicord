@@ -20,6 +20,7 @@ struct GuildButton: View {
   @Environment(\.gateway) var gw
   @Environment(\.colorScheme) var colorScheme
   @Environment(\.theme) var theme
+  @State var isHovering: Bool = false
 
   init(guild: Guild?) {
     self.guild = guild
@@ -45,15 +46,18 @@ struct GuildButton: View {
         // if the guild is selected
         if appState.selectedGuild == guild?.id {
           return 38
+        } else if isHovering {
+          return 20
         } else if /* if theres unreads TODO */
         false {
-          return 4
+          return 8
         } else {
           return 0
         }
       }()
       // either a guild or DMs
       guildButton(from: guild)
+      .onHover { isHovering = $0 }
         .overlay(alignment: .leading) {
           Capsule()
             .fill(.primary)

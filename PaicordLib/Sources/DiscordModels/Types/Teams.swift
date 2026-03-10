@@ -5,11 +5,19 @@ public struct Team: Sendable, Codable, Equatable, Hashable {
   public struct Member: Sendable, Codable, Equatable, Hashable {
 
     /// https://discord.com/developers/docs/topics/teams#data-models-membership-state-enum
-    @UnstableEnum<Int>
+    #if Non64BitSystemsCompatibility
+      @UnstableEnum<Int64>
+    #else
+      @UnstableEnum<Int>
+    #endif
     public enum State: Sendable, Codable {
       case invited  // 1
       case accepted  // 2
-      case __undocumented(Int)
+      #if Non64BitSystemsCompatibility
+        case __undocumented(Int64)
+      #else
+        case __undocumented(Int)
+      #endif
     }
 
     /// https://discord.com/developers/docs/topics/teams#data-models-team-member-role-types

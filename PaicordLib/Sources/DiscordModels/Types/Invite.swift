@@ -1,20 +1,36 @@
 /// https://discord.com/developers/docs/resources/invite#invite-object-invite-structure
 public struct Invite: Sendable, Codable {
 
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum Kind: Sendable, Codable {
     case guild  // 0
     case groupDm  // 1
     case friend  // 2
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   /// https://discord.com/developers/docs/resources/invite#invite-object-invite-target-types
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum TargetKind: Sendable, Codable {
     case stream  // 1
     case embeddedApplication  // 2
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   public var type: Kind

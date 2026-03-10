@@ -253,8 +253,7 @@ public actor DiscordCache {
     public var invites: OrderedDictionary<InviteID, [Gateway.InviteCreate]> =
       [:]
     /// `[ChannelID: [Message]]`
-    public var messages:
-      OrderedDictionary<ChannelSnowflake, [Gateway.MessageCreate]> = [:]
+    public var messages: OrderedDictionary<ChannelSnowflake, [Gateway.MessageCreate]> = [:]
     /// `[ChannelID: [MessageID: [EditedMessage]]]`
     /// It's `[EditedMessage]` because it will keep all edited versions of a message.
     /// This does not keep the most recent message, which is available in `messages`.
@@ -271,8 +270,7 @@ public actor DiscordCache {
       > =
         [:]
     /// `[GuildID: [Rule]]`
-    public var autoModerationRules:
-      OrderedDictionary<GuildSnowflake, [AutoModerationRule]> = [:]
+    public var autoModerationRules: OrderedDictionary<GuildSnowflake, [AutoModerationRule]> = [:]
     /// `[GuildID: [ActionExecution]]`
     public var autoModerationExecutions:
       OrderedDictionary<GuildSnowflake, [AutoModerationActionExecution]> = [:]
@@ -281,8 +279,7 @@ public actor DiscordCache {
       OrderedDictionary<AnySnowflake, GuildApplicationCommandPermissions> =
         [:]
     /// `[EntitlementID: Entitlement]`
-    public var entitlements:
-      OrderedDictionary<EntitlementSnowflake, Entitlement> = [:]
+    public var entitlements: OrderedDictionary<EntitlementSnowflake, Entitlement> = [:]
     /// `[ChannelSnowflake: [MessageSnowflake: [MessagePollVote]]`
     public var messagePollVotes:
       OrderedDictionary<
@@ -592,8 +589,7 @@ public actor DiscordCache {
           }
         } else {
           if let removed = update.removed_member_ids {
-            self.guilds[update.guild_id]!.threads[idx].threadMembers!.removeAll
-            {
+            self.guilds[update.guild_id]!.threads[idx].threadMembers!.removeAll {
               guard let id = $0.member.user?.id ?? $0.user_id else {
                 return false
               }
@@ -706,8 +702,7 @@ public actor DiscordCache {
         let idx = self.guilds[user.guild_id]?.guild_scheduled_events
           .firstIndex(where: { $0.id == user.guild_scheduled_event_id })
       else { break }
-      if self.guilds[user.guild_id]?.guild_scheduled_events[idx].user_ids == nil
-      {
+      if self.guilds[user.guild_id]?.guild_scheduled_events[idx].user_ids == nil {
         self.guilds[user.guild_id]?.guild_scheduled_events[idx]
           .user_ids = [user.user_id]
       } else {

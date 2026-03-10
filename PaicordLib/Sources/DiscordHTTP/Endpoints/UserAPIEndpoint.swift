@@ -298,6 +298,7 @@ public enum UserAPIEndpoint: Endpoint {
       suffix = "users/@me/settings-proto/\(type.rawValue.description)"
     case .modifyUserSettingsProto(let type):
       suffix = "users/@me/settings-proto/\(type.rawValue.description)"
+      
     // MARK: - Remote Authentication
     case .createRemoteAuthSession:
       suffix = "users/@me/remote-auth"

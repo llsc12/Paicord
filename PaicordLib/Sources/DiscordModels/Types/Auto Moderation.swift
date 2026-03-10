@@ -2,32 +2,58 @@
 public struct AutoModerationRule: Sendable, Codable {
 
   /// https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-event-types
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum EventKind: Sendable, Codable {
     case messageSend  // 1
-    case __undocumented(Int)
+    case memberUpdate  // 2
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   /// https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-types
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum TriggerKind: Sendable, Codable {
     case keyword  // 1
     case spam  // 3
     case keywordPreset  // 4
     case mentionSpam  // 5
-    case __undocumented(Int)
+    case memberProfile  // 6
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   /// https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata
   public struct TriggerMetadata: Sendable, Codable {
 
     /// https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-keyword-preset-types
-    @UnstableEnum<Int>
+    #if Non64BitSystemsCompatibility
+      @UnstableEnum<Int64>
+    #else
+      @UnstableEnum<Int>
+    #endif
     public enum KeywordPreset: Sendable, Codable {
       case profanity  // 1
       case sexualContent  // 2
       case slurs  // 3
-      case __undocumented(Int)
+      #if Non64BitSystemsCompatibility
+        case __undocumented(Int64)
+      #else
+        case __undocumented(Int)
+      #endif
     }
 
     public var keyword_filter: [String]?
@@ -59,6 +85,7 @@ public struct AutoModerationRule: Sendable, Codable {
     case blockMessage(customMessage: String?)
     case sendAlertMessage(channelId: ChannelSnowflake)
     case timeout(durationSeconds: Int)
+    case blockMemberInteraction
 
     private enum CodingKeys: String, CodingKey {
       case type
@@ -99,11 +126,14 @@ public struct AutoModerationRule: Sendable, Codable {
           forKey: .metadata
         ).decode(Int.self, forKey: .duration_seconds)
         self = .timeout(durationSeconds: durationSeconds)
+      case 4:
+        self = .blockMemberInteraction
       default:
         throw DecodingError.dataCorrupted(
           .init(
             codingPath: container.codingPath,
-            debugDescription: "Unexpected AutoModerationRule.Action 'type': \(type)"
+            debugDescription:
+              "Unexpected AutoModerationRule.Action 'type': \(type)"
           )
         )
       }
@@ -133,6 +163,8 @@ public struct AutoModerationRule: Sendable, Codable {
           forKey: .metadata
         )
         try metadataContainer.encode(durationSeconds, forKey: .duration_seconds)
+      case .blockMemberInteraction:
+        try container.encode(4, forKey: .type)
       }
     }
 
@@ -152,6 +184,8 @@ public struct AutoModerationRule: Sendable, Codable {
           name: "durationSeconds"
         )
       case .sendAlertMessage(_):
+        [ValidationFailure]()
+      case .blockMemberInteraction:
         [ValidationFailure]()
       }
     }
