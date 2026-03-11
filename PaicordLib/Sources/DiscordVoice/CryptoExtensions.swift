@@ -79,14 +79,11 @@ extension VoiceGateway.EncryptionMode {
   ) -> (ciphertext: Data, tag: Data, nonceSuffix: Data)? {
 
     let nonceSuffixValue: UInt32 = sequence ?? .random(in: .min ... .max)
-    var beNonceSuffix = nonceSuffixValue.bigEndian
-    let nonceSuffix = withUnsafeBytes(of: &beNonceSuffix) { Data($0) }
+    var leNonceSuffix = nonceSuffixValue.littleEndian
+    let nonceSuffix = withUnsafeBytes(of: &leNonceSuffix) { Data($0) }
 
-    var nonceData = Data(repeating: 0, count: nonceLength)
-    nonceData.replaceSubrange(
-      nonceData.count - nonceSuffix.count..<nonceData.count,
-      with: nonceSuffix
-    )
+    var nonceData = Data(repeating: 0, count: self.nonceLength)
+    nonceData.replaceSubrange(0..<nonceSuffix.count, with: nonceSuffix)
 
     switch self {
     case .aead_aes256_gcm_rtpsize:
@@ -111,11 +108,11 @@ extension VoiceGateway.EncryptionMode {
         let sealed = try? ChaChaPoly.seal(
           buffer,
           using: key,
-          nonce: chachaNonce
+          nonce: chachaNonce,
+          authenticating: additionalData
         )
       else { return nil }
       return (sealed.ciphertext, sealed.tag, nonceSuffix)
-
     default:
       fatalError("[Voice Crypto] Unsupported encryption mode \(self)")
     }

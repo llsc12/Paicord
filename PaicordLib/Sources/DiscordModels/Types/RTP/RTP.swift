@@ -153,6 +153,7 @@ public struct RTPPacket: Sendable, RawRepresentable {
   public var payload: ByteBuffer
   
   public init(
+    `extension`: Bool,
     payloadType: RTPType,
     sequence: UInt16,
     timestamp: UInt32,
@@ -162,7 +163,7 @@ public struct RTPPacket: Sendable, RawRepresentable {
   ) {
     self.version = 2
     self.padding = false
-    self.extension = false
+    self.extension = `extension`
     self.marker = marker
     self.payloadType = payloadType
     self.sequence = sequence
