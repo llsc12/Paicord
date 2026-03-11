@@ -428,22 +428,29 @@ public final class BlockParser {
 
   // MARK: - List Parsers
 
-  private func parseList() throws -> AST.ListNode {
+  private func parseList(_ indentationLevel: Int = 0) throws -> AST.ListNode {
     let startLocation = tokenStream.current.location
     let firstMarker = tokenStream.current.content
 
-    let isOrdered = firstMarker.last == "." || firstMarker.last == ")"
+    let isOrdered = firstMarker.last == "."
     let startNumber = isOrdered ? Int(firstMarker.dropLast()) : nil
     let delimiter = isOrdered ? firstMarker.last : nil
     let bulletChar = isOrdered ? nil : firstMarker.first
 
     var items: [ASTNode] = []
 
+    var whitespaceCount = 0
+    var itemNumber = startNumber
     while !tokenStream.isAtEnd && tokenStream.check(.listMarker) {
+      let level = whitespaceCount / 2
+      if whitespaceCount != 0 && level < indentationLevel {
+        print(tokenStream.current.content)
+        break
+      }
       let marker = tokenStream.current.content
 
       // Check if this marker matches the list type
-      let markerIsOrdered = marker.last == "." || marker.last == ")"
+      let markerIsOrdered = marker.last == "."
       if markerIsOrdered != isOrdered {
         break
       }
@@ -459,21 +466,31 @@ public final class BlockParser {
       }
 
       // Parse list item
-      let item = try parseListItem()
+      var item: ASTNode
+      if whitespaceCount > 0 && level != indentationLevel {
+        item = try parseList(indentationLevel == level ? indentationLevel : indentationLevel + 1)
+      } else {
+        item = try parseListItem(itemNumber)
+      }
       items.append(item)
+      
+      if isOrdered {
+        itemNumber! += 1
+      }
 
-      skipWhitespaceAndNewlines()
+      whitespaceCount = skipWhitespaceAndNewlines()
     }
 
     return AST.ListNode(
       isOrdered: isOrdered,
       startNumber: startNumber,
+      level: indentationLevel,
       items: items,
       sourceLocation: startLocation
     )
   }
 
-  private func parseListItem() throws -> AST.ListItemNode {
+  private func parseListItem(_ itemNumber: Int?) throws -> AST.ListItemNode {
     let startLocation = tokenStream.current.location
 
     // Consume list marker
@@ -525,7 +542,7 @@ public final class BlockParser {
       }
     }
 
-    return AST.ListItemNode(children: children, sourceLocation: startLocation)
+    return AST.ListItemNode(itemNumber: itemNumber, children: children, sourceLocation: startLocation)
   }
 
   private func isNextListItem() -> Bool {
@@ -859,9 +876,14 @@ public final class BlockParser {
     }
   }
 
-  private func skipWhitespaceAndNewlines() {
+  private func skipWhitespaceAndNewlines() -> Int {
+    var count: Int = 0
     while tokenStream.check(.whitespace) || tokenStream.check(.newline) {
+      if tokenStream.check(.whitespace) {
+        count += tokenStream.current.length
+      }
       tokenStream.advance()
     }
+    return count
   }
 }

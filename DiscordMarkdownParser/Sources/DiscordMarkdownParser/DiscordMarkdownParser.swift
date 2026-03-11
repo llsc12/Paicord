@@ -263,6 +263,7 @@ public final class DiscordMarkdownParser: Sendable {
     return AST.ListNode(
       isOrdered: list.isOrdered,
       startNumber: list.startNumber,
+      level: list.level,
       items: processedItems,
       sourceLocation: list.sourceLocation
     )
@@ -279,6 +280,7 @@ public final class DiscordMarkdownParser: Sendable {
     )
 
     return AST.ListItemNode(
+      itemNumber: listItem.listNumber,
       children: processedChildren,
       sourceLocation: listItem.sourceLocation
     )
@@ -480,6 +482,7 @@ public final class DiscordMarkdownParser: Sendable {
     case .listItem:
       if let listItemNode = originalNode as? AST.ListItemNode {
         return AST.ListItemNode(
+          itemNumber: listItemNode.listNumber,
           children: children,
           sourceLocation: listItemNode.sourceLocation
         )
