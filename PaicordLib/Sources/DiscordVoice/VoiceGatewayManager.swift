@@ -438,7 +438,7 @@ public actor VoiceGatewayManager {
   }
 
   // MARK: - UDP setup
-  
+
   func setupUDP(_ payload: VoiceGateway.Ready) {
     self.udpConnectionTask = Task {
       do {
@@ -515,9 +515,9 @@ public actor VoiceGatewayManager {
   private func storeConnection(_ connection: VoiceConnection) {
     self.udpConnection = connection
   }
-  
+
   // MARK: - Speaking
-  
+
   private struct OpusFrameRing {
     private var buf: [Data?]
     private var head = 0
@@ -619,6 +619,8 @@ public actor VoiceGatewayManager {
             }
           }
 
+          let sequence = sequence
+          let timestamp = timestamp
           Task {
             await sendOpusPacket(
               frame: frame,
@@ -632,6 +634,8 @@ public actor VoiceGatewayManager {
           silenceFramesRemaining = silenceTailCount
 
         } else if silenceFramesRemaining > 0 {
+          let sequence = sequence
+          let timestamp = timestamp
           Task {
             await sendSilence(
               sequence: sequence,
@@ -681,7 +685,7 @@ public actor VoiceGatewayManager {
   ) async {
     // Discord Opus silence frame
     let silence = Data([0xF8, 0xFF, 0xFE])
-    
+
     await sendOpusPacket(
       frame: silence,
       sequence: sequence,
@@ -759,7 +763,7 @@ public actor VoiceGatewayManager {
       )
     }
   }
-  
+
   public func enqueueOpusFrame(_ frame: Data) {
     pendingOpusFrames.push(frame)
   }

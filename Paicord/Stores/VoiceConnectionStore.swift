@@ -345,6 +345,7 @@ final class VoiceConnectionStore: DiscordDataStore {
     let ssrc: UInt32
     let decoder: Opus.Decoder
     let playerNode: AVAudioPlayerNode
+    let scheduler: PlayerScheduler
 
     init(ssrc: UInt32) {
       self.ssrc = ssrc
@@ -354,6 +355,35 @@ final class VoiceConnectionStore: DiscordDataStore {
         application: .voip
       )
       self.playerNode = AVAudioPlayerNode()
+      self.scheduler = PlayerScheduler(node: self.playerNode)
+    }
+  }
+
+  private actor PlayerScheduler {
+    private weak var node: AVAudioPlayerNode?
+    private var queue: [AVAudioPCMBuffer] = []
+    private var draining = false
+
+    init(node: AVAudioPlayerNode) {
+      self.node = node
+    }
+
+    func enqueue(_ buffer: AVAudioPCMBuffer) {
+      queue.append(buffer)
+      if !draining {
+        draining = true
+        Task { await drain() }
+      }
+    }
+
+    private func drain() async {
+      defer { draining = false }
+      while !queue.isEmpty {
+        guard let node else { return }
+        let buf = queue.removeFirst()
+        node.scheduleBuffer(buf, completionHandler: nil)
+        await Task.yield()
+      }
     }
   }
 
@@ -457,7 +487,7 @@ final class VoiceConnectionStore: DiscordDataStore {
             // awaiting causes stuttering bc callback happens when buffer finishes
             // playing and the node runs dry.
             Task {
-              await stream.playerNode.scheduleBuffer(converted)
+              await stream.scheduler.enqueue(converted)
             }
           } catch {
             print("[Voice OPUS] Frame decode error for ssrc \(ssrc):", error)
