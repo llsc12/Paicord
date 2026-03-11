@@ -63,6 +63,7 @@
 		AA21D2872EAB090200C75093 /* MemberSidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA21D2862EAB08FE00C75093 /* MemberSidebarView.swift */; };
 		AA2278C52EA44828002C335F /* ProfilePopoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2278C42EA4481F002C335F /* ProfilePopoutView.swift */; };
 		AA2278C72EA448C7002C335F /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2278C62EA448BD002C335F /* Profile.swift */; };
+		AA2610F72F6191280078A870 /* PCMFloatRingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2610F62F6191280078A870 /* PCMFloatRingBuffer.swift */; };
 		AA2F51C32EE4ABCE00F18DB7 /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2F51C22EE4ABCA00F18DB7 /* Storage.swift */; };
 		AA321F162F0E84B300D48332 /* SponsorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA321F152F0E84AF00D48332 /* SponsorSheet.swift */; };
 		AA409ABC2EC6909800848045 /* Theming.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA409ABB2EC6909300848045 /* Theming.swift */; };
@@ -216,6 +217,7 @@
 		AA21D2862EAB08FE00C75093 /* MemberSidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberSidebarView.swift; sourceTree = "<group>"; };
 		AA2278C42EA4481F002C335F /* ProfilePopoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePopoutView.swift; sourceTree = "<group>"; };
 		AA2278C62EA448BD002C335F /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
+		AA2610F62F6191280078A870 /* PCMFloatRingBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCMFloatRingBuffer.swift; sourceTree = "<group>"; };
 		AA2F51C22EE4ABCA00F18DB7 /* Storage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
 		AA321F152F0E84AF00D48332 /* SponsorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SponsorSheet.swift; sourceTree = "<group>"; };
 		AA409ABB2EC6909300848045 /* Theming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theming.swift; sourceTree = "<group>"; };
@@ -371,6 +373,7 @@
 			isa = PBXGroup;
 			children = (
 				AA2F51C22EE4ABCA00F18DB7 /* Storage.swift */,
+				AA2610F82F6191300078A870 /* Audio */,
 				AA078FC52EC80D2100EDFFA8 /* LocalConsoleManager */,
 				AA409ABD2EC74F3100848045 /* Theming */,
 				AABED5A72E7FF970005BDD63 /* PaicordLib++ */,
@@ -639,6 +642,14 @@
 				AA21D27D2EA8ED3E00C75093 /* ProfileFullSheetView.swift */,
 			);
 			path = Profiles;
+			sourceTree = "<group>";
+		};
+		AA2610F82F6191300078A870 /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+				AA2610F62F6191280078A870 /* PCMFloatRingBuffer.swift */,
+			);
+			path = Audio;
 			sourceTree = "<group>";
 		};
 		AA36D5A52EB60F23006612F8 /* Input */ = {
@@ -1132,6 +1143,7 @@
 				AA1097182E64C181005BC3D2 /* HomeView.swift in Sources */,
 				AA7B38F42EB50F0100CA4A3C /* MessageDrainStore.swift in Sources */,
 				AA74E4392EBC411C0031B285 /* EntityContextMenu.swift in Sources */,
+				AA2610F72F6191280078A870 /* PCMFloatRingBuffer.swift in Sources */,
 				AA10971D2E64C18C005BC3D2 /* ChatView.swift in Sources */,
 				AA9C81862E66670E0086B1DA /* CornerRadius.swift in Sources */,
 				AA47AF1D2EDEF019008A50C9 /* FamilyCentreSection.swift in Sources */,
@@ -1398,10 +1410,10 @@
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
-				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = YES;
 				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
 				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
-				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = YES;
 				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
 				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
@@ -1462,10 +1474,10 @@
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
-				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = YES;
 				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
 				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
-				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = YES;
 				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
 				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;

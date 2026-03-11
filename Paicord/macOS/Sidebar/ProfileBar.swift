@@ -6,6 +6,7 @@
 //  Copyright © 2025 Lakhan Lothiyi.
 //
 
+import AVKit
 import PaicordLib
 import SDWebImageSwiftUI
 import SwiftPrettyPrint
@@ -20,6 +21,8 @@ struct ProfileBar: View {
   @State var showingUsername = false
   @State var showingPopover = false
   @State var barHovered = false
+
+  @State var micError = false
 
   var body: some View {
     HStack {
@@ -44,8 +47,10 @@ struct ProfileBar: View {
             )
             .bold()
             if showingUsername {
-              Text(verbatim: "@\(gw.user.currentUser?.username ?? "Unknown User")")
-                .transition(.opacity)
+              Text(
+                verbatim: "@\(gw.user.currentUser?.username ?? "Unknown User")"
+              )
+              .transition(.opacity)
             } else {
               if let session = gw.user.sessions.first(where: { $0.id == "all" }
               ),
@@ -80,7 +85,7 @@ struct ProfileBar: View {
       }
 
       Spacer()
-      
+
       if gw.voice.voiceGateway != nil {
         Button {
           Task {
@@ -94,6 +99,51 @@ struct ProfileBar: View {
             .background(.ultraThinMaterial)
             .clipShape(.circle)
         }
+        .buttonStyle(.borderless)
+        
+        Button {
+          Task {
+            switch AVAudioApplication.shared.recordPermission {
+            case .granted:
+              await gw.voice.updateVoiceState(isMuted: !gw.voice.isMuted)
+            case .denied:
+              micError = true
+            case .undetermined:
+              if await AVAudioApplication.requestRecordPermission() {
+                await gw.voice.updateVoiceState(isMuted: false)
+              }
+            @unknown default:
+              fatalError()
+            }
+          }
+        } label: {
+          Image(systemName: gw.voice.isMuted ? "mic.slash.fill" : "mic.fill")
+            .font(.title2)
+            .padding(5)
+            .background(.ultraThinMaterial)
+            .clipShape(.circle)
+        }
+        .buttonStyle(.borderless)
+        .alert("Microphone Unavailable", isPresented: $micError) {
+          Button("OK", role: .cancel) {}
+        } message: {
+          Text(
+            "Please allow microphone access in your system settings to unmute yourself in voice channels."
+          )
+        }
+        
+        Button {
+          Task {
+            await gw.voice.updateVoiceState(isDeafened: !gw.voice.isDeafened)
+          }
+        } label: {
+          Image(systemName: gw.voice.isDeafened ? "speaker.slash.fill" : "speaker.wave.2.fill")
+            .font(.title2)
+            .padding(5)
+            .background(.ultraThinMaterial)
+            .clipShape(.circle)
+        }
+        .buttonStyle(.borderless)
       }
 
       #if os(macOS)
@@ -161,7 +211,9 @@ struct ProfileBar: View {
                 ?? "Unknown User"
             )
             .bold()
-            Text(verbatim: "@\(gw.user.currentUser?.username ?? "Unknown User")")
+            Text(
+              verbatim: "@\(gw.user.currentUser?.username ?? "Unknown User")"
+            )
           }
         }
         .padding(.vertical, 5)

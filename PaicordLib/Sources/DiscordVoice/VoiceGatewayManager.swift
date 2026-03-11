@@ -130,7 +130,7 @@ public actor VoiceGatewayManager {
   private var udpListeningTask: Task<Void, any Error>?
   private var udpSpeakingTask: Task<Void, Never>?
 
-  private var pendingOpusFrames = OpusFrameRing(capacity: 5)
+  private var pendingOpusFrames = OpusFrameRing(capacity: 10)
 
   private var recvBuffer = ReceiveBuffer(targetFrames: 5, maxFrames: 50)
 
