@@ -83,12 +83,18 @@
             nativeBuildInputs = with pkgs; [
               just
               # swift
+              # swiftpm
               swiftly
               rustup
 
               clang
-              gcc
               # binutils
+              gcc
+              perl
+              curl
+              git
+              cacert
+              gnupg
               fontconfig
               pkg-config
             ];
@@ -98,17 +104,16 @@
               ncurses
               sqlite
               libxml2_13
+              swiftPackages.Dispatch
             ];
 
             shellHook = ''
               SWIFTLY_HOME="''${SWIFTLY_HOME_DIR:-$HOME/.local/share/swiftly}"
               SWIFT_TOOLCHAIN=$(ls -1 "$SWIFTLY_HOME/toolchains" 2>/dev/null | sort -V | tail -1)
               export SWIFT_LIBRARY_PATH="$SWIFTLY_HOME/toolchains/$SWIFT_TOOLCHAIN/usr/lib/swift_static/linux"
-
-              export LIBRARY_PATH="${pkgs.gcc.cc}/lib:${pkgs.gcc.cc}/lib/gcc/${pkgs.stdenv.hostPlatform.config}/${lib.getVersion pkgs.gcc.cc}:${pkgs.libgcc.lib}/lib:''${LIBRARY_PATH:-}"
             '';
 
-            LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath buildInputs;
+            LD_LIBRARY_PATH = lib.makeLibraryPath buildInputs;
             SLINT_ENABLE_EXPERIMENTAL_FEATURES = 1;
           };
       }
