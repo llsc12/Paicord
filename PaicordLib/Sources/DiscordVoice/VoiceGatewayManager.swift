@@ -130,8 +130,7 @@ public actor VoiceGatewayManager {
   private var udpListeningTask: Task<Void, any Error>?
   private var udpSpeakingTask: Task<Void, Never>?
 
-  private var pendingOpusFrames: [Data] = []
-  private var channelDrainTask: Task<Void, Never>?
+  private var pendingOpusFrames = OpusFrameRing(capacity: 5)
 
   private var recvBuffer = ReceiveBuffer(targetFrames: 5, maxFrames: 50)
 
@@ -152,8 +151,6 @@ public actor VoiceGatewayManager {
     })?.key ?? 0
   }
 
-  /// Outgoing channel only takes Opus frames, rtp packet forming and encryption is handled automatically
-  private let outgoingAudioChannel = AsyncChannel<Data>()
   /// Incoming channel for you to iterate over. The payload is modified to contain a decrypted Opus frame.
   public let incomingAudioChannel = AsyncChannel<RTPPacket>()
 
@@ -373,7 +370,7 @@ public actor VoiceGatewayManager {
       )
     case .ready(let payload):
       await self.onSuccessfulConnection()
-
+      await self.dave.assign(ssrc: payload.ssrc, to: .opus)
       self.knownSSRCs[UInt(payload.ssrc)] = self.connectionData.userID
       setupUDP(payload)
     case .sessionDescription(let payload):
@@ -440,6 +437,8 @@ public actor VoiceGatewayManager {
     }
   }
 
+  // MARK: - UDP setup
+  
   func setupUDP(_ payload: VoiceGateway.Ready) {
     self.udpConnectionTask = Task {
       do {
@@ -516,12 +515,47 @@ public actor VoiceGatewayManager {
   private func storeConnection(_ connection: VoiceConnection) {
     self.udpConnection = connection
   }
+  
+  // MARK: - Speaking
+  
+  private struct OpusFrameRing {
+    private var buf: [Data?]
+    private var head = 0
+    private var tail = 0
+    private(set) var count = 0
+    let capacity: Int
+
+    init(capacity: Int) {
+      self.capacity = capacity
+      self.buf = Array(repeating: nil, count: capacity)
+    }
+
+    mutating func push(_ frame: Data) {
+      if count == capacity {
+        // drop oldest
+        buf[head] = nil
+        head = (head + 1) % capacity
+        count -= 1
+      }
+      buf[tail] = frame
+      tail = (tail + 1) % capacity
+      count += 1
+    }
+
+    mutating func pop() -> Data? {
+      guard count > 0 else { return nil }
+      let v = buf[head]
+      buf[head] = nil
+      head = (head + 1) % capacity
+      count -= 1
+      return v
+    }
+  }
 
   /// Writes Opus data out through UDP.
   private func speak(
     description: VoiceGateway.SessionDescription
   ) {
-    startDrainingOutgoingChannel()
     guard let mode = description.mode,
       VoiceGateway.EncryptionMode.supportedCases.contains(mode)
     else {
@@ -561,12 +595,7 @@ public actor VoiceGatewayManager {
       while !Task.isCancelled {
         let start = clock.now
 
-        let frame: Data?
-        if pendingOpusFrames.isEmpty {
-          frame = nil
-        } else {
-          frame = pendingOpusFrames.removeFirst()
-        }
+        let frame = pendingOpusFrames.pop()
 
         if let frame {
           if let payload = self.nextSpeakingPayload {
@@ -590,24 +619,28 @@ public actor VoiceGatewayManager {
             }
           }
 
-          await sendOpusPacket(
-            frame: frame,
-            sequence: sequence,
-            timestamp: timestamp,
-            ssrc: .init(audioSSRC),
-            mode: mode,
-            key: key
-          )
+          Task {
+            await sendOpusPacket(
+              frame: frame,
+              sequence: sequence,
+              timestamp: timestamp,
+              ssrc: .init(audioSSRC),
+              mode: mode,
+              key: key
+            )
+          }
           silenceFramesRemaining = silenceTailCount
 
         } else if silenceFramesRemaining > 0 {
-          await sendSilence(
-            sequence: sequence,
-            timestamp: timestamp,
-            ssrc: .init(audioSSRC),
-            mode: mode,
-            key: key
-          )
+          Task {
+            await sendSilence(
+              sequence: sequence,
+              timestamp: timestamp,
+              ssrc: .init(audioSSRC),
+              mode: mode,
+              key: key
+            )
+          }
           silenceFramesRemaining -= 1
 
           if silenceFramesRemaining == 0 {
@@ -628,8 +661,6 @@ public actor VoiceGatewayManager {
           }
 
         } else {
-          timestamp &+= 960
-          sequence &+= 1
           try? await clock.sleep(until: start + interval)
           continue
         }
@@ -650,7 +681,7 @@ public actor VoiceGatewayManager {
   ) async {
     // Discord Opus silence frame
     let silence = Data([0xF8, 0xFF, 0xFE])
-
+    
     await sendOpusPacket(
       frame: silence,
       sequence: sequence,
@@ -659,18 +690,6 @@ public actor VoiceGatewayManager {
       mode: mode,
       key: key
     )
-  }
-
-  private func startDrainingOutgoingChannel() {
-    channelDrainTask = Task {
-      for await frame in outgoingAudioChannel {
-        pendingOpusFrames.append(frame)
-
-        if pendingOpusFrames.count > 5 {
-          pendingOpusFrames.removeFirst()
-        }
-      }
-    }
   }
 
   func sendOpusPacket(
@@ -684,6 +703,7 @@ public actor VoiceGatewayManager {
     guard let udpConnection = self.udpConnection else { return }
 
     let headerPacket = RTPPacket(
+      extension: false,
       payloadType: .dynamic(.init(VoiceGateway.Codec.opusCodec.payload_type)),
       sequence: sequence,
       timestamp: timestamp,
@@ -739,6 +759,12 @@ public actor VoiceGatewayManager {
       )
     }
   }
+  
+  public func enqueueOpusFrame(_ frame: Data) {
+    pendingOpusFrames.push(frame)
+  }
+
+  // MARK: - Listening
 
   /// Start listening for incoming audio packets on the UDP connection.
   private func listen(
@@ -1100,7 +1126,6 @@ public actor VoiceGatewayManager {
     self.udpConnectionTask?.cancel()
     self.udpListeningTask?.cancel()
     self.udpSpeakingTask?.cancel()
-    self.channelDrainTask?.cancel()
     self.udpConnection = nil
     self.nextSpeakingPayload = nil
 
