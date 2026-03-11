@@ -108,6 +108,11 @@ final class VoiceConnectionStore: DiscordDataStore {
   // MARK: - Public methods
 
   func updateVoiceConnection(_ update: VoiceConnectionUpdate) async {
+    if case .join(let channelId, let guildId) = update,
+      self.channelId == channelId && self.guildId == guildId
+    {
+      return
+    }
     // for changing currently connected channel or disconnecting from voice, we still stop everything
     await voiceGateway?.disconnect()
     voiceGateway = nil
@@ -356,6 +361,11 @@ final class VoiceConnectionStore: DiscordDataStore {
       )
       self.playerNode = AVAudioPlayerNode()
       self.scheduler = PlayerScheduler(node: self.playerNode)
+    }
+
+    deinit {
+      playerNode.stop()
+      try? decoder.reset()
     }
   }
 

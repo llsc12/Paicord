@@ -428,7 +428,7 @@ public struct Gateway: Sendable, Codable {
         switch self {
         case .unhandledDispatchEvent(let type):
           return
-          "Gateway.Event.GatewayDecodingError.unhandledDispatchEvent(type: \(type ?? "nil"))"
+            "Gateway.Event.GatewayDecodingError.unhandledDispatchEvent(type: \(type ?? "nil"))"
         }
       }
     }
