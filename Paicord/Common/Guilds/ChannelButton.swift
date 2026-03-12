@@ -293,6 +293,82 @@ struct ChannelButton: View {
     }
   }
 
+  struct VoiceChannelUsers: View {
+    @Environment(\.gateway) var gw
+    @Environment(\.appState) var appState
+    var channel: DiscordChannel
+    
+    var body: some View {
+      let voiceChannels = gw.voiceChannels
+      if let voiceStates = voiceChannels.voiceStates[appState.selectedGuild]?[
+        channel.id
+      ] {
+        ForEach(voiceStates.values) { state in
+          UserButton(state: state)
+        }
+      }
+    }
+    
+    struct UserButton: View {
+      var state: VoiceState
+      @Environment(\.guildStore) var guildStore
+      @Environment(\.gateway) var gw
+      
+      @State var isHovered = false
+      @State var showPopover = false
+      var body: some View {
+        let member = state.member ?? guildStore?.members[state.user_id]
+        let user =
+          state.member?.user?.toPartialUser() ?? gw.user.users[state.user_id]
+        Button {
+          if  user != nil {
+            showPopover.toggle()
+          }
+        } label: {
+          HStack {
+            Profile.AvatarWithPresence(
+              member: member,
+              user: user
+            )
+            .profileShowsAvatarDecoration()
+            .frame(maxWidth: 20, maxHeight: 20)
+
+            Text(
+              state.member?.nick ?? user?.global_name ?? user?.username
+                ?? "Unknown User"
+            )
+            .lineLimit(1)
+            .foregroundStyle(.secondary)
+          }
+          .frame(maxWidth: .infinity, alignment: .leading)
+          .padding(.vertical, 6)
+          .padding(.horizontal, 8)
+          .background(
+            Group {
+              if isHovered {
+                Color.gray.opacity(0.2)
+              } else {
+                Color.clear
+              }
+            }
+            .clipShape(.rounded)
+          )
+        }
+        .buttonStyle(.borderless)
+        .onHover { isHovered = $0 }
+        .popover(isPresented: $showPopover) {
+          if let user {
+            ProfilePopoutView(
+              guild: guildStore,
+              member: member,
+              user: user
+            )
+          }
+        }
+      }
+    }
+  }
+
   /// Button that triggers voice channel actions.
   @ViewBuilder
   func voiceChannelButton<Content: View>(
@@ -300,33 +376,39 @@ struct ChannelButton: View {
   )
     -> some View
   {
-    VoiceChannelButton(
-      channels: channels,
-      channel: channel
-    ) { hovered in
-      label(hovered)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .lineLimit(1)
-        .background(
-          Group {
-            if hovered {
-              Color.gray.opacity(0.2)
-            } else {
-              Color.clear
+    VStack(spacing: 2) {
+      VoiceChannelButton(
+        channels: channels,
+        channel: channel
+      ) { hovered in
+        label(hovered)
+          .frame(maxWidth: .infinity, alignment: .leading)
+          .lineLimit(1)
+          .background(
+            Group {
+              if hovered {
+                Color.gray.opacity(0.2)
+              } else {
+                Color.clear
+              }
             }
-          }
-          .clipShape(.rounded)
-        )
-        .background(
-          Group {
-            if appState.selectedChannel == channel.id {
-              Color.gray.opacity(0.13)
-            } else {
-              Color.clear
+            .clipShape(.rounded)
+          )
+          .background(
+            Group {
+              if appState.selectedChannel == channel.id {
+                Color.gray.opacity(0.13)
+              } else {
+                Color.clear
+              }
             }
-          }
-          .clipShape(.rounded)
-        )
+            .clipShape(.rounded)
+          )
+      }
+
+      VoiceChannelUsers(channel: channel)
+        .padding(.leading, 32)
+        .padding(.bottom, 4)
     }
   }
 
