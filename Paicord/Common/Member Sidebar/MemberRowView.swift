@@ -8,6 +8,13 @@
 import PaicordLib
 import SwiftUIX
 
+private struct Pair: Identifiable {
+  var id: UserSnowflake { user.id }
+  
+  var member: Guild.PartialMember?
+  var user: DiscordUser
+}
+
 extension MemberSidebarView {
   struct MemberRowView: View {
     @Environment(\.guildStore) var guildStore
@@ -15,11 +22,11 @@ extension MemberSidebarView {
     var user: DiscordUser
 
     @State var isHovering: Bool = false
-    @State var showPopover: Bool = false
+    @State private var showPopoverItem: Pair? = nil
 
     var body: some View {
       Button {
-        showPopover = true
+        showPopoverItem = .init(member: member, user: user)
       } label: {
         HStack {
           Profile.AvatarWithPresence(
@@ -73,11 +80,11 @@ extension MemberSidebarView {
       }
       .buttonStyle(.plain)
       .onHover { self.isHovering = $0 }
-      .popover(isPresented: $showPopover) {
+      .popover(item: $showPopoverItem) { pair in
         ProfilePopoutView(
           guild: guildStore,
-          member: member,
-          user: user.toPartialUser()
+          member: pair.member,
+          user: pair.user.toPartialUser()
         )
       }
     }
