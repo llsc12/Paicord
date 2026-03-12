@@ -63,3 +63,10 @@ extension Payloads.CreateMessage: @retroactive Identifiable {
     .init(self.nonce?.asString ?? "unknown")
   }
 }
+
+
+extension VoiceState: @retroactive Identifiable {
+  public var id: UserSnowflake {
+    self.user_id
+  }
+}

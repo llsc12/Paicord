@@ -52,7 +52,8 @@ public struct Guild: Sendable, Codable, Hashable, Equatable, Identifiable {
     embedded_activities: [Gateway.Activity]? = nil,
     members: [Guild.Member]? = nil,
     version: Int? = nil,
-    guild_id: GuildSnowflake? = nil
+    guild_id: GuildSnowflake? = nil,
+    voice_states: [VoiceState]? = nil
   ) {
     self.id = id
     self.name = name
@@ -105,6 +106,7 @@ public struct Guild: Sendable, Codable, Hashable, Equatable, Identifiable {
     self.members = members
     self.version = version
     self.guild_id = guild_id
+    self.voice_states = voice_states
   }
 
   /// https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-structure
@@ -517,6 +519,7 @@ public struct Guild: Sendable, Codable, Hashable, Equatable, Identifiable {
   public var members: [Guild.Member]?
   public var version: Int?
   public var guild_id: GuildSnowflake?
+  public var voice_states: [VoiceState]?
 }
 
 /// https://discord.com/developers/docs/resources/guild#guild-object-guild-structure
@@ -571,6 +574,7 @@ public struct PartialGuild: Sendable, Codable, Equatable, Hashable {
   public var embedded_activities: [Gateway.Activity]?
   public var version: Int?
   public var guild_id: GuildSnowflake?
+  public var voice_states: [VoiceState]?
 }
 
 extension Guild {

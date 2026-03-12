@@ -1,5 +1,5 @@
 /// https://discord.com/developers/docs/resources/voice#voice-state-object-voice-state-structure
-public struct VoiceState: Sendable, Codable {
+public struct VoiceState: Sendable, Codable, Equatable, Hashable {
   public var guild_id: GuildSnowflake?
   public var channel_id: ChannelSnowflake?
   public var user_id: UserSnowflake
