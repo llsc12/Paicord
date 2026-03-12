@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1640"
+   LastUpgradeVersion = "2630"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
-      buildImplicitDependencies = "YES">
+      buildImplicitDependencies = "YES"
+      buildArchitectures = "Automatic">
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"
@@ -14,10 +15,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AA1096DA2E63BE84005BC3D2"
-               BuildableName = "Paicord.app"
-               BlueprintName = "Paicord"
-               ReferencedContainer = "container:Paicord.xcodeproj">
+               BlueprintIdentifier = "TestCode"
+               BuildableName = "TestCode"
+               BlueprintName = "TestCode"
+               ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -43,24 +44,12 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "AA1096DA2E63BE84005BC3D2"
-            BuildableName = "Paicord.app"
-            BlueprintName = "Paicord"
-            ReferencedContainer = "container:Paicord.xcodeproj">
+            BlueprintIdentifier = "TestCode"
+            BuildableName = "TestCode"
+            BlueprintName = "TestCode"
+            ReferencedContainer = "container:">
          </BuildableReference>
       </BuildableProductRunnable>
-      <EnvironmentVariables>
-         <EnvironmentVariable
-            key = "SWIFTUI_DISABLE_MIXED_VIEW_HIERARCHY=1"
-            value = ""
-            isEnabled = "YES">
-         </EnvironmentVariable>
-         <EnvironmentVariable
-            key = "DISABLE_STD_INTERCEPT"
-            value = "1"
-            isEnabled = "YES">
-         </EnvironmentVariable>
-      </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -72,10 +61,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "AA1096DA2E63BE84005BC3D2"
-            BuildableName = "Paicord.app"
-            BlueprintName = "Paicord"
-            ReferencedContainer = "container:Paicord.xcodeproj">
+            BlueprintIdentifier = "TestCode"
+            BuildableName = "TestCode"
+            BlueprintName = "TestCode"
+            ReferencedContainer = "container:">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

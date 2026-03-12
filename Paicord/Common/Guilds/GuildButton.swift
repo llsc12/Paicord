@@ -260,8 +260,14 @@ struct GuildButton: View {
   /// A button representing a guild or DMs
   func guildButton(from guild: Guild?) -> some View {
     Button {
-      ImpactGenerator.impact(style: .light)
-      appState.selectedGuild = guild?.id
+      if appState.selectedGuild == guild?.id {
+        #if os(iOS)
+        appState.chatOpen = true
+        #endif
+      } else {
+        ImpactGenerator.impact(style: .light)
+        appState.selectedGuild = guild?.id
+      }
     } label: {
       let isSelected = appState.selectedGuild == guild?.id
       Group {

@@ -1484,7 +1484,7 @@ extension Gateway {
 
   /// https://discord.com/developers/docs/topics/gateway-events#voice-server-update-voice-server-update-event-fields
   public struct VoiceServerUpdate: Sendable, Codable {
-    public var token: String
+    public var token: Secret
     public var guild_id: GuildSnowflake
     public var endpoint: String?
   }

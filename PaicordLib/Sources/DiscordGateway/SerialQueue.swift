@@ -2,24 +2,24 @@ import Foundation
 import Logging
 import NIOCore
 
-actor SerialQueue {
+package actor SerialQueue {
 
   var lastSend: Date
   let waitTime: Duration
 
-  init(waitTime: Duration) {
+  package init(waitTime: Duration) {
     /// Setting `lastSend` to sometime in the past that is not way too far.
     let waitSeconds = waitTime.asTimeInterval
     self.lastSend = Date().addingTimeInterval(-waitSeconds * 2)
     self.waitTime = waitTime
   }
 
-  func reset() {
+  package func reset() {
     let waitSeconds = waitTime.asTimeInterval
     self.lastSend = Date().addingTimeInterval(-waitSeconds * 2)
   }
 
-  nonisolated func perform(_ task: @escaping @Sendable () -> Void) {
+  nonisolated package func perform(_ task: @escaping @Sendable () -> Void) {
     Task { await self._perform(task) }
   }
 

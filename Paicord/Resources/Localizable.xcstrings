@@ -227,6 +227,9 @@
     "Mention" : {
 
     },
+    "Microphone Unavailable" : {
+
+    },
     "Multi-Factor Authentication" : {
 
     },
@@ -258,6 +261,9 @@
 
     },
     "Playgrounds" : {
+
+    },
+    "Please allow microphone access in your system settings to unmute yourself in voice channels." : {
 
     },
     "Profile" : {
