@@ -26,6 +26,21 @@ final class VoiceConnectionStore: DiscordDataStore {
     } else {
       self.isMuted = true
     }
+
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(audioEngineConfigurationChange),
+      name: .AVAudioEngineConfigurationChange,
+      object: audioEngine
+    )
+  }
+
+  deinit {
+    NotificationCenter.default.removeObserver(
+      self,
+      name: .AVAudioEngineConfigurationChange,
+      object: audioEngine
+    )
   }
 
   var gateway: GatewayStore?
@@ -431,18 +446,37 @@ final class VoiceConnectionStore: DiscordDataStore {
 
   // MARK: - Audio engine setup and handling
 
+  @objc private func audioEngineConfigurationChange() {
+    print("[Voice] Audio engine configuration changed, resetting audio engine")
+    self.audioEngineSetup()
+  }
+
   private func audioEngineSetup() {
     Task {
       self.audioEngineCleanup()
 
       /// avaudioengine will throw a c++ exception if you start it when `inputNode == nullptr || outputNode == nullptr`.
       self.ensureDummyNodeAttached()
-
+      
       /// microphone tap
       self.setupTap()
 
+      /// voice processing mode
       do {
-        audioEngine.prepare()
+        try inputNode.setVoiceProcessingEnabled(true)
+        inputNode.voiceProcessingOtherAudioDuckingConfiguration = .init(
+          enableAdvancedDucking: true,
+          duckingLevel: .max
+        )
+        inputNode.isVoiceProcessingAGCEnabled = true
+        inputNode.isVoiceProcessingBypassed = false
+        inputNode.isVoiceProcessingInputMuted = false
+        
+      } catch {
+        print("[Voice] Failed to enable voice processing mode:", error)
+      }
+
+      do {
         try audioEngine.start()
       } catch {
         print("[Voice] Failed to start audio engine:", error)
@@ -521,9 +555,6 @@ final class VoiceConnectionStore: DiscordDataStore {
     let opusFrameCount: AVAudioFrameCount = 960
     let opusFrameSize = Int(opusFrameCount)
 
-    let inputFormat = inputNode.inputFormat(forBus: 0)
-    let converter = AVAudioConverter(from: inputFormat, to: targetFormat)!
-
     var ring = PCMFloatRingBuffer(
       channels: Int(targetFormat.channelCount),
       capacityFrames: opusFrameSize * 8
@@ -532,6 +563,7 @@ final class VoiceConnectionStore: DiscordDataStore {
     let tapFormat = inputNode.inputFormat(forBus: 0)
     print("[Voice] Installing tap with format:", tapFormat)
 
+    // print graph description
     inputNode.installTap(
       onBus: 0,
       bufferSize: opusFrameCount,
@@ -539,45 +571,14 @@ final class VoiceConnectionStore: DiscordDataStore {
     ) {
       buffer,
       _ in
+      print("received mic buffer")
       guard buffer.frameLength > 0 else { return }
-
-      let outCapacity = max(
-        opusFrameCount * 4,
-        AVAudioFrameCount(Double(buffer.frameLength) * 2.0)
-      )
-      guard
-        let converted = AVAudioPCMBuffer(
-          pcmFormat: targetFormat,
-          frameCapacity: outCapacity
-        )
-      else {
-        return
-      }
-
-      var error: NSError? = nil
-      var fedInput = false
-      let status = converter.convert(to: converted, error: &error) {
-        _,
-        outStatus in
-        if fedInput {
-          outStatus.pointee = .noDataNow
-          return nil
-        } else {
-          fedInput = true
-          outStatus.pointee = .haveData
-          return buffer
-        }
-      }
-
-      guard error == nil else { return }
-      guard status == .haveData || status == .inputRanDry else { return }
-      guard converted.frameLength > 0 else { return }
-      guard let src = converted.floatChannelData else { return }
+      guard let src = buffer.floatChannelData else { return }
 
       ring.write(
         from: src,
-        frames: Int(converted.frameLength),
-        srcChannels: Int(converted.format.channelCount)
+        frames: Int(buffer.frameLength),
+        srcChannels: Int(buffer.format.channelCount)
       )
 
       while ring.availableFrames >= opusFrameSize {
