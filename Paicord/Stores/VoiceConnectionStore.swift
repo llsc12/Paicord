@@ -75,7 +75,8 @@ final class VoiceConnectionStore: DiscordDataStore {
           handleResume(payload)
         case .voiceServerUpdate(let payload):
           handleVoiceServerUpdate(payload)
-        // capture and store voice events
+        case .voiceStateUpdate(let payload):
+          handleVoiceStateUpdate(payload)
         default:
           break
         }
@@ -114,7 +115,7 @@ final class VoiceConnectionStore: DiscordDataStore {
   private(set) var preferredRegion: String?
   private(set) var flags: IntBitField<VoiceStateUpdate.Flags> = []
 
-  private var voiceStatus: GatewayState = .stopped {
+  private(set) var voiceStatus: GatewayState = .stopped {
     didSet {
       print("[Voice] Voice connection status changed to \(voiceStatus)")
     }
@@ -288,6 +289,27 @@ final class VoiceConnectionStore: DiscordDataStore {
 
       if AVAudioApplication.shared.recordPermission != .granted {
         await AVAudioApplication.requestRecordPermission()
+      }
+    }
+  }
+  
+  private func handleVoiceStateUpdate(_ payload: VoiceState) {
+    // if we receie a voice state payload and it contains a session
+    // id that isnt this client's current session id, we joined
+    // from another client and we should destroy this connection.
+    
+    // criteria for disconnecting:
+    // - session id isnt ours
+    // - guild id matches the guild id of current voice connection
+    
+    Task {
+      let vSessionID = payload.session_id
+      let vGuildID = payload.guild_id
+      
+      if self.guildId == vGuildID, await self.gateway?.gateway?.getSessionID() != vSessionID {
+        print("[Voice] Another client made this clientth disconnect")
+        await voiceGateway?.disconnect()
+        voiceGateway = nil
       }
     }
   }
