@@ -12,13 +12,7 @@ import PaicordLib
 @Observable
 class ReadStateStore: DiscordDataStore {
   var gateway: GatewayStore?
-
   var eventTask: Task<Void, Never>?
-
-  func setGateway(_ gateway: GatewayStore?) {
-    self.gateway = gateway
-    setupEventHandling()
-  }
 
   var readStates: [AnySnowflake: Gateway.ReadState] = [:]
 
