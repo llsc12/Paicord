@@ -297,23 +297,27 @@ struct ChannelButton: View {
     @Environment(\.gateway) var gw
     @Environment(\.appState) var appState
     var channel: DiscordChannel
-    
+
     var body: some View {
       let voiceChannels = gw.voiceChannels
       if let voiceStates = voiceChannels.voiceStates[appState.selectedGuild]?[
         channel.id
-      ] {
-        ForEach(voiceStates.values) { state in
-          UserButton(state: state)
+      ], !voiceStates.isEmpty {
+        LazyVStack(spacing: 2) {
+          ForEach(voiceStates.values) { state in
+            UserButton(state: state)
+          }
         }
+        .padding(.leading, 32)
+        .padding(.bottom, 4)
       }
     }
-    
+
     struct UserButton: View {
       var state: VoiceState
       @Environment(\.guildStore) var guildStore
       @Environment(\.gateway) var gw
-      
+
       @State var isHovered = false
       @State var showPopover = false
       var body: some View {
@@ -321,7 +325,7 @@ struct ChannelButton: View {
         let user =
           state.member?.user?.toPartialUser() ?? gw.user.users[state.user_id]
         Button {
-          if  user != nil {
+          if user != nil {
             showPopover.toggle()
           }
         } label: {
@@ -376,7 +380,7 @@ struct ChannelButton: View {
   )
     -> some View
   {
-    VStack(spacing: 2) {
+    LazyVStack(spacing: 2) {
       VoiceChannelButton(
         channels: channels,
         channel: channel
@@ -407,8 +411,6 @@ struct ChannelButton: View {
       }
 
       VoiceChannelUsers(channel: channel)
-        .padding(.leading, 32)
-        .padding(.bottom, 4)
     }
   }
 

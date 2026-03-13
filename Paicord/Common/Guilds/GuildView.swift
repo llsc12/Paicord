@@ -57,7 +57,7 @@ struct GuildView: View {
             }
           }
 
-        VStack(spacing: 1) {
+        LazyVStack(spacing: 1) {
           ForEach(uncategorizedChannels) { channel in
             ChannelButton(channels: guild.channels, channel: channel)
               .padding(.horizontal, 4)

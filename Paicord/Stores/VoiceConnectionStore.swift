@@ -299,15 +299,20 @@ final class VoiceConnectionStore: DiscordDataStore {
     // from another client and we should destroy this connection.
     
     // criteria for disconnecting:
+    // - its a voice state update for our user id
     // - session id isnt ours
     // - guild id matches the guild id of current voice connection
     
     Task {
+      let vUserId = payload.user_id
       let vSessionID = payload.session_id
       let vGuildID = payload.guild_id
-      
-      if self.guildId == vGuildID, await self.gateway?.gateway?.getSessionID() != vSessionID {
-        print("[Voice] Another client made this clientth disconnect")
+
+      if self.gateway?.user.currentUser?.id == vUserId,
+        self.guildId == vGuildID,
+        await self.gateway?.gateway?.getSessionID() != vSessionID
+      {
+        print("[Voice] Another client made this client disconnect")
         await voiceGateway?.disconnect()
         voiceGateway = nil
       }
@@ -582,7 +587,7 @@ final class VoiceConnectionStore: DiscordDataStore {
       capacityFrames: opusFrameSize * 8
     )
 
-    let tapFormat = inputNode.inputFormat(forBus: 0)
+    let tapFormat = inputNode.outputFormat(forBus: 0)
     print("[Voice] Installing tap with format:", tapFormat)
 
     // print graph description
@@ -593,7 +598,6 @@ final class VoiceConnectionStore: DiscordDataStore {
     ) {
       buffer,
       _ in
-      print("received mic buffer")
       guard buffer.frameLength > 0 else { return }
       guard let src = buffer.floatChannelData else { return }
 
