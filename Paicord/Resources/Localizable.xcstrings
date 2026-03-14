@@ -77,6 +77,9 @@
     "Authenticator App" : {
 
     },
+    "Awaiting Audio Setup" : {
+
+    },
     "Awaiting READY" : {
 
     },
@@ -93,6 +96,9 @@
 
     },
     "ComponentsV2 unsupported" : {
+
+    },
+    "Connecting to Voice" : {
 
     },
     "Copy" : {
@@ -344,6 +350,9 @@
     "Unimplemented" : {
 
     },
+    "Unknown Channel" : {
+
+    },
     "Unknown User" : {
 
     },
@@ -373,6 +382,12 @@
       }
     },
     "View Logs" : {
+
+    },
+    "Voice Connected" : {
+
+    },
+    "Voice Disconnected" : {
 
     },
     "We're so excited to see you again!" : {

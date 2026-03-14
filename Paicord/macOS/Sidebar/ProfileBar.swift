@@ -23,13 +23,11 @@ struct ProfileBar: View {
 
   struct VoiceBarSection: View {
     @Environment(\.gateway) var gw
-    @State var micError = false
-
     var vgw: VoiceConnectionStore { gw.voice }
 
     var body: some View {
       if gw.voice.voiceGateway != nil {
-        VStack {
+        VStack(spacing: 2) {
           HStack {
             Group {
               switch vgw.voiceStatus {
@@ -42,7 +40,10 @@ struct ProfileBar: View {
               case .connecting:
                 if #available(macOS 15.0, *) {
                   Image(systemName: "wifi")
-                    .symbolEffect(.bounce.up.byLayer, options: .repeat(.periodic(delay: 0.0)))
+                    .symbolEffect(
+                      .bounce.up.byLayer,
+                      options: .repeat(.periodic(delay: 0.0))
+                    )
                     .foregroundStyle(.yellow)
                 } else {
                   Image(systemName: "wifi.exclamationmark")
@@ -54,13 +55,66 @@ struct ProfileBar: View {
               case .connected:
                 Image(systemName: "wifi")
                   .foregroundStyle(.green)
+                  .symbolEffect(.bounce.up.byLayer, options: .nonRepeating)
               }
             }
             .imageScale(.large)
             .frame(width: 30, height: 30)
             .background(Color.black.opacity(0.2))
             .clipShape(.rect(cornerRadius: 5))
-            
+
+            VStack(alignment: .leading) {
+              Group {
+                switch vgw.voiceStatus {
+                case .stopped, .noConnection:
+                  Text("Voice Disconnected")
+                    .foregroundStyle(.red)
+                case .connecting:
+                  Text("Connecting to Voice")
+                    .foregroundStyle(.yellow)
+                case .configured:
+                  Text("Awaiting Audio Setup")
+                    .foregroundStyle(.yellow)
+                case .connected:
+                  Text("Voice Connected")
+                    .foregroundStyle(.green)
+                }
+              }
+              .font(.headline)
+              .fontWeight(.semibold)
+
+              let channelStore: ChannelStore? = {
+                // shouldnt be nil.
+                guard let channelID = vgw.channelId else { return nil }
+                if let guildID = vgw.guildId {
+                  let guildStore = gw.getGuildStore(for: guildID)
+                  return gw.getChannelStore(for: channelID, from: guildStore)
+                } else {
+                  return gw.getChannelStore(for: channelID)
+                }
+              }()
+              if let channel = channelStore?.channel {
+                Group {
+                  if let guild = channelStore?.guildStore?.guild,
+                    let cName = channel.name
+                  {
+                    Text(verbatim: "\(guild.name) / \(cName)")
+                  } else if let name = channel.name
+                    ?? channel.recipients?.map({
+                      $0.global_name ?? $0.username
+                    }).joined(separator: ", ")
+                  {
+                    Text(verbatim: name)
+                  } else {
+                    Text("Unknown Channel")
+                  }
+                }
+                .font(.caption)
+              }
+            }
+
+            Spacer()
+
             Button {
               Task {
                 await vgw.updateVoiceConnection(.disconnect)
@@ -69,62 +123,25 @@ struct ProfileBar: View {
               // hang up call
               Image(systemName: "phone.down.fill")
                 .font(.title2)
-                .padding(5)
-                .background(.ultraThinMaterial)
-                .clipShape(.circle)
+                .maxWidth(35)
+                .maxHeight(35)
             }
-            .buttonStyle(.borderless)
+            .buttonStyle(
+              .borderlessHoverEffect(
+                hoverColor: .red,
+                pressedColor: .red
+              )
+            )
+
           }
-          
+          .frame(maxWidth: .infinity, alignment: .leading)
           HStack {
-            Button {
-              Task {
-                switch AVAudioApplication.shared.recordPermission {
-                case .granted:
-                  await vgw.updateVoiceState(isMuted: !gw.voice.isMuted)
-                case .denied:
-                  micError = true
-                case .undetermined:
-                  if await AVAudioApplication.requestRecordPermission() {
-                    await vgw.updateVoiceState(isMuted: false)
-                  }
-                @unknown default:
-                  fatalError()
-                }
-              }
-            } label: {
-              Image(systemName: vgw.isMuted ? "mic.slash.fill" : "mic.fill")
-                .font(.title2)
-                .padding(5)
-                .background(.ultraThinMaterial)
-                .clipShape(.circle)
-            }
-            .buttonStyle(.borderless)
-            .alert("Microphone Unavailable", isPresented: $micError) {
-              Button("OK", role: .cancel) {}
-            } message: {
-              Text(
-                "Please allow microphone access in your system settings to unmute yourself in voice channels."
-              )
-            }
-            
-            Button {
-              Task {
-                await vgw.updateVoiceState(isDeafened: !vgw.isDeafened)
-              }
-            } label: {
-              Image(
-                systemName: gw.voice.isDeafened
-                ? "speaker.slash.fill" : "speaker.wave.2.fill"
-              )
-              .font(.title2)
-              .padding(5)
-              .background(.ultraThinMaterial)
-              .clipShape(.circle)
-            }
-            .buttonStyle(.borderless)
+
           }
+          .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .padding(4)
+        .padding(.horizontal, 6)
       } else {
         EmptyView()
       }
@@ -140,6 +157,10 @@ struct ProfileBar: View {
     @State var showingUsername = false
     @State var showingPopover = false
     @State var barHovered = false
+
+    @State var micError = false
+
+    var vgw: VoiceConnectionStore { gw.voice }
 
     var body: some View {
       HStack {
@@ -207,17 +228,109 @@ struct ProfileBar: View {
 
         Spacer()
 
+        Button {
+          Task {
+            switch AVAudioApplication.shared.recordPermission {
+            case .granted:
+              await vgw.updateVoiceState(isMuted: !gw.voice.isMuted)
+            case .denied:
+              micError = true
+            case .undetermined:
+              if await AVAudioApplication.requestRecordPermission() {
+                await vgw.updateVoiceState(isMuted: false)
+              }
+            @unknown default:
+              fatalError()
+            }
+          }
+        } label: {
+          if #available(macOS 15.0, iOS 18.0, *) {
+            Image(systemName: vgw.isMuted ? "mic.slash.fill" : "mic.fill")
+              .contentTransition(
+                .symbolEffect(
+                  .replace.magic(fallback: .upUp.byLayer),
+                  options: .nonRepeating
+                )
+              )
+              .font(.title2)
+              .maxWidth(35)
+              .maxHeight(35)
+          } else {
+            Image(systemName: vgw.isMuted ? "mic.slash.fill" : "mic.fill")
+              .contentTransition(
+                .symbolEffect(.replace.wholeSymbol, options: .nonRepeating)
+              )
+              .font(.title2)
+              .maxWidth(35)
+              .maxHeight(35)
+          }
+        }
+        .buttonStyle(
+          .borderlessHoverEffect(
+            pressedColor: .red,
+            isSelected: vgw.isMuted
+          )
+        )
+        .alert("Microphone Unavailable", isPresented: $micError) {
+          Button("OK", role: .cancel) {}
+        } message: {
+          Text(
+            "Please allow microphone access in your system settings to unmute yourself in voice channels."
+          )
+        }
+
+        Button {
+          Task {
+            await vgw.updateVoiceState(isDeafened: !vgw.isDeafened)
+          }
+        } label: {
+          if #available(macOS 15.0, iOS 18.0, *) {
+            Image(
+              systemName: gw.voice.isDeafened
+                ? "headphones.slash" : "headphones"
+            )
+            .contentTransition(
+              .symbolEffect(
+                .replace.magic(fallback: .upUp.byLayer),
+                options: .nonRepeating
+              )
+            )
+            .font(.title2)
+            .maxWidth(35)
+            .maxHeight(35)
+          } else {
+            Image(
+              systemName: gw.voice.isDeafened
+                ? "headphones.slash" : "headphones"
+            )
+            .contentTransition(
+              .symbolEffect(.replace.wholeSymbol, options: .nonRepeating)
+            )
+            .font(.title2)
+            .maxWidth(35)
+            .maxHeight(35)
+          }
+        }
+        .buttonStyle(
+          .borderlessHoverEffect(
+            pressedColor: .red,
+            isSelected: vgw.isDeafened
+          )
+        )
+
         #if os(macOS)
           Button {
             openWindow(id: "settings")
           } label: {
             Image(systemName: "gearshape.fill")
               .font(.title2)
-              .padding(5)
-              .background(.ultraThinMaterial)
-              .clipShape(.circle)
+              .maxWidth(35)
+              .maxHeight(35)
           }
-          .buttonStyle(.borderless)
+
+          .buttonStyle(
+            .borderlessHoverEffect()
+          )
         #elseif os(iOS)
           /// targetting ipad here, ios wouldnt have this at all
           // do something
@@ -228,14 +341,13 @@ struct ProfileBar: View {
         if let nameplate = gw.user.currentUser?.collectibles?.nameplate {
           Profile.NameplateView(nameplate: nameplate)
             .nameplateAnimated(barHovered)
-            .saturation(0.9)
-            .brightness(0.1)
+            .nameplateImageOpacity(0.4)
         }
       }
       .clipped()
       .onHover { barHovered = $0 }
     }
-    
+
     func emojiURL(for emoji: Gateway.Activity.ActivityEmoji, animated: Bool)
       -> URL?
     {
@@ -268,7 +380,8 @@ struct ProfileBar: View {
 
             VStack(alignment: .leading) {
               Text(
-                gw.user.currentUser?.global_name ?? gw.user.currentUser?.username
+                gw.user.currentUser?.global_name ?? gw.user.currentUser?
+                  .username
                   ?? "Unknown User"
               )
               .bold()
@@ -420,5 +533,122 @@ struct ProfileBar: View {
         }
       }
     }
+  }
+}
+
+// button style thats borderless, and has configurable hover effects
+extension ButtonStyle where Self == BorderlessHoverEffectButtonStyle {
+  static func borderlessHoverEffect(
+    hoverColor: Color = .gray,
+    pressedColor: Color = .gray,
+    persistentBackground: AnyShapeStyle? = nil,
+    isSelected: Bool = false,
+    selectionShape: AnyShape = .init(.rect(cornerRadius: 8)),
+  ) -> some ButtonStyle {
+    BorderlessHoverEffectButtonStyle(
+      hoverColor: hoverColor,
+      pressedColor: pressedColor,
+      persistentBackground: persistentBackground,
+      isSelected: isSelected,
+      selectionShape: selectionShape
+    )
+  }
+}
+
+struct BorderlessHoverEffectButtonStyle: ButtonStyle {
+  var hoverColor: Color
+  var pressedColor: Color
+  var persistentBackground: AnyShapeStyle?
+  var isSelected = false
+  var selectionShape: AnyShape
+  @State private var isHovered = false
+
+  func makeBody(configuration: Configuration) -> some View {
+    configuration.label
+      .background {
+        ZStack {
+          if let persistentBackground {
+            Rectangle()
+              .fill(persistentBackground)
+          }
+          if configuration.isPressed {
+            pressedColor
+              .opacity(0.12)
+          }
+          if isHovered {
+            hoverColor.opacity(0.2)
+          }
+          if isSelected {
+            pressedColor
+              .opacity(0.2)
+              .opacity(0.8)
+          }
+        }
+        .clipShape(selectionShape)
+      }
+      .foregroundColor(isSelected ? pressedColor : nil)
+      .onHover { isHovered = $0 }
+  }
+}
+
+#Preview("button test") {
+  @Previewable @State var selected = false
+  Button {
+    selected.toggle()
+  } label: {
+    Image(systemName: "checkmark")
+      .padding(10)
+  }
+  .buttonStyle(
+    .borderlessHoverEffect(
+      hoverColor: .blue,
+      pressedColor: .blue,
+      persistentBackground: .init(.ultraThinMaterial),
+      isSelected: selected,
+      selectionShape: .init(.rect),
+    )
+  )
+  .padding()
+}
+
+#Preview("nameplate test") {
+  let decoration = DiscordUser.AvatarDecoration(
+    asset: "a_741750ac1c9091a58059be33590c2821",
+    sku_id: .init("1424960507143524495")
+  )
+
+  let llsc12 = DiscordUser(
+    id: .init("381538809180848128"),
+    username: "llsc12",
+    discriminator: "0",
+    global_name: nil,
+    avatar: "df71b3f223666fd8331c9940c6f7cbd9",
+    banner: nil,
+    bot: false,
+    system: false,
+    mfa_enabled: true,
+    accent_color: nil,
+    locale: .englishUS,
+    verified: true,
+    email: nil,
+    flags: .init(rawValue: 4_194_352),
+    premium_type: nil,
+    public_flags: .init(rawValue: 4_194_304),
+    collectibles: .init(
+      nameplate:
+        .init(
+          asset: "nameplates/nameplates_v3/bonsai/",
+          sku_id: SKUSnowflake("1382845914225442886"),
+          label: "COLLECTIBLES_NAMEPLATES_VOL_3_BONSAI_A11Y",
+          palette: .bubble_gum
+        )
+    ),
+    avatar_decoration_data: decoration
+  )
+  Group {
+    Profile.NameplateView(nameplate: llsc12.collectibles!.nameplate!)
+      .nameplateAnimated(true)
+      .nameplateImageOpacity(0.4)
+      .frame(width: 400, height: 80)
   }
 }

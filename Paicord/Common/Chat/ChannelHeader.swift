@@ -81,7 +81,8 @@ extension ChatView {
           .frame(width: 36, height: 36)
 
           Text(
-            vm.channel?.name
+            verbatim:
+              vm.channel?.name
               ?? ppl.map({
                 $0.global_name ?? $0.username
               }).joined(separator: ", ")
@@ -94,10 +95,15 @@ extension ChatView {
           Image(systemName: "number")
             .foregroundStyle(.secondary)
             .imageScale(idiom == .phone ? .medium : .large)
-          let name = vm.channel?.name ?? "Unknown Channel"
-          Text(name)
-            .font(idiom == .phone ? .headline : .title3)
-            .fontWeight(.semibold)
+          if let name = vm.channel?.name {
+            Text(verbatim: name)
+              .font(idiom == .phone ? .headline : .title3)
+              .fontWeight(.semibold)
+          } else {
+            Text("Unknown Channel")
+              .font(idiom == .phone ? .headline : .title3)
+              .fontWeight(.semibold)
+          }
         }
       }
     }

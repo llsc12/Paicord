@@ -16,6 +16,7 @@ extension EnvironmentValues {
   @Entry var profileHideOfflinePresence: Bool = false
 
   @Entry var nameplateAnimated: Bool = false
+  @Entry var nameplateImageOpacity: CGFloat = 1
 }
 
 extension View {
@@ -37,6 +38,11 @@ extension View {
   /// Whether to show animated nameplates
   func nameplateAnimated(_ animated: Bool = true) -> some View {
     environment(\.nameplateAnimated, animated)
+  }
+  
+  /// Opacity of the image in the nameplate
+  func nameplateImageOpacity(_ opacity: CGFloat = 1) -> some View {
+    environment(\.nameplateImageOpacity, opacity)
   }
 }
 
@@ -233,6 +239,7 @@ enum Profile {
   struct NameplateView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.nameplateAnimated) var animated
+    @Environment(\.nameplateImageOpacity) var opacity
     let nameplate: DiscordUser.Collectibles.Nameplate
 
     var color: Color {
@@ -295,11 +302,13 @@ enum Profile {
                 .clipped()
             }
           }
+          .opacity(opacity)
         } else {
           WebImage(url: staticURL)
             .resizable()
             .scaledToFill()
             .clipped()
+            .opacity(opacity)
         }
       }
     }
@@ -495,6 +504,15 @@ struct AvatarDecorationView: View {
     flags: .init(rawValue: 4_194_352),
     premium_type: nil,
     public_flags: .init(rawValue: 4_194_304),
+    collectibles: .init(
+      nameplate:
+        .init(
+          asset: "nameplates/nameplates_v3/bonsai/",
+          sku_id: SKUSnowflake("1382845914225442886"),
+          label: "COLLECTIBLES_NAMEPLATES_VOL_3_BONSAI_A11Y",
+          palette: .bubble_gum
+        )
+    ),
     avatar_decoration_data: decoration
   )
   Group {
