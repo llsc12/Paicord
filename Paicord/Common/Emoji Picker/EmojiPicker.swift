@@ -221,7 +221,7 @@ struct EmojiPicker: View {
     func guildButton(from guild: Guild) -> some View {
       Group {
         if let icon = guild.icon,
-           let url = iconURL(id: guild.id, icon: icon, animated: false)
+          let url = iconURL(id: guild.id, icon: icon, animated: false)
         {
           WebImage(url: url)
             .resizable()
@@ -292,13 +292,10 @@ struct EmojiPicker: View {
         })
         guilds.append(contentsOf: unlistedGuilds.map(\.id))
       }
-      #warning(
-        "replace with integer initialiser once pr discordbm-changes is merged"
-      )
       guilds.append(
         contentsOf: gw.settings.userSettings.guildFolders.folders.flatMap(
           \.guildIds
-        ).map { GuildSnowflake($0.description) }
+        ).map { GuildSnowflake($0) }
       )
       return guilds
     }
