@@ -88,7 +88,7 @@ extension ChatView {
     #endif
 
     @State private var isFocused: Bool = false
-    @State var filesRemovedDuringSelection: Error? = nil
+    @State var filesRemovedDuringSelection: (any Error)? = nil
 
     enum SelectionError: LocalizedError {
       case filesPastLimit(limit: Int)

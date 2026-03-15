@@ -137,7 +137,7 @@ final class PaicordAppState {
   // MARK: - Error state
   var showingError = false
   var showingErrorSheet = false
-  var error: Error? = nil {
+  var error: (any Error)? = nil {
     didSet {
       showingError = error != nil
     }

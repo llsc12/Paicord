@@ -166,7 +166,7 @@ struct CaptchaSheet: ViewControllerRepresentable {
       }
     #endif
 
-    private func handleResult(_ result: Result<String, Error>) {
+    private func handleResult(_ result: Result<String, any Error>) {
       switch result {
       case .success(let token):
         onToken(CaptchaSubmitData(challenge: challenge, token: token))
