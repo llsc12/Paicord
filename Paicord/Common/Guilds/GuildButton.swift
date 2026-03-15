@@ -259,70 +259,12 @@ struct GuildButton: View {
 
   /// A button representing a guild or DMs
   func guildButton(from guild: Guild?) -> some View {
-    Button {
+    let isSelected = appState.selectedGuild == guild?.id
+    return Button {
       ImpactGenerator.impact(style: .light)
       appState.selectedGuild = guild?.id
     } label: {
-      let isSelected = appState.selectedGuild == guild?.id
-      Group {
-        if let id = guild?.id {
-          Group {
-            let shouldAnimate = appState.selectedGuild == id
-            if let icon = guild?.icon,
-              let url = iconURL(id: id, icon: icon, animated: shouldAnimate)
-            {
-              AnimatedImage(
-                url: url,
-                isAnimating: .constant(shouldAnimate)
-              )
-              .resizable()
-              .scaledToFill()
-            } else {
-              // server name initials TODO
-              Rectangle()
-                .fill(.clear)
-                .aspectRatio(1, contentMode: .fit)
-                .background(isSelected ? .accent : .gray.opacity(0.3))
-                .overlay {
-                  // get initials from guild name
-                  let initials = (guild?.name ?? "")
-                    .split(separator: " ")
-                    .compactMap(\.first)
-                    .reduce("") { $0 + String($1) }
-
-                  Text(initials)
-                    .font(.title2)
-                    .minimumScaleFactor(0.1)
-                    .foregroundStyle(
-                      colorScheme == .dark
-                        ? Color.white
-                        : (isSelected
-                          ? Color.white
-                          : Color.black)
-                    )
-                }
-            }
-          }
-        } else {
-          Rectangle()
-            .fill(.clear)
-            .aspectRatio(1, contentMode: .fit)
-            .overlay {
-              Image(systemName: "bubble.left.and.bubble.right.fill")
-                .font(.title2)
-                .foregroundStyle(
-                  colorScheme == .dark ? .white : isSelected ? .white : .black
-                )
-            }
-            .background(
-              isSelected
-                ? theme.common.accent
-                : theme.common.primaryButtonBackground.opacity(0.5)
-            )
-        }
-      }
-      .clipShape(.rect(cornerRadius: isSelected ? 10 : 32, style: .continuous))
-      .animation(.default, value: isSelected)
+      guildButtonLabel(guild: guild, isSelected: isSelected)
     }
     .buttonStyle(.borderless)
     .contextMenu {
@@ -338,6 +280,72 @@ struct GuildButton: View {
         }
       }
     }
+  }
+
+  @ViewBuilder
+  private func guildButtonLabel(guild: Guild?, isSelected: Bool) -> some View {
+    Group {
+      if let id = guild?.id {
+        guildIconView(guild: guild, id: id, isSelected: isSelected)
+      } else {
+        dmButtonLabel(isSelected: isSelected)
+      }
+    }
+    .clipShape(.rect(cornerRadius: isSelected ? 10 : 32, style: .continuous))
+    .animation(.default, value: isSelected)
+  }
+
+  @ViewBuilder
+  private func guildIconView(guild: Guild?, id: GuildSnowflake, isSelected: Bool) -> some View {
+    let shouldAnimate = appState.selectedGuild == id
+    if let icon = guild?.icon,
+      let url = iconURL(id: id, icon: icon, animated: shouldAnimate)
+    {
+      AnimatedImage(
+        url: url,
+        isAnimating: .constant(shouldAnimate)
+      )
+      .resizable()
+      .scaledToFill()
+    } else {
+      let initials: String = (guild?.name ?? "")
+        .split(separator: " ")
+        .compactMap(\.first)
+        .reduce("") { $0 + String($1) }
+      Rectangle()
+        .fill(.clear)
+        .aspectRatio(1, contentMode: .fit)
+        .background(isSelected ? Color.accentColor : Color.gray.opacity(0.3))
+        .overlay {
+          Text(initials)
+            .font(.title2)
+            .minimumScaleFactor(0.1)
+            .foregroundStyle(
+              colorScheme == .dark
+                ? Color.white
+                : (isSelected ? Color.white : Color.black)
+            )
+        }
+    }
+  }
+
+  @ViewBuilder
+  private func dmButtonLabel(isSelected: Bool) -> some View {
+    Rectangle()
+      .fill(.clear)
+      .aspectRatio(1, contentMode: .fit)
+      .overlay {
+        Image(systemName: "bubble.left.and.bubble.right.fill")
+          .font(.title2)
+          .foregroundStyle(
+            colorScheme == .dark ? .white : isSelected ? .white : .black
+          )
+      }
+      .background(
+        isSelected
+          ? theme.common.accent
+          : theme.common.primaryButtonBackground.opacity(0.5)
+      )
   }
 
   func iconURL(id: GuildSnowflake, icon: String, animated: Bool) -> URL? {
