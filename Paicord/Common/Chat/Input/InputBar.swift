@@ -551,7 +551,7 @@ extension ChatView {
       guard !msg.isEmpty || inputVM.uploadItems.isEmpty == false else {
         return
       }
-      guard let channelId = appState.selectedChannel else { return }
+      guard let channelId = appState.selectedChannel.channelID else { return }
       // create a copy of the vm
       let toSend = inputVM.copy()
       inputVM.reset()

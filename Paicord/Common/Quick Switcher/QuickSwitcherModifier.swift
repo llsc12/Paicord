@@ -479,20 +479,24 @@ struct QuickSwitcherView: View {
       let res = try await gw.client.createDm(payload: .init(recipient: user.id))
       try res.guardSuccess()
       let channel = try res.decode()
-      appState.selectedGuild = nil
-      appState.selectedChannel = channel.id
+      appState.selectedGuild = .directMessages
+      appState.selectedChannel = .textChannel(channel.id)
     case .groupDM(let channel):
-      appState.selectedGuild = nil
-      appState.selectedChannel = channel.id
+      appState.selectedGuild = .directMessages
+      appState.selectedChannel = .textChannel(channel.id)
     case .guildChannel(let channel, _, let guild):
-      appState.selectedGuild = guild.id
+      appState.selectedGuild = .guild(guild.id)
       switch channel.type {
       case .guildText, .guildAnnouncement:
-        appState.selectedChannel = channel.id
+        appState.selectedChannel = .textChannel(channel.id)
+      case .guildVoice:
+        appState.selectedChannel = .voiceChannel(channel.id)
+      case .publicThread, .privateThread, .announcementThread:
+        appState.selectedChannel = .thread(channel.id)
       default: break
       }
     case .guild(let guild):
-      appState.selectedGuild = guild.id
+      appState.selectedGuild = .guild(guild.id)
     }
   }
 }

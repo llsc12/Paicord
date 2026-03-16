@@ -21,7 +21,7 @@ struct ChannelButton: View {
     switch channel.type {
     case .dm:
       textChannelButton { hovered in
-        let selected = appState.selectedChannel == channel.id
+        let selected = appState.selectedChannel.channelID == channel.id
         HStack {
           if let user = channel.recipients?.first {
             Profile.AvatarWithPresence(
@@ -205,7 +205,7 @@ struct ChannelButton: View {
     var body: some View {
       if !shouldHide {
         Button {
-          appState.selectedChannel = channel.id
+          appState.selectedChannel = .textChannel(channel.id)
           #if os(iOS)
             withAnimation {
               appState.chatOpen.toggle()
@@ -246,7 +246,7 @@ struct ChannelButton: View {
         )
         .background(
           Group {
-            if appState.selectedChannel == channel.id {
+            if appState.selectedChannel.channelID == channel.id {
               Color.gray.opacity(0.13)
             } else {
               Color.clear
@@ -277,10 +277,12 @@ struct ChannelButton: View {
       if !shouldHide {
         Button {
           Task {
+            appState.selectedChannel = .voiceChannel(channel.id)
+            guard let guildID = appState.selectedGuild.guildID else { return }
             await gw.voice.updateVoiceConnection(
               .join(
                 channelId: channel.id,
-                guildId: appState.selectedGuild,
+                guildId: guildID,
               )
             )
           }
@@ -300,7 +302,7 @@ struct ChannelButton: View {
 
     var body: some View {
       let voiceChannels = gw.voiceChannels
-      if let voiceStates = voiceChannels.voiceStates[appState.selectedGuild]?[
+      if let guildID = appState.selectedGuild.guildID, let voiceStates = voiceChannels.voiceStates[guildID]?[
         channel.id
       ], !voiceStates.isEmpty {
         LazyVStack(spacing: 2) {
@@ -318,7 +320,6 @@ struct ChannelButton: View {
       @Environment(\.guildStore) var guildStore
       @Environment(\.gateway) var gw
 
-      @State var isHovered = false
       @State var showPopover = false
       var body: some View {
         let member = state.member ?? guildStore?.members[state.user_id]
@@ -347,19 +348,8 @@ struct ChannelButton: View {
           .frame(maxWidth: .infinity, alignment: .leading)
           .padding(.vertical, 6)
           .padding(.horizontal, 8)
-          .background(
-            Group {
-              if isHovered {
-                Color.gray.opacity(0.2)
-              } else {
-                Color.clear
-              }
-            }
-            .clipShape(.rounded)
-          )
         }
-        .buttonStyle(.borderless)
-        .onHover { isHovered = $0 }
+        .buttonStyle(.borderlessHoverEffect(isSelected: showPopover, selectionShape: .init(.rounded)))
         .popover(isPresented: $showPopover) {
           if let user {
             ProfilePopoutView(
@@ -400,7 +390,7 @@ struct ChannelButton: View {
           )
           .background(
             Group {
-              if appState.selectedChannel == channel.id {
+              if appState.selectedChannel.channelID == channel.id {
                 Color.gray.opacity(0.13)
               } else {
                 Color.clear

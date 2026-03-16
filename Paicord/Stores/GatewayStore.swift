@@ -219,9 +219,13 @@ final class GatewayStore {
     print(
       "[GatewayStore] Reconnected, resubscribing to previously subscribed guilds."
     )
-    let channelIds = PaicordAppState.instances.compactMap(
-      \.value.selectedChannel
-    )
+    let channelIds = PaicordAppState.instances.compactMap {
+      switch $0.value.selectedChannel {
+      case .textChannel(let channelId), .thread(let channelId), .voiceChannel(let channelId):
+        return channelId
+        default: return nil
+      }
+    }
     _channels = _channels.filter { channelIds.contains($0.key) }
     if let channel = _channels.values.first {
       print(

@@ -214,7 +214,7 @@ struct EntityContextMenu<Entity>: ViewModifier {
         Label("Copy Text", systemImage: "document.on.document.fill")
       }
       Button {
-        let guildID = appState.selectedGuild?.rawValue ?? "@me"
+        let guildID = appState.selectedGuild.guildID?.rawValue ?? "@me"
         let channelID = message.channel_id.rawValue
         let messageID = message.id.rawValue
         copyText(

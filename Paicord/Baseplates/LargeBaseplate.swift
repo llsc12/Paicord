@@ -53,17 +53,20 @@ struct LargeBaseplate: View {
     } detail: {
       Group {
         if let currentChannelStore {
-          ChatView(vm: currentChannelStore)
-            .inspector(isPresented: $showingInspector) {
-              MemberSidebarView(
-                guildStore: currentGuildStore,
-                channelStore: currentChannelStore
-              )
-              .inspectorColumnWidth(min: 250, ideal: 250, max: 360)
-            }
-            .id(currentChannelStore.channelId)  // force view update
-            .environment(\.guildStore, currentGuildStore)
-            .environment(\.channelStore, currentChannelStore)
+          switch appState.selectedChannel {
+          case .textChannel, .thread:
+            textChannelLayout(currentChannelStore)
+          case .voiceChannel:
+            voiceChannelLayout(currentChannelStore)
+          case .dashboard:
+              Text(":3")
+                .font(.largeTitle)
+                .foregroundStyle(.secondary)
+          case .friends:
+            Text(":3c")
+              .font(.largeTitle)
+              .foregroundStyle(.secondary)
+          }
         } else {
           // placeholder
           VStack {
@@ -99,14 +102,14 @@ struct LargeBaseplate: View {
       }
     }
     .task(id: appState.selectedGuild) {
-      if let selected = appState.selectedGuild {
+      if let selected = appState.selectedGuild.guildID {
         self.currentGuildStore = gw.getGuildStore(for: selected)
       } else {
         self.currentGuildStore = nil
       }
     }
     .task(id: appState.selectedChannel) {
-      if let selected = appState.selectedChannel {
+      if let selected = appState.selectedChannel.channelID {
         // there is a likelihood that currentGuildStore is wrong when this runs
         // but i dont think it will be a problem maybe.
         self.currentChannelStore = gw.getChannelStore(
@@ -117,6 +120,33 @@ struct LargeBaseplate: View {
         self.currentChannelStore = nil
       }
     }
+  }
+  
+  @ViewBuilder
+  func textChannelLayout(_ channelStore: ChannelStore) -> some View {
+    ChatView(vm: channelStore)
+      .inspector(isPresented: $showingInspector) {
+        MemberSidebarView(
+          guildStore: currentGuildStore,
+          channelStore: currentChannelStore
+        )
+        .inspectorColumnWidth(min: 250, ideal: 250, max: 360)
+      }
+      .id(channelStore.channelId)  // force view update
+      .environment(\.guildStore, currentGuildStore)
+      .environment(\.channelStore, currentChannelStore)
+  }
+  
+  @ViewBuilder
+  func voiceChannelLayout(_ channelStore: ChannelStore) -> some View {
+      VoiceView(vm: channelStore)
+      .inspector(isPresented: $showingInspector) {
+        ChatView(vm: channelStore)
+        .inspectorColumnWidth(min: 400, ideal: 450, max: 750)
+      }
+      .id(channelStore.channelId)  // force view update
+      .environment(\.guildStore, currentGuildStore)
+      .environment(\.channelStore, currentChannelStore)
   }
 }
 

@@ -44,7 +44,7 @@ struct GuildButton: View {
     } else {
       let height: CGFloat = {
         // if the guild is selected
-        if appState.selectedGuild == guild?.id {
+        if appState.selectedGuild.guildID == guild?.id {
           return 38
         } else if isHovering {
           return 20
@@ -260,20 +260,21 @@ struct GuildButton: View {
   /// A button representing a guild or DMs
   func guildButton(from guild: Guild?) -> some View {
     Button {
-      if appState.selectedGuild == guild?.id {
+      if appState.selectedGuild.guildID == guild?.id {
         #if os(iOS)
         appState.chatOpen = true
         #endif
       } else {
         ImpactGenerator.impact(style: .light)
-        appState.selectedGuild = guild?.id
+        guard let id = guild?.id else { return }
+        appState.selectedGuild = .guild(id)
       }
     } label: {
-      let isSelected = appState.selectedGuild == guild?.id
+      let isSelected = appState.selectedGuild.guildID == guild?.id
       Group {
         if let id = guild?.id {
           Group {
-            let shouldAnimate = appState.selectedGuild == id
+            let shouldAnimate = appState.selectedGuild.guildID == id
             if let icon = guild?.icon,
               let url = iconURL(id: id, icon: icon, animated: shouldAnimate)
             {

@@ -572,12 +572,7 @@ final class VoiceConnectionStore: DiscordDataStore {
   private let micChannel = AsyncChannel<AVAudioPCMBuffer>()
 
   private func setupTap() {
-    let targetFormat = AVAudioFormat(
-      commonFormat: .pcmFormatFloat32,
-      sampleRate: .opus48khz,
-      channels: 2,
-      interleaved: false
-    )!
+    let targetFormat = Self.pcmFormat
 
     let opusFrameCount: AVAudioFrameCount = 960
     let opusFrameSize = Int(opusFrameCount)
@@ -587,24 +582,57 @@ final class VoiceConnectionStore: DiscordDataStore {
       capacityFrames: opusFrameSize * 8
     )
 
-    let tapFormat = inputNode.outputFormat(forBus: 0)
-    print("[Voice] Installing tap with format:", tapFormat)
+    let initialTapFormat = inputNode.inputFormat(forBus: 0)
+    print("[Voice] Installing tap with format:", initialTapFormat)
 
-    // print graph description
+    // Initialize upfront to prevent clicking artifacts and preserve internal converter state
+    var converter = AVAudioConverter(from: initialTapFormat, to: targetFormat)
+    var lastTapFormat = initialTapFormat
+
     inputNode.installTap(
       onBus: 0,
       bufferSize: opusFrameCount,
-      format: tapFormat
-    ) {
-      buffer,
-      _ in
-      guard buffer.frameLength > 0 else { return }
-      guard let src = buffer.floatChannelData else { return }
+      format: nil
+    ) { [weak self] buffer, _ in
+      guard let self = self, buffer.frameLength > 0 else { return }
+      
+      if lastTapFormat != buffer.format {
+        lastTapFormat = buffer.format
+        converter = AVAudioConverter(from: buffer.format, to: targetFormat)
+      }
+      
+      guard let activeConverter = converter else { return }
+      
+      let inputRate = buffer.format.sampleRate
+      let outputRate = targetFormat.sampleRate
+      let capacityRate = outputRate / inputRate
+      let capacity = AVAudioFrameCount(ceil(Double(buffer.frameLength) * capacityRate) + 1)
+      
+      guard let convertedBuffer = AVAudioPCMBuffer(pcmFormat: targetFormat, frameCapacity: capacity) else { return }
+      
+      var error: NSError?
+      var inputBlockProvided = false
+      let status = activeConverter.convert(to: convertedBuffer, error: &error) { inNumPackets, outStatus in
+        if inputBlockProvided {
+          outStatus.pointee = .noDataNow
+          return nil
+        }
+        inputBlockProvided = true
+        outStatus.pointee = .haveData
+        return buffer
+      }
+      
+      if status == .error || error != nil {
+        print("[Voice] Audio conversion error: \(String(describing: error))")
+        return
+      }
+      
+      guard convertedBuffer.frameLength > 0, let src = convertedBuffer.floatChannelData else { return }
 
       ring.write(
         from: src,
-        frames: Int(buffer.frameLength),
-        srcChannels: Int(buffer.format.channelCount)
+        frames: Int(convertedBuffer.frameLength),
+        srcChannels: Int(targetFormat.channelCount)
       )
 
       while ring.availableFrames >= opusFrameSize {
@@ -633,7 +661,7 @@ final class VoiceConnectionStore: DiscordDataStore {
         if self.isMuted { continue }
 
         do {
-          guard let interleaved = interleavedBuffer(from: buffer) else {
+          guard let interleaved = self.interleavedBuffer(from: buffer) else {
             continue
           }
           let encodedSize = try self.opusEncoder.encode(

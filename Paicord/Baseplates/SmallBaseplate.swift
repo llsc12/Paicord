@@ -114,14 +114,14 @@ struct SmallBaseplate: View {
     }
     .slideoverDisabled(disableSlideover)
     .task(id: appState.selectedGuild) {
-      if let selected = appState.selectedGuild {
+      if let selected = appState.selectedGuild.guildID {
         self.currentGuildStore = gw.getGuildStore(for: selected)
       } else {
         self.currentGuildStore = nil
       }
     }
     .task(id: appState.selectedChannel) {
-      if let selected = appState.selectedChannel {
+      if let selected = appState.selectedChannel.channelID {
         // there is a likelihood that currentGuildStore is wrong when this runs
         // but i dont think it will be a problem maybe.
         self.currentChannelStore = gw.getChannelStore(
