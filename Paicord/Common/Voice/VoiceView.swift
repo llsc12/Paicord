@@ -28,7 +28,7 @@ struct VoiceView: View {
 
   var body: some View {
     Group {
-      VStack(spacing: 15) {
+      LazyVStack(spacing: 15) {
         let voiceChannels = gw.voiceChannels
         let guildID = vm.guildStore?.guildId
         let voiceStates =
@@ -81,6 +81,7 @@ struct VoiceView: View {
           } label: {
             Text("Join Voice")
           }
+          .disabled(!(vm.guildStore?.hasPermission(channel: vm, .connect) ?? true))
         }
       }
       .foregroundStyle(.white.secondary)
@@ -149,29 +150,25 @@ struct VoiceView: View {
     @Binding var showingVoiceUI: Bool
     var namespace: Namespace.ID
 
-    var itemSize: CGFloat? { vgw?.channelId != channelStore?.channelId ? 150 : nil }
+    var itemSize: CGFloat? {
+      vgw?.channelId != channelStore?.channelId ? 150 : nil
+    }
 
     var body: some View {
       let chunks:
         ChunksOfCountCollection<
           OrderedDictionary<UserSnowflake, VoiceState>.Values
         > = {
-          if let itemSize {
-            return members.values.chunks(
-              ofCount: max(1, min(4, Int(contentSize.width / itemSize)))
-            )
-          } else {
-            // chunk by powers of 2 to make a nicely expanding grid
-            let count = members.count
-            let chunkSize: Int = {
-              var size = 1
-              while Int(pow(2.0, Double(size))) < count {
-                size += 1
-              }
-              return size
-            }()
-            return members.values.chunks(ofCount: chunkSize)
-          }
+          // chunk by powers of 2 to make a nicely expanding grid
+          let count = members.count
+          let chunkSize: Int = {
+            var size = 1
+            while Int(pow(2.0, Double(size))) < count {
+              size += 1
+            }
+            return size
+          }()
+          return members.values.chunks(ofCount: chunkSize)
         }()
       VStack(alignment: .center, spacing: 0) {
         ForEach(Array(chunks.enumerated()), id: \.offset) { _, chunk in

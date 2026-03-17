@@ -13,6 +13,7 @@ import SwiftUIX
 struct ChannelButton: View {
   @Environment(\.gateway) var gw
   @Environment(\.appState) var appState
+  @Environment(\.guildStore) var guild
   var channels: [ChannelSnowflake: DiscordChannel]
   var channel: DiscordChannel
 
@@ -158,8 +159,13 @@ struct ChannelButton: View {
     case .guildVoice:
       voiceChannelButton { hovered in
         HStack {
-          Image(systemName: "speaker.wave.2.fill")
-            .imageScale(.medium)
+          if guild?.hasPermission(channel: channel, .connect) == false {
+            Image(systemName: "lock.fill")
+              .imageScale(.medium)
+          } else {
+            Image(systemName: "speaker.wave.2.fill")
+              .imageScale(.medium)
+          }
           Text(channel.name ?? "unknown")
           Spacer()
           
@@ -284,12 +290,19 @@ struct ChannelButton: View {
         .viewChannel
       ) == false
     }
+    var canConnect: Bool {
+      guard let guild else { return false }
+      return guild.hasPermission(
+        channel: channel,
+        .connect
+      )
+    }
     var body: some View {
       if !shouldHide {
         Button {
           Task {
             appState.selectedChannel = .voiceChannel(channel.id)
-            guard let guildID = appState.selectedGuild.guildID else { return }
+            guard let guildID = appState.selectedGuild.guildID, canConnect else { return }
             await gw.voice.updateVoiceConnection(
               .join(
                 channelId: channel.id,
@@ -302,6 +315,7 @@ struct ChannelButton: View {
         }
         .onHover { isHovered = $0 }
         .buttonStyle(.borderless)
+        .disabled(!canConnect)
       }
     }
   }
