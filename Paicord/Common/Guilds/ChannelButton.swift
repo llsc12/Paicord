@@ -110,11 +110,17 @@ struct ChannelButton: View {
             }
             .aspectRatio(1, contentMode: .fit)
           }
-          Text(
-            channel.name ?? channel.recipients?.map({
-              $0.global_name ?? $0.username
-            }).joined(separator: ", ") ?? "Unknown Group DM"
-          )
+          VStack(alignment: .leading, spacing: 2){
+            Text(
+              channel.name ?? channel.recipients?.map({
+                $0.global_name ?? $0.username
+              }).joined(separator: ", ") ?? "Unknown Group DM"
+            )
+            .lineLimit(1)
+
+            Text("\(channel.recipients?.count ?? 0) members")
+              .font(.caption)
+          }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .frame(height: 38)

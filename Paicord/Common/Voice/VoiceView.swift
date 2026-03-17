@@ -28,7 +28,7 @@ struct VoiceView: View {
 
   var body: some View {
     Group {
-      LazyVStack(spacing: 15) {
+      VStack(spacing: 15) {
         let voiceChannels = gw.voiceChannels
         let guildID = vm.guildStore?.guildId
         let voiceStates =
@@ -116,7 +116,7 @@ struct VoiceView: View {
             showingVoiceUI = true
           }
           timer?.invalidate()
-          timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false) {
+          timer = Timer.scheduledTimer(withTimeInterval: 4.0, repeats: false) {
             _ in
             self.showingVoiceUI = false
           }
@@ -128,7 +128,7 @@ struct VoiceView: View {
         return event
       }
 
-      timer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false) { _ in
+      timer = Timer.scheduledTimer(withTimeInterval: 4.0, repeats: false) { _ in
         self.showingVoiceUI = false
       }
     }
@@ -166,7 +166,7 @@ struct VoiceView: View {
             while Int(pow(2.0, Double(size))) < count {
               size += 1
             }
-            return size
+            return size + (itemSize != nil ? 1 : 0)
           }()
           return members.values.chunks(ofCount: chunkSize)
         }()
@@ -292,6 +292,9 @@ struct VoiceView: View {
           }
         }
         .padding(2)
+        .transaction(value: isSpeaking) { t in
+          t.disableAnimations()
+        }
         .task(id: user, grabColor)
         .task(id: member, grabColor)
       }
