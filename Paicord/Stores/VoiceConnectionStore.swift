@@ -491,10 +491,6 @@ final class VoiceConnectionStore: DiscordDataStore {
       /// voice processing mode
       do {
         try inputNode.setVoiceProcessingEnabled(true)
-        inputNode.voiceProcessingOtherAudioDuckingConfiguration = .init(
-          enableAdvancedDucking: true,
-          duckingLevel: .max
-        )
         inputNode.isVoiceProcessingAGCEnabled = true
         inputNode.isVoiceProcessingBypassed = false
         inputNode.isVoiceProcessingInputMuted = false
@@ -746,6 +742,8 @@ final class VoiceConnectionStore: DiscordDataStore {
 
   private func ensureIncomingStreamExists(ssrc: UInt32) {
     if incomingStreamsBySSRC[ssrc] != nil { return }
+    // ensure it isn't us
+    guard knownSSRCs[UInt(ssrc)] != gateway?.user.currentUser?.id else { return }
 
     let stream = IncomingStream(ssrc: ssrc)
     incomingStreamsBySSRC[ssrc] = stream

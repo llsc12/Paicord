@@ -159,6 +159,8 @@ struct ProfileBar: View {
     @State var barHovered = false
 
     @State var micError = false
+    
+    @ViewStorage var didDeafenBeforeMute = false
 
     var vgw: VoiceConnectionStore { gw.voice }
 
@@ -232,7 +234,8 @@ struct ProfileBar: View {
           Task {
             switch AVAudioApplication.shared.recordPermission {
             case .granted:
-              await vgw.updateVoiceState(isMuted: !gw.voice.isMuted)
+              // if deafened whilst unmuting, undeafen
+              await vgw.updateVoiceState(isMuted: !gw.voice.isMuted, isDeafened: vgw.isDeafened && gw.voice.isMuted ? false : nil)
             case .denied:
               micError = true
             case .undetermined:
@@ -281,7 +284,18 @@ struct ProfileBar: View {
 
         Button {
           Task {
-            await vgw.updateVoiceState(isDeafened: !vgw.isDeafened)
+            // if going to deafen and not currently muted, deafen and mute. if coming back, undeafen and unmute too.
+            var deaf = vgw.isDeafened
+            var mute = vgw.isMuted
+            if !deaf && !mute {
+              didDeafenBeforeMute = true
+              mute = true
+            } else if vgw.isDeafened && didDeafenBeforeMute {
+              mute = false
+              didDeafenBeforeMute = false
+            }
+            deaf.toggle()
+            await vgw.updateVoiceState(isMuted: mute, isDeafened: deaf)
           }
         } label: {
           if #available(macOS 15.0, iOS 18.0, *) {

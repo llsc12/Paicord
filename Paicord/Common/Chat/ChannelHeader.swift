@@ -92,9 +92,20 @@ extension ChatView {
         }
       default:
         HStack(spacing: 4) {
-          Image(systemName: "number")
-            .foregroundStyle(.secondary)
-            .imageScale(idiom == .phone ? .medium : .large)
+          switch vm.channel?.type {
+          case .guildText, .guildAnnouncement:
+            Image(systemName: "number")
+              .foregroundStyle(.secondary)
+              .imageScale(idiom == .phone ? .medium : .large)
+          case .guildVoice:
+            Image(systemName: "speaker.wave.2.fill")
+              .foregroundStyle(.secondary)
+              .imageScale(idiom == .phone ? .medium : .large)
+          default:
+            Image(systemName: "number")
+              .foregroundStyle(.secondary)
+              .imageScale(idiom == .phone ? .medium : .large)
+          }
           if let name = vm.channel?.name {
             Text(verbatim: name)
               .font(idiom == .phone ? .headline : .title3)

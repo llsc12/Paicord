@@ -34,6 +34,16 @@
     "%@ unsupported" : {
 
     },
+    "%@%@ %@ currently in voice" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@%2$@ %3$@ currently in voice"
+          }
+        }
+      }
+    },
     "%lld members" : {
 
     },
@@ -215,6 +225,9 @@
     "Join the [Paicord Server](https://discord.gg/fqhPGHPyaK) to manage badges!" : {
 
     },
+    "Join Voice" : {
+
+    },
     "Log In" : {
 
     },
@@ -240,6 +253,9 @@
 
     },
     "Multi-Factor Authentication" : {
+
+    },
+    "No one is currently in voice" : {
 
     },
     "Notifications" : {
@@ -359,6 +375,9 @@
     "Unknown User" : {
 
     },
+    "Unsupported block: %@" : {
+
+    },
     "Unsupported embed type: %@" : {
 
     },
@@ -382,9 +401,6 @@
       }
     },
     "View Logs" : {
-
-    },
-    "Voice Channel" : {
 
     },
     "Voice Connected" : {

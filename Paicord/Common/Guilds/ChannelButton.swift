@@ -156,11 +156,22 @@ struct ChannelButton: View {
       }
       .tint(.primary)
     case .guildVoice:
-      voiceChannelButton { _ in
+      voiceChannelButton { hovered in
         HStack {
           Image(systemName: "speaker.wave.2.fill")
             .imageScale(.medium)
           Text(channel.name ?? "unknown")
+          Spacer()
+          
+          if hovered {
+            Button {
+              appState.selectedChannel = .voiceChannel(channel.id)
+            } label: {
+              Image(systemName: "bubble.fill")
+                .imageScale(.small)
+            }
+            .buttonStyle(.borderless)
+          }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .minHeight(35)
@@ -319,31 +330,78 @@ struct ChannelButton: View {
       var state: VoiceState
       @Environment(\.guildStore) var guildStore
       @Environment(\.gateway) var gw
-
+      var vgw: VoiceConnectionStore { gw.voice }
       @State var showPopover = false
+      
+      var isDeafened: Bool {
+        state.self_deaf || state.deaf
+      }
+      
+      var isServerDeafened: Bool {
+        state.deaf
+      }
+      
+      var isMuted: Bool {
+        state.self_mute || state.mute
+      }
+      
+      var isServerMuted: Bool {
+        state.mute
+      }
+      
+      var isSpeaking: Bool {
+        if let state = vgw.usersSpeakingState[state.user_id] {
+          return state.isEmpty == false
+        }
+        return false
+      }
+      
+      var member: Guild.PartialMember? {
+        state.member ?? guildStore?.members[state.user_id]
+      }
+      
+      var user: PartialUser? {
+        state.member?.user?.toPartialUser() ?? gw.user.users[state.user_id]
+      }
+      
       var body: some View {
-        let member = state.member ?? guildStore?.members[state.user_id]
-        let user =
-          state.member?.user?.toPartialUser() ?? gw.user.users[state.user_id]
         Button {
           if user != nil {
             showPopover.toggle()
           }
         } label: {
           HStack {
-            Profile.AvatarWithPresence(
+            Profile.Avatar(
               member: member,
               user: user
             )
-            .profileShowsAvatarDecoration()
             .frame(maxWidth: 20, maxHeight: 20)
+            .overlay(
+              Circle()
+                .fill(Color.clear)
+                .stroke(isSpeaking ? Color.green : Color.clear, lineWidth: 2)
+            )
 
             Text(
               state.member?.nick ?? user?.global_name ?? user?.username
                 ?? "Unknown User"
             )
             .lineLimit(1)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(isSpeaking ? .primary : .secondary)
+            
+            Spacer()
+            
+            if isMuted {
+              Image(systemName: "mic.slash.fill")
+                .imageScale(.small)
+                .foregroundStyle(isServerMuted ? .red : .secondary)
+            }
+            
+            if isDeafened {
+              Image(systemName: "headphones.slash")
+                .imageScale(.small)
+                .foregroundStyle(isServerDeafened ? .red : .secondary)
+            }
           }
           .frame(maxWidth: .infinity, alignment: .leading)
           .padding(.vertical, 6)
