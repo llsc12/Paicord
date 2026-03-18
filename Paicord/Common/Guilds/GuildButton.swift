@@ -266,8 +266,11 @@ struct GuildButton: View {
         #endif
       } else {
         ImpactGenerator.impact(style: .light)
-        guard let id = guild?.id else { return }
-        appState.selectedGuild = .guild(id)
+        if let id = guild?.id {
+          appState.selectedGuild = .guild(id)
+        } else {
+          appState.selectedGuild = .directMessages
+        }
       }
     } label: {
       let isSelected = appState.selectedGuild.guildID == guild?.id
