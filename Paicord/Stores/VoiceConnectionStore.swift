@@ -253,7 +253,7 @@ final class VoiceConnectionStore: DiscordDataStore {
     // else we can start a new voice gateway connection with the new endpoint and token
     Task {
       guard let endpoint = payload.endpoint, !endpoint.isEmpty,
-        let guildId, let channelId,
+        let channelId,
         let sessionId = await gateway?.gateway?.getSessionID(),
         let userId = gateway?.user.currentUser?.id
       else {
@@ -263,17 +263,29 @@ final class VoiceConnectionStore: DiscordDataStore {
         Task {
           await voiceGateway?.disconnect()
           voiceGateway = nil
+          await gateway?.gateway?.updateVoiceState(
+            payload: .init(
+              guild_id: nil,
+              channel_id: nil,
+              self_mute: self.isMuted,
+              self_deaf: self.isDeafened,
+              self_video: self.isVideoEnabled,
+              preferred_region: self.preferredRegion,
+              preferred_regions: nil,
+              flags: flags
+            )
+          )
         }
         return
       }
 
       print(
-        "[Voice] Received voice server update, connecting to voice gateway at endpoint \(endpoint) for guild \(guildId.rawValue) and channel \(channelId.rawValue)"
+        "[Voice] Received voice server update, connecting to voice gateway at endpoint \(endpoint) for guild \(guildId?.rawValue ?? "nil") and channel \(channelId.rawValue)"
       )
       self.voiceGateway = VoiceGatewayManager.init(
         connectionData: .init(
           token: payload.token,
-          guildID: guildId,
+          guildID: self.guildId ?? .init(channelId.rawValue),
           channelID: channelId,
           userID: userId,
           sessionID: sessionId,
@@ -290,25 +302,33 @@ final class VoiceConnectionStore: DiscordDataStore {
       if AVAudioApplication.shared.recordPermission != .granted {
         await AVAudioApplication.requestRecordPermission()
       }
+      
+      if self.guildId == nil {
+        print("[Voice] Ringing DM recipients")
+        try? await gateway?.client.ringChannelRecipients(channelID: channelId, payload: .init()).guardSuccess()
+      }
     }
   }
-  
+
   private func handleVoiceStateUpdate(_ payload: VoiceState) {
     // if we receie a voice state payload and it contains a session
     // id that isnt this client's current session id, we joined
     // from another client and we should destroy this connection.
-    
+
     // criteria for disconnecting:
+    // - there actually is a voice connection to disconnect from
     // - its a voice state update for our user id
     // - session id isnt ours
-    // - guild id matches the guild id of current voice connection
-    
+    // - payload guild id matches the current guild id
+
     Task {
       let vUserId = payload.user_id
       let vSessionID = payload.session_id
       let vGuildID = payload.guild_id
 
-      if self.gateway?.user.currentUser?.id == vUserId,
+      if
+        voiceGateway != nil,
+        self.gateway?.user.currentUser?.id == vUserId,
         self.guildId == vGuildID,
         await self.gateway?.gateway?.getSessionID() != vSessionID
       {
@@ -484,7 +504,7 @@ final class VoiceConnectionStore: DiscordDataStore {
 
       /// avaudioengine will throw a c++ exception if you start it when `inputNode == nullptr || outputNode == nullptr`.
       self.ensureDummyNodeAttached()
-      
+
       /// microphone tap
       self.setupTap()
 
@@ -494,7 +514,7 @@ final class VoiceConnectionStore: DiscordDataStore {
         inputNode.isVoiceProcessingAGCEnabled = true
         inputNode.isVoiceProcessingBypassed = false
         inputNode.isVoiceProcessingInputMuted = false
-        
+
       } catch {
         print("[Voice] Failed to enable voice processing mode:", error)
       }
@@ -591,24 +611,33 @@ final class VoiceConnectionStore: DiscordDataStore {
       format: nil
     ) { [weak self] buffer, _ in
       guard let self = self, buffer.frameLength > 0 else { return }
-      
+
       if lastTapFormat != buffer.format {
         lastTapFormat = buffer.format
         converter = AVAudioConverter(from: buffer.format, to: targetFormat)
       }
-      
+
       guard let activeConverter = converter else { return }
-      
+
       let inputRate = buffer.format.sampleRate
       let outputRate = targetFormat.sampleRate
       let capacityRate = outputRate / inputRate
-      let capacity = AVAudioFrameCount(ceil(Double(buffer.frameLength) * capacityRate) + 1)
-      
-      guard let convertedBuffer = AVAudioPCMBuffer(pcmFormat: targetFormat, frameCapacity: capacity) else { return }
-      
+      let capacity = AVAudioFrameCount(
+        ceil(Double(buffer.frameLength) * capacityRate) + 1
+      )
+
+      guard
+        let convertedBuffer = AVAudioPCMBuffer(
+          pcmFormat: targetFormat,
+          frameCapacity: capacity
+        )
+      else { return }
+
       var error: NSError?
       var inputBlockProvided = false
-      let status = activeConverter.convert(to: convertedBuffer, error: &error) { inNumPackets, outStatus in
+      let status = activeConverter.convert(to: convertedBuffer, error: &error) {
+        inNumPackets,
+        outStatus in
         if inputBlockProvided {
           outStatus.pointee = .noDataNow
           return nil
@@ -617,13 +646,15 @@ final class VoiceConnectionStore: DiscordDataStore {
         outStatus.pointee = .haveData
         return buffer
       }
-      
+
       if status == .error || error != nil {
         print("[Voice] Audio conversion error: \(String(describing: error))")
         return
       }
-      
-      guard convertedBuffer.frameLength > 0, let src = convertedBuffer.floatChannelData else { return }
+
+      guard convertedBuffer.frameLength > 0,
+        let src = convertedBuffer.floatChannelData
+      else { return }
 
       ring.write(
         from: src,
@@ -743,7 +774,9 @@ final class VoiceConnectionStore: DiscordDataStore {
   private func ensureIncomingStreamExists(ssrc: UInt32) {
     if incomingStreamsBySSRC[ssrc] != nil { return }
     // ensure it isn't us
-    guard knownSSRCs[UInt(ssrc)] != gateway?.user.currentUser?.id else { return }
+    guard knownSSRCs[UInt(ssrc)] != gateway?.user.currentUser?.id else {
+      return
+    }
 
     let stream = IncomingStream(ssrc: ssrc)
     incomingStreamsBySSRC[ssrc] = stream

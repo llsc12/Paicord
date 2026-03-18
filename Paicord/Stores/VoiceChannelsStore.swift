@@ -27,6 +27,8 @@ final class VoiceChannelsStore: DiscordDataStore {
   var userChannelIndex: [GuildSnowflake?: [UserSnowflake: ChannelSnowflake]] =
     [:]
 
+  var calls: [ChannelSnowflake: Gateway.CallCreate] = [:]
+
   func setupEventHandling() {
     guard let gateway = gateway?.gateway else { return }
 
@@ -39,6 +41,12 @@ final class VoiceChannelsStore: DiscordDataStore {
           handleVoiceChannelStartTimeUpdate(payload)
         case .voiceStateUpdate(let payload):
           handleVoiceStateUpdate(payload)
+        case .callCreate(let payload):
+          handleCallCreate(payload)
+        case .callUpdate(let payload):
+          handleCallUpdate(payload)
+        case .callDelete(let payload):
+          handleCallDelete(payload)
         default:
           break
         }
@@ -47,6 +55,11 @@ final class VoiceChannelsStore: DiscordDataStore {
   }
 
   func handleReady(_ payload: Gateway.Ready) {
+    self.voiceStates.removeAll()
+    self.userChannelIndex.removeAll()
+    self.calls.removeAll()
+    self.startTimes.removeAll()
+
     for guild in payload.guilds {
       for state in guild.voice_states ?? [] {
         guard let channelID = state.channel_id else { continue }
@@ -112,5 +125,17 @@ final class VoiceChannelsStore: DiscordDataStore {
         userChannelIndex.removeValue(forKey: guildID)
       }
     }
+  }
+
+  func handleCallCreate(_ payload: Gateway.CallCreate) {
+    calls[payload.channel_id] = payload
+  }
+
+  func handleCallUpdate(_ payload: Gateway.CallUpdate) {
+    calls[payload.channel_id]?.update(with: payload)
+  }
+
+  func handleCallDelete(_ payload: Gateway.CallDelete) {
+    calls.removeValue(forKey: payload.channel_id)
   }
 }
