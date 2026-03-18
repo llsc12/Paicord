@@ -215,8 +215,9 @@ public actor UserGatewayManager {
     #if DEBUG
       let queries: [(String, String)] = [
         ("v", "\(DiscordGlobalConfiguration.apiVersion)"),
-        ("encoding", "json")
+        ("encoding", "json"),
       ]
+    #else
       let decompressorWSExtension: ZstdDecompressorWSExtension
       do {
         decompressorWSExtension = try ZstdDecompressorWSExtension(
@@ -224,17 +225,16 @@ public actor UserGatewayManager {
         )
       } catch {
         self.logger.critical(
-          "Will not connect because can't create a decompressor. Something is wrong. Please report this failure at https://github.com/DiscordBM/DiscordBM/issues",
+          "Will not connect because can't create a decompressor. Something is wrong. Please report this failure at https://github.com/llsc12/Paicord/issues",
           metadata: ["error": .string(String(reflecting: error))]
         )
         return
       }
-    #else
-    let queries: [(String, String)] = [
-      ("v", "\(DiscordGlobalConfiguration.apiVersion)"),
-      ("encoding", "json"),
-      ("compress", "zstd-stream"),
-    ]
+      let queries: [(String, String)] = [
+        ("v", "\(DiscordGlobalConfiguration.apiVersion)"),
+        ("encoding", "json"),
+        ("compress", "zstd-stream"),
+      ]
     #endif
 
     #if DEBUG

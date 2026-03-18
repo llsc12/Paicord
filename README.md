@@ -14,7 +14,7 @@ A  native Discord client written in Swift using SwiftUI, with a goal of feature 
 
 ## Progress
 
-Paicord has support for core chat features, like partial markdown, attachments and embeds with support for file uploads, editing, replying and deleting messages, and more! 
+Paicord has support for core chat features, like partial markdown, attachments and embeds with support for file uploads, editing, replying and deleting messages, partial voice support and more! 
 
 Paicord aims for feature parity! By default, the more difficult features are targeted first. Whilst this leaves many smaller features unimplemented at first, it helps keep momentum going! [Click here for a rough feature list!](Feature Checklist.md)
 
@@ -75,6 +75,12 @@ Will never be implemented, using the same token on two clients like the one you 
 <summary><b>What about theming support?</b></summary>
 This information only applies to the SwiftUI application.<br>
 That's in the works! Paicord will let you set custom colors or materials on various interface elements. There will also be pre-made alternative interface layouts. It won't be as flexible as CSS, but it should hopefully allow for some tasteful customisation!
+</details>
+<details>
+<summary><b>I want to help translate the app!</b></summary>
+Awesome! To translate the macOS/iOS app, you'll need Xcode installed or <a href="https://github.com/llsc12/xcstring-tool/releases/latest">xcstring-tool</a> if not on macOS (linux CLI tool, run under WSL if on Windows).<br>
+If using Xcode, open the Localizable.xcstrings file in `Paicord/Resources`. If using xcstring-tool, use the file browser with arrow keys and enter, with tab for autocompletions to navigate to the file, or pass the filepath into the command.<br>
+Add your language, then begin localising! You will need to handle different substitutions, use <a href="https://developer.apple.com/documentation/xcode/localizing-and-varying-text-with-a-string-catalog#Add-variants-for-strings-that-contain-plurals">this document</a> to learn more.
 </details>
 
 Any other questions? Join the [Discord server]()!

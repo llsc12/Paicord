@@ -255,9 +255,9 @@ extension DiscordLocaleDict: Equatable where C: Equatable {
 public struct DiscordTimestamp: Codable, Hashable {
 
   public enum DecodingError: Swift.Error, CustomStringConvertible {
-    /// The timestamp had an unexpected format. This is a library decoding issue, please report this at https://github.com/DiscordBM/DiscordBM/issues.
+    /// The timestamp had an unexpected format. This is a library decoding issue, please report this at https://github.com/llsc12/Paicord/issues.
     case unexpectedFormat([any CodingKey], String)
-    /// Could not convert the timestamp to a 'Date'. This is a library decoding issue, please report this at https://github.com/DiscordBM/DiscordBM/issues.
+    /// Could not convert the timestamp to a 'Date'. This is a library decoding issue, please report this at https://github.com/llsc12/Paicord/issues.
     case conversionFailure([any CodingKey], String, DateComponents)
 
     public var description: String {
@@ -370,7 +370,7 @@ public struct DiscordTimestamp: Codable, Hashable {
         .init(
           codingPath: container.codingPath,
           debugDescription:
-            "Programming Error. Could not encode Date '\(date.debugDescription)' to Discord Timestamp. Please report: https://github.com/DiscordBM/DiscordBM/issues"
+            "Programming Error. Could not encode Date '\(date.debugDescription)' to Discord Timestamp. Please report: https://github.com/llsc12/Paicord/issues"
         )
       )
     }

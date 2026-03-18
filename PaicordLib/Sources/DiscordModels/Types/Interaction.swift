@@ -1316,9 +1316,9 @@ extension Interaction {
     public var components: [Component]
 
     public enum CodingError: Swift.Error, CustomStringConvertible {
-      /// This component kind was not expected here. This is a library decoding issue, please report at: https://github.com/DiscordBM/DiscordBM/issues.
+      /// This component kind was not expected here. This is a library decoding issue, please report at: https://github.com/llsc12/Paicord/issues.
       case unexpectedComponentKind(Kind)
-      /// I thought action-row is supposed to only appear at top-level as a container for other components. This is a library decoding issue, please report at: https://github.com/DiscordBM/DiscordBM/issues.
+      /// I thought action-row is supposed to only appear at top-level as a container for other components. This is a library decoding issue, please report at: https://github.com/llsc12/Paicord/issues.
       case actionRowIsSupposedToOnlyAppearAtTopLevel
 
       public var description: String {

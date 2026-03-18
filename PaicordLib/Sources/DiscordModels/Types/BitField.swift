@@ -115,7 +115,7 @@ where R: RawRepresentable & LosslessRawRepresentable & Hashable, R.RawValue == U
 extension StringBitField: Codable {
 
   public enum DecodingError: Error, CustomStringConvertible {
-    /// The string value could not be converted to an integer. This is a library decoding issue, please report this at https://github.com/DiscordBM/DiscordBM/issues.
+    /// The string value could not be converted to an integer. This is a library decoding issue, please report this at https://github.com/llsc12/Paicord/issues.
     case notRepresentingUInt(String)
 
     public var description: String {
