@@ -114,7 +114,6 @@ public actor VoiceGatewayManager {
   }
 
   //MARK: Connection data
-  public nonisolated let identifyPayload: VoiceGateway.Identify
   // discord uses this for analytics but we'll send it anyways
   public nonisolated let rtcConnectionID = UUID().uuidString.lowercased()
 
@@ -205,26 +204,6 @@ public actor VoiceGatewayManager {
     self.stateCallback = stateCallback
     self.maxFrameSize = maxFrameSize
     self.connectionData = connectionData
-    self.identifyPayload = .init(
-      server_id: connectionData.guildID,
-      channel_id: connectionData.channelID,
-      user_id: connectionData.userID,
-      session_id: connectionData.sessionID,
-      token: connectionData.token,
-      video: true,
-      streams: [
-        .init(
-          type: .video,
-          rid: "100",
-          quality: 100
-        ),
-        .init(
-          type: .video,
-          rid: "50",
-          quality: 50
-        ),
-      ]
-    )
 
     var logger = DiscordGlobalConfiguration.makeLogger("VoiceGatewayManager")
     logger[metadataKey: "gateway-id"] = .string("\(self.id)")
@@ -1186,7 +1165,26 @@ extension VoiceGatewayManager {
     connectionBackoff.willTry()
     let identify = VoiceGateway.Event(
       opcode: .identify,
-      data: .identify(identifyPayload)
+      data: .identify(.init(
+        server_id: connectionData.guildID ,
+        channel_id: connectionData.channelID,
+        user_id: connectionData.userID,
+        session_id: connectionData.sessionID,
+        token: connectionData.token,
+        video: true,
+        streams: [
+          .init(
+            type: .video,
+            rid: "100",
+            quality: 100
+          ),
+          .init(
+            type: .video,
+            rid: "50",
+            quality: 50
+          ),
+        ]
+      ))
     )
     self.send(message: .init(payload: identify, opcode: .text))
   }
