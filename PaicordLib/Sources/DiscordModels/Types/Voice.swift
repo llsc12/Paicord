@@ -140,3 +140,8 @@ public struct VoiceStateUpdate: Sendable, Codable {
     #endif
   }
 }
+
+/// https://docs.discord.food/resources/channel#response-body
+public struct CallEligibility: Sendable, Codable {
+  public var ringable: Bool
+}

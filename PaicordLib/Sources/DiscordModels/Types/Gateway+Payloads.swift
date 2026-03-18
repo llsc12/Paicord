@@ -1485,7 +1485,7 @@ extension Gateway {
   /// https://discord.com/developers/docs/topics/gateway-events#voice-server-update-voice-server-update-event-fields
   public struct VoiceServerUpdate: Sendable, Codable {
     public var token: Secret
-    public var guild_id: GuildSnowflake
+    public var guild_id: GuildSnowflake?
     public var endpoint: String?
   }
 
@@ -1540,6 +1540,7 @@ extension Gateway {
     public var message_id: MessageSnowflake
     public var region: String
     public var ringing: [UserSnowflake]
+    public var voice_states: [VoiceState]?
   }
 
   /// https://docs.discord.food/topics/gateway-events#call-update
@@ -1548,7 +1549,6 @@ extension Gateway {
     public var message_id: MessageSnowflake
     public var region: String
     public var ringing: [UserSnowflake]
-    public var voice_states: [VoiceState]?
   }
 
   /// https://docs.discord.food/topics/gateway-events#call-delete
@@ -1567,6 +1567,11 @@ extension Gateway {
 
   /// https://docs.discord.food/topics/gateway-events#request-channel-member-count
   public struct RequestChannelMemberCount: Sendable, Codable {
+    public init(guild_id: GuildSnowflake, channel_id: ChannelSnowflake) {
+      self.guild_id = guild_id
+      self.channel_id = channel_id
+    }
+    
     public var guild_id: GuildSnowflake
     public var channel_id: ChannelSnowflake
   }
