@@ -230,25 +230,80 @@ struct ProfileBar: View {
 
         Spacer()
 
-        Button {
-          Task {
-            switch AVAudioApplication.shared.recordPermission {
-            case .granted:
-              // if deafened whilst unmuting, undeafen
-              await vgw.updateVoiceState(isMuted: !gw.voice.isMuted, isDeafened: vgw.isDeafened && gw.voice.isMuted ? false : nil)
-            case .denied:
-              micError = true
-            case .undetermined:
-              if await AVAudioApplication.requestRecordPermission() {
-                await vgw.updateVoiceState(isMuted: false)
+        HStack {
+          Button {
+            Task {
+              switch AVAudioApplication.shared.recordPermission {
+              case .granted:
+                // if deafened whilst unmuting, undeafen
+                await vgw.updateVoiceState(isMuted: !gw.voice.isMuted, isDeafened: vgw.isDeafened && gw.voice.isMuted ? false : nil)
+              case .denied:
+                micError = true
+              case .undetermined:
+                if await AVAudioApplication.requestRecordPermission() {
+                  await vgw.updateVoiceState(isMuted: false)
+                }
+              @unknown default:
+                fatalError()
               }
-            @unknown default:
-              fatalError()
+            }
+          } label: {
+            if #available(macOS 15.0, iOS 18.0, *) {
+              Image(systemName: vgw.isMuted ? "mic.slash.fill" : "mic.fill")
+                .contentTransition(
+                  .symbolEffect(
+                    .replace.magic(fallback: .upUp.byLayer),
+                    options: .nonRepeating
+                  )
+                )
+                .font(.title2)
+                .maxWidth(35)
+                .maxHeight(35)
+            } else {
+              Image(systemName: vgw.isMuted ? "mic.slash.fill" : "mic.fill")
+                .contentTransition(
+                  .symbolEffect(.replace.wholeSymbol, options: .nonRepeating)
+                )
+                .font(.title2)
+                .maxWidth(35)
+                .maxHeight(35)
             }
           }
-        } label: {
-          if #available(macOS 15.0, iOS 18.0, *) {
-            Image(systemName: vgw.isMuted ? "mic.slash.fill" : "mic.fill")
+          .buttonStyle(
+            .borderlessHoverEffect(
+              pressedColor: .red,
+              isSelected: vgw.isMuted
+            )
+          )
+          .alert("Microphone Unavailable", isPresented: $micError) {
+            Button("OK", role: .cancel) {}
+          } message: {
+            Text(
+              "Please allow microphone access in your system settings to unmute yourself in voice channels."
+            )
+          }
+
+          Button {
+            Task {
+              // if going to deafen and not currently muted, deafen and mute. if coming back, undeafen and unmute too.
+              var deaf = vgw.isDeafened
+              var mute = vgw.isMuted
+              if !deaf && !mute {
+                didDeafenBeforeMute = true
+                mute = true
+              } else if vgw.isDeafened && didDeafenBeforeMute {
+                mute = false
+                didDeafenBeforeMute = false
+              }
+              deaf.toggle()
+              await vgw.updateVoiceState(isMuted: mute, isDeafened: deaf)
+            }
+          } label: {
+            if #available(macOS 15.0, iOS 18.0, *) {
+              Image(
+                systemName: gw.voice.isDeafened
+                  ? "headphones.slash" : "headphones"
+              )
               .contentTransition(
                 .symbolEffect(
                   .replace.magic(fallback: .upUp.byLayer),
@@ -258,97 +313,44 @@ struct ProfileBar: View {
               .font(.title2)
               .maxWidth(35)
               .maxHeight(35)
-          } else {
-            Image(systemName: vgw.isMuted ? "mic.slash.fill" : "mic.fill")
+            } else {
+              Image(
+                systemName: gw.voice.isDeafened
+                  ? "headphones.slash" : "headphones"
+              )
               .contentTransition(
                 .symbolEffect(.replace.wholeSymbol, options: .nonRepeating)
               )
               .font(.title2)
               .maxWidth(35)
               .maxHeight(35)
-          }
-        }
-        .buttonStyle(
-          .borderlessHoverEffect(
-            pressedColor: .red,
-            isSelected: vgw.isMuted
-          )
-        )
-        .alert("Microphone Unavailable", isPresented: $micError) {
-          Button("OK", role: .cancel) {}
-        } message: {
-          Text(
-            "Please allow microphone access in your system settings to unmute yourself in voice channels."
-          )
-        }
-
-        Button {
-          Task {
-            // if going to deafen and not currently muted, deafen and mute. if coming back, undeafen and unmute too.
-            var deaf = vgw.isDeafened
-            var mute = vgw.isMuted
-            if !deaf && !mute {
-              didDeafenBeforeMute = true
-              mute = true
-            } else if vgw.isDeafened && didDeafenBeforeMute {
-              mute = false
-              didDeafenBeforeMute = false
             }
-            deaf.toggle()
-            await vgw.updateVoiceState(isMuted: mute, isDeafened: deaf)
           }
-        } label: {
-          if #available(macOS 15.0, iOS 18.0, *) {
-            Image(
-              systemName: gw.voice.isDeafened
-                ? "headphones.slash" : "headphones"
-            )
-            .contentTransition(
-              .symbolEffect(
-                .replace.magic(fallback: .upUp.byLayer),
-                options: .nonRepeating
-              )
-            )
-            .font(.title2)
-            .maxWidth(35)
-            .maxHeight(35)
-          } else {
-            Image(
-              systemName: gw.voice.isDeafened
-                ? "headphones.slash" : "headphones"
-            )
-            .contentTransition(
-              .symbolEffect(.replace.wholeSymbol, options: .nonRepeating)
-            )
-            .font(.title2)
-            .maxWidth(35)
-            .maxHeight(35)
-          }
-        }
-        .buttonStyle(
-          .borderlessHoverEffect(
-            pressedColor: .red,
-            isSelected: vgw.isDeafened
-          )
-        )
-
-        #if os(macOS)
-          Button {
-            openWindow(id: "settings")
-          } label: {
-            Image(systemName: "gearshape.fill")
-              .font(.title2)
-              .maxWidth(35)
-              .maxHeight(35)
-          }
-
           .buttonStyle(
-            .borderlessHoverEffect()
+            .borderlessHoverEffect(
+              pressedColor: .red,
+              isSelected: vgw.isDeafened
+            )
           )
-        #elseif os(iOS)
-          /// targetting ipad here, ios wouldnt have this at all
-          // do something
-        #endif
+
+          #if os(macOS)
+            Button {
+              openWindow(id: "settings")
+            } label: {
+              Image(systemName: "gearshape.fill")
+                .font(.title2)
+                .maxWidth(35)
+                .maxHeight(35)
+            }
+            .buttonStyle(
+              .borderlessHoverEffect()
+            )
+          #elseif os(iOS)
+            /// targetting ipad here, ios wouldnt have this at all
+            // do something
+          #endif
+        }
+        .padding(.vertical, -8)
       }
       .padding(8)
       .background {

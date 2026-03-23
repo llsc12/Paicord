@@ -21,8 +21,6 @@ struct VoiceView: View {
 
   @Namespace private var voiceGridAnimations
   @ViewStorage var frame: CGRect = .zero
-  @ViewStorage var monitor: Any?
-  @ViewStorage var isHovering: Bool = false
   @ViewStorage var timer: Timer? = nil
   @State var showingVoiceUI = false
 
@@ -81,7 +79,9 @@ struct VoiceView: View {
           } label: {
             Text("Join Voice")
           }
-          .disabled(!(vm.guildStore?.hasPermission(channel: vm, .connect) ?? true))
+          .disabled(
+            !(vm.guildStore?.hasPermission(channel: vm, .connect) ?? true)
+          )
         }
       }
       .foregroundStyle(.white.secondary)
@@ -107,35 +107,18 @@ struct VoiceView: View {
       of: { $0.frame(in: .local) },
       action: { frame = $0 }
     )
-    .onAppear {
-      // monitor mouse movement
-      monitor = NSEvent.addLocalMonitorForEvents(matching: .mouseMoved) {
-        event in
-        if isHovering {
-          if !showingVoiceUI {
-            showingVoiceUI = true
-          }
-          timer?.invalidate()
-          timer = Timer.scheduledTimer(withTimeInterval: 4.0, repeats: false) {
-            _ in
-            self.showingVoiceUI = false
-          }
-        } else {
-          if showingVoiceUI {
-            showingVoiceUI = false
-          }
+    .onContinuousHover(coordinateSpace: .local) { phase in
+      switch phase {
+      case .active:
+        if !showingVoiceUI {
+          showingVoiceUI = true
         }
-        return event
-      }
-
-      timer = Timer.scheduledTimer(withTimeInterval: 4.0, repeats: false) { _ in
-        self.showingVoiceUI = false
-      }
-    }
-    .onHover { isHovering = $0 }
-    .onDisappear {
-      if let monitor {
-        NSEvent.removeMonitor(monitor)
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: 4.0, repeats: false) {
+          _ in
+          self.showingVoiceUI = false
+        }
+      case .ended: break
       }
     }
   }

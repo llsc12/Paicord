@@ -133,7 +133,17 @@ struct ChannelButton: View {
       let expectedParentID = channel.id
       let childChannels = channels.values
         .filter { $0.parent_id ?? (try! .makeFake()) == expectedParentID }
-        .sorted { ($0.position ?? 0) < ($1.position ?? 0) }
+      // sort by type and position
+//        .sorted { ($0.position ?? 0) < ($1.position ?? 0) }
+        .sorted { lhs, rhs in
+          let lhsType = [DiscordChannel.Kind.guildVoice, .guildStageVoice].contains(lhs.type ?? .guildText)
+          let rhsType = [DiscordChannel.Kind.guildVoice, .guildStageVoice].contains(rhs.type ?? .guildText)
+          if lhsType == rhsType {
+            return (lhs.position ?? 0) < (rhs.position ?? 0)
+          } else {
+            return (lhsType && !rhsType)
+          }
+        }
         .map { $0.id }
 
       category(channelIDs: childChannels)

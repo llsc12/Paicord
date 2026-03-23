@@ -97,8 +97,7 @@ struct LargeBaseplate: View {
     .toolbar {
       if let vm = currentChannelStore,
         vm.channel?.type == .dm || vm.channel?.type == .groupDm,
-        gw.voiceChannels.voiceStates[nil]?[vm.channelId] == nil
-          && gw.voiceChannels.calls[vm.channelId] == nil
+         gw.voice.channelId != vm.channelId
       {
         Button {
           Task {

@@ -311,7 +311,7 @@ final class VoiceConnectionStore: DiscordDataStore {
   }
 
   private func handleVoiceStateUpdate(_ payload: VoiceState) {
-    // if we receie a voice state payload and it contains a session
+    // if we receive a voice state payload and it contains a session
     // id that isnt this client's current session id, we joined
     // from another client and we should destroy this connection.
 
