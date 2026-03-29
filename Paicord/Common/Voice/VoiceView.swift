@@ -20,6 +20,7 @@ struct VoiceView: View {
   var vgw: VoiceConnectionStore? { gw.voice }
 
   @Namespace private var voiceGridAnimations
+  // chat size
   @ViewStorage var frame: CGRect = .zero
   @ViewStorage var timer: Timer? = nil
   @State var showingVoiceUI = false
@@ -55,9 +56,15 @@ struct VoiceView: View {
                 ?? "Unknown User"
             }
             let remainderCount = voiceStates.count - firstTwo.count
-            Text(
-              "\(firstTwo.joined(separator: voiceStates.count == 2 ? " and " : ", "))\(remainderCount > 0 ? " and \(remainderCount) other\(remainderCount == 1 ? "" : "s")" : "") \(voiceStates.count == 1 ? "is" : "are") currently in voice"
+            let totalCount = voiceStates.count
+            let firstTwoNames = firstTwo.joined(separator: totalCount > 2 ? ", " : " and ")
+            let localised = String.init(
+              localized:
+                "voice channel string \(firstTwoNames) \(remainderCount) \(totalCount)",
+              comment:
+                "1 person: \"Person is currently in voice\", 2 people: \"Person1 and Person2 are currently in voice\" using firstTwoNames, 3+ people: \"Person1, Person2 and 1 other(s) are currently in voice\" using firstTwoNames and remainderCount checking it for pluralization. "
             )
+            Text(localised)
           }
 
           Button {

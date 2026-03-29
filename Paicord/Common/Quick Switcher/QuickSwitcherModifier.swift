@@ -223,7 +223,7 @@ struct QuickSwitcherView: View {
           ProgressView()
             .progressViewStyle(.circular)
         } else if !results.isEmpty {
-          Text("\(results.count) Result\(results.count == 1 ? "" : "s")")
+          Text("\(results.count) Results")
             .font(.caption)
             .foregroundStyle(.secondary)
         }
