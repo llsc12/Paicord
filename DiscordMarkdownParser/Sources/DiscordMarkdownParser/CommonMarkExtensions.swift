@@ -183,7 +183,7 @@ public enum CommonMarkUtils {
       // Must be followed by . or )
       guard index < trimmed.endIndex else { return nil }
       let delimiter = trimmed[index]
-      guard delimiter == "." || delimiter == ")" else { return nil }
+      guard delimiter == "." else { return nil }
 
       index = trimmed.index(after: index)
 
@@ -242,7 +242,7 @@ public struct ListMarkerInfo: Sendable, Equatable {
   /// The number for ordered lists
   public let number: Int?
 
-  /// The delimiter for ordered lists ('.' or ')')
+  /// The delimiter for ordered lists ('.')
   public let delimiter: Character?
 
   /// The width of the marker in characters
