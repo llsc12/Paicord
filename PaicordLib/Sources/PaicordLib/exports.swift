@@ -12,7 +12,8 @@ public struct Test {
 
   public var name: String
 
-  func sayHello() {
+  public func sayHello() {
     print("Hello, \(name)!")
+
   }
 }
