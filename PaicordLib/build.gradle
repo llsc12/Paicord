@@ -119,9 +119,19 @@ def buildSwiftAll = tasks.register("buildSwiftAll") {
 
   // If the package description changes, we should execute jextract again, maybe we added jextract to new targets
   inputs.file(new File(projectDir, "Package.swift"))
-  inputs.dir(new File(layout.projectDirectory.asFile, "Sources/PaicordLib".toString()))
+  inputs.dir(new File(layout.projectDirectory.asFile, "Sources/DiscordAuth".toString()))
+  inputs.dir(new File(layout.projectDirectory.asFile, "Sources/DiscordCore".toString()))
+  inputs.dir(new File(layout.projectDirectory.asFile, "Sources/DiscordGateway".toString()))
+  inputs.dir(new File(layout.projectDirectory.asFile, "Sources/DiscordHTTP".toString()))
+  inputs.dir(new File(layout.projectDirectory.asFile, "Sources/DiscordModels".toString()))
+  inputs.dir(new File(layout.projectDirectory.asFile, "Sources/DiscordUtilities".toString()))
 
-  outputs.dir(layout.buildDirectory.dir("../.build/plugins/outputs/${layout.projectDirectory.asFile.getName().toLowerCase()}/PaicordLib/destination/JExtractSwiftPlugin/src/generated/java"))
+  outputs.dir(layout.buildDirectory.dir("../.build/plugins/outputs/${layout.projectDirectory.asFile.getName().toLowerCase()}/DiscordAuth/destination/JExtractSwiftPlugin/src/generated/java"))
+  outputs.dir(layout.buildDirectory.dir("../.build/plugins/outputs/${layout.projectDirectory.asFile.getName().toLowerCase()}/DiscordCore/destination/JExtractSwiftPlugin/src/generated/java"))
+  outputs.dir(layout.buildDirectory.dir("../.build/plugins/outputs/${layout.projectDirectory.asFile.getName().toLowerCase()}/DiscordGateway/destination/JExtractSwiftPlugin/src/generated/java"))
+  outputs.dir(layout.buildDirectory.dir("../.build/plugins/outputs/${layout.projectDirectory.asFile.getName().toLowerCase()}/DiscordHTTP/destination/JExtractSwiftPlugin/src/generated/java"))
+  outputs.dir(layout.buildDirectory.dir("../.build/plugins/outputs/${layout.projectDirectory.asFile.getName().toLowerCase()}/DiscordModels/destination/JExtractSwiftPlugin/src/generated/java"))
+  outputs.dir(layout.buildDirectory.dir("../.build/plugins/outputs/${layout.projectDirectory.asFile.getName().toLowerCase()}/DiscordUtilities/destination/JExtractSwiftPlugin/src/generated/java"))
 }
 
 // Create a build task for each ABI

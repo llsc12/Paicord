@@ -97,30 +97,39 @@ let package = Package(
         .target(name: "DiscordModels"),
         .target(name: "DiscordUtilities"),
       ],
+      swiftSettings: swiftSettings
+    ),
+    .target(
+      name: "DiscordCore",
+      dependencies: [
+        .product(name: "SwiftJava", package: "swift-java"),
+        .product(name: "SwiftJavaJNICore", package: "swift-java-jni-core"),
+        .product(name: "Logging", package: "swift-log"),
+        .product(name: "MultipartKit", package: "multipart-kit"),
+      ],
       swiftSettings: swiftSettings,
       plugins: [
         .plugin(name: "JExtractSwiftPlugin", package: "swift-java")
       ]
     ),
     .target(
-      name: "DiscordCore",
-      dependencies: [
-        .product(name: "Logging", package: "swift-log"),
-        .product(name: "MultipartKit", package: "multipart-kit"),
-      ],
-      swiftSettings: swiftSettings
-    ),
-    .target(
       name: "DiscordHTTP",
       dependencies: [
+        .product(name: "SwiftJava", package: "swift-java"),
+        .product(name: "SwiftJavaJNICore", package: "swift-java-jni-core"),
         .product(name: "AsyncHTTPClient", package: "async-http-client"),
         .target(name: "DiscordModels"),
       ],
-      swiftSettings: swiftSettings
+      swiftSettings: swiftSettings,
+      plugins: [
+        .plugin(name: "JExtractSwiftPlugin", package: "swift-java")
+      ]
     ),
     .target(
       name: "DiscordGateway",
       dependencies: [
+        .product(name: "SwiftJava", package: "swift-java"),
+        .product(name: "SwiftJavaJNICore", package: "swift-java-jni-core"),
         .product(name: "NIOCore", package: "swift-nio"),
         .product(name: "AsyncHTTPClient", package: "async-http-client"),
         .product(name: "WSClient", package: "swift-websocket"),
@@ -129,11 +138,16 @@ let package = Package(
         .product(name: "Crypto", package: "swift-crypto"),
         .product(name: "_CryptoExtras", package: "swift-crypto"),
       ],
-      swiftSettings: swiftSettings
+      swiftSettings: swiftSettings,
+      plugins: [
+        .plugin(name: "JExtractSwiftPlugin", package: "swift-java")
+      ]
     ),
     .target(
       name: "DiscordModels",
       dependencies: [
+        .product(name: "SwiftJava", package: "swift-java"),
+        .product(name: "SwiftJavaJNICore", package: "swift-java-jni-core"),
         .product(name: "NIOFoundationCompat", package: "swift-nio"),
         .product(name: "MultipartKit", package: "multipart-kit"),
         .target(name: "DiscordCore"),
@@ -142,21 +156,34 @@ let package = Package(
         .product(name: "UInt128", package: "UInt128"),
       ],
       exclude: ["Protobuf/README.md"],
-      swiftSettings: swiftSettings
+      swiftSettings: swiftSettings,
+      plugins: [
+        .plugin(name: "JExtractSwiftPlugin", package: "swift-java")
+      ]
     ),
     .target(
       name: "DiscordUtilities",
       dependencies: [
+        .product(name: "SwiftJava", package: "swift-java"),
+        .product(name: "SwiftJavaJNICore", package: "swift-java-jni-core"),
         .target(name: "DiscordModels")
       ],
-      swiftSettings: swiftSettings
+      swiftSettings: swiftSettings,
+      plugins: [
+        .plugin(name: "JExtractSwiftPlugin", package: "swift-java")
+      ]
     ),
     .target(
       name: "DiscordAuth",
       dependencies: [
+        .product(name: "SwiftJava", package: "swift-java"),
+        .product(name: "SwiftJavaJNICore", package: "swift-java-jni-core"),
         .target(name: "DiscordModels")
       ],
-      swiftSettings: swiftSettings
+      swiftSettings: swiftSettings,
+      plugins: [
+        .plugin(name: "JExtractSwiftPlugin", package: "swift-java")
+      ]
     ),
     .plugin(
       name: "GenerateAPIEndpoints",
