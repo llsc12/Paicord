@@ -26,7 +26,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "Paicord"
 
-include(":paicordlib")
-project(":paicordlib").projectDir = file("PaicordLib")
-include(":paicordkt")
-project(":paicordkt").projectDir = file("PaicordKt")
+include(":PaicordLib")
+project(":PaicordLib").projectDir = file("PaicordLib")
+include(":Paicord")
+project(":Paicord").projectDir = file("PaicordKt")

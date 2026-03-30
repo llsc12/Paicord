@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-  namespace "com.llsc12.paicordlib"
+  namespace "com.llsc12.PaicordLib"
   compileSdkVersion 36
 
   defaultConfig {
@@ -119,9 +119,9 @@ def buildSwiftAll = tasks.register("buildSwiftAll") {
 
   // If the package description changes, we should execute jextract again, maybe we added jextract to new targets
   inputs.file(new File(projectDir, "Package.swift"))
-  inputs.dir(new File(layout.projectDirectory.asFile, "Sources/SwiftHashing".toString()))
+  inputs.dir(new File(layout.projectDirectory.asFile, "Sources/PaicordLib".toString()))
 
-  outputs.dir(layout.buildDirectory.dir("../.build/plugins/outputs/${layout.projectDirectory.asFile.getName().toLowerCase()}/SwiftHashing/destination/JExtractSwiftPlugin/src/generated/java"))
+  outputs.dir(layout.buildDirectory.dir("../.build/plugins/outputs/${layout.projectDirectory.asFile.getName().toLowerCase()}/PaicordLib/destination/JExtractSwiftPlugin/src/generated/java"))
 }
 
 // Create a build task for each ABI
