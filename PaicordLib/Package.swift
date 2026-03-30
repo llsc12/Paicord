@@ -61,7 +61,7 @@ let package = Package(
     .package(url: "https://github.com/vapor/multipart-kit.git", from: "4.5.3"),
     .package(url: "https://github.com/jpsim/Yams.git", from: "5.0.5"),
     .package(
-      url: "https://github.com/apple/swift-syntax.git",
+      url: "https://github.com/swiftlang/swift-syntax.git",
       "509.0.0"..<"603.0.0"
     ),
     .package(url: "https://github.com/facebook/zstd.git", from: "1.5.7"),
