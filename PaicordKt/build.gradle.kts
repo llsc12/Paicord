@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.hashingapp"
+    namespace = "com.llsc12.paicord"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.llsc12.Paicord"
+        applicationId = "com.llsc12.paicord"
         minSdk = 28
         targetSdk = 36
         versionCode = 1
@@ -49,7 +49,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation("org.swift.swiftkit:swiftkit-core:1.0-SNAPSHOT")
-    implementation(project(":PaicordLib"))
+    implementation(project(":paicordlib"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

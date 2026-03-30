@@ -10,3 +10,5 @@ Package.resolved
 local.properties
 /.idea
 /.gradle
+/PaicordLib/build
+/build

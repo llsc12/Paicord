@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
   name: "PaicordLib",
   platforms: [
-    .macOS(.v13),
+    .macOS(.v15),
     .iOS(.v16),
     .tvOS(.v16),
     .watchOS(.v9),
@@ -14,30 +14,37 @@ let package = Package(
   products: [
     .library(
       name: "PaicordLib",
-      targets: ["PaicordLib"]
+      type: .dynamic,
+      targets: ["PaicordLib"],
     ),
     .library(
       name: "DiscordCore",
+      type: .dynamic,
       targets: ["DiscordCore"]
     ),
     .library(
       name: "DiscordHTTP",
+      type: .dynamic,
       targets: ["DiscordHTTP"]
     ),
     .library(
       name: "DiscordGateway",
+      type: .dynamic,
       targets: ["DiscordGateway"]
     ),
     .library(
       name: "DiscordModels",
+      type: .dynamic,
       targets: ["DiscordModels"]
     ),
     .library(
       name: "DiscordUtilities",
+      type: .dynamic,
       targets: ["DiscordUtilities"]
     ),
     .library(
       name: "DiscordAuth",
+      type: .dynamic,
       targets: ["DiscordAuth"]
     ),
   ],
@@ -74,11 +81,15 @@ let package = Package(
       url: "https://github.com/apple/swift-crypto.git",
       "1.0.0"..<"5.0.0"
     ),
+    .package(url: "https://github.com/swiftlang/swift-java", branch: "main"),
+    .package(url: "https://github.com/swiftlang/swift-java-jni-core", branch: "main") // temporary
   ],
   targets: [
     .target(
       name: "PaicordLib",
       dependencies: [
+        .product(name: "SwiftJava", package: "swift-java"),
+        .product(name: "SwiftJavaJNICore", package: "swift-java-jni-core"),
         .target(name: "DiscordAuth"),
         .target(name: "DiscordHTTP"),
         .target(name: "DiscordCore"),
@@ -86,7 +97,10 @@ let package = Package(
         .target(name: "DiscordModels"),
         .target(name: "DiscordUtilities"),
       ],
-      swiftSettings: swiftSettings
+      swiftSettings: swiftSettings,
+      plugins: [
+        .plugin(name: "JExtractSwiftPlugin", package: "swift-java")
+      ]
     ),
     .target(
       name: "DiscordCore",
@@ -127,6 +141,7 @@ let package = Package(
         .product(name: "SwiftProtobuf", package: "swift-protobuf"),
         .product(name: "UInt128", package: "UInt128"),
       ],
+      exclude: ["Protobuf/README.md"],
       swiftSettings: swiftSettings
     ),
     .target(
@@ -211,6 +226,8 @@ let package = Package(
 
 var featureFlags: [SwiftSetting] {
   [
+    // fixes a swift module resolution bug when using swift-java
+    .swiftLanguageMode(.v5),
     /// https://github.com/apple/swift-evolution/blob/main/proposals/0335-existential-any.md
     /// Require `any` for existential types.
     .enableUpcomingFeature("ExistentialAny")
