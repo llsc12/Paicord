@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
   name: "PaicordLib",
   platforms: [
-    .macOS(.v15),
+    .macOS(.v13),
     .iOS(.v16),
     .tvOS(.v16),
     .watchOS(.v9),
