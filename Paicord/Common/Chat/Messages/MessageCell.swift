@@ -83,7 +83,7 @@ struct MessageCell: View {
         HStack {
           AvatarBalancing()
           (Text(Image(systemName: "xmark.circle.fill"))
-            + Text(" Unsupported message type \(message.type)"))
+            + Text(verbatim: " Unsupported message type \(message.type)"))
             .foregroundStyle(.red)
             .frame(maxWidth: .infinity, alignment: .leading)
         }

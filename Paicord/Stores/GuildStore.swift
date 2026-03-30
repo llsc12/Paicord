@@ -340,7 +340,6 @@ class GuildStore: DiscordDataStore {
     // also the gateway doesnt take member list ids, we send channel snowflakes
     let subscriptions: [ChannelSnowflake: [IntPair]] =
       subscribedMemberListIDs.reduce(into: [:]) { partialResult, element in
-        let memberListId = element.key
         let channelSnowflake = element.value.channelID
         partialResult[channelSnowflake] = element.value.ranges
       }

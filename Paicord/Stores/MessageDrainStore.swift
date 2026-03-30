@@ -71,7 +71,7 @@ class MessageDrainStore: DiscordDataStore {
       MessageSnowflake, Payloads.CreateMessage
     >
   ]()
-  var failedMessages: [MessageSnowflake: Error] = [:]
+  var failedMessages: [MessageSnowflake: any Error] = [:]
   var messageSendQueueTask: Task<Void, Never>?
   var messageTasks: [MessageSnowflake: @Sendable () async throws -> Void] = [:]
 

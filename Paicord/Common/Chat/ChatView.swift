@@ -33,7 +33,7 @@ struct ChatView: View {
     @FocusState private var isChatFocused: Bool
 
     @ViewStorage private var scrollStopWorkItem: DispatchWorkItem?
-    @ViewStorage private var scrollObserver: NSObjectProtocol?
+    @ViewStorage private var scrollObserver: (any NSObjectProtocol)?
   #endif
 
   var body: some View {
@@ -291,7 +291,7 @@ struct ChatView: View {
   //    DispatchQueue.main.asyncAfter(deadline: .now(), execute: workItem)
   //  }
 
-  @State var ackTask: Task<Void, Error>? = nil
+  @State var ackTask: Task<Void, any Error>? = nil
   private func acknowledge() {
     ackTask?.cancel()
     ackTask = Task {

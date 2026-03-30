@@ -72,7 +72,7 @@ extension ChatView {
       let nonce =
         message.nonce?.asString != nil
         ? MessageSnowflake(message.nonce!.asString) : nil
-      let error: Error? = nonce != nil ? drain.failedMessages[nonce!] : nil
+      let error: (any Error)? = nonce != nil ? drain.failedMessages[nonce!] : nil
 
       // adding them together can cause arithmetic overflow, so hash instead
       let cellHash: Int = {
@@ -130,7 +130,7 @@ extension ChatView {
     let channelStore: ChannelStore
     @Environment(\.gateway) var gw
     let inline: Bool
-    var error: Error?
+    var error: (any Error)?
 
     @State var editedPopover = false
     @State var avatarAnimated = false

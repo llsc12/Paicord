@@ -10,9 +10,7 @@ import PaicordLib
 import PhotosUI
 import SwiftUIX
 
-#if os(iOS)
-  import MijickCamera
-#endif
+
 
 extension ChatView {
   struct InputBar: View {
@@ -90,7 +88,7 @@ extension ChatView {
     #endif
 
     @State private var isFocused: Bool = false
-    @State var filesRemovedDuringSelection: Error? = nil
+    @State var filesRemovedDuringSelection: (any Error)? = nil
 
     enum SelectionError: LocalizedError {
       case filesPastLimit(limit: Int)
@@ -230,12 +228,16 @@ extension ChatView {
           )
         }
         .fullScreenCover(isPresented: $cameraPickerPresented) {
-          MCamera()
-          .setCameraOutputType(.photo)
-          .setCloseMCameraAction(closeMCameraAction)
-          .onImageCaptured(onImageCaptured)
-          .onVideoCaptured(onVideoCaptured)
-          .startSession()
+          CameraPicker { result in
+            switch result {
+            case .success(.photo(let image)):
+              onImageCaptured(image)
+            case .success(.video(let url)):
+              onVideoCaptured(url)
+            case .failure:
+              break
+            }
+          }
         }
         .alert(
           "Some files were not added",
@@ -600,10 +602,7 @@ extension ChatView {
     }
 
     #if os(iOS)
-      func closeMCameraAction() {
-        self.cameraPickerPresented = false
-      }
-      func onImageCaptured(_ image: UIImage, _ controller: MCamera.Controller) {
+      func onImageCaptured(_ image: UIImage) {
         Task {
           let tempDir = FileManager.default.temporaryDirectory
           let fileURL = tempDir.appendingPathComponent(
@@ -618,10 +617,9 @@ extension ChatView {
               print("Failed to save captured image: \(error)")
             }
           }
-          controller.closeMCamera()
         }
       }
-      func onVideoCaptured(_ videoURL: URL, _ controller: MCamera.Controller) {
+      func onVideoCaptured(_ videoURL: URL) {
         Task {
           let newVideoURL = FileManager.default.temporaryDirectory
             .appendingPathComponent(
@@ -633,8 +631,6 @@ extension ChatView {
           )
           inputVM.trackTempFile(newVideoURL)
           inputVM.selectedFiles.append(newVideoURL)
-
-          controller.closeMCamera()
         }
       }
     #endif
