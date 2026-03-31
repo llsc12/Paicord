@@ -2,117 +2,13 @@
   "sourceLanguage": "en",
   "version": "1.1",
   "strings": {
-    "GIF Picker Coming Soon!": {
+    "Edit Message": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "GIF-Wähler bald verfügbar!"
+            "value": "Nachricht bearbeiten"
           }
-        }
-      }
-    },
-    "Thread": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
-      }
-    },
-    "Notifications View": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "Donors get Discord server roles, and custom profile badges visible to other Paicord users!": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Spender bekommen Rollen auf dem Discord Server und personalisierte Profil-Abzeichen, die für alle Paicord-Nutzer sichtbar sind!"
-          }
-        }
-      }
-    },
-    "Update Available": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
-      }
-    },
-    "Welcome to the start of #%@": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "A new version of Paicord is available! Head to [the releases page](https:\/\/github.com\/llsc12\/Paicord\/releases\/latest), or [the Discord server](https:\/\/discord.gg\/fqhPGHPyaK) to download the latest version.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Eine neue Version von Paicord ist verfügbar! Gehe zur [Release Seite](https:\/\/github.com\/llsc12\/Paicord\/releases\/latest) oder [dem Discord Server](https:\/\/discord.gg\/fqhPGHPyaK), um die neueste Version herunterzuladen."
-          }
-        }
-      }
-    },
-    "Delete": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "translated", "value": "Löschen" } }
-      }
-    },
-    "Enjoying Paicord?": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gefällt dir Paicord?"
-          }
-        }
-      }
-    },
-    "Copy Message Link": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nachrichten-Link kopieren"
-          }
-        }
-      }
-    },
-    "Authenticator App": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Authentifizierungs-App"
-          }
-        }
-      }
-    },
-    "Mark Unread": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
-      }
-    },
-    "ON": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "Awaiting READY": {
-      "localizations": {
-        "de": {
-          "stringUnit": { "value": "Warten auf READY", "state": "translated" }
-        }
-      }
-    },
-    "Error": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "Fehler", "state": "translated" } }
-      }
-    },
-    "Edit Profile": {
-      "localizations": {
-        "de": {
-          "stringUnit": { "state": "translated", "value": "Profil bearbeiten" }
         }
       }
     },
@@ -126,19 +22,877 @@
         }
       }
     },
-    "%@ unsupported": {
+    "Version %@ (%@)": {
+      "localizations": {
+        "en": {
+          "stringUnit": { "state": "new", "value": "Version %1$@ (%2$@)" }
+        },
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Unsupported block: %@": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Playgrounds": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Check your phone!": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": " %1$@ wird nicht unterstützt"
+            "value": "Schau auf deinem Telefon!"
+          }
+        }
+      }
+    },
+    "Home": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "translated", "value": "Home" } }
+      }
+    },
+    "View Logs": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "You're on build %lld, and the latest build is %lld.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "value": "You're on build %1$lld, and the latest build is %2$lld.",
+            "state": "new"
+          }
+        },
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Delete Message": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "value": "Nachricht löschen", "state": "translated" }
+        }
+      }
+    },
+    "OFF": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "GIF Picker Coming Soon!": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GIF-Wähler bald verfügbar!"
+          }
+        }
+      }
+    },
+    "Copy": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "Kopieren", "state": "translated" } }
+      }
+    },
+    "Show FLEX": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Editing Message": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nachricht wird bearbeitet"
+          }
+        }
+      }
+    },
+    "ON": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "An action required MFA to continue.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "Eine Aktion benötigt MFA um fortzufahren.",
+            "state": "translated"
+          }
+        }
+      }
+    },
+    "Some files were not added": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Select an account to continue or add a new one.": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Welcome to the start of this channel": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "Willkommen am Anfang dieses Kanals",
+            "state": "translated"
+          }
+        }
+      }
+    },
+    "Log In": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "Einloggen", "state": "translated" } }
+      }
+    },
+    "OK": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Upload Photos": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "(edited)": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "value": " (bearbeitet)", "state": "translated" }
+        }
+      }
+    },
+    "Notifications": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "value": "Benachrichtigungen", "state": "translated" }
+        }
+      }
+    },
+    "Choose an account": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wähle einen Account"
+          }
+        }
+      }
+    },
+    "Enter your backup code": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "Gib deinen Backup-Code ein",
+            "state": "translated"
+          }
+        }
+      }
+    },
+    "Create Thread": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "value": "Thread erstellen", "state": "translated" }
+        }
+      }
+    },
+    "Account": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "Account", "state": "translated" } }
+      }
+    },
+    "You don't have permission to view the message history of #%@.": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Donate": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "Spenden", "state": "translated" } }
+      }
+    },
+    "Dismiss": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "translated", "value": "Ignorieren" } }
+      }
+    },
+    "Paicord": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Forgot Password": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "value": "Passwort vergessen", "state": "translated" }
+        }
+      }
+    },
+    "You are giving access to your Discord account to another device.": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    " is typing...": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "value": " schreibt...", "state": "translated" }
+        }
+      }
+    },
+    "We're so excited to see you again!": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Forgot your password?": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hast du dein Passwort vergessen?"
+          }
+        }
+      }
+    },
+    "Enter a valid login above to send a reset link!": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "Gib oben einen gültigen Login ein, um einen Link zum Zurücksetzen zu erhalten!",
+            "state": "translated"
+          }
+        }
+      }
+    },
+    "You can only use each backup code once.": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Copy Message Link": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nachrichten-Link kopieren"
+          }
+        }
+      }
+    },
+    "Direct Messages": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "state": "translated", "value": "Privatnachrichten" }
+        }
+      }
+    },
+    "A new version of Paicord is available! Head to [the releases page](https:\/\/github.com\/llsc12\/Paicord\/releases\/latest), or [the Discord server](https:\/\/discord.gg\/fqhPGHPyaK) to download the latest version.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine neue Version von Paicord ist verfügbar! Gehe zur [Release Seite](https:\/\/github.com\/llsc12\/Paicord\/releases\/latest) oder [dem Discord Server](https:\/\/discord.gg\/fqhPGHPyaK), um die neueste Version herunterzuladen."
+          }
+        }
+      }
+    },
+    "Settings": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "value": "Einstellungen", "state": "translated" }
+        }
+      }
+    },
+    "Edit Profile": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "state": "translated", "value": "Profil bearbeiten" }
+        }
+      }
+    },
+    "Thread": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    " and ": {
+      "localizations": {
+        "de": { "stringUnit": { "value": " und", "state": "translated" } }
+      }
+    },
+    "Paicord Logs": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Upload Files": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    " are typing...": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "state": "translated", "value": " schreiben..." }
+        }
+      }
+    },
+    "Toggle Member List": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    ":3": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "translated", "value": ":3" } }
+      }
+    },
+    "Quick Switcher": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Apps": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "translated", "value": "Apps" } }
+      }
+    },
+    "Unsupported embed type: %@": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "%lld members": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "value": " %1$lld Mitglieder", "state": "translated" }
+        }
+      }
+    },
+    "Notifications View": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Benachrichtigungsansicht"
+          }
+        }
+      }
+    },
+    "Delete": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "translated", "value": "Löschen" } }
+      }
+    },
+    "Copy Message ID": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nachrichten-ID kopieren"
+          }
+        }
+      }
+    },
+    ", ": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "translated", "value": "," } }
+      }
+    },
+    "wip bro go do totp": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Paicord is free and open source software. If you enjoy using Paicord, consider sponsoring its development to help support ongoing improvements and new features!": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "Paicord ist kostenlos und Open-Source-Software. Falls es dir gefällt, denke darüber nach die Entwicklung als Spender zu unterstützen, um neue Features und andere Verbesserungen zu ermöglichen!",
+            "state": "translated"
+          }
+        }
+      }
+    },
+    "Forward": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "state": "translated", "value": "Weiterleiten" }
+        }
+      }
+    },
+    "Sponsor": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Update Available": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Toggle Sidebar": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Remote Authentication": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "ComponentsV2 unsupported": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ComponentsV2 werden derzeit nicht unterstützt"
+          }
+        }
+      }
+    },
+    "Enjoying Paicord?": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "Gefällt dir Paicord?",
+            "state": "translated"
+          }
+        }
+      }
+    },
+    " Unsupported message type %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": " Nicht unterstützer Nachrichtentyp %1$@\u0013"
+          }
+        }
+      }
+    },
+    "Sticker Picker Coming Soon!": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Copy User ID": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "state": "translated", "value": "Nutzer-ID kopieren" }
+        }
+      }
+    },
+    " Forwarded": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "state": "translated", "value": " Weitergeleitet" }
+        }
+      }
+    },
+    "Yesterday at ": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Made with ❤️ by llsc12": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "Gemacht mit ❤️von llsc12",
+            "state": "translated"
+          }
+        }
+      }
+    },
+    "Switch Account": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Welcome Back!": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Willkommen zurück!\u001b[A"
+          }
+        }
+      }
+    },
+    "Enter your authentication code": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "Gib deinen Authentifizierungscode ein",
+            "state": "translated"
           }
         }
       }
     },
     "Stickers": {
       "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Are you sure?": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "Bist du dir sicher?",
+            "state": "translated"
+          }
+        }
+      }
+    },
+    "If you like Paicord and would like to support its development, consider donating! You'll receive a Donator role in the Discord server and you'll receive custom badges!": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "Wenn dir Paicord gefällt und du die Entwicklung unterstützen möchtest, denke über eine Spende nach! Du bekommst eine Spenderrolle im Discord-Server und personalisierbare Badges!",
+            "state": "translated"
+          }
+        }
+      }
+    },
+    "Awaiting READY": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "state": "translated", "value": "Warten auf READY" }
+        }
+      }
+    },
+    "1": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "translated", "value": "1" } }
+      }
+    },
+    "Edited at %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "value": "Bearbeitet um %1$@", "state": "translated" }
+        }
+      }
+    },
+    "GIFS": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "translated", "value": "GIFS" } }
+      }
+    },
+    "Log in with QR Code": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mit QR-Code einloggen"
+          }
+        }
+      }
+    },
+    "": {
+      "localizations": {
         "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Something really bad has happened, gateway connections disabled.\nPlease report this.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Etwas katastrophales ist passiert und Gateway-Verbindungen wurden deaktiviert!\\nBitte melde dies."
+          }
+        }
+      }
+    },
+    "Join the [Paicord Server](https:\/\/discord.gg\/fqhPGHPyaK) to manage badges!": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tritt dem [Paicord Server](https:\/\/discord.gg\/fqhPGHPyaK) bei, um Badges zu bearbeiten!"
+          }
+        }
+      }
+    },
+    "Profile": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "Profil", "state": "translated" } }
+      }
+    },
+    "Swipe on a theme to delete it.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wische über ein Theme, um es zu löschen."
+          }
+        }
+      }
+    },
+    "An unknown error occurred.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "Ein unbekannter Fehler ist aufgetreten.",
+            "state": "translated"
+          }
+        }
+      }
+    },
+    "Login requires MFA to continue.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "Login benötigt MFA zum fortfahren.",
+            "state": "translated"
+          }
+        }
+      }
+    },
+    "and ": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Select a channel to start chatting": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wähle einen Kanal, um eine Konversation zu beginnen."
+          }
+        }
+      }
+    },
+    "Donors get Discord server roles, and custom profile badges visible to other Paicord users!": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spender bekommen Rollen auf dem Discord Server und personalisierte Profil-Abzeichen, die für alle Paicord-Nutzer sichtbar sind!"
+          }
+        }
+      }
+    },
+    "Enter the code sent to your phone": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "Gib den Code ein, der an dein Telefon gesendet wurde",
+            "state": "translated"
+          }
+        }
+      }
+    },
+    "Password": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "translated", "value": "Passwort" } }
+      }
+    },
+    "Copy Author ID": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "state": "translated", "value": "Author-ID kopieren" }
+        }
+      }
+    },
+    "Error": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "translated", "value": "Fehler" } }
+      }
+    },
+    "Further MFA restricted actions will be allowed for the next 5 minutes.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "Weitere Aktionen, die MFA benötigen, werden für die nächsten 5 Minuten erlaubt sein.",
+            "state": "translated"
+          }
+        }
+      }
+    },
+    "Mention": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "translated", "value": "Erwähnung" } }
+      }
+    },
+    "Download IPA": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "state": "translated", "value": "Lade IPA herunter" }
+        }
+      }
+    },
+    "You don't have permission to view the message history in this channel.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Du hast keine Berechtigung, um den Nachrichtenverlauf in diesem Kanal zu sehen."
+          }
+        }
+      }
+    },
+    "Replying to %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "value": "Antwort an %1$@", "state": "translated" }
+        }
+      }
+    },
+    "Authenticator App": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "Authentifizierungs-App",
+            "state": "translated"
+          }
+        }
+      }
+    },
+    "Unimplemented": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Add Theme": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "state": "translated", "value": "Theme hinzufügen" }
+        }
+      }
+    },
+    "Copy Text": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "state": "translated", "value": "Text kopieren" }
+        }
+      }
+    },
+    "Welcome to the start of #%@": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Emojis": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "translated", "value": "Emojis" } }
+      }
+    },
+    "Mark Unread": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "Als ungelesen markieren",
+            "state": "translated"
+          }
+        }
+      }
+    },
+    "%lld Result%@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": " %1$lld Ergebnis%2$@",
+            "state": "translated"
+          }
+        },
+        "en": { "stringUnit": { "state": "new", "value": "%1$lld Result%2$@" } }
+      }
+    },
+    "Sketchy shit": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "SMS": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "SMS", "state": "translated" } }
+      }
+    },
+    "This MFA method is not currently supported.": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "You will receive a password reset form shortly!": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Installed Themes": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "Installierte Themes",
+            "state": "translated"
+          }
+        }
+      }
+    },
+    "Backup Code": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "value": "Backup-Code", "state": "translated" }
+        }
+      }
+    },
+    "Add Account": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "value": "Account hinzufügen", "state": "translated" }
+        }
+      }
+    },
+    "Camera": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "Kamera", "state": "translated" } }
+      }
+    },
+    "Tools": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "translated", "value": "Werkzeuge" } }
+      }
+    },
+    "Where would you like to go?": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "state": "translated", "value": "Wohin möchtest du?" }
+        }
+      }
+    },
+    "Unknown User": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unbekannter Benutzer"
+          }
+        }
+      }
+    },
+    "Logging in as %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "Es wird sich als %1$@ eingeloggt",
+            "state": "translated"
+          }
+        }
+      }
+    },
+    "Reply": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "Antworte", "state": "translated" } }
       }
     },
     "Multi-Factor Authentication": {
@@ -161,729 +915,24 @@
         }
       }
     },
-    "Check your phone!": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "value": "Schau auf deinem Telefon!",
-            "state": "translated"
-          }
-        }
-      }
-    },
-    "Add Account": {
-      "localizations": {
-        "de": {
-          "stringUnit": { "value": "Account hinzufügen", "state": "translated" }
-        }
-      }
-    },
-    ", ": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
-      }
-    },
-    "ComponentsV2 unsupported": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "value": "ComponentsV2 werden derzeit nicht unterstützt",
-            "state": "translated"
-          }
-        }
-      }
-    },
-    "Made with ❤️ by llsc12": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gemacht mit ❤️von llsc12"
-          }
-        }
-      }
-    },
-    "Welcome Back!": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "Swipe on a theme to delete it.": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
-      }
-    },
-    "OFF": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
-      }
-    },
-    "You're on build %lld, and the latest build is %lld.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "value": "You're on build %1$lld, and the latest build is %2$lld.",
-            "state": "new"
-          }
-        },
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
     "Scan this with the Paicord or Discord mobile app to log in instantly.": {
       "localizations": {
         "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
       }
     },
-    ":3": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "translated", "value": ":3" } }
-      }
-    },
-    "Unsupported embed type: %@": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "Enter your authentication code": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "value": "Gib deinen Authentifizierungscode ein",
-            "state": "translated"
-          }
-        }
-      }
-    },
-    "Editing Message": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "value": "Nachricht wird bearbeitet",
-            "state": "translated"
-          }
-        }
-      }
-    },
-    " Unsupported message type %@": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "value": " Nicht unterstützer Nachrichtentyp %1$@\u0013",
-            "state": "translated"
-          }
-        }
-      }
-    },
-    "Settings": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
-      }
-    },
-    " Forwarded": {
-      "localizations": {
-        "de": {
-          "stringUnit": { "value": " Weitergeleitet", "state": "translated" }
-        }
-      }
-    },
-    "You can only use each backup code once.": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "Toggle Sidebar": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
-      }
-    },
-    "Enter your backup code": {
+    "%@ unsupported": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Gib deinen Backup-Code ein"
+            "value": " %1$@ wird nicht unterstützt"
           }
-        }
-      }
-    },
-    "Create Thread": {
-      "localizations": {
-        "de": {
-          "stringUnit": { "state": "translated", "value": "Thread erstellen" }
-        }
-      }
-    },
-    "Where would you like to go?": {
-      "localizations": {
-        "de": {
-          "stringUnit": { "value": "Wohin möchtest du?", "state": "translated" }
         }
       }
     },
     "idk bro ur files cooked": {
       "localizations": {
         "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "Profile": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "You don't have permission to view the message history in this channel.": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
-      }
-    },
-    "OK": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "Are you sure?": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bist du dir sicher?"
-          }
-        }
-      }
-    },
-    "Notifications": {
-      "localizations": {
-        "de": {
-          "stringUnit": { "value": "Benachrichtigungen", "state": "translated" }
-        }
-      }
-    },
-    "Version %@ (%@)": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } },
-        "en": {
-          "stringUnit": { "value": "Version %1$@ (%2$@)", "state": "new" }
-        }
-      }
-    },
-    "Copy User ID": {
-      "localizations": {
-        "de": {
-          "stringUnit": { "value": "Nutzer-ID kopieren", "state": "translated" }
-        }
-      }
-    },
-    "Upload Photos": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "Toggle Member List": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
-      }
-    },
-    "Forgot Password": {
-      "localizations": {
-        "de": {
-          "stringUnit": { "state": "translated", "value": "Passwort vergessen" }
-        }
-      }
-    },
-    "Add Theme": {
-      "localizations": {
-        "de": {
-          "stringUnit": { "state": "translated", "value": "Theme hinzufügen" }
-        }
-      }
-    },
-    "If you like Paicord and would like to support its development, consider donating! You'll receive a Donator role in the Discord server and you'll receive custom badges!": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Wenn dir Paicord gefällt und du die Entwicklung unterstützen möchtest, denke über eine Spende nach! Du bekommst eine Spenderrolle im Discord-Server und personalisierbare Badges!"
-          }
-        }
-      }
-    },
-    "Login requires MFA to continue.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Login benötigt MFA zum fortfahren."
-          }
-        }
-      }
-    },
-    "%lld members": {
-      "localizations": {
-        "de": {
-          "stringUnit": { "state": "translated", "value": " %1$lld Mitglieder" }
-        }
-      }
-    },
-    "Yesterday at ": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "Paicord is free and open source software. If you enjoy using Paicord, consider sponsoring its development to help support ongoing improvements and new features!": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "value": "Paicord ist kostenlos und Open-Source-Software. Falls es dir gefällt, denke darüber nach die Entwicklung als Spender zu unterstützen, um neue Features und andere Verbesserungen zu ermöglichen!",
-            "state": "translated"
-          }
-        }
-      }
-    },
-    "Download IPA": {
-      "localizations": {
-        "de": {
-          "stringUnit": { "state": "translated", "value": "Lade IPA herunter" }
-        }
-      }
-    },
-    "Log in with QR Code": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mit QR-Code einloggen"
-          }
-        }
-      }
-    },
-    "Further MFA restricted actions will be allowed for the next 5 minutes.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Weitere Aktionen, die MFA benötigen, werden für die nächsten 5 Minuten erlaubt sein."
-          }
-        }
-      }
-    },
-    "Select a channel to start chatting": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "value": "Wähle einen Kanal, um eine Konversation zu beginnen.",
-            "state": "translated"
-          }
-        }
-      }
-    },
-    "Log In": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "translated", "value": "Einloggen" } }
-      }
-    },
-    "and ": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "We're so excited to see you again!": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
-      }
-    },
-    "Home": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "Unimplemented": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
-      }
-    },
-    "1": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "Paicord Logs": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
-      }
-    },
-    "Copy Message ID": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nachrichten-ID kopieren"
-          }
-        }
-      }
-    },
-    "%lld Result%@": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "value": " %1$lld Ergebnis%2$@",
-            "state": "translated"
-          }
-        },
-        "en": { "stringUnit": { "value": "%1$lld Result%2$@", "state": "new" } }
-      }
-    },
-    "Remote Authentication": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "Logging in as %@": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
-      }
-    },
-    "Donate": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "translated", "value": "Spenden" } }
-      }
-    },
-    "Enter a valid login above to send a reset link!": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gib oben einen gültigen Login ein, um einen Link zum Zurücksetzen zu erhalten!"
-          }
-        }
-      }
-    },
-    "GIFS": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "GIFS", "state": "translated" } }
-      }
-    },
-    "Unknown User": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "Choose an account": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "value": "Wähle einen Account",
-            "state": "translated"
-          }
-        }
-      }
-    },
-    "Copy Text": {
-      "localizations": {
-        "de": {
-          "stringUnit": { "state": "translated", "value": "Text kopieren" }
-        }
-      }
-    },
-    "An action required MFA to continue.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "value": "Eine Aktion benötigt MFA um fortzufahren.",
-            "state": "translated"
-          }
-        }
-      }
-    },
-    "(edited)": {
-      "localizations": {
-        "de": {
-          "stringUnit": { "state": "translated", "value": " (bearbeitet)" }
-        }
-      }
-    },
-    "Copy": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "Kopieren", "state": "translated" } }
-      }
-    },
-    "Paicord": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "Emojis": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "Emojis", "state": "translated" } }
-      }
-    },
-    " is typing...": {
-      "localizations": {
-        "de": {
-          "stringUnit": { "value": " schreibt...", "state": "translated" }
-        }
-      }
-    },
-    "Password": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "Passwort", "state": "translated" } }
-      }
-    },
-    "Backup Code": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
-      }
-    },
-    "Direct Messages": {
-      "localizations": {
-        "de": {
-          "stringUnit": { "value": "Privatnachrichten", "state": "translated" }
-        }
-      }
-    },
-    "Select an account to continue or add a new one.": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
-      }
-    },
-    "Copy Author ID": {
-      "localizations": {
-        "de": {
-          "stringUnit": { "value": "Author-ID kopieren", "state": "translated" }
-        }
-      }
-    },
-    "Forgot your password?": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "value": "Hast du dein Passwort vergessen?",
-            "state": "translated"
-          }
-        }
-      }
-    },
-    "This MFA method is not currently supported.": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
-      }
-    },
-    "Dismiss": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "Ignorieren", "state": "translated" } }
-      }
-    },
-    "Show FLEX": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "Upload Files": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
-      }
-    },
-    "You don't have permission to view the message history of #%@.": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
-      }
-    },
-    "Unsupported block: %@": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "Replying to %@": {
-      "localizations": {
-        "de": {
-          "stringUnit": { "state": "translated", "value": "Antwort an %1$@" }
-        }
-      }
-    },
-    "Some files were not added": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
-      }
-    },
-    "Edited at %@": {
-      "localizations": {
-        "de": {
-          "stringUnit": { "state": "translated", "value": "Bearbeitet um %1$@" }
-        }
-      }
-    },
-    "Reply": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "translated", "value": "Antworte" } }
-      }
-    },
-    "Forward": {
-      "localizations": {
-        "de": {
-          "stringUnit": { "value": "Weiterleiten", "state": "translated" }
-        }
-      }
-    },
-    " and ": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "translated", "value": " und" } }
-      }
-    },
-    "Delete Message": {
-      "localizations": {
-        "de": {
-          "stringUnit": { "state": "translated", "value": "Nachricht löschen" }
-        }
-      }
-    },
-    "Enter the code sent to your phone": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "value": "Gib den Code ein, der an dein Telefon gesendet wurde",
-            "state": "translated"
-          }
-        }
-      }
-    },
-    "Switch Account": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "Account": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "translated", "value": "Account" } }
-      }
-    },
-    "Apps": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "Playgrounds": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "View Logs": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "Mention": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "Erwähnung", "state": "translated" } }
-      }
-    },
-    "Edit Message": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "value": "Nachricht bearbeiten",
-            "state": "translated"
-          }
-        }
-      }
-    },
-    "SMS": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
-      }
-    },
-    "Installed Themes": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "Something really bad has happened, gateway connections disabled.\nPlease report this.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Etwas katastrophales ist passiert und Gateway-Verbindungen wurden deaktiviert!\\nBitte melde dies."
-          }
-        }
-      }
-    },
-    "Welcome to the start of this channel": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
-      }
-    },
-    "Sticker Picker Coming Soon!": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    " are typing...": {
-      "localizations": {
-        "de": {
-          "stringUnit": { "value": " schreiben...", "state": "translated" }
-        }
-      }
-    },
-    "Tools": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "Camera": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "Kamera", "state": "translated" } }
-      }
-    },
-    "Join the [Paicord Server](https:\/\/discord.gg\/fqhPGHPyaK) to manage badges!": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "value": "Tritt dem [Paicord Server](https:\/\/discord.gg\/fqhPGHPyaK) bei, um Badges zu bearbeiten!",
-            "state": "translated"
-          }
-        }
-      }
-    },
-    "Sponsor": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
-      }
-    },
-    "An unknown error occurred.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ein unbekannter Fehler ist aufgetreten."
-          }
-        }
-      }
-    },
-    "You will receive a password reset form shortly!": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "wip bro go do totp": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
-      }
-    },
-    "Sketchy shit": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "You are giving access to your Discord account to another device.": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
-      }
-    },
-    "Quick Switcher": {
-      "localizations": {
-        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
-      }
-    },
-    "": {
-      "localizations": {
-        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
       }
     }
   }
