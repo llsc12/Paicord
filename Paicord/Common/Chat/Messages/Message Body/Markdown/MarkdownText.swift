@@ -373,7 +373,6 @@ class MarkdownRendererVM {
   // Shared cache (renderer instances)
   fileprivate static let cache: NSCache<NSString, CachedRender> = {
     let c = NSCache<NSString, CachedRender>()
-    c.countLimit = 512
     return c
   }()
   fileprivate class CachedRender: NSObject {
