@@ -4,7 +4,7 @@
       "localizations": {
         "de": {
           "stringUnit": {
-            "value": "Login benötigt MFA zum fortfahren.",
+            "value": "Login benötigt MFA zum Fortfahren.",
             "state": "translated"
           }
         }
