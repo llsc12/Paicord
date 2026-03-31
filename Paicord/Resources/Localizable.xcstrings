@@ -1,1 +1,805 @@
-{"strings":{"Paicord Logs":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}}," is typing...":{"localizations":{"de":{"stringUnit":{"state":"translated","value":" schreibt..."}}}},"Switch Account":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Donate":{"localizations":{"de":{"stringUnit":{"value":"Spenden","state":"translated"}}}},", ":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"GIF Picker Coming Soon!":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Enter your authentication code":{"localizations":{"de":{"stringUnit":{"state":"translated","value":"Gib deinen Authentifizierungscode ein"}}}},"Upload Photos":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Backup Code":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Tools":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Password":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Swipe on a theme to delete it.":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"%@ unsupported":{"localizations":{"de":{"stringUnit":{"value":" %1$@ wird nicht unterstützt","state":"translated"}}}},"Sponsor":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"Further MFA restricted actions will be allowed for the next 5 minutes.":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Made with ❤️ by llsc12":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Update Available":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"You can only use each backup code once.":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Forgot Password":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"Toggle Sidebar":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Thread":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"SMS":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"Enter a valid login above to send a reset link!":{"localizations":{"de":{"stringUnit":{"value":"Gib oben einen gültigen Login ein, um einen Link zum Zurücksetzen zu erhalten!","state":"translated"}}}},"You don't have permission to view the message history of #%@.":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"Enjoying Paicord?":{"localizations":{"de":{"stringUnit":{"state":"translated","value":"Gefällt dir Paicord?"}}}},"Camera":{"localizations":{"de":{"stringUnit":{"state":"translated","value":"Kamera"}}}},"Choose an account":{"localizations":{"de":{"stringUnit":{"state":"translated","value":"Wähle einen Account"}}}},"Paicord":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Mark Unread":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"You will receive a password reset form shortly!":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"Settings":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Remind Me Later":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Log in with QR Code":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Email or Phone Number":{"localizations":{"de":{"stringUnit":{"value":"E-Mail oder Telefonnummer","state":"translated"}}}},"Welcome to the start of #%@":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"OFF":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}}," are typing...":{"localizations":{"de":{"stringUnit":{"state":"translated","value":" schreiben..."}}}},"Scan this with the Paicord or Discord mobile app to log in instantly.":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Select a channel to start chatting":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Join the [Paicord Server](https:\/\/discord.gg\/fqhPGHPyaK) to manage badges!":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},":3":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"You don't have permission to view the message history in this channel.":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Edited at %@":{"localizations":{"de":{"stringUnit":{"value":"Bearbeitet um %1$@","state":"translated"}}}},"%lld members":{"localizations":{"de":{"stringUnit":{"value":" %1$lld Mitglieder","state":"translated"}}}},"Paicord is free and open source software. If you enjoy using Paicord, consider sponsoring its development to help support ongoing improvements and new features!":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Welcome Back!":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"Apps":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}}," Forwarded":{"localizations":{"de":{"stringUnit":{"state":"translated","value":" Weitergeleitet"}}}},"Editing Message":{"localizations":{"de":{"stringUnit":{"state":"translated","value":"Nachricht wird bearbeitet"}}}},"and ":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"Installed Themes":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"ON":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"You're on build %lld, and the latest build is %lld.":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}},"en":{"stringUnit":{"state":"new","value":"You're on build %1$lld, and the latest build is %2$lld."}}}},"Awaiting READY":{"localizations":{"de":{"stringUnit":{"state":"translated","value":"Warten auf READY"}}}},"Dismiss":{"localizations":{"de":{"stringUnit":{"state":"translated","value":"Ignorieren"}}}},"Where would you like to go?":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"Version %@ (%@)":{"localizations":{"en":{"stringUnit":{"value":"Version %1$@ (%2$@)","state":"new"}},"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Unsupported embed type: %@":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"If you like Paicord and would like to support its development, consider donating! You'll receive a Donator role in the Discord server and you'll receive custom badges!":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"An unknown error occurred.":{"localizations":{"de":{"stringUnit":{"value":"Ein unbekannter Fehler ist aufgetreten.","state":"translated"}}}},"Copy Message ID":{"localizations":{"de":{"stringUnit":{"state":"translated","value":"Nachrichten-ID kopieren"}}}},"Quick Switcher":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"%lld Result%@":{"localizations":{"en":{"stringUnit":{"state":"new","value":"%1$lld Result%2$@"}},"de":{"stringUnit":{"state":"translated","value":" %1$lld Ergebnis%2$@"}}}},"Notifications View":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"Sketchy shit":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"Add Account":{"localizations":{"de":{"stringUnit":{"value":"Account hinzufügen","state":"translated"}}}},"Copy Text":{"localizations":{"de":{"stringUnit":{"state":"translated","value":"Text kopieren"}}}},"Notifications":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}}," Unsupported message type %@":{"localizations":{"de":{"stringUnit":{"value":" Nicht unterstützer Nachrichtentyp %1$@\u0013","state":"translated"}}}},"Donors get Discord server roles, and custom profile badges visible to other Paicord users!":{"localizations":{"de":{"stringUnit":{"state":"translated","value":"Spender bekommen Rollen auf dem Discord Server und personalisierte Profil-Abzeichen, die für alle Paicord-Nutzer sichtbar sind!"}}}},"Emojis":{"localizations":{"de":{"stringUnit":{"state":"translated","value":"Emojis"}}}},"Copy User ID":{"localizations":{"de":{"stringUnit":{"state":"translated","value":"Nutzer-ID kopieren"}}}},"Forgot your password?":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"Welcome to the start of this channel":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"Playgrounds":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}}," and ":{"localizations":{"de":{"stringUnit":{"state":"translated","value":" und"}}}},"Stickers":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Upload Files":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"Authenticator App":{"localizations":{"de":{"stringUnit":{"state":"translated","value":"Authentifizierungs-App"}}}},"Replying to %@":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Copy Message Link":{"localizations":{"de":{"stringUnit":{"state":"translated","value":"Nachrichten-Link kopieren"}}}},"Forward":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Mention":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"Login requires MFA to continue.":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"Sticker Picker Coming Soon!":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Toggle Member List":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Add Theme":{"localizations":{"de":{"stringUnit":{"state":"translated","value":"Theme hinzufügen"}}}},"This MFA method is not currently supported.":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"Logging in as %@":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"View Logs":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"Delete Message":{"localizations":{"de":{"stringUnit":{"value":"Nachricht löschen","state":"translated"}}}},"You are giving access to your Discord account to another device.":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Are you sure?":{"localizations":{"de":{"stringUnit":{"state":"translated","value":"Bist du dir sicher?"}}}},"Unimplemented":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"An action required MFA to continue.":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"Select an account to continue or add a new one.":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Unsupported block: %@":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"Account":{"localizations":{"de":{"stringUnit":{"value":"Account","state":"translated"}}}},"Remote Authentication":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"(edited)":{"localizations":{"de":{"stringUnit":{"state":"translated","value":" (bearbeitet)"}}}},"Something really bad has happened, gateway connections disabled.\nPlease report this.":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"We're so excited to see you again!":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"Log In":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"GIFS":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Show FLEX":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"1":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"idk bro ur files cooked":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Yesterday at ":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Edit Message":{"localizations":{"de":{"stringUnit":{"state":"translated","value":"Nachricht bearbeiten"}}}},"Copy":{"localizations":{"de":{"stringUnit":{"state":"translated","value":"Kopieren"}}}},"Unknown User":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Enter your backup code":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"Check your phone!":{"localizations":{"de":{"stringUnit":{"value":"Schau auf deinem Telefon!","state":"translated"}}}},"Download IPA":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Multi-Factor Authentication":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"Home":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Delete":{"localizations":{"de":{"stringUnit":{"value":"Löschen","state":"translated"}}}},"Direct Messages":{"localizations":{"de":{"stringUnit":{"value":"Privatnachrichten","state":"translated"}}}},"Error":{"localizations":{"de":{"stringUnit":{"state":"translated","value":"Fehler"}}}},"Profile":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"wip bro go do totp":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"OK":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"Copy Author ID":{"localizations":{"de":{"stringUnit":{"state":"translated","value":"Author-ID kopieren"}}}},"A new version of Paicord is available! Head to [the releases page](https:\/\/github.com\/llsc12\/Paicord\/releases\/latest), or [the Discord server](https:\/\/discord.gg\/fqhPGHPyaK) to download the latest version.":{"localizations":{"de":{"stringUnit":{"value":"Eine neue Version von Paicord ist verfügbar! Gehe zur [Release Seite](https:\/\/github.com\/llsc12\/Paicord\/releases\/latest) oder [dem Discord Server](https:\/\/discord.gg\/fqhPGHPyaK), um die neueste Version herunterzuladen.","state":"translated"}}}},"Create Thread":{"localizations":{"de":{"stringUnit":{"state":"translated","value":"Thread erstellen"}}}},"ComponentsV2 unsupported":{"localizations":{"de":{"stringUnit":{"value":"ComponentsV2 werden derzeit nicht unterstützt","state":"translated"}}}},"Some files were not added":{"localizations":{"de":{"stringUnit":{"state":"notTranslated","value":""}}}},"Reply":{"localizations":{"de":{"stringUnit":{"value":"","state":"notTranslated"}}}},"Enter the code sent to your phone":{"localizations":{"de":{"stringUnit":{"value":"Gib den Code ein, der an dein Telefon gesendet wurde","state":"translated"}}}},"Edit Profile":{"localizations":{"de":{"stringUnit":{"state":"translated","value":"Profil bearbeiten"}}}}},"version":"1.1","sourceLanguage":"en"}
+{
+  "strings": {
+    "Paicord Logs": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    " is typing...": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "state": "translated", "value": " schreibt..." }
+        }
+      }
+    },
+    "Switch Account": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Donate": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "Spenden", "state": "translated" } }
+      }
+    },
+    ", ": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "GIF Picker Coming Soon!": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Enter your authentication code": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gib deinen Authentifizierungscode ein"
+          }
+        }
+      }
+    },
+    "Upload Photos": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Backup Code": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Tools": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Password": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Swipe on a theme to delete it.": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "%@ unsupported": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": " %1$@ wird nicht unterstützt",
+            "state": "translated"
+          }
+        }
+      }
+    },
+    "Sponsor": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Further MFA restricted actions will be allowed for the next 5 minutes.": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Made with ❤️ by llsc12": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Update Available": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "You can only use each backup code once.": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Forgot Password": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Toggle Sidebar": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Thread": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "SMS": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Enter a valid login above to send a reset link!": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "Gib oben einen gültigen Login ein, um einen Link zum Zurücksetzen zu erhalten!",
+            "state": "translated"
+          }
+        }
+      }
+    },
+    "You don't have permission to view the message history of #%@.": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Enjoying Paicord?": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gefällt dir Paicord?"
+          }
+        }
+      }
+    },
+    "Camera": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "translated", "value": "Kamera" } }
+      }
+    },
+    "Choose an account": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wähle einen Account"
+          }
+        }
+      }
+    },
+    "Paicord": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Mark Unread": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "You will receive a password reset form shortly!": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Settings": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Remind Me Later": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Log in with QR Code": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Email or Phone Number": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "E-Mail oder Telefonnummer",
+            "state": "translated"
+          }
+        }
+      }
+    },
+    "Welcome to the start of #%@": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "OFF": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    " are typing...": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "state": "translated", "value": " schreiben..." }
+        }
+      }
+    },
+    "Scan this with the Paicord or Discord mobile app to log in instantly.": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Select a channel to start chatting": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Join the [Paicord Server](https:\/\/discord.gg\/fqhPGHPyaK) to manage badges!": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    ":3": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "You don't have permission to view the message history in this channel.": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Edited at %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "value": "Bearbeitet um %1$@", "state": "translated" }
+        }
+      }
+    },
+    "%lld members": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "value": " %1$lld Mitglieder", "state": "translated" }
+        }
+      }
+    },
+    "Paicord is free and open source software. If you enjoy using Paicord, consider sponsoring its development to help support ongoing improvements and new features!": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Welcome Back!": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Apps": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    " Forwarded": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "state": "translated", "value": " Weitergeleitet" }
+        }
+      }
+    },
+    "Editing Message": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nachricht wird bearbeitet"
+          }
+        }
+      }
+    },
+    "and ": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Installed Themes": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "ON": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "You're on build %lld, and the latest build is %lld.": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } },
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "You're on build %1$lld, and the latest build is %2$lld."
+          }
+        }
+      }
+    },
+    "Awaiting READY": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "state": "translated", "value": "Warten auf READY" }
+        }
+      }
+    },
+    "Dismiss": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "translated", "value": "Ignorieren" } }
+      }
+    },
+    "Where would you like to go?": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Version %@ (%@)": {
+      "localizations": {
+        "en": {
+          "stringUnit": { "value": "Version %1$@ (%2$@)", "state": "new" }
+        },
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Unsupported embed type: %@": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "If you like Paicord and would like to support its development, consider donating! You'll receive a Donator role in the Discord server and you'll receive custom badges!": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "An unknown error occurred.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "Ein unbekannter Fehler ist aufgetreten.",
+            "state": "translated"
+          }
+        }
+      }
+    },
+    "Copy Message ID": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nachrichten-ID kopieren"
+          }
+        }
+      }
+    },
+    "Quick Switcher": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "%lld Result%@": {
+      "localizations": {
+        "en": {
+          "stringUnit": { "state": "new", "value": "%1$lld Result%2$@" }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": " %1$lld Ergebnis%2$@"
+          }
+        }
+      }
+    },
+    "Notifications View": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Sketchy shit": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Add Account": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "value": "Account hinzufügen", "state": "translated" }
+        }
+      }
+    },
+    "Copy Text": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "state": "translated", "value": "Text kopieren" }
+        }
+      }
+    },
+    "Notifications": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    " Unsupported message type %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": " Nicht unterstützer Nachrichtentyp %1$@\u0013",
+            "state": "translated"
+          }
+        }
+      }
+    },
+    "Donors get Discord server roles, and custom profile badges visible to other Paicord users!": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spender bekommen Rollen auf dem Discord Server und personalisierte Profil-Abzeichen, die für alle Paicord-Nutzer sichtbar sind!"
+          }
+        }
+      }
+    },
+    "Emojis": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "translated", "value": "Emojis" } }
+      }
+    },
+    "Copy User ID": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "state": "translated", "value": "Nutzer-ID kopieren" }
+        }
+      }
+    },
+    "Forgot your password?": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Welcome to the start of this channel": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Playgrounds": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    " and ": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "translated", "value": " und" } }
+      }
+    },
+    "Stickers": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Upload Files": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Authenticator App": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Authentifizierungs-App"
+          }
+        }
+      }
+    },
+    "Replying to %@": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Copy Message Link": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nachrichten-Link kopieren"
+          }
+        }
+      }
+    },
+    "Forward": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Mention": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Login requires MFA to continue.": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Sticker Picker Coming Soon!": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Toggle Member List": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Add Theme": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "state": "translated", "value": "Theme hinzufügen" }
+        }
+      }
+    },
+    "This MFA method is not currently supported.": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Logging in as %@": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "View Logs": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Delete Message": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "value": "Nachricht löschen", "state": "translated" }
+        }
+      }
+    },
+    "You are giving access to your Discord account to another device.": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Are you sure?": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bist du dir sicher?"
+          }
+        }
+      }
+    },
+    "Unimplemented": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "An action required MFA to continue.": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Select an account to continue or add a new one.": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Unsupported block: %@": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Account": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "Account", "state": "translated" } }
+      }
+    },
+    "Remote Authentication": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "(edited)": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "state": "translated", "value": " (bearbeitet)" }
+        }
+      }
+    },
+    "Something really bad has happened, gateway connections disabled.\nPlease report this.": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "We're so excited to see you again!": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Log In": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "GIFS": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Show FLEX": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "1": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "idk bro ur files cooked": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Yesterday at ": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Edit Message": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nachricht bearbeiten"
+          }
+        }
+      }
+    },
+    "Copy": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "translated", "value": "Kopieren" } }
+      }
+    },
+    "Unknown User": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Enter your backup code": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Check your phone!": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "Schau auf deinem Telefon!",
+            "state": "translated"
+          }
+        }
+      }
+    },
+    "Download IPA": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Multi-Factor Authentication": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Home": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Delete": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "Löschen", "state": "translated" } }
+      }
+    },
+    "Direct Messages": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "value": "Privatnachrichten", "state": "translated" }
+        }
+      }
+    },
+    "Error": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "translated", "value": "Fehler" } }
+      }
+    },
+    "Profile": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "wip bro go do totp": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "OK": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Copy Author ID": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "state": "translated", "value": "Author-ID kopieren" }
+        }
+      }
+    },
+    "A new version of Paicord is available! Head to [the releases page](https:\/\/github.com\/llsc12\/Paicord\/releases\/latest), or [the Discord server](https:\/\/discord.gg\/fqhPGHPyaK) to download the latest version.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "Eine neue Version von Paicord ist verfügbar! Gehe zur [Release Seite](https:\/\/github.com\/llsc12\/Paicord\/releases\/latest) oder [dem Discord Server](https:\/\/discord.gg\/fqhPGHPyaK), um die neueste Version herunterzuladen.",
+            "state": "translated"
+          }
+        }
+      }
+    },
+    "Create Thread": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "state": "translated", "value": "Thread erstellen" }
+        }
+      }
+    },
+    "ComponentsV2 unsupported": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "ComponentsV2 werden derzeit nicht unterstützt",
+            "state": "translated"
+          }
+        }
+      }
+    },
+    "Some files were not added": {
+      "localizations": {
+        "de": { "stringUnit": { "state": "notTranslated", "value": "" } }
+      }
+    },
+    "Reply": {
+      "localizations": {
+        "de": { "stringUnit": { "value": "", "state": "notTranslated" } }
+      }
+    },
+    "Enter the code sent to your phone": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "Gib den Code ein, der an dein Telefon gesendet wurde",
+            "state": "translated"
+          }
+        }
+      }
+    },
+    "Edit Profile": {
+      "localizations": {
+        "de": {
+          "stringUnit": { "state": "translated", "value": "Profil bearbeiten" }
+        }
+      }
+    }
+  },
+  "version": "1.1",
+  "sourceLanguage": "en"
+}
