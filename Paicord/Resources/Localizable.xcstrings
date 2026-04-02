@@ -158,9 +158,6 @@
     "Dismiss" : {
 
     },
-    "Display" : {
-
-    },
     "Donate" : {
 
     },
@@ -275,9 +272,6 @@
     "Mention" : {
 
     },
-    "Motion & Animation" : {
-
-    },
     "Multi-Factor Authentication" : {
 
     },
@@ -387,9 +381,6 @@
 
     },
     "Switch Account" : {
-
-    },
-    "System-level features like VoiceOver, switch control, and display accommodations can be configured in System Settings." : {
 
     },
     "This MFA method is not currently supported." : {
