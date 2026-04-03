@@ -17,7 +17,7 @@ struct SettingsView: SettingsContainer {
 
   @AppStorage("Paicord.Appearance.ChatMessagesAnimated") var chatMessagesAnimated: Bool = false
 
-var settingsBody: some SettingsContent {
+  var settingsBody: some SettingsContent {
   SettingsGroup("Paicord", .inline) {
     paicordSection
   }
@@ -47,4 +47,5 @@ var settingsBody: some SettingsContent {
   }
 
   debugSection
+  }
 }
