@@ -13,14 +13,6 @@ import SwiftUIX
 
 struct ChatView: View {
   @State var vm: ChannelStore
-extension SettingsView {
-  var chatSection: some SettingsContent {
-    SettingsGroup("Chat", systemImage: "message") {
-      ChatSettingsRows()
-      ChatSettingsView()
-    }
-  }
-}
   @Environment(\.appState) var appState
   @Environment(\.accessibilityReduceMotion) var accessibilityReduceMotion
   @Environment(\.userInterfaceIdiom) var idiom
@@ -335,4 +327,12 @@ extension Notification.Name {
   static let chatViewShouldScrollToID = Notification.Name(
     "chatViewShouldScrollToID"
   )
+}
+extension SettingsView {
+  var chatSection: some SettingsContent {
+    SettingsGroup("Chat", systemImage: "message") {
+      ChatSettingsRows()
+      ChatSettingsView()
+    }
+  }
 }
