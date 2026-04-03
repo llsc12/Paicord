@@ -13,7 +13,6 @@ extension SettingsView {
   var chatSection: some SettingsContent {
     SettingsGroup("Chat", systemImage: "message") {
       ChatSettingsRows()
-=======
       ChatSettingsView()
     }
   }
