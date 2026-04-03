@@ -328,11 +328,3 @@ extension Notification.Name {
     "chatViewShouldScrollToID"
   )
 }
-extension SettingsView {
-  var chatSection: some View { 
-    SettingsGroup("Chat", systemImage: "message") {
-      ChatSettingsRows()
-      ChatSettingsView()
-    }
-  }
-}
