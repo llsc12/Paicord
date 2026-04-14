@@ -208,6 +208,10 @@ public enum SuperProperties {
     "138.0.7204.251"
   }
 
+  public static func chromeMajorVer() -> String {
+    chromeVer().split(separator: ".").first.map(String.init) ?? "138"
+  }
+
   public static func webkitVer() -> String {
     "537.36"
   }
@@ -327,20 +331,20 @@ public enum SuperProperties {
   public static func client_version() -> String {
     switch Gateway.Identify.ConnectionProperties.__defaultOS {
     case "iOS", "watchOS":
-      return "318.0"
+      return "323.0"
     case "Mac OS X":
-      return "0.0.379"
+      return "0.0.384"
     default:
-      return "0.0.379"
+      return "0.0.384"
     }
   }
 
   public static func client_build_number() -> Int? {
     switch Gateway.Identify.ConnectionProperties.__defaultOS {
     case "iOS", "watchOS":
-      return 94578
+      return 98117
     case "Mac OS X":
-      return 507104
+      return 526941
     default:
       return nil
     }
