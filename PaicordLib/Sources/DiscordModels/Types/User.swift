@@ -481,7 +481,7 @@ extension DiscordUser {
     }
 
     public var id: String
-    public var name: String
+    public var name: String?
     public var type: Service
     public var revoked: Bool?
     public var integrations: [PartialIntegration]?
@@ -495,7 +495,7 @@ extension DiscordUser {
   /// https://docs.discord.food/resources/connected-accounts#partial-connection-structure
   public struct PartialConnection: Sendable, Codable, Equatable, Hashable {
     public var id: String
-    public var name: String
+    public var name: String?
     public var type: Connection.Service
     public var verified: Bool
   }

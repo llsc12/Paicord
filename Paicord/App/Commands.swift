@@ -54,7 +54,7 @@ struct PaicordCommands: Commands {
         }
       }
       .disabled(
-        gatewayStore.accounts.currentAccountID != nil 
+        gatewayStore.accounts.currentAccountID == nil 
       )
     }
     // add reload button to the system's View menu
