@@ -19,15 +19,41 @@ import SwiftUIX
 
 extension MessageCell {
   struct AttachmentsView: View {
+    @Environment(\.appState) var appState
 
+    var message: DiscordChannel.PartialMessage
     var previewableAttachments: [DiscordChannel.Message.Attachment] = []
     var audioAttachments: [DiscordChannel.Message.Attachment] = []
     var fileAttachments: [DiscordChannel.Message.Attachment] = []
 
-    init(attachments: [DiscordChannel.Message.Attachment]) {
+    init(
+      message: DiscordChannel.PartialMessage,
+      attachments: [DiscordChannel.Message.Attachment]
+    ) {
+      self.message = message
       for att in attachments {
         if let type = UTType(mimeType: att.content_type ?? ""),
-          AttachmentGridItemPreview.supportedTypes.contains(type)
+          AttachmentItemPreview.supportedTypes.contains(type)
+        {
+          previewableAttachments.append(att)
+        } else if let type = UTType(mimeType: att.content_type ?? ""),
+          AttachmentAudioPlayer.supportedTypes.contains(type)
+        {
+          audioAttachments.append(att)
+        } else {
+          fileAttachments.append(att)
+        }
+      }
+    }
+
+    init(
+      message: DiscordChannel.Message,
+      attachments: [DiscordChannel.Message.Attachment]
+    ) {
+      self.message = message.toPartialMessage()
+      for att in attachments {
+        if let type = UTType(mimeType: att.content_type ?? ""),
+          AttachmentItemPreview.supportedTypes.contains(type)
         {
           previewableAttachments.append(att)
         } else if let type = UTType(mimeType: att.content_type ?? ""),
@@ -78,17 +104,27 @@ extension MessageCell {
 
     @ViewBuilder
     var mosaic: some View {
+      #warning("Do this soon")
       list
     }
 
     @ViewBuilder
     var list: some View {
-      ForEach(previewableAttachments) { attachment in
-        AttachmentSizedView(attachment: attachment) {
-          AttachmentGridItemPreview(
-            attachment: attachment
-          )
+      ForEach(previewableAttachments.indices, id: \.self) { i in
+        let attachment = previewableAttachments[i]
+        Button {
+          appState.attachmentViewerIndex = i
+          appState.attachmentViewerAttachments = previewableAttachments
+          appState.attachmentViewerContextMessage = message
+          appState.showingAttachmentViewer = true
+        } label: {
+          AttachmentSizedView(attachment: attachment) {
+            AttachmentItemPreview(
+              attachment: attachment
+            )
+          }
         }
+        .buttonStyle(.plain)
         .debugRender()
         .debugCompute()
       }
@@ -107,20 +143,30 @@ extension MessageCell {
         self.content = content()
       }
 
-      private let maxWidth: CGFloat = 500
-      private let maxHeight: CGFloat = 300
+      private let maxWidth = 500
+      private let maxHeight = 300
+
+      var width: CGFloat {
+        .init(min(maxWidth, attachment.width ?? maxWidth))
+      }
+      var height: CGFloat {
+        .init(min(maxHeight, attachment.height ?? maxHeight))
+      }
 
       var body: some View {
-        content
+        Color.almostClear
           .aspectRatio(attachment.aspectRatio, contentMode: .fit)
-          .clipShape(.rounded)
-          .frame(maxWidth: maxWidth, maxHeight: maxHeight, alignment: .leading)
-          .fixedSize(horizontal: false, vertical: true)
+          .frame(maxWidth: width, maxHeight: height, alignment: .leading)
+          .overlay(alignment: .topLeading) {
+            content
+              .clipShape(.rounded)
+              .scaledToFit()
+          }
       }
     }
 
     /// Handles images, videos
-    struct AttachmentGridItemPreview: View {
+    struct AttachmentItemPreview: View {
       static let supportedTypes: [UTType] = [
         .png,
         .jpeg,
@@ -132,22 +178,48 @@ extension MessageCell {
 
       var attachment: DiscordMedia
 
+      var displayPoster = false
+      func displayMode(asPoster: Bool) -> some View {
+        var copy = self
+        copy.displayPoster = asPoster
+        return copy
+      }
+
       var body: some View {
         switch attachment.type {
         case .png, .jpeg, .jpeg, .webP, .gif:
           ImageView(attachment: attachment)
         case .mpeg4Movie, .quickTimeMovie:
-          VideoView(attachment: attachment)
+          if displayPoster {
+            ImageView(attachment: attachment, needsPoster: true)
+          } else {
+            VideoView(attachment: attachment)
+          }
         default:
-          Text("\(attachment.type) unsupported")
+          // unknown type. sadly discord can sometimes not provide content type.
+          // fields like thumbnail may not always send content type field.
+          ImageView(attachment: attachment, needsPoster: true)
         }
       }
 
       // preview for image
       struct ImageView: View {
         var attachment: DiscordMedia
+        var needsPoster: Bool = false
         var body: some View {
-          AnimatedImage(url: URL(string: attachment.proxyurl)) {
+          let url: URL? = {
+            if needsPoster {
+              var components = URLComponents(string: attachment.proxyurl)!
+              components.queryItems =
+                (components.queryItems ?? []) + [
+                  URLQueryItem(name: "format", value: "png")
+                ]
+              return components.url
+            } else {
+              return URL(string: attachment.proxyurl)
+            }
+          }()
+          AnimatedImage(url: url) {
             if let placeholder = attachment.placeholder,
               let data = Data(base64Encoded: placeholder)
             {
@@ -155,12 +227,18 @@ extension MessageCell {
               #if os(macOS)
                 Image(nsImage: img)
                   .resizable()
+                  .aspectRatio(attachment.aspectRatio, contentMode: .fit)
+                  .scaledToFill()
               #else
                 Image(uiImage: img)
                   .resizable()
+                  .aspectRatio(attachment.aspectRatio, contentMode: .fit)
+                  .scaledToFill()
               #endif
             } else {
               Color.gray.opacity(0.2)
+                .aspectRatio(attachment.aspectRatio, contentMode: .fit)
+                .scaledToFill()
             }
 
           }
@@ -234,7 +312,6 @@ extension MessageCell {
             VideoPlayer(player: player)
           }
         }
-
       }
     }
 
@@ -404,7 +481,8 @@ extension MessageCell {
           // set up session delegate to track progress
           final class SessionDelegate: NSObject, URLSessionDownloadDelegate {
             let proxy: DownloadProxyType
-            nonisolated(unsafe) var continuation: CheckedContinuation<String, Error>?
+            nonisolated(unsafe) var continuation:
+              CheckedContinuation<String, Error>?
 
             func urlSession(
               _ session: URLSession,
@@ -675,7 +753,8 @@ extension MessageCell {
           DownloadButton { proxy in
             final class SessionDelegate: NSObject, URLSessionDownloadDelegate {
               let proxy: DownloadButton<URL>.DownloadProxy
-              nonisolated(unsafe) var continuation: CheckedContinuation<URL, Error>?
+              nonisolated(unsafe) var continuation:
+                CheckedContinuation<URL, Error>?
               let destinationURL: URL
 
               func urlSession(
@@ -684,7 +763,8 @@ extension MessageCell {
                 didFinishDownloadingTo location: URL
               ) {
                 do {
-                  if FileManager.default.fileExists(atPath: destinationURL.path) {
+                  if FileManager.default.fileExists(atPath: destinationURL.path)
+                  {
                     try FileManager.default.removeItem(at: destinationURL)
                   }
                   try FileManager.default.moveItem(
@@ -828,11 +908,148 @@ extension MessageCell {
         }
       #endif
     }
+
+    struct GifvView: View {
+      @State private var controller: PlayerController
+      private let media: Embed.Media
+      private let staticMedia: Embed.Media?
+
+      private let maxWidth: CGFloat = 500
+      private let maxHeight: CGFloat = 300
+
+      init(media: Embed.Media, staticMedia: Embed.Media? = nil) {
+        self.media = media
+        self.staticMedia = staticMedia
+        _controller = State(initialValue: PlayerController(media: media))
+      }
+
+      var body: some View {
+        AVPlayerLayerContainer(player: controller.player)
+          .aspectRatio(media.aspectRatio, contentMode: .fit)
+          .clipShape(.rounded)
+          .frame(maxWidth: maxWidth, maxHeight: maxHeight, alignment: .leading)
+          .onAppear { controller.play() }
+          .onDisappear { controller.pauseAndReset() }
+      }
+
+      @Observable
+      final class PlayerController {
+        let player: AVPlayer
+        private var observerToken: Any?
+
+        init(media: Embed.Media) {
+          guard let url = URL(string: media.proxyurl)
+          else {
+            self.player = AVPlayer()
+            return
+          }
+          let item = AVPlayerItem(asset: AVAsset(url: url))
+          self.player = AVPlayer(playerItem: item)
+
+          observerToken = NotificationCenter.default.addObserver(
+            forName: .AVPlayerItemDidPlayToEndTime,
+            object: item,
+            queue: .main
+          ) { [weak self] _ in
+            self?.player.seek(to: .zero)
+            self?.player.play()
+          }
+        }
+
+        deinit {
+          if let o = observerToken {
+            NotificationCenter.default.removeObserver(o)
+          }
+          player.pause()
+        }
+
+        func play() { player.play() }
+        func pauseAndReset() {
+          player.seek(to: .zero)
+          player.pause()
+        }
+      }
+
+      struct AVPlayerLayerContainer: AppKitOrUIKitViewRepresentable {
+        var player: AVPlayer
+
+        typealias AppKitOrUIKitViewType = AppKitOrUIKitView
+
+        func makeAppKitOrUIKitView(context: Context) -> AppKitOrUIKitView {
+          #if os(iOS)
+            let view = PlayerView_iOS()
+            view.player = player
+            return view
+          #elseif os(macOS)
+            let view = PlayerView_macOS()
+            view.player = player
+            return view
+          #endif
+        }
+
+        func updateAppKitOrUIKitView(
+          _ view: AppKitOrUIKitViewType,
+          context: Context
+        ) {
+          #if os(iOS)
+            (view as? PlayerView_iOS)?.player = player
+          #elseif os(macOS)
+            (view as? PlayerView_macOS)?.player = player
+          #endif
+        }
+
+        #if os(iOS)
+          class PlayerView_iOS: AppKitOrUIKitView {
+            override class var layerClass: AnyClass { AVPlayerLayer.self }
+            var player: AVPlayer? {
+              get { (layer as? AVPlayerLayer)?.player }
+              set { (layer as? AVPlayerLayer)?.player = newValue }
+            }
+          }
+        #elseif os(macOS)
+          class PlayerView_macOS: AppKitOrUIKitView {
+            override init(frame frameRect: CGRect) {
+              super.init(frame: frameRect)
+              wantsLayer = true
+            }
+            required init?(coder: NSCoder) {
+              super.init(coder: coder)
+              wantsLayer = true
+            }
+
+            var player: AVPlayer? {
+              didSet { updatePlayerLayer() }
+            }
+
+            private var playerLayer: AVPlayerLayer?
+
+            override func layout() {
+              super.layout()
+              playerLayer?.frame = bounds
+            }
+
+            private func updatePlayerLayer() {
+              playerLayer?.removeFromSuperlayer()
+              guard let player = player else {
+                playerLayer = nil
+                return
+              }
+              let pl = AVPlayerLayer(player: player)
+              pl.frame = bounds
+              pl.videoGravity = .resizeAspect
+              layer?.addSublayer(pl)
+              playerLayer = pl
+            }
+          }
+        #endif
+      }
+    }
+
   }
 }
 
 #Preview {
-  MessageCell.AttachmentsView(attachments: [
+  let attachments: [DiscordChannel.Message.Attachment] = [
     .init(
       id: try! .makeFake(),
       filename: "meow.zip",
@@ -860,26 +1077,25 @@ extension MessageCell {
       waveform: nil,
       flags: nil
     ),
-  ])
+  ]
+  MessageCell.AttachmentsView(
+    message: .init(
+      id: try! .makeFake(),
+      channel_id: try! .makeFake(),
+      content: "gm",
+      timestamp: .init(date: .now),
+      tts: false,
+      mention_everyone: false,
+      mentions: [],
+      mention_roles: [],
+      attachments: attachments,
+      embeds: [],
+      pinned: false,
+      type: .default
+    ),
+    attachments: attachments
+  )
   .padding()
-}
-
-extension DiscordMedia {
-  var type: UTType {
-    if let mimeType = content_type, let type = UTType(mimeType: mimeType) {
-      return type
-    } else {
-      return .data
-    }
-  }
-
-  var aspectRatio: CGFloat? {
-    if let width = self.width, let height = self.height {
-      return width.toCGFloat / height.toCGFloat
-    } else {
-      return nil
-    }
-  }
 }
 
 #if os(iOS)
@@ -920,8 +1136,24 @@ extension DiscordMedia {
     flags: nil
   )
 
-  MessageCell.AttachmentsView(attachments: [data])
-    .padding()
+  MessageCell.AttachmentsView(
+    message: .init(
+      id: try! .makeFake(),
+      channel_id: try! .makeFake(),
+      content: "gm",
+      timestamp: .init(date: .now),
+      tts: false,
+      mention_everyone: false,
+      mentions: [],
+      mention_roles: [],
+      attachments: [data],
+      embeds: [],
+      pinned: false,
+      type: .default
+    ),
+    attachments: [data]
+  )
+  .padding()
 }
 
 extension SFSpeechRecognizer {

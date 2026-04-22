@@ -118,6 +118,7 @@ struct ChatView: View {
             name: .chatViewShouldScrollToBottom,
             object: ["channelId": vm.channelId, "immediate": true]
           )
+          InputBar.inputVMs[vm.channelId]?.uploadItems = []
           return .handled
         }
         .introspect(.scrollView, on: .macOS(.v14...)) { scrollView in
@@ -204,7 +205,6 @@ struct ChatView: View {
     .scrollDismissesKeyboard(.interactively)
     .background(theme.common.secondaryBackground)
     .ignoresSafeArea(.keyboard, edges: .all)
-
     #if os(macOS)
       .onDisappear {
         if let observer = scrollObserver {

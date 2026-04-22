@@ -8,6 +8,7 @@
 
 import PaicordLib
 import SwiftProtobuf
+import UniformTypeIdentifiers
 
 extension DiscordProtos_DiscordUsers_V1_PreloadedUserSettings.GuildFolder:
   @retroactive Identifiable
@@ -59,6 +60,25 @@ extension DiscordChannel.Message.Attachment: DiscordMedia {
     self.proxy_url
   }
 }
+
+extension DiscordMedia {
+  var type: UTType {
+    if let mimeType = content_type, let type = UTType(mimeType: mimeType) {
+      return type
+    } else {
+      return .data
+    }
+  }
+
+  var aspectRatio: CGFloat? {
+    if let width = self.width, let height = self.height {
+      return width.toCGFloat / height.toCGFloat
+    } else {
+      return nil
+    }
+  }
+}
+
 
 extension Payloads.CreateMessage: @retroactive Identifiable {
   public var id: MessageSnowflake {
