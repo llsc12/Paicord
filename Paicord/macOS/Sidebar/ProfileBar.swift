@@ -20,6 +20,9 @@ struct ProfileBar: View {
   @State var showingUsername = false
   @State var showingPopover = false
   @State var barHovered = false
+#if os(iOS)
+  @State var settingsSheetPresented = false
+#endif
 
   var body: some View {
     HStack {
@@ -80,22 +83,26 @@ struct ProfileBar: View {
       }
 
       Spacer()
-
-      #if os(macOS)
-        Button {
-          openWindow(id: "settings")
-        } label: {
-          Image(systemName: "gearshape.fill")
-            .font(.title2)
-            .padding(5)
-            .background(.ultraThinMaterial)
-            .clipShape(.circle)
-        }
-        .buttonStyle(.borderless)
-      #elseif os(iOS)
-        /// targetting ipad here, ios wouldnt have this at all
-        // do something
-      #endif
+      
+      Button {
+#if os(macOS)
+        openWindow(id: "settings")
+#elseif os(iOS)
+        settingsSheetPresented = true
+#endif
+      } label: {
+        Image(systemName: "gearshape.fill")
+          .font(.title2)
+          .padding(5)
+          .background(.ultraThinMaterial)
+          .clipShape(.circle)
+      }
+      .buttonStyle(.borderless)
+#if os(iOS)
+      .sheet(isPresented: $settingsSheetPresented) {
+        SettingsView()
+      }
+#endif
     }
     .padding(8)
     .background {
