@@ -79,6 +79,11 @@ struct ProfilePopoutView: View {
       .overlay(.ultraThinMaterial)
     )
     .ignoresSafeArea(.container, edges: .bottom)
+    .overlay(alignment: .top) {
+      if (profile?.private == true) {
+        ProfileBannerView()
+      }
+    }
     .environment(\.colorScheme, colorScheme ?? systemColorScheme)
     #if os(iOS)
       .presentationBackground(.ultraThinMaterial)
