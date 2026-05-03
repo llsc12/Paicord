@@ -75,15 +75,14 @@ struct ProfileBar: View {
           .background(.black.opacity(0.001))
           .onHover { showingUsername = $0 }
           .animation(.spring(), value: showingUsername)
-        }
+          .frame(maxWidth: .infinity, alignment: .leading)
+        }.contentShape(.rect)
       }
       .buttonStyle(.plain)
       .popover(isPresented: $showingPopover) {
         ProfileButtonPopout()
       }
 
-      Spacer()
-      
       Button {
 #if os(macOS)
         openWindow(id: "settings")
