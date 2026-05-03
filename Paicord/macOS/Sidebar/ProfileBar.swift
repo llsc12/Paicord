@@ -20,9 +20,6 @@ struct ProfileBar: View {
   @State var showingUsername = false
   @State var showingPopover = false
   @State var barHovered = false
-#if os(iOS)
-  @State var settingsSheetPresented = false
-#endif
 
   var body: some View {
     HStack {
@@ -87,7 +84,10 @@ struct ProfileBar: View {
 #if os(macOS)
         openWindow(id: "settings")
 #elseif os(iOS)
-        settingsSheetPresented = true
+        NotificationCenter.default.post(
+          name: .presentSettingsSheet,
+          object: nil
+        )
 #endif
       } label: {
         Image(systemName: "gearshape.fill")
@@ -97,11 +97,6 @@ struct ProfileBar: View {
           .clipShape(.circle)
       }
       .buttonStyle(.borderless)
-#if os(iOS)
-      .sheet(isPresented: $settingsSheetPresented) {
-        SettingsView()
-      }
-#endif
     }
     .padding(8)
     .background {
