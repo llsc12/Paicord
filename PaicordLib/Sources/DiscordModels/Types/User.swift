@@ -195,7 +195,7 @@ public struct DiscordUser: Sendable, Codable, Equatable, Hashable {
     public var premium_type: PremiumKind?
     public var premium_since: DiscordTimestamp?
     public var premium_guild_since: DiscordTimestamp?
-    public var `private`: Bool
+    public var `private`: Bool?
 
     public init(
       application: ProfileApplication? = nil,
@@ -214,7 +214,7 @@ public struct DiscordUser: Sendable, Codable, Equatable, Hashable {
       premium_type: PremiumKind? = nil,
       premium_since: DiscordTimestamp? = nil,
       premium_guild_since: DiscordTimestamp? = nil,
-      private: Bool = false
+      private: Bool? = nil
     ) {
       self.application = application
       self.user = user
