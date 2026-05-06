@@ -10,14 +10,14 @@ import SwiftUI
 
 struct AsyncButton<Label>: View where Label: View {
   let action: @MainActor () async throws -> Void
-  let `catch`: (Error) -> Void
+  let `catch`: (any Error) -> Void
   let label: () -> Label
 
   @State var task: Task<Void, Never>? = nil
 
   init(
     action: @escaping @MainActor @Sendable () async throws -> Void,
-    `catch`: @escaping (Error) -> Void,
+    `catch`: @escaping (any Error) -> Void,
     @ViewBuilder label: @escaping () -> Label
   ) {
     self.action = action
@@ -49,7 +49,7 @@ extension AsyncButton where Label == Text {
   init(
     _ titleKey: LocalizedStringKey,
     action: @escaping @MainActor @Sendable () async throws -> Void,
-    `catch`: @escaping (Error) -> Void
+    `catch`: @escaping (any Error) -> Void
   ) {
     self.init(action: action, catch: `catch`) {
       Text(titleKey)
@@ -59,7 +59,7 @@ extension AsyncButton where Label == Text {
   init<S>(
     _ title: S,
     action: @escaping @MainActor @Sendable () async throws -> Void,
-    `catch`: @escaping (Error) -> Void
+    `catch`: @escaping (any Error) -> Void
   )
   where S: StringProtocol {
     self.init(action: action, catch: `catch`) {

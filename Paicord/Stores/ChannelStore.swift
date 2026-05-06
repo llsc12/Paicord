@@ -48,7 +48,7 @@ class ChannelStore: DiscordDataStore {
   var hasMoreHistory = true
 
   /// The task that is currently loading messages, if any.
-  var loadingMessagesTask: Task<Void, Error>?
+  var loadingMessagesTask: Task<Void, any Error>?
 
   /// Whether the latest messages are in memory. If we're scrolling far back into history, this will be false.
   /// Scrolling back to the latest messages will require a fetch, setting this to true and unloading older messages.

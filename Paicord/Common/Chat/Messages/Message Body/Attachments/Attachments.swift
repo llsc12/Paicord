@@ -96,11 +96,11 @@ extension MessageCell {
 
     /// Designed to ensure attachments have a deterministic size, not using maxWidth/maxHeight
     struct AttachmentSizedView<Content: View>: View {
-      let attachment: DiscordMedia
+      let attachment: any DiscordMedia
       let content: Content
 
       init(
-        attachment: DiscordMedia,
+        attachment: any DiscordMedia,
         @ViewBuilder content: () -> Content
       ) {
         self.attachment = attachment
@@ -130,7 +130,7 @@ extension MessageCell {
         .quickTimeMovie,
       ]
 
-      var attachment: DiscordMedia
+      var attachment: any DiscordMedia
 
       var body: some View {
         switch attachment.type {
@@ -145,7 +145,7 @@ extension MessageCell {
 
       // preview for image
       struct ImageView: View {
-        var attachment: DiscordMedia
+        var attachment: any DiscordMedia
         var body: some View {
           AnimatedImage(url: URL(string: attachment.proxyurl)) {
             if let placeholder = attachment.placeholder,
@@ -169,7 +169,7 @@ extension MessageCell {
       }
 
       struct VideoView: View {
-        var attachment: DiscordMedia
+        var attachment: any DiscordMedia
         @State var wantsPlayback: Bool = false
 
         var poster: URL {
@@ -217,10 +217,10 @@ extension MessageCell {
         }
 
         struct VideoPlayerView: View {
-          var attachment: DiscordMedia
+          var attachment: any DiscordMedia
           var player: AVPlayer
 
-          init(attachment: DiscordMedia) {
+          init(attachment: any DiscordMedia) {
             self.attachment = attachment
             self.player = AVPlayer(
               url: URL(string: attachment.proxyurl)!
@@ -404,7 +404,7 @@ extension MessageCell {
           // set up session delegate to track progress
           final class SessionDelegate: NSObject, URLSessionDownloadDelegate {
             let proxy: DownloadProxyType
-            nonisolated(unsafe) var continuation: CheckedContinuation<String, Error>?
+            nonisolated(unsafe) var continuation: CheckedContinuation<String, any Error>?
 
             func urlSession(
               _ session: URLSession,
@@ -431,7 +431,7 @@ extension MessageCell {
             func urlSession(
               _ session: URLSession,
               task: URLSessionTask,
-              didCompleteWithError error: Error?
+              didCompleteWithError error: (any Error)?
             ) {
               DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                 if let error {
@@ -675,7 +675,7 @@ extension MessageCell {
           DownloadButton { proxy in
             final class SessionDelegate: NSObject, URLSessionDownloadDelegate {
               let proxy: DownloadButton<URL>.DownloadProxy
-              nonisolated(unsafe) var continuation: CheckedContinuation<URL, Error>?
+              nonisolated(unsafe) var continuation: CheckedContinuation<URL, any Error>?
               let destinationURL: URL
 
               func urlSession(
@@ -714,7 +714,7 @@ extension MessageCell {
               func urlSession(
                 _ session: URLSession,
                 task: URLSessionTask,
-                didCompleteWithError error: Error?
+                didCompleteWithError error: (any Error)?
               ) {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                   if let error {

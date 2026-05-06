@@ -19,7 +19,7 @@ final class GatewayStore {
   @ObservationIgnored private(set) var gateway: UserGatewayManager?
 
   @ObservationIgnored
-  var client: DiscordClient {
+  var client: any DiscordClient {
     gateway?.client ?? unauthenticatedClient
   }
 

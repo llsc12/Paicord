@@ -13,7 +13,7 @@ struct DownloadButton<T: Sendable>: View {
     case inactive  // not pressed
     case pending  // pressed, waiting to start
     case downloading(progress: Progress)  // in progress
-    case error(Error)  // failed
+    case error(any Error)  // failed
     case completed  // finished
 
     static func == (lhs: DownloadState, rhs: DownloadState) -> Bool {

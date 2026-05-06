@@ -48,7 +48,7 @@ struct PaicordSheetsAlerts: ViewModifier {
   }
 
   @ViewBuilder
-  private func errorTextView(error: Error?) -> some View {
+  private func errorTextView(error: (any Error)?) -> some View {
     if let error = error as? DiscordHTTPErrorResponse {
       Text(error.description)
     } else if let error = error as? DiscordHTTPError {

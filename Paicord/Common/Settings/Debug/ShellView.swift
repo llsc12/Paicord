@@ -144,7 +144,7 @@ private struct BottomPositionPreferenceKey: PreferenceKey {
 
 final class ShellViewModel: ObservableObject {
   @Published var logs: [StdOutInterceptor.LogItem] = []
-  private var observation: NSObjectProtocol?
+  private var observation: (any NSObjectProtocol)?
 
   init() {
     // Load initial logs once

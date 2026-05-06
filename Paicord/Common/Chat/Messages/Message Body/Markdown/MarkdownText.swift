@@ -477,7 +477,7 @@ class MarkdownRendererVM {
   }
 
   // Create a BlockElement from an ASTNode if it is a block-level node.
-  private func makeBlock(from node: ASTNode) -> BlockElement? {
+  private func makeBlock(from node: any ASTNode) -> BlockElement? {
     let baseIDSeed = sourceID(for: node)
     switch node.nodeType {
     case .paragraph:
@@ -681,7 +681,7 @@ class MarkdownRendererVM {
     return h.finalize()
   }
 
-  private func sourceID(for node: ASTNode) -> Int {
+  private func sourceID(for node: any ASTNode) -> Int {
     var h = Hasher()
     h.combine(node.nodeType)
     h.combine(node.sourceLocation)
@@ -689,7 +689,7 @@ class MarkdownRendererVM {
   }
 
   private func renderInlinesToNSAttributedString(
-    nodes: [ASTNode],
+    nodes: [any ASTNode],
     headingLevel: Int? = nil,
     baseStyle: BaseInlineStyle = .body
   ) -> NSAttributedString {
@@ -718,7 +718,7 @@ class MarkdownRendererVM {
   }
 
   private func append(
-    node: ASTNode,
+    node: any ASTNode,
     to container: NSMutableAttributedString,
     baseAttributes: [NSAttributedString.Key: Any]
   ) {
@@ -1610,7 +1610,7 @@ final class EmojiAttachmentViewProvider: NSTextAttachmentViewProvider {
     textAttachment: NSTextAttachment,
     parentView: AppKitOrUIKitView?,
     textLayoutManager: NSTextLayoutManager?,
-    location: NSTextLocation
+    location: any NSTextLocation
   ) {
     super.init(
       textAttachment: textAttachment,

@@ -29,7 +29,7 @@ extension SettingsView {
 struct ThemingSection: View {
   let theming = Theming.shared
   @State private var showingImportTheme = false
-  @State private var importError: Error?
+  @State private var importError: (any Error)?
   var body: some View {
     Section("Installed Themes") {
       ForEach(theming.themes) { theme in

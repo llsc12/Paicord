@@ -1,0 +1,17 @@
+format_version = 2
+
+[apps.Paicord]
+identifier = "com.llsc12.Paicord"
+product = "Paicord"
+version = "0.1.0"
+icon = "AppIcon.png"
+
+[apps.Paicord.plist]
+UIFileSharingEnabled = true
+UISupportsDocumentBrowser = true
+LSSupportsOpeningDocumentsInPlace = true
+SUEnableAutomaticChecks = true
+SUFeedURL = "https://raw.githubusercontent.com/llsc12/Paicord/refs/heads/updates/feeds/appcast.xml"
+SUPublicEDKey = "jm4wGX1iAP7kwHkRWm82RYspd2WIXp+g4lISBqE73W0="
+SUScheduledCheckInterval = 43200
+UIDesignRequiresCompatibility = true
