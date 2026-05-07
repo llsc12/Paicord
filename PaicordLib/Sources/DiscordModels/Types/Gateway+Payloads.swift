@@ -419,7 +419,7 @@ extension Gateway {
   /// https://docs.discord.food/topics/gateway-events#update-time-spent-session-id
   public struct UpdateTimeSpentSessionID: Sendable, Codable {
     // Unix timestamp (in milliseconds) of when the session ID was generated
-    public var initialization_timestamp: Int = Int(
+    public var initialization_timestamp: Int64 = Int64(
       SuperProperties._initialisation_date.timeIntervalSince1970 * 1000
     )
     // A client-generated UUID, same as client_heartbeat_session_id in client properties
@@ -1257,10 +1257,10 @@ extension Gateway {
 
     /// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-timestamps
     public struct Timestamps: Sendable, Codable, Equatable, Hashable {
-      public var start: Int?
-      public var end: Int?
+      public var start: DiscordTimestamp?
+      public var end: DiscordTimestamp?
 
-      public init(start: Int? = nil, end: Int? = nil) {
+      public init(start: DiscordTimestamp? = nil, end: DiscordTimestamp? = nil) {
         self.start = start
         self.end = end
       }
@@ -1379,7 +1379,7 @@ extension Gateway {
     public var name: String?
     public var type: Kind?
     public var url: String?
-    public var created_at: Int?
+    public var created_at: DiscordTimestamp?
     public var timestamps: Timestamps?
     public var application_id: ApplicationSnowflake?
     public var details: String?
@@ -1398,7 +1398,7 @@ extension Gateway {
       self.type = try container.decodeIfPresent(Kind.self, forKey: .type)
       self.url = try container.decodeIfPresent(String.self, forKey: .url)
       self.created_at = try container.decodeIfPresent(
-        Int.self,
+        DiscordTimestamp.self,
         forKey: .created_at
       )
       self.timestamps = try container.decodeIfPresent(

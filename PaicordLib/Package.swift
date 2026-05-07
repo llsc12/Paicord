@@ -46,7 +46,8 @@ let package = Package(
     ),
   ],
   traits: [
-    "Non64BitSystemsCompatibility"
+    .trait(name: "Non64BitSystemsCompatibility"),
+    .default(enabledTraits: ["Non64BitSystemsCompatibility"])
   ],
   dependencies: [
     .package(url: "https://github.com/apple/swift-nio.git", from: "2.49.0"),

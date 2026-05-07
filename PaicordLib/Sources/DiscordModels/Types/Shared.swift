@@ -340,12 +340,12 @@ public struct DiscordTimestamp: Codable, Hashable {
         )
       }
       self.date = date
-    } else if let int = try? container.decode(Int.self) {
+    } else if let int = try? container.decode(Int64.self) {
       self.date = Date(timeIntervalSince1970: TimeInterval(int))
     } else {
       throw DecodingError.unexpectedFormat(
         container.codingPath,
-        "Non String/Int value"
+        "Non String/Int64 value"
       )
     }
   }
