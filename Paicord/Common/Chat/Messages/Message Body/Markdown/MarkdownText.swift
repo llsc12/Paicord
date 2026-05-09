@@ -219,13 +219,10 @@ struct MarkdownText: View, Equatable {
         if let children = block.children {
           VStack(alignment: .leading, spacing: 4) {
             ForEach(children) { child in
-              HStack(alignment: .top, spacing: 8) {
-                Text(verbatim: "•").font(.body)
-                BlockView(block: child)
-                  .equatable()
-              }
+              BlockView(block: child)
+                .equatable()
             }
-          }
+          }.padding(.leading, CGFloat(block.level ?? 0) * AppKitOrUIKitFont.labelFontSize * 2)
         }
 
       case .listItem:
@@ -233,10 +230,17 @@ struct MarkdownText: View, Equatable {
           let converted = AttributedString(attr)
           Text(converted)
         } else if let children = block.children {
+          let level = block.level ?? 0
+          let ordered = block.isOrdered ?? false
+          let number = block.itemNumber ?? 1
+          
           VStack(alignment: .leading, spacing: 4) {
             ForEach(children) { nested in
-              BlockView(block: nested)
-                .equatable()
+              HStack(alignment: .top, spacing: 8) {
+                Text(verbatim: ordered ? "\(number)." : level > 0 ? "◦" : "•").font(.body)
+                BlockView(block: nested)
+                  .equatable()
+              }
             }
           }
         } else {
@@ -330,6 +334,7 @@ private struct BlockElement: Identifiable, Equatable, Hashable {
   let attributedContent: NSAttributedString?
   let isOrdered: Bool?
   let startingNumber: Int?
+  let itemNumber: Int?
   let codeContent: String?
   let language: String?
   let level: Int?
@@ -491,6 +496,7 @@ class MarkdownRendererVM {
         attributedContent: attributed,
         isOrdered: nil,
         startingNumber: nil,
+        itemNumber: nil,
         codeContent: nil,
         language: nil,
         level: nil,
@@ -511,6 +517,7 @@ class MarkdownRendererVM {
           attributedContent: attributed,
           isOrdered: nil,
           startingNumber: nil,
+          itemNumber: nil,
           codeContent: nil,
           language: nil,
           level: heading.level,
@@ -531,6 +538,7 @@ class MarkdownRendererVM {
         attributedContent: attributed,
         isOrdered: nil,
         startingNumber: nil,
+        itemNumber: nil,
         codeContent: nil,
         language: nil,
         level: nil,
@@ -546,6 +554,7 @@ class MarkdownRendererVM {
           attributedContent: nil,
           isOrdered: nil,
           startingNumber: nil,
+          itemNumber: nil,
           codeContent: code.content,
           language: code.language,
           level: nil,
@@ -568,6 +577,7 @@ class MarkdownRendererVM {
         attributedContent: nil,
         isOrdered: nil,
         startingNumber: nil,
+        itemNumber: nil,
         codeContent: nil,
         language: nil,
         level: nil,
@@ -593,15 +603,20 @@ class MarkdownRendererVM {
               ),
               nodeType: .listItem,
               attributedContent: nil,
-              isOrdered: nil,
-              startingNumber: nil,
+              isOrdered: list.isOrdered,
+              startingNumber: list.startNumber,
+              itemNumber: listItem.listNumber,
               codeContent: nil,
               language: nil,
-              level: nil,
+              level: list.level,
               children: listItemChildren,
               sourceLocation: listItem.sourceLocation
             )
             items.append(itemBlock)
+          } else if let nestedList = item as? AST.ListNode {
+            if let nestedListBlock = makeBlock(from: nestedList) {
+              items.append(nestedListBlock)
+            }
           } else {
             let attr = renderInlinesToNSAttributedString(
               nodes: item.children,
@@ -611,11 +626,12 @@ class MarkdownRendererVM {
               id: makeID(base: sourceID(for: item), content: attr.string),
               nodeType: .listItem,
               attributedContent: attr,
-              isOrdered: nil,
-              startingNumber: nil,
+              isOrdered: list.isOrdered,
+              startingNumber: list.startNumber,
+              itemNumber: nil,
               codeContent: nil,
               language: nil,
-              level: nil,
+              level: list.level,
               children: nil,
               sourceLocation: item.sourceLocation
             )
@@ -626,11 +642,12 @@ class MarkdownRendererVM {
           id: makeID(base: baseIDSeed, content: items.map(\.id).description),
           nodeType: .list,
           attributedContent: nil,
-          isOrdered: nil,
-          startingNumber: nil,
+          isOrdered: list.isOrdered,
+          startingNumber: list.startNumber,
+          itemNumber: nil,
           codeContent: nil,
           language: nil,
-          level: nil,
+          level: list.level,
           children: items,
           sourceLocation: node.sourceLocation
         )
@@ -645,6 +662,7 @@ class MarkdownRendererVM {
         attributedContent: attr,
         isOrdered: nil,
         startingNumber: nil,
+        itemNumber: nil,
         codeContent: nil,
         language: nil,
         level: nil,
@@ -664,6 +682,7 @@ class MarkdownRendererVM {
         attributedContent: attr,
         isOrdered: nil,
         startingNumber: nil,
+        itemNumber: nil,
         codeContent: nil,
         language: nil,
         level: nil,
@@ -1680,3 +1699,75 @@ final class EmojiAttachmentViewProvider: NSTextAttachmentViewProvider {
     container = nil
   }
 }
+
+#Preview {
+  let msg = """
+    1. Item 1
+    3. Item 2 (3.)
+      5. Item 2a (5.)
+      2. Item 2b (2.)
+    7. Item 3 (7.)
+    """
+  let user = DiscordUser(
+    id: .init("381538809180848128"),
+    username: "markdown test",
+    discriminator: "0",
+    global_name: nil,
+    avatar: "df71b3f223666fd8331c9940c6f7cbd9",
+    banner: nil,
+    bot: false,
+    system: false,
+    mfa_enabled: true,
+    accent_color: nil,
+    locale: .englishUS,
+    verified: true,
+    email: nil,
+    flags: .init(rawValue: 4_194_352),
+    premium_type: nil,
+    public_flags: .init(rawValue: 4_194_304),
+    avatar_decoration_data: nil
+  )
+  MessageCell(
+    for: .init(
+      id: try! .makeFake(),
+      channel_id: try! .makeFake(),
+      author: user,
+      content: msg,
+      timestamp: .init(date: .now),
+      edited_timestamp: nil,
+      tts: false,
+      mention_everyone: false,
+      mentions: [],
+      mention_roles: [],
+      mention_channels: nil,
+      attachments: [],
+      embeds: [],
+      reactions: nil,
+      nonce: nil,
+      pinned: false,
+      webhook_id: nil,
+      type: DiscordChannel.Message.Kind.default,
+      activity: nil,
+      application: nil,
+      application_id: nil,
+      message_reference: nil,
+      flags: [],
+      referenced_message: nil,
+      interaction: nil,
+      thread: nil,
+      components: nil,
+      sticker_items: nil,
+      stickers: nil,
+      position: nil,
+      role_subscription_data: nil,
+      resolved: nil,
+      poll: nil,
+      call: nil,
+      guild_id: nil,
+      member: nil
+    ),
+    prior: nil,
+    channel: .init(id: try! .makeFake())
+  )
+}
+
