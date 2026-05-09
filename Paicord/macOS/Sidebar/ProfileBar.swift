@@ -14,11 +14,93 @@ import SwiftUIX
 
 struct ProfileBar: View {
   var body: some View {
-    VStack(spacing: 0) {
-      VoiceBarSection()
-      Divider()
-      ProfileBarSection()
+    HStack {
+      Button {
+        showingPopover.toggle()
+      } label: {
+        HStack {
+          if let user = gw.user.currentUser {
+            Profile.AvatarWithPresence(
+              member: nil,
+              user: user
+            )
+            .maxHeight(30)
+            .profileAnimated(barHovered)
+            .profileShowsAvatarDecoration()
+          }
+
+          VStack(alignment: .leading) {
+            Text(
+              gw.user.currentUser?.global_name ?? gw.user.currentUser?.username
+                ?? "Unknown User"
+            )
+            .bold()
+            if showingUsername {
+              Text(verbatim: "@\(gw.user.currentUser?.username ?? "Unknown User")")
+                .transition(.opacity)
+            } else {
+              if let session = gw.user.sessions.first(where: { $0.id == "all" }
+              ),
+                let status = session.activities.first,
+                status.type == .custom
+              {
+                if let emoji = status.emoji {
+                  if let url = emojiURL(for: emoji, animated: true) {
+                    AnimatedImage(url: url)
+                      .resizable()
+                      .scaledToFit()
+                      .frame(width: 16, height: 16)
+                  } else {
+                    Text(emoji.name)
+                      .font(.system(size: 14))
+                  }
+                }
+
+                Text(status.state ?? "")
+                  .transition(.opacity)
+              }
+            }
+          }
+          .background(.black.opacity(0.001))
+          .onHover { showingUsername = $0 }
+          .animation(.spring(), value: showingUsername)
+          .frame(maxWidth: .infinity, alignment: .leading)
+        }.contentShape(.rect)
+      }
+      .buttonStyle(.plain)
+      .popover(isPresented: $showingPopover) {
+        ProfileButtonPopout()
+      }
+
+      Button {
+#if os(macOS)
+        openWindow(id: "settings")
+#elseif os(iOS)
+        NotificationCenter.default.post(
+          name: .presentSettingsSheet,
+          object: nil
+        )
+#endif
+      } label: {
+        Image(systemName: "gearshape.fill")
+          .font(.title2)
+          .padding(5)
+          .background(.ultraThinMaterial)
+          .clipShape(.circle)
+      }
+      .buttonStyle(.borderless)
     }
+    .padding(8)
+    .background {
+      if let nameplate = gw.user.currentUser?.collectibles?.nameplate {
+        Profile.NameplateView(nameplate: nameplate)
+          .nameplateAnimated(barHovered)
+          .saturation(0.9)
+          .brightness(0.1)
+      }
+    }
+    .clipped()
+    .onHover { barHovered = $0 }
   }
 
   struct VoiceBarSection: View {
@@ -159,7 +241,7 @@ struct ProfileBar: View {
     @State var barHovered = false
 
     @State var micError = false
-    
+
     @ViewStorage var didDeafenBeforeMute = false
 
     var vgw: VoiceConnectionStore { gw.voice }
@@ -221,14 +303,13 @@ struct ProfileBar: View {
             .background(.black.opacity(0.001))
             .onHover { showingUsername = $0 }
             .animation(.spring(), value: showingUsername)
-          }
+            .frame(maxWidth: .infinity, alignment: .leading)
+          }.contentShape(.rect)
         }
         .buttonStyle(.plain)
         .popover(isPresented: $showingPopover) {
           ProfileButtonPopout()
         }
-
-        Spacer()
 
         HStack {
           Button {
@@ -333,22 +414,23 @@ struct ProfileBar: View {
             )
           )
 
-          #if os(macOS)
-            Button {
-              openWindow(id: "settings")
-            } label: {
-              Image(systemName: "gearshape.fill")
-                .font(.title2)
-                .maxWidth(35)
-                .maxHeight(35)
-            }
-            .buttonStyle(
-              .borderlessHoverEffect()
+          Button {
+#if os(macOS)
+            openWindow(id: "settings")
+#elseif os(iOS)
+            NotificationCenter.default.post(
+              name: .presentSettingsSheet,
+              object: nil
             )
-          #elseif os(iOS)
-            /// targetting ipad here, ios wouldnt have this at all
-            // do something
-          #endif
+#endif
+          } label: {
+            Image(systemName: "gearshape.fill")
+              .font(.title2)
+              .padding(5)
+              .background(.ultraThinMaterial)
+              .clipShape(.circle)
+          }
+          .buttonStyle(.borderless)
         }
         .padding(.vertical, -8)
       }

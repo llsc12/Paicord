@@ -2700,7 +2700,8 @@ extension DiscordClient {
 
   /// https://discord.com/developers/docs/resources/user#leave-guild
   @inlinable
-  public func leaveGuild(id: GuildSnowflake) async throws -> DiscordHTTPResponse {
+  public func leaveGuild(id: GuildSnowflake) async throws -> DiscordHTTPResponse
+  {
     let endpoint = APIEndpoint.leaveGuild(guildId: id)
     return try await self.send(request: .init(to: endpoint))
   }
@@ -2713,8 +2714,16 @@ extension DiscordClient {
   ) async throws -> DiscordClientResponse<DiscordChannel> {
     let endpoint = APIEndpoint.createDm
     return try await self.send(
-      request: .init(to: endpoint),
-      payload: payload
+      request: .init(
+        to: endpoint,
+        headers: [
+          "X-Context-Properties":
+            SuperProperties.GenerateContextPropertiesHeader(
+              context: .createDM
+            )
+        ]
+      ),
+      payload: payload,
     )
   }
 
