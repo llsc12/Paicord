@@ -58,6 +58,7 @@ struct RootView: View {
         .quickSwitcher()
         .sponsorSheet()
         .updateSheet()
+        .settingsSheet()
         .task {
           appState.loadPrevGuild()
           #if os(iOS)
