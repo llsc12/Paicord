@@ -589,7 +589,7 @@ extension Gateway {
     public var nsfw: Bool
     public var application_command_counts: [String: Int]?
     public var embedded_activities: [Gateway.Activity]?
-    public var version: Int?
+    public var version: Int64?
     public var guild_id: GuildSnowflake?
     /// Extra fields:
     public var joined_at: DiscordTimestamp
@@ -807,7 +807,7 @@ extension Gateway {
   public struct GuildRoleDelete: Sendable, Codable {
     public var guild_id: GuildSnowflake
     public var role_id: RoleSnowflake
-    public var version: Int?
+    public var version: Int64?
   }
 
   /// Not the same as what Discord calls `Guild Scheduled Event User`.
@@ -1777,7 +1777,7 @@ extension Gateway {
       // TODO: Make enums
       public var client: ClientType
       public var os: String
-      public var version: Int
+      public var version: Int64
 
       @UnstableEnum<String>
       public enum ClientType: Sendable, Codable {
@@ -2035,7 +2035,7 @@ extension Gateway {
   public struct ChannelPinsAcknowledge: Sendable, Codable {
     public var channel_id: ChannelSnowflake
     public var timestamp: DiscordTimestamp
-    public var version: Int
+    public var version: Int64
   }
 
   /// https://docs.discord.food/topics/gateway-events#user-non-channel-ack-structure
@@ -2043,7 +2043,7 @@ extension Gateway {
     public var ack_type: ReadState.Kind
     public var resource_id: UserSnowflake
     public var entity_id: AnySnowflake
-    public var version: Int
+    public var version: Int64
   }
 
   /// https://docs.discord.food/resources/message#create-attachments

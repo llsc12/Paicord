@@ -37,6 +37,10 @@ extension Gateway.Identify.ConnectionProperties {
   // if this is in header, the user agent will be included, otherwise it will be nil
   public init(ws: Bool = true) {
     self.os = Self.__defaultOS
+    #if os(watchOS)
+    // needs to be iOS
+    self.os = "iOS"
+    #endif
     self.browser = SuperProperties.browser()
     self.release_channel = "stable"
     self.system_locale = SuperProperties.GenerateLocaleHeader()

@@ -51,7 +51,7 @@ public struct Guild: Sendable, Codable, Hashable, Equatable, Identifiable {
     application_command_counts: [String: Int]? = nil,
     embedded_activities: [Gateway.Activity]? = nil,
     members: [Guild.Member]? = nil,
-    version: Int? = nil,
+    version: Int64? = nil,
     guild_id: GuildSnowflake? = nil,
     voice_states: [VoiceState]? = nil
   ) {
@@ -517,7 +517,7 @@ public struct Guild: Sendable, Codable, Hashable, Equatable, Identifiable {
   public var application_command_counts: [String: Int]?
   public var embedded_activities: [Gateway.Activity]?
   public var members: [Guild.Member]?
-  public var version: Int?
+  public var version: Int64?
   public var guild_id: GuildSnowflake?
   public var voice_states: [VoiceState]?
 }
@@ -572,7 +572,7 @@ public struct PartialGuild: Sendable, Codable, Equatable, Hashable {
   public var nsfw: Bool?
   public var application_command_counts: [String: Int]?
   public var embedded_activities: [Gateway.Activity]?
-  public var version: Int?
+  public var version: Int64?
   public var guild_id: GuildSnowflake?
   public var voice_states: [VoiceState]?
 }
@@ -786,7 +786,7 @@ extension Guild {
     public var notify_highlights: Int
     public var suppress_everyone: Bool
     public var suppress_roles: Bool
-    public var version: Int
+    public var version: Int64
 
     /// https://docs.discord.food/resources/user-settings#partial-user-guild-settings-structure
     public struct Partial: Sendable, Codable {

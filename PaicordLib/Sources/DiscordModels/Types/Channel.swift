@@ -221,7 +221,7 @@ public struct DiscordChannel: Sendable, Codable, Equatable, Hashable {
   public var available_tags: [ForumTag]?
   public var template: String?
   public var member_ids_preview: [String]?
-  public var version: Int?
+  public var version: Int64?
   /// Thread-only:
   public var member: ThreadMember?
   public var newly_created: Bool?

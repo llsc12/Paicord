@@ -302,7 +302,7 @@ public struct Interaction: Sendable, Codable {
   public var member: Guild.Member?
   public var user: DiscordUser?
   public var token: String
-  public var version: Int
+  public var version: Int64
   public var message: DiscordChannel.Message?
   public var locale: DiscordLocale?
   public var guild_locale: DiscordLocale?
@@ -390,7 +390,7 @@ public struct Interaction: Sendable, Codable {
     )
     self.user = try container.decodeIfPresent(DiscordUser.self, forKey: .user)
     self.token = try container.decode(String.self, forKey: .token)
-    self.version = try container.decode(Int.self, forKey: .version)
+    self.version = try container.decode(Int64.self, forKey: .version)
     self.message = try container.decodeIfPresent(
       DiscordChannel.Message.self,
       forKey: .message
