@@ -9,6 +9,106 @@
 import PaicordLib
 import SwiftUIX
 
+enum PaicordGuildNavigation: RawRepresentable, Hashable {
+  init?(rawValue: String) {
+    let components = rawValue.split(separator: ":", maxSplits: 1)
+    guard components.count == 2 else { return nil }
+    let type = components[0]
+    let value = components[1]
+
+    switch type {
+    case "guild":
+      self = .guild(GuildSnowflake(String(value)))
+    case "directMessages":
+      self = .directMessages
+    default:
+      return nil
+    }
+  }
+
+  var rawValue: String {
+    switch self {
+    case .guild(let guildId):
+      return "guild:\(guildId.rawValue)"
+    case .directMessages:
+      return "directMessages: "
+    }
+  }
+
+  case guild(GuildSnowflake)
+  case directMessages
+
+  static func make(from dict: [String: String]) -> [PaicordGuildNavigation:
+    PaicordChannelNavigation]?
+  {
+    var result: [PaicordGuildNavigation: PaicordChannelNavigation] = [:]
+    for (key, value) in dict {
+      if let guildNav = PaicordGuildNavigation(rawValue: key),
+        let channelNav = PaicordChannelNavigation(rawValue: value)
+      {
+        result[guildNav] = channelNav
+      }
+    }
+    return result
+  }
+  
+  static func make(from: [PaicordGuildNavigation: PaicordChannelNavigation]) -> [String: String] {
+    var result: [String: String] = [:]
+    for (key, value) in from {
+      result[key.rawValue] = value.rawValue
+    }
+    return result
+  }
+}
+
+enum PaicordChannelNavigation: RawRepresentable, Hashable {
+  init?(rawValue: String) {
+    let components = rawValue.split(separator: ":", maxSplits: 1)
+    guard components.count == 2 else { return nil }
+    let type = components[0]
+    let value = components[1]
+
+    switch type {
+    case "textChannel":
+      self = .textChannel(ChannelSnowflake(String(value)))
+    case "voiceChannel":
+      self = .voiceChannel(ChannelSnowflake(String(value)))
+    case "thread":
+      self = .thread(ChannelSnowflake(String(value)))
+    case "dashboard":
+      self = .dashboard
+    case "friends":
+      self = .friends
+    default:
+      return nil
+    }
+  }
+
+  var rawValue: String {
+    switch self {
+    case .textChannel(let channelId):
+      return "textChannel:\(channelId.rawValue)"
+    case .voiceChannel(let channelId):
+      return "voiceChannel:\(channelId.rawValue)"
+    case .thread(let channelId):
+      return "thread:\(channelId.rawValue)"
+    case .dashboard:
+      return "dashboard: "
+    case .friends:
+      return "friends: "
+    }
+  }
+
+  case dashboard
+
+  case textChannel(ChannelSnowflake)
+  case voiceChannel(ChannelSnowflake)
+  case thread(ChannelSnowflake)
+
+  // special dms navigation destinations
+  case friends
+}
+
 @Observable
 final class PaicordAppState {
   // each window gets its own app state
@@ -18,12 +118,10 @@ final class PaicordAppState {
     Self.instances[id] = self
 
     loadPrevSelectedChannels()
-    if let lastDM = self.rawPrevSelectedChannels[
-      self.selectedGuild?.rawValue ?? "nil"
-    ] {
-      self.selectedChannel = ChannelSnowflake(lastDM)
+    if let lastKnownChannel = self.rawPrevSelectedChannels[self.selectedGuild] {
+      self.selectedChannel = lastKnownChannel
     } else {
-      self.selectedChannel = nil
+      self.selectedChannel = .dashboard
     }
   }
   deinit {
@@ -43,53 +141,48 @@ final class PaicordAppState {
   private let storageKey = "AppState.PrevSelectedChannels"
   var suppressChannelSave = false
 
-  private var _selectedGuild: GuildSnowflake? = nil {
+  private var _selectedGuild: PaicordGuildNavigation = .directMessages {
     didSet {
       UserDefaults.standard.set(
-        _selectedGuild?.rawValue,
+        _selectedGuild.rawValue,
         forKey: "AppState.PrevSelectedGuild"
       )
     }
   }
-  var selectedGuild: GuildSnowflake? {
+  var selectedGuild: PaicordGuildNavigation {
     get { _selectedGuild }
     set {
-      let newGuildKey = newValue?.rawValue ?? "nil"
-
       suppressChannelSave = true
       defer { suppressChannelSave = false }
 
-      let lastChannel = rawPrevSelectedChannels[newGuildKey]
+      let lastChannel = rawPrevSelectedChannels[newValue]
       if let lastChannel {
-        selectedChannel = ChannelSnowflake(lastChannel)
+        selectedChannel = lastChannel
       } else {
-        selectedChannel = nil
+        selectedChannel = .dashboard
       }
 
       _selectedGuild = newValue
     }
   }
 
-  var selectedChannel: ChannelSnowflake? {
+  var selectedChannel: PaicordChannelNavigation = .dashboard {
     didSet {
       guard !suppressChannelSave else { return }
-      let key = selectedGuild?.rawValue ?? "nil"
-      if let channel = selectedChannel {
-        rawPrevSelectedChannels[key] = channel.rawValue
-      } else {
-        rawPrevSelectedChannels.removeValue(forKey: key)
-      }
+      let key = selectedGuild
+      rawPrevSelectedChannels[key] = selectedChannel
       savePrevSelectedChannels()
     }
   }
 
   // persistent mapping as [String: String] where key == guild.rawValue or "nil"
   @ObservationIgnored
-  private var rawPrevSelectedChannels: [String: String] = [:]
+  private var rawPrevSelectedChannels:
+    [PaicordGuildNavigation: PaicordChannelNavigation] = [:]
 
   func resetStore() {
-    selectedGuild = nil
-    selectedChannel = nil
+    selectedGuild = .directMessages
+    selectedChannel = .dashboard
     rawPrevSelectedChannels = [:]
     UserDefaults.standard.removeObject(
       forKey: "AppState.PrevSelectedGuild"
@@ -100,13 +193,16 @@ final class PaicordAppState {
   // MARK: - Persistence Helpers
 
   func loadPrevGuild() {
-    let guildIdString = UserDefaults.standard.string(
+    let guildValue = UserDefaults.standard.string(
       forKey: "AppState.PrevSelectedGuild"
     )
-    guard let guildIdString else { return }
-    let guildId = GuildSnowflake(guildIdString)
-    guard GatewayStore.shared.user.guilds.keys.contains(guildId) else { return }
-    self.selectedGuild = GuildSnowflake(guildId)
+    guard let guildValue else { return }
+    if case .guild(let guildId) = PaicordGuildNavigation(rawValue: guildValue) {
+      guard GatewayStore.shared.user.guilds.keys.contains(guildId) else {
+        return
+      }
+      self.selectedGuild = .guild(guildId)
+    }
   }
 
   private func loadPrevSelectedChannels() {
@@ -114,7 +210,9 @@ final class PaicordAppState {
 
     if let data = defaults.data(forKey: storageKey) {
       if let obj = try? JSONSerialization.jsonObject(with: data),
-        let dict = obj as? [String: String]
+        let dict = PaicordGuildNavigation.make(
+          from: obj as? [String: String] ?? [:]
+        )
       {
         rawPrevSelectedChannels = dict
         return
@@ -125,8 +223,8 @@ final class PaicordAppState {
   }
 
   private func savePrevSelectedChannels() {
-    let json = rawPrevSelectedChannels
-    if let data = try? JSONSerialization.data(withJSONObject: json) {
+    let json = PaicordGuildNavigation.make(from: rawPrevSelectedChannels)
+    if let data = try? JSONSerialization.data(withJSONObject: json) { // Thread 1: Swift runtime failure: unhandled C++ / Objective-C exception
       UserDefaults.standard.set(data, forKey: storageKey)
     } else {
       // fallback: write dictionary directly
@@ -140,6 +238,30 @@ final class PaicordAppState {
   var error: Error? = nil {
     didSet {
       showingError = error != nil
+    }
+  }
+}
+
+extension PaicordGuildNavigation {
+  var guildID: GuildSnowflake? {
+    switch self {
+    case .guild(let guildId):
+      return guildId
+    case .directMessages:
+      return nil
+    }
+  }
+}
+
+extension PaicordChannelNavigation {
+  var channelID: ChannelSnowflake? {
+    switch self {
+    case .textChannel(let channelId),
+      .voiceChannel(let channelId),
+      .thread(let channelId):
+      return channelId
+    case .dashboard, .friends:
+      return nil
     }
   }
 }

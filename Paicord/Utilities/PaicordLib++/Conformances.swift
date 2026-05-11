@@ -13,8 +13,6 @@ extension DiscordProtos_DiscordUsers_V1_PreloadedUserSettings.GuildFolder:
   @retroactive Identifiable
 {}
 
-extension Guild: @retroactive Identifiable {}
-
 extension DiscordChannel: @retroactive Identifiable {}
 
 extension Snowflake: @retroactive Identifiable {
@@ -63,5 +61,12 @@ extension DiscordChannel.Message.Attachment: DiscordMedia {
 extension Payloads.CreateMessage: @retroactive Identifiable {
   public var id: MessageSnowflake {
     .init(self.nonce?.asString ?? "unknown")
+  }
+}
+
+
+extension VoiceState: @retroactive Identifiable {
+  public var id: UserSnowflake {
+    self.user_id
   }
 }

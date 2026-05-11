@@ -81,7 +81,8 @@ extension ChatView {
           .frame(width: 36, height: 36)
 
           Text(
-            vm.channel?.name
+            verbatim:
+              vm.channel?.name
               ?? ppl.map({
                 $0.global_name ?? $0.username
               }).joined(separator: ", ")
@@ -91,13 +92,29 @@ extension ChatView {
         }
       default:
         HStack(spacing: 4) {
-          Image(systemName: "number")
-            .foregroundStyle(.secondary)
-            .imageScale(idiom == .phone ? .medium : .large)
-          let name = vm.channel?.name ?? "Unknown Channel"
-          Text(name)
-            .font(idiom == .phone ? .headline : .title3)
-            .fontWeight(.semibold)
+          switch vm.channel?.type {
+          case .guildText, .guildAnnouncement:
+            Image(systemName: "number")
+              .foregroundStyle(.secondary)
+              .imageScale(idiom == .phone ? .medium : .large)
+          case .guildVoice:
+            Image(systemName: "speaker.wave.2.fill")
+              .foregroundStyle(.secondary)
+              .imageScale(idiom == .phone ? .medium : .large)
+          default:
+            Image(systemName: "number")
+              .foregroundStyle(.secondary)
+              .imageScale(idiom == .phone ? .medium : .large)
+          }
+          if let name = vm.channel?.name {
+            Text(verbatim: name)
+              .font(idiom == .phone ? .headline : .title3)
+              .fontWeight(.semibold)
+          } else {
+            Text("Unknown Channel")
+              .font(idiom == .phone ? .headline : .title3)
+              .fontWeight(.semibold)
+          }
         }
       }
     }

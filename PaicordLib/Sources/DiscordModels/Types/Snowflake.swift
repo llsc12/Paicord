@@ -175,7 +175,7 @@ public struct SnowflakeInfo: Sendable {
 
   public enum Error: Swift.Error, CustomStringConvertible {
     /// Entered field '\(name)' is bigger than expected. It has a value of '\(value)', but max accepted is '\(max)'
-    case fieldTooBig(_ name: String, value: String, max: Int)
+    case fieldTooBig(_ name: String, value: String, max: Int64)
     /// Entered field '\(name)' is smaller than expected. It has a value of '\(value)', but min accepted is '\(min)'
     case fieldTooSmall(_ name: String, value: String, min: UInt64)
 
@@ -269,7 +269,7 @@ public struct SnowflakeInfo: Sendable {
     }
 
     let timeSince1970 = UInt64(date.timeIntervalSince1970)
-    guard timeSince1970 <= (1 << 42 / 1_000) else {
+    guard timeSince1970 <= (Int64(1) << 42 / 1_000) else {
       throw Error.fieldTooBig(
         "date",
         value: "\(timeSince1970)",
@@ -279,8 +279,8 @@ public struct SnowflakeInfo: Sendable {
 
     self.timestamp = UInt64(date.timeIntervalSince1970 * 1_000)
 
-    guard timestamp < (1 << 42) else {
-      let max = (1 << 42 / 1_000) - 1
+    guard timestamp < (Int64(1) << 42) else {
+      let max = (Int64(1) << 42 / 1_000) - 1
       throw Error.fieldTooBig("date", value: "\(timestamp)", max: max)
     }
     guard workerId <= (1 << 5) else {

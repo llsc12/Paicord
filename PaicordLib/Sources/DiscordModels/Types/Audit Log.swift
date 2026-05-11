@@ -344,7 +344,10 @@ public struct AuditLog: Sendable, Codable {
             String.self,
             forKey: .auto_moderation_rule_trigger_type
           )
-          if let intTrigger = Int(triggerType),
+          
+          #if Non64BitSystemsCompatibility
+          if
+            let intTrigger = Int64(triggerType),
             let type = AutoModerationRule.TriggerKind(rawValue: intTrigger)
           {
             self.auto_moderation_rule_trigger_type = type
@@ -357,6 +360,22 @@ public struct AuditLog: Sendable, Codable {
               )
             )
           }
+          #else
+          if
+            let intTrigger = Int(triggerType),
+            let type = AutoModerationRule.TriggerKind(rawValue: intTrigger)
+          {
+            self.auto_moderation_rule_trigger_type = type
+          } else {
+            throw DecodingError.keyNotFound(
+              CodingKeys.auto_moderation_rule_trigger_type,
+              .init(
+                codingPath: decoder.codingPath,
+                debugDescription: "Can't decode from value: '\(triggerType)'"
+              )
+            )
+          }
+          #endif
           self.channel_id = try container.decode(
             ChannelSnowflake.self,
             forKey: .channel_id

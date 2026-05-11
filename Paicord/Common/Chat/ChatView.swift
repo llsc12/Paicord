@@ -151,7 +151,7 @@ struct ChatView: View {
       .scrollPosition(id: $currentScrollPosition, anchor: .bottom)  // causes issues with input bar height changes:
       // currently, the input bar changing size can cause the scrollview position to jump unexpectedly.
       // not sure how to fix.
-      .bottomAnchored()
+//      .bottomAnchored()
       .scrollClipDisabled()
       .maxHeight(.infinity)
       .overlay(alignment: .bottomTrailing) {

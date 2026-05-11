@@ -37,6 +37,10 @@ extension Gateway.Identify.ConnectionProperties {
   // if this is in header, the user agent will be included, otherwise it will be nil
   public init(ws: Bool = true) {
     self.os = Self.__defaultOS
+    #if os(watchOS)
+    // needs to be iOS
+    self.os = "iOS"
+    #endif
     self.browser = SuperProperties.browser()
     self.release_channel = "stable"
     self.system_locale = SuperProperties.GenerateLocaleHeader()
@@ -411,9 +415,15 @@ public enum SuperProperties {
   public static func device_vendor_id() -> String? {
     #if os(iOS)
       DispatchQueue.main.sync {
-        if let uuid = UIDevice.current.identifierForVendor {
-          return uuid.uuidString.uppercased()
-        }
+        #if os(iOS)
+          if let uuid = UIDevice.current.identifierForVendor {
+            return uuid.uuidString.uppercased()
+          }
+        #elseif os(watchOS)
+          if let uuid = WKInterfaceDevice.current().identifierForVendor {
+            return uuid.uuidString.uppercased()
+          }
+        #endif
         return UUID().uuidString.uppercased()  // fallback
       }
     #elseif os(watchOS)

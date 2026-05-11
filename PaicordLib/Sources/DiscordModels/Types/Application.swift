@@ -43,9 +43,7 @@ public struct DiscordApplication: Sendable, Codable {
   #else
     @UnstableEnum<Int>
   #endif
-  public enum IntegrationKind: Sendable, Codable, CodingKeyRepresentable,
-    Equatable
-  {
+  public enum IntegrationKind: Sendable, Codable, Equatable {
     case guildInstall  // 0
     case userInstall  // 1
     #if Non64BitSystemsCompatibility

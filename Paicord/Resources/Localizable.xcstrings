@@ -25,11 +25,24 @@
     ":3" : {
 
     },
+    ":3c" : {
+
+    },
     "(edited)" : {
 
     },
     "%@ unsupported" : {
 
+    },
+    "%@%@ %@ currently in voice" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@%2$@ %3$@ currently in voice"
+          }
+        }
+      }
     },
     "%lld members" : {
 
@@ -77,6 +90,9 @@
     "Authenticator App" : {
 
     },
+    "Awaiting Audio Setup" : {
+
+    },
     "Awaiting READY" : {
 
     },
@@ -93,6 +109,9 @@
 
     },
     "ComponentsV2 unsupported" : {
+
+    },
+    "Connecting to Voice" : {
 
     },
     "Copy" : {
@@ -230,7 +249,13 @@
     "Mention" : {
 
     },
+    "Microphone Unavailable" : {
+
+    },
     "Multi-Factor Authentication" : {
+
+    },
+    "No one is currently in voice" : {
 
     },
     "Notifications" : {
@@ -263,6 +288,7 @@
     "Playgrounds" : {
 
     },
+    "Please allow microphone access in your system settings to unmute yourself in voice channels." : {
     "Private Profile" : {
 
     },
@@ -314,6 +340,9 @@
     "Sponsor" : {
 
     },
+    "Start Call" : {
+
+    },
     "Sticker Picker Coming Soon!" : {
 
     },
@@ -342,6 +371,9 @@
 
     },
     "Unimplemented" : {
+
+    },
+    "Unknown Channel" : {
 
     },
     "Unknown User" : {
@@ -373,6 +405,12 @@
       }
     },
     "View Logs" : {
+
+    },
+    "Voice Connected" : {
+
+    },
+    "Voice Disconnected" : {
 
     },
     "We're so excited to see you again!" : {

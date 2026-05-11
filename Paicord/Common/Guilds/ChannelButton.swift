@@ -13,6 +13,7 @@ import SwiftUIX
 struct ChannelButton: View {
   @Environment(\.gateway) var gw
   @Environment(\.appState) var appState
+  @Environment(\.guildStore) var guild
   var channels: [ChannelSnowflake: DiscordChannel]
   var channel: DiscordChannel
 
@@ -21,7 +22,7 @@ struct ChannelButton: View {
     switch channel.type {
     case .dm:
       textChannelButton { hovered in
-        let selected = appState.selectedChannel == channel.id
+        let selected = appState.selectedChannel.channelID == channel.id
         HStack {
           if let user = channel.recipients?.first {
             Profile.AvatarWithPresence(
@@ -109,11 +110,17 @@ struct ChannelButton: View {
             }
             .aspectRatio(1, contentMode: .fit)
           }
-          Text(
-            channel.name ?? channel.recipients?.map({
-              $0.global_name ?? $0.username
-            }).joined(separator: ", ") ?? "Unknown Group DM"
-          )
+          VStack(alignment: .leading, spacing: 2){
+            Text(
+              channel.name ?? channel.recipients?.map({
+                $0.global_name ?? $0.username
+              }).joined(separator: ", ") ?? "Unknown Group DM"
+            )
+            .lineLimit(1)
+
+            Text("\(channel.recipients?.count ?? 0) members")
+              .font(.caption)
+          }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .frame(height: 38)
@@ -126,7 +133,17 @@ struct ChannelButton: View {
       let expectedParentID = channel.id
       let childChannels = channels.values
         .filter { $0.parent_id ?? (try! .makeFake()) == expectedParentID }
-        .sorted { ($0.position ?? 0) < ($1.position ?? 0) }
+      // sort by type and position
+//        .sorted { ($0.position ?? 0) < ($1.position ?? 0) }
+        .sorted { lhs, rhs in
+          let lhsType = [DiscordChannel.Kind.guildVoice, .guildStageVoice].contains(lhs.type ?? .guildText)
+          let rhsType = [DiscordChannel.Kind.guildVoice, .guildStageVoice].contains(rhs.type ?? .guildText)
+          if lhsType == rhsType {
+            return (lhs.position ?? 0) < (rhs.position ?? 0)
+          } else {
+            return (lhsType && !rhsType)
+          }
+        }
         .map { $0.id }
 
       category(channelIDs: childChannels)
@@ -156,18 +173,33 @@ struct ChannelButton: View {
       }
       .tint(.primary)
     case .guildVoice:
-      textChannelButton { _ in
+      voiceChannelButton { hovered in
         HStack {
-          Image(systemName: "speaker.wave.2.fill")
-            .imageScale(.medium)
+          if guild?.hasPermission(channel: channel, .connect) == false {
+            Image(systemName: "lock.fill")
+              .imageScale(.medium)
+          } else {
+            Image(systemName: "speaker.wave.2.fill")
+              .imageScale(.medium)
+          }
           Text(channel.name ?? "unknown")
+          Spacer()
+          
+          if hovered {
+            Button {
+              appState.selectedChannel = .voiceChannel(channel.id)
+            } label: {
+              Image(systemName: "bubble.fill")
+                .imageScale(.small)
+            }
+            .buttonStyle(.borderless)
+          }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .minHeight(35)
         .padding(.horizontal, 12)
       }
       .tint(.primary)
-      .disabled(true)
     default:
       textChannelButton { _ in
         HStack {
@@ -206,7 +238,7 @@ struct ChannelButton: View {
     var body: some View {
       if !shouldHide {
         Button {
-          appState.selectedChannel = channel.id
+          appState.selectedChannel = .textChannel(channel.id)
           #if os(iOS)
             withAnimation {
               appState.chatOpen.toggle()
@@ -247,7 +279,7 @@ struct ChannelButton: View {
         )
         .background(
           Group {
-            if appState.selectedChannel == channel.id {
+            if appState.selectedChannel.channelID == channel.id {
               Color.gray.opacity(0.13)
             } else {
               Color.clear
@@ -255,6 +287,208 @@ struct ChannelButton: View {
           }
           .clipShape(.rounded)
         )
+    }
+  }
+
+  struct VoiceChannelButton<Content: View>: View {
+    @Environment(\.appState) var appState
+    @Environment(\.gateway) var gw
+    @Environment(\.guildStore) var guild
+    @State private var isHovered = false
+    var channels: [ChannelSnowflake: DiscordChannel]
+    var channel: DiscordChannel
+    var content: (_ hovered: Bool) -> Content
+
+    var shouldHide: Bool {
+      guard let guild else { return false }
+      return guild.hasPermission(
+        channel: channel,
+        .viewChannel
+      ) == false
+    }
+    var canConnect: Bool {
+      guard let guild else { return false }
+      return guild.hasPermission(
+        channel: channel,
+        .connect
+      )
+    }
+    var body: some View {
+      if !shouldHide {
+        Button {
+          Task {
+            appState.selectedChannel = .voiceChannel(channel.id)
+            guard let guildID = appState.selectedGuild.guildID, canConnect else { return }
+            await gw.voice.updateVoiceConnection(
+              .join(
+                channelId: channel.id,
+                guildId: guildID,
+              )
+            )
+          }
+        } label: {
+          content(isHovered)
+        }
+        .onHover { isHovered = $0 }
+        .buttonStyle(.borderless)
+        .disabled(!canConnect)
+      }
+    }
+  }
+
+  struct VoiceChannelUsers: View {
+    @Environment(\.gateway) var gw
+    @Environment(\.appState) var appState
+    var channel: DiscordChannel
+
+    var body: some View {
+      let voiceChannels = gw.voiceChannels
+      if let guildID = appState.selectedGuild.guildID, let voiceStates = voiceChannels.voiceStates[guildID]?[
+        channel.id
+      ], !voiceStates.isEmpty {
+        LazyVStack(spacing: 2) {
+          ForEach(voiceStates.values) { state in
+            UserButton(state: state)
+          }
+        }
+        .padding(.leading, 32)
+        .padding(.bottom, 4)
+      }
+    }
+
+    struct UserButton: View {
+      var state: VoiceState
+      @Environment(\.guildStore) var guildStore
+      @Environment(\.gateway) var gw
+      var vgw: VoiceConnectionStore { gw.voice }
+      @State var showPopover = false
+      
+      var isDeafened: Bool {
+        state.self_deaf || state.deaf
+      }
+      
+      var isServerDeafened: Bool {
+        state.deaf
+      }
+      
+      var isMuted: Bool {
+        state.self_mute || state.mute
+      }
+      
+      var isServerMuted: Bool {
+        state.mute
+      }
+      
+      var isSpeaking: Bool {
+        if let state = vgw.usersSpeakingState[state.user_id] {
+          return state.isEmpty == false
+        }
+        return false
+      }
+      
+      var member: Guild.PartialMember? {
+        state.member ?? guildStore?.members[state.user_id]
+      }
+      
+      var user: PartialUser? {
+        state.member?.user?.toPartialUser() ?? gw.user.users[state.user_id]
+      }
+      
+      var body: some View {
+        Button {
+          if user != nil {
+            showPopover.toggle()
+          }
+        } label: {
+          HStack {
+            Profile.Avatar(
+              member: member,
+              user: user
+            )
+            .frame(maxWidth: 20, maxHeight: 20)
+            .overlay(
+              Circle()
+                .fill(Color.clear)
+                .stroke(isSpeaking ? Color.green : Color.clear, lineWidth: 2)
+            )
+
+            Text(
+              state.member?.nick ?? user?.global_name ?? user?.username
+                ?? "Unknown User"
+            )
+            .lineLimit(1)
+            .foregroundStyle(isSpeaking ? .primary : .secondary)
+            
+            Spacer()
+            
+            if isMuted {
+              Image(systemName: "mic.slash.fill")
+                .imageScale(.small)
+                .foregroundStyle(isServerMuted ? .red : .secondary)
+            }
+            
+            if isDeafened {
+              Image(systemName: "headphones.slash")
+                .imageScale(.small)
+                .foregroundStyle(isServerDeafened ? .red : .secondary)
+            }
+          }
+          .frame(maxWidth: .infinity, alignment: .leading)
+          .padding(.vertical, 6)
+          .padding(.horizontal, 8)
+        }
+        .buttonStyle(.borderlessHoverEffect(isSelected: showPopover, selectionShape: .init(.rounded)))
+        .popover(isPresented: $showPopover) {
+          if let user {
+            ProfilePopoutView(
+              guild: guildStore,
+              member: member,
+              user: user
+            )
+          }
+        }
+      }
+    }
+  }
+
+  /// Button that triggers voice channel actions.
+  @ViewBuilder
+  func voiceChannelButton<Content: View>(
+    @ViewBuilder label: @escaping (_ hovered: Bool) -> Content
+  )
+    -> some View
+  {
+    LazyVStack(spacing: 2) {
+      VoiceChannelButton(
+        channels: channels,
+        channel: channel
+      ) { hovered in
+        label(hovered)
+          .frame(maxWidth: .infinity, alignment: .leading)
+          .lineLimit(1)
+          .background(
+            Group {
+              if hovered {
+                Color.gray.opacity(0.2)
+              } else {
+                Color.clear
+              }
+            }
+            .clipShape(.rounded)
+          )
+          .background(
+            Group {
+              if appState.selectedChannel.channelID == channel.id {
+                Color.gray.opacity(0.13)
+              } else {
+                Color.clear
+              }
+            }
+            .clipShape(.rounded)
+          )
+      }
+
+      VoiceChannelUsers(channel: channel)
     }
   }
 

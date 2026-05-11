@@ -241,7 +241,57 @@ extension DiscordClient {
       payload: payload
     )
   }
-
+  
+  // MARK: - Channels
+  
+  /// Checks if the current user is eligible to ring a call in the DM channel.
+  /// https://docs.discord.food/resources/channel#get-call-eligibility
+  @inlinable
+  public func getCallEligibility(channelID: ChannelSnowflake) async throws
+    -> DiscordClientResponse<CallEligibility>
+  {
+    let endpoint = UserAPIEndpoint.getCallEligibility(channelId: channelID)
+    return try await self.send(request: .init(to: endpoint))
+  }
+  
+  /// Modifies the active call in the private channel. Returns a 204 empty response on success. Fires a Call Update Gateway event.
+  /// https://docs.discord.food/resources/channel#modify-call
+  @inlinable
+  public func modifyCall(channelID: ChannelSnowflake, payload: Payloads.ModifyCall)
+    async throws -> DiscordHTTPResponse {
+    let endpoint = UserAPIEndpoint.modifyCall(channelId: channelID)
+    return try await self.send(
+      request: .init(to: endpoint),
+      payload: payload
+    )
+  }
+  
+  /// Rings the recipients of a private channel to notify them of an active call. Returns a 204 empty response on success. Fires a Call Update Gateway event.
+  /// https://docs.discord.food/resources/channel#ring-channel-recipients
+  @inlinable
+  public func ringChannelRecipients(channelID: ChannelSnowflake, payload: Payloads.RingChannelRecipients) async throws
+    -> DiscordHTTPResponse
+  {
+    let endpoint = UserAPIEndpoint.ringChannelRecipients(channelId: channelID)
+    return try await self.send(
+      request: .init(to: endpoint),
+      payload: payload
+    )
+  }
+  
+  /// Stops ringing the recipients of a private channel. Returns a 204 empty response on success. Fires a Call Update Gateway event.
+  /// https://docs.discord.food/resources/channel#stop-ringing-channel-recipients
+  @inlinable
+  public func stopRingingChannelRecipients(channelID: ChannelSnowflake, payload: Payloads.RingChannelRecipients) async throws
+    -> DiscordHTTPResponse
+  {
+    let endpoint = UserAPIEndpoint.stopRingingChannelRecipients(channelId: channelID)
+    return try await self.send(
+      request: .init(to: endpoint),
+      payload: payload
+    )
+  }
+  
   // MARK: - Emoji
 
   /// Returns the most-used emojis for the given guild.

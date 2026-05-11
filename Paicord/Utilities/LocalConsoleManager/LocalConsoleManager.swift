@@ -53,6 +53,10 @@ class StdOutInterceptor {
   }
 
   func startIntercepting() {
+    if ProcessInfo.processInfo.environment["DISABLE_STD_INTERCEPT"] == "1" {
+      return
+    }
+      
     queue.sync {
       guard !self.isActive else { return }
       self.isActive = true

@@ -289,7 +289,7 @@ public enum DiscordHTTPError: Error, CustomStringConvertible {
   case badStatusCode(DiscordHTTPResponse)
   /// Discord responded with a 200 status code but you requested DiscordBM to decode a `JSONError`.
   case cantDecodeJSONErrorFromSuccessfulResponse(DiscordHTTPResponse)
-  /// The response body was unexpectedly empty. If it happens frequently, you should report it to me at https://github.com/DiscordBM/DiscordBM/issues.
+  /// The response body was unexpectedly empty. If it happens frequently, you should report it to me at https://github.com/llsc12/Paicord/issues.
   case emptyBody(DiscordHTTPResponse)
   /// Discord didn't send a Content-Type header. See if they mentions any errors in the response.
   case noContentTypeHeader(DiscordHTTPResponse)

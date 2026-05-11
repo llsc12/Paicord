@@ -12,7 +12,8 @@ let package = Package(
     // Products define the executables and libraries a package produces, making them visible to other packages.
     .library(
       name: "DiscordMarkdownParser",
-      targets: ["DiscordMarkdownParser"])
+      targets: ["DiscordMarkdownParser"]
+    )
   ],
   dependencies: [
     .package(path: "../PaicordLib")
@@ -24,9 +25,17 @@ let package = Package(
       name: "DiscordMarkdownParser",
       dependencies: [
         "PaicordLib"
-      ]),
+      ],
+      swiftSettings: [
+        .interoperabilityMode(.Cxx)
+      ]
+    ),
     .testTarget(
       name: "DiscordMarkdownParserTests",
-      dependencies: ["DiscordMarkdownParser"]),
+      dependencies: ["DiscordMarkdownParser"],
+      swiftSettings: [
+        .interoperabilityMode(.Cxx)
+      ]
+    ),
   ]
 )

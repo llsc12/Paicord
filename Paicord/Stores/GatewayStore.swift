@@ -117,14 +117,16 @@ final class GatewayStore {
     presence.setGateway(self)
     messageDrain.setGateway(self)
     switcher.setGateway(self)
+    voice.setGateway(self)
+    voiceChannels.setGateway(self)
 
     // Update existing channel stores
-    for channelStore in channels.values {
+    for channelStore in _channels.values {
       channelStore.setGateway(self)
     }
 
     // Update existing guild stores
-    for guildStore in guilds.values {
+    for guildStore in _guilds.values {
       guildStore.setGateway(self)
     }
   }
@@ -137,8 +139,11 @@ final class GatewayStore {
     presence = .init()
     messageDrain = .init()
     switcher = .init()
-    channels = [:]
-    guilds = [:]
+    voice.cancelEventHandling() // cancel any ongoing voice stuff
+    voice = .init()
+    voiceChannels = .init()
+    _channels = [:]
+    _guilds = [:]
     subscribedGuilds = []
   }
 
@@ -153,30 +158,29 @@ final class GatewayStore {
   var presence = PresenceStore()
   var messageDrain = MessageDrainStore()
   var switcher = QuickSwitcherProviderStore()
+  var voice = VoiceConnectionStore()
+  var voiceChannels = VoiceChannelsStore()
 
-  private var channels: [ChannelSnowflake: ChannelStore] = [:]
+  var _channels: [ChannelSnowflake: ChannelStore] = [:]
   func getChannelStore(for id: ChannelSnowflake, from guild: GuildStore? = nil)
     -> ChannelStore
   {
-    if let store = channels[id] {
+    if let store = _channels[id] {
       return store
     } else {
       let channel = guild?.channels[id] ?? user.privateChannels[id]
       let store = ChannelStore(id: id, from: channel, guildStore: guild)
       store.setGateway(self)
-      channels[id] = store
+      _channels[id] = store
       return store
     }
   }
 
   private var subscribedGuilds: Set<GuildSnowflake> = []
-  private var guilds: [GuildSnowflake: GuildStore] = [:]
+  var _guilds: [GuildSnowflake: GuildStore] = [:]
   func getGuildStore(for id: GuildSnowflake) -> GuildStore {
     defer {
       if !subscribedGuilds.contains(id) {
-        print(
-          "[GatewayStore] Subscribing for guild store to \(id.rawValue)"
-        )
         subscribedGuilds.insert(id)
         Task {
           await gateway?.updateGuildSubscriptions(
@@ -192,17 +196,17 @@ final class GatewayStore {
                 )
               ])
           )
-          print("[GatewayStore] Subscribed to guild \(id.rawValue)")
+          print("[GatewayStore] Subscribed for GuildStore \(id.rawValue)")
         }
       }
     }
-    if let store = guilds[id] {
+    if let store = _guilds[id] {
       return store
     } else {
       let guild = user.guilds[id]
       let store = GuildStore(id: id, from: guild)
       store.setGateway(self)
-      guilds[id] = store
+      _guilds[id] = store
       return store
     }
   }
@@ -210,21 +214,6 @@ final class GatewayStore {
   // MARK: - Handlers
 
   private func handleReady(_ data: Gateway.Ready) {
-    // send voice states, temporary until paicord has proper voice handling
-    Task {
-      await self.gateway?.updateVoiceState(
-        payload: .init(
-          guild_id: nil,
-          channel_id: nil,
-          self_mute: true,
-          self_deaf: true,
-          self_video: false,
-          preferred_region: nil,
-          preferred_regions: nil,
-          flags: []
-        )
-      )
-    }
 
     // update user data in account storage
     accounts.updateProfile(for: data.user.id, data.user)
@@ -234,11 +223,15 @@ final class GatewayStore {
     print(
       "[GatewayStore] Reconnected, resubscribing to previously subscribed guilds."
     )
-    let channelIds = PaicordAppState.instances.compactMap(
-      \.value.selectedChannel
-    )
-    channels = channels.filter { channelIds.contains($0.key) }
-    if let channel = channels.values.first {
+    let channelIds = PaicordAppState.instances.compactMap {
+      switch $0.value.selectedChannel {
+      case .textChannel(let channelId), .thread(let channelId), .voiceChannel(let channelId):
+        return channelId
+        default: return nil
+      }
+    }
+    _channels = _channels.filter { channelIds.contains($0.key) }
+    if let channel = _channels.values.first {
       print(
         "[GatewayStore] Refetching messages on behalf of focused channel \(channel.channelId.rawValue)."
       )
@@ -278,22 +271,22 @@ final class GatewayStore {
     // Now that we've done that, we need to use this ready data to update any internal stores that need it
     // guilds need repopulating. also guilds could have been left during the client down time. remove guilds if they don't exist anymore then repopulate.
     // remove guilds that don't exist anymore, also remove their guildstores and any of their channelstores
-    for (guildId, guildStore) in guilds {
+    for (guildId, guildStore) in _guilds {
       if !existingGuildIds.contains(guildId) {
         print(
           "[GatewayStore] Removing guild store for non-existent guild \(guildId.rawValue)."
         )
         // remove their channels from channel stores
         for channelId in guildStore.channels.keys {
-          channels.removeValue(forKey: channelId)  // only really removes anything if the server that disappeared had a focused channel
+          _channels.removeValue(forKey: channelId)  // only really removes anything if the server that disappeared had a focused channel
         }
         // remove the guildstore itself
-        guilds.removeValue(forKey: guildId)
+        _guilds.removeValue(forKey: guildId)
       }
     }
 
     // repopulate guildstores
-    for guildStore in self.guilds.values {
+    for guildStore in _guilds.values {
       if let guild = data.guilds.first(where: { $0.id == guildStore.guildId }) {
         guildStore.populate(with: guild)
       }

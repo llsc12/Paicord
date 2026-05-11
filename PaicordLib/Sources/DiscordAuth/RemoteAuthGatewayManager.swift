@@ -9,7 +9,7 @@
 import AsyncHTTPClient
 import Atomics
 import Crypto
-import DiscordHTTP
+import DiscordGateway
 import DiscordModels
 import Foundation
 import Logging
@@ -133,7 +133,8 @@ public actor RemoteAuthGatewayManager {
   //MARK: Event streams
   var eventsStreamContinuations: [AsyncStream<RemoteAuthPayload>.Continuation] =
     []
-  var eventsParseFailureContinuations: [AsyncStream<(any Error, ByteBuffer)>.Continuation] = []
+  var eventsParseFailureContinuations:
+    [AsyncStream<(any Error, ByteBuffer)>.Continuation] = []
 
   /// An async sequence of Gateway events.
   public var events: DiscordAsyncSequence<RemoteAuthPayload> {
@@ -281,7 +282,8 @@ public actor RemoteAuthGatewayManager {
           )
           await self.onSuccessfulConnection()
 
-          for try await message in inbound.messages(maxSize: self.maxFrameSize) {
+          for try await message in inbound.messages(maxSize: self.maxFrameSize)
+          {
             await self.processBinaryData(
               message,
               forConnectionWithId: connectionId
@@ -843,7 +845,9 @@ extension RemoteAuthGatewayManager {
   /// Use this to exchange a remote auth ticket for a Discord auth token.
   /// - Parameter ticket: The remote auth ticket received from the gateway.
   /// - Returns: A token.
-  public func exchange(ticket: String, client: any DiscordClient) async throws -> Secret {
+  public func exchange(ticket: String, client: any DiscordClient) async throws
+    -> Secret
+  {
     let req = try await client.exchangeRemoteAuthTicket(
       payload: .init(ticket: ticket)
     )

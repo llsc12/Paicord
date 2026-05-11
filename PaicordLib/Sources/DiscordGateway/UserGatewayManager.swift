@@ -18,7 +18,7 @@ import WSClient
 import enum NIOWebSocket.WebSocketErrorCode
 import struct NIOWebSocket.WebSocketOpcode
 
-public actor UserGatewayManager: GatewayManager {
+public actor UserGatewayManager {
 
   private struct Message {
     let payload: Gateway.Event
@@ -153,6 +153,7 @@ public actor UserGatewayManager: GatewayManager {
       .userSettingsProto,
       .debounceMessageReactions,
       .nonChannelReadStates,
+      .autoCallConnect
     ],
     captchaCallback: CaptchaChallengeHandler? = nil,
     mfaCallback: MFAVerificationHandler? = nil,
@@ -212,51 +213,56 @@ public actor UserGatewayManager: GatewayManager {
 
     await self.sendQueue.reset()
     let gatewayURL = await getGatewayURL()
-    //    #if DEBUGo
-    let queries: [(String, String)] = [
-      ("v", "\(DiscordGlobalConfiguration.apiVersion)"),
-      ("encoding", "json"),
-      ("compress", "zstd-stream"),
-    ]
-    let decompressorWSExtension: ZstdDecompressorWSExtension
-    do {
-      decompressorWSExtension = try ZstdDecompressorWSExtension(
-        logger: self.logger
-      )
-    } catch {
-      self.logger.critical(
-        "Will not connect because can't create a decompressor. Something is wrong. Please report this failure at https://github.com/DiscordBM/DiscordBM/issues",
-        metadata: ["error": .string(String(reflecting: error))]
-      )
-      return
-    }
-    //    #endif
+    #if DEBUG
+      let queries: [(String, String)] = [
+        ("v", "\(DiscordGlobalConfiguration.apiVersion)"),
+        ("encoding", "json"),
+      ]
+    #else
+      let decompressorWSExtension: ZstdDecompressorWSExtension
+      do {
+        decompressorWSExtension = try ZstdDecompressorWSExtension(
+          logger: self.logger
+        )
+      } catch {
+        self.logger.critical(
+          "Will not connect because can't create a decompressor. Something is wrong. Please report this failure at https://github.com/llsc12/Paicord/issues",
+          metadata: ["error": .string(String(reflecting: error))]
+        )
+        return
+      }
+      let queries: [(String, String)] = [
+        ("v", "\(DiscordGlobalConfiguration.apiVersion)"),
+        ("encoding", "json"),
+        ("compress", "zstd-stream"),
+      ]
+    #endif
 
-    //    #if DEBUG
-    //    let configuration = WebSocketClientConfiguration(
-    //      maxFrameSize: self.maxFrameSize,
-    //      additionalHeaders: [
-    //        .userAgent: SuperProperties.useragent(ws: false)!,
-    //        .origin: "https://discord.com",
-    //        .cacheControl: "no-cache",
-    //        .acceptLanguage: SuperProperties.GenerateLocaleHeader(),
-    //
-    //      ],
-    //      extensions: []
-    //    )
-    //    #else
-    let configuration = WebSocketClientConfiguration(
-      maxFrameSize: self.maxFrameSize,
-      additionalHeaders: [
-        .userAgent: SuperProperties.useragent(ws: false)!,
-        .origin: "https://discord.com",
-        .cacheControl: "no-cache",
-        .acceptLanguage: SuperProperties.GenerateLocaleHeader(),
+    #if DEBUG
+      let configuration = WebSocketClientConfiguration(
+        maxFrameSize: self.maxFrameSize,
+        additionalHeaders: [
+          .userAgent: SuperProperties.useragent(ws: false)!,
+          .origin: "https://discord.com",
+          .cacheControl: "no-cache",
+          .acceptLanguage: SuperProperties.GenerateLocaleHeader(),
 
-      ],
-      extensions: [.nonNegotiatedExtension { decompressorWSExtension }]
-    )
-    //    #endif
+        ],
+        extensions: []
+      )
+    #else
+      let configuration = WebSocketClientConfiguration(
+        maxFrameSize: self.maxFrameSize,
+        additionalHeaders: [
+          .userAgent: SuperProperties.useragent(ws: false)!,
+          .origin: "https://discord.com",
+          .cacheControl: "no-cache",
+          .acceptLanguage: SuperProperties.GenerateLocaleHeader(),
+
+        ],
+        extensions: [.nonNegotiatedExtension { decompressorWSExtension }]
+      )
+    #endif
 
     logger.trace("Will try to connect to Discord through web-socket")
     let connectionId = self.connectionId.wrappingIncrementThenLoad(
@@ -281,7 +287,8 @@ public actor UserGatewayManager: GatewayManager {
           self.state.store(.configured, ordering: .relaxed)
           self.stateCallback?(.configured)
 
-          for try await message in inbound.messages(maxSize: self.maxFrameSize) {
+          for try await message in inbound.messages(maxSize: self.maxFrameSize)
+          {
             await self.processBinaryData(
               message,
               forConnectionWithId: connectionId
@@ -601,11 +608,10 @@ extension UserGatewayManager {
         )
       )
     )
-    let opcode = Gateway.Opcode.identify
     self.send(
       message: .init(
         payload: resume,
-        opcode: .init(encodedWebSocketOpcode: opcode.rawValue)!
+        opcode: .text
       )
     )
 

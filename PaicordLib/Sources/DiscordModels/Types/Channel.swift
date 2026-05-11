@@ -221,7 +221,7 @@ public struct DiscordChannel: Sendable, Codable, Equatable, Hashable {
   public var available_tags: [ForumTag]?
   public var template: String?
   public var member_ids_preview: [String]?
-  public var version: Int?
+  public var version: Int64?
   /// Thread-only:
   public var member: ThreadMember?
   public var newly_created: Bool?
@@ -653,10 +653,34 @@ extension DiscordChannel {
       public var id: InteractionSnowflake
       public var type: Interaction.Kind
       public var user: DiscordUser
-      public var authorizing_integration_owners: [DiscordApplication.IntegrationKind: AnySnowflake]
+      public var authorizing_integration_owners:
+        [DiscordApplication.IntegrationKind: AnySnowflake]
       public var original_response_message_id: MessageSnowflake?
       public var target_user: DiscordUser?
       public var target_message_id: MessageSnowflake?
+
+      public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decode(InteractionSnowflake.self, forKey: .id)
+        self.type = try container.decode(Interaction.Kind.self, forKey: .type)
+        self.user = try container.decode(DiscordUser.self, forKey: .user)
+        self.authorizing_integration_owners = (try? container.decode(
+          [DiscordApplication.IntegrationKind: AnySnowflake].self,
+          forKey: .authorizing_integration_owners
+        )) ?? [:]
+        self.original_response_message_id = try container.decodeIfPresent(
+          MessageSnowflake.self,
+          forKey: .original_response_message_id
+        )
+        self.target_user = try container.decodeIfPresent(
+          DiscordUser.self,
+          forKey: .target_user
+        )
+        self.target_message_id = try container.decodeIfPresent(
+          MessageSnowflake.self,
+          forKey: .target_message_id
+        )
+      }
     }
 
     public struct Call: Sendable, Codable, Equatable, Hashable {
@@ -943,7 +967,8 @@ extension DiscordChannel {
 }
 
 /// https://discord.com/developers/docs/resources/message#embed-object
-public struct Embed: Sendable, Codable, Equatable, Hashable, ValidatablePayload {
+public struct Embed: Sendable, Codable, Equatable, Hashable, ValidatablePayload
+{
 
   /// https://discord.com/developers/docs/resources/message#embed-object-embed-types
   @UnstableEnum<String>

@@ -255,9 +255,9 @@ extension DiscordLocaleDict: Equatable where C: Equatable {
 public struct DiscordTimestamp: Codable, Hashable {
 
   public enum DecodingError: Swift.Error, CustomStringConvertible {
-    /// The timestamp had an unexpected format. This is a library decoding issue, please report this at https://github.com/DiscordBM/DiscordBM/issues.
+    /// The timestamp had an unexpected format. This is a library decoding issue, please report this at https://github.com/llsc12/Paicord/issues.
     case unexpectedFormat([any CodingKey], String)
-    /// Could not convert the timestamp to a 'Date'. This is a library decoding issue, please report this at https://github.com/DiscordBM/DiscordBM/issues.
+    /// Could not convert the timestamp to a 'Date'. This is a library decoding issue, please report this at https://github.com/llsc12/Paicord/issues.
     case conversionFailure([any CodingKey], String, DateComponents)
 
     public var description: String {
@@ -340,12 +340,12 @@ public struct DiscordTimestamp: Codable, Hashable {
         )
       }
       self.date = date
-    } else if let int = try? container.decode(Int.self) {
+    } else if let int = try? container.decode(Int64.self) {
       self.date = Date(timeIntervalSince1970: TimeInterval(int))
     } else {
       throw DecodingError.unexpectedFormat(
         container.codingPath,
-        "Non String/Int value"
+        "Non String/Int64 value"
       )
     }
   }
@@ -370,7 +370,7 @@ public struct DiscordTimestamp: Codable, Hashable {
         .init(
           codingPath: container.codingPath,
           debugDescription:
-            "Programming Error. Could not encode Date '\(date.debugDescription)' to Discord Timestamp. Please report: https://github.com/DiscordBM/DiscordBM/issues"
+            "Programming Error. Could not encode Date '\(date.debugDescription)' to Discord Timestamp. Please report: https://github.com/llsc12/Paicord/issues"
         )
       )
     }

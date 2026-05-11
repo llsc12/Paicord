@@ -64,6 +64,17 @@ class GuildStore: DiscordDataStore {
     }
   }
 
+  func setGateway(_ gateway: GatewayStore?) {
+    // override default impl of protocol.
+    cancelEventHandling()
+    self.gateway = gateway
+    if gateway != nil {
+      setupEventHandling()
+    }
+
+    fetchVoiceChannelsMembers()
+  }
+
   // MARK: - Protocol Methods
 
   func setupEventHandling() {
@@ -72,6 +83,12 @@ class GuildStore: DiscordDataStore {
     eventTask = Task { @MainActor in
       for await event in await gateway.events {
         switch event.data {
+        case .ready(let readyData):
+          handleReady(readyData)
+
+        case .resumed:
+          handleResumed()
+
         case .guildUpdate(let updatedGuild):
           if updatedGuild.id == guildId {
             handleGuildUpdate(updatedGuild)
@@ -151,6 +168,15 @@ class GuildStore: DiscordDataStore {
   }
 
   // MARK: - Event Handlers
+
+  private func handleReady(_ readyData: Gateway.Ready) {
+    fetchVoiceChannelsMembers()
+  }
+
+  private func handleResumed() {
+    fetchVoiceChannelsMembers()
+  }
+
   private func handleGuildUpdate(_ updatedGuild: Guild) {
     guild = updatedGuild
 
@@ -206,8 +232,9 @@ class GuildStore: DiscordDataStore {
     )
     guard membersChunk.guild_id == guildId else { return }
     for member in membersChunk.members {
-      if let user = member.user {
+      if let user = member.user?.toPartialUser() {
         members[user.id] = member.toPartialMember()
+        gateway?.user.users[user.id, default: user].update(with: user)
       }
     }
   }
@@ -340,7 +367,6 @@ class GuildStore: DiscordDataStore {
     // also the gateway doesnt take member list ids, we send channel snowflakes
     let subscriptions: [ChannelSnowflake: [IntPair]] =
       subscribedMemberListIDs.reduce(into: [:]) { partialResult, element in
-        let memberListId = element.key
         let channelSnowflake = element.value.channelID
         partialResult[channelSnowflake] = element.value.ranges
       }
@@ -354,5 +380,31 @@ class GuildStore: DiscordDataStore {
         ]
       )
     )
+  }
+
+  private func fetchVoiceChannelsMembers() {
+    // check for people in voice chats, they may not have member data.
+    let requestingIDs: [UserSnowflake] =
+      gateway?.voiceChannels.voiceStates[
+        guildId,
+        default: [:]
+      ].values.flatMap(\.values)
+      .reduce(into: [UserSnowflake]()) {
+        partialResult,
+        state in
+        if state.member == nil {
+          partialResult.append(state.user_id)
+        }
+      } ?? []
+
+    if !requestingIDs.isEmpty {
+      Task { @MainActor in
+        try? await Task.sleep(for: .milliseconds(500))
+        print(
+          "[GuildStore] Requesting \(requestingIDs.count) members in vc in guild \(guildId.rawValue)"
+        )
+        await self.requestMembers(for: .init(requestingIDs))
+      }
+    }
   }
 }

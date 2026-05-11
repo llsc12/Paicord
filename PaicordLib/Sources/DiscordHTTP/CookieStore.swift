@@ -30,7 +30,7 @@ public struct Cookie: Codable, Sendable {
 
 @usableFromInline
 actor CookieStore {
-  private var cookies: [String: Cookie] = [:]
+  internal var cookies: [String: Cookie] = [:]
 
   // gets cookies
   @usableFromInline

@@ -3131,4 +3131,26 @@ public enum Payloads {
 
     public func validate() -> [ValidationFailure] {}
   }
+  
+  /// https://docs.discord.food/resources/channel#modify-call
+  public struct ModifyCall: Sendable, Encodable, ValidatablePayload {
+    public var region: String?
+    
+    public init(region: String? = nil) {
+      self.region = region
+    }
+    
+    public func validate() -> [ValidationFailure] {}
+  }
+  
+  /// https://docs.discord.food/resources/channel#ring-channel-recipients
+  public struct RingChannelRecipients: Sendable, Encodable, ValidatablePayload {
+    public var recipients: [UserSnowflake]?
+    
+    public init(recipients: [UserSnowflake]? = nil) {
+      self.recipients = recipients
+    }
+    
+    public func validate() -> [ValidationFailure] {}
+  }
 }

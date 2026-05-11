@@ -419,7 +419,7 @@ extension Gateway {
   /// https://docs.discord.food/topics/gateway-events#update-time-spent-session-id
   public struct UpdateTimeSpentSessionID: Sendable, Codable {
     // Unix timestamp (in milliseconds) of when the session ID was generated
-    public var initialization_timestamp: Int = Int(
+    public var initialization_timestamp: Int64 = Int64(
       SuperProperties._initialisation_date.timeIntervalSince1970 * 1000
     )
     // A client-generated UUID, same as client_heartbeat_session_id in client properties
@@ -589,7 +589,7 @@ extension Gateway {
     public var nsfw: Bool
     public var application_command_counts: [String: Int]?
     public var embedded_activities: [Gateway.Activity]?
-    public var version: Int?
+    public var version: Int64?
     public var guild_id: GuildSnowflake?
     /// Extra fields:
     public var joined_at: DiscordTimestamp
@@ -807,7 +807,7 @@ extension Gateway {
   public struct GuildRoleDelete: Sendable, Codable {
     public var guild_id: GuildSnowflake
     public var role_id: RoleSnowflake
-    public var version: Int?
+    public var version: Int64?
   }
 
   /// Not the same as what Discord calls `Guild Scheduled Event User`.
@@ -1257,10 +1257,10 @@ extension Gateway {
 
     /// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-timestamps
     public struct Timestamps: Sendable, Codable, Equatable, Hashable {
-      public var start: Int?
-      public var end: Int?
+      public var start: DiscordTimestamp?
+      public var end: DiscordTimestamp?
 
-      public init(start: Int? = nil, end: Int? = nil) {
+      public init(start: DiscordTimestamp? = nil, end: DiscordTimestamp? = nil) {
         self.start = start
         self.end = end
       }
@@ -1379,7 +1379,7 @@ extension Gateway {
     public var name: String?
     public var type: Kind?
     public var url: String?
-    public var created_at: Int?
+    public var created_at: DiscordTimestamp?
     public var timestamps: Timestamps?
     public var application_id: ApplicationSnowflake?
     public var details: String?
@@ -1398,7 +1398,7 @@ extension Gateway {
       self.type = try container.decodeIfPresent(Kind.self, forKey: .type)
       self.url = try container.decodeIfPresent(String.self, forKey: .url)
       self.created_at = try container.decodeIfPresent(
-        Int.self,
+        DiscordTimestamp.self,
         forKey: .created_at
       )
       self.timestamps = try container.decodeIfPresent(
@@ -1484,8 +1484,8 @@ extension Gateway {
 
   /// https://discord.com/developers/docs/topics/gateway-events#voice-server-update-voice-server-update-event-fields
   public struct VoiceServerUpdate: Sendable, Codable {
-    public var token: String
-    public var guild_id: GuildSnowflake
+    public var token: Secret
+    public var guild_id: GuildSnowflake?
     public var endpoint: String?
   }
 
@@ -1540,6 +1540,7 @@ extension Gateway {
     public var message_id: MessageSnowflake
     public var region: String
     public var ringing: [UserSnowflake]
+    public var voice_states: [VoiceState]?
   }
 
   /// https://docs.discord.food/topics/gateway-events#call-update
@@ -1548,7 +1549,6 @@ extension Gateway {
     public var message_id: MessageSnowflake
     public var region: String
     public var ringing: [UserSnowflake]
-    public var voice_states: [VoiceState]?
   }
 
   /// https://docs.discord.food/topics/gateway-events#call-delete
@@ -1567,6 +1567,11 @@ extension Gateway {
 
   /// https://docs.discord.food/topics/gateway-events#request-channel-member-count
   public struct RequestChannelMemberCount: Sendable, Codable {
+    public init(guild_id: GuildSnowflake, channel_id: ChannelSnowflake) {
+      self.guild_id = guild_id
+      self.channel_id = channel_id
+    }
+    
     public var guild_id: GuildSnowflake
     public var channel_id: ChannelSnowflake
   }
@@ -1772,7 +1777,7 @@ extension Gateway {
       // TODO: Make enums
       public var client: ClientType
       public var os: String
-      public var version: Int
+      public var version: Int64
 
       @UnstableEnum<String>
       public enum ClientType: Sendable, Codable {
@@ -2030,7 +2035,7 @@ extension Gateway {
   public struct ChannelPinsAcknowledge: Sendable, Codable {
     public var channel_id: ChannelSnowflake
     public var timestamp: DiscordTimestamp
-    public var version: Int
+    public var version: Int64
   }
 
   /// https://docs.discord.food/topics/gateway-events#user-non-channel-ack-structure
@@ -2038,7 +2043,7 @@ extension Gateway {
     public var ack_type: ReadState.Kind
     public var resource_id: UserSnowflake
     public var entity_id: AnySnowflake
-    public var version: Int
+    public var version: Int64
   }
 
   /// https://docs.discord.food/resources/message#create-attachments

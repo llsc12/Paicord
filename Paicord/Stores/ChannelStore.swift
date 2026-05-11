@@ -645,7 +645,9 @@ class ChannelStore: DiscordDataStore {
           print(
             "[ChannelStore] Requesting \(unknownMembers.count) unknown members in guild \(guildStore.guildId.rawValue)"
           )
-          await guildStore.requestMembers(for: unknownMembers)
+          Task { @MainActor in
+            await guildStore.requestMembers(for: unknownMembers)
+          }
         }
       }
     } catch {

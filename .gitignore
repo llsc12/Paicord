@@ -9,4 +9,7 @@ Package.resolved
 **/*.xcuserstate
 /.gradle
 /.idea
+/PaicordKt/.idea
 /PaicordLib/build
+/build
+local.properties

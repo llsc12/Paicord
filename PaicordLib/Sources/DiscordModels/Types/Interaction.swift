@@ -302,7 +302,7 @@ public struct Interaction: Sendable, Codable {
   public var member: Guild.Member?
   public var user: DiscordUser?
   public var token: String
-  public var version: Int
+  public var version: Int64
   public var message: DiscordChannel.Message?
   public var locale: DiscordLocale?
   public var guild_locale: DiscordLocale?
@@ -390,7 +390,7 @@ public struct Interaction: Sendable, Codable {
     )
     self.user = try container.decodeIfPresent(DiscordUser.self, forKey: .user)
     self.token = try container.decode(String.self, forKey: .token)
-    self.version = try container.decode(Int.self, forKey: .version)
+    self.version = try container.decode(Int64.self, forKey: .version)
     self.message = try container.decodeIfPresent(
       DiscordChannel.Message.self,
       forKey: .message
@@ -1316,9 +1316,9 @@ extension Interaction {
     public var components: [Component]
 
     public enum CodingError: Swift.Error, CustomStringConvertible {
-      /// This component kind was not expected here. This is a library decoding issue, please report at: https://github.com/DiscordBM/DiscordBM/issues.
+      /// This component kind was not expected here. This is a library decoding issue, please report at: https://github.com/llsc12/Paicord/issues.
       case unexpectedComponentKind(Kind)
-      /// I thought action-row is supposed to only appear at top-level as a container for other components. This is a library decoding issue, please report at: https://github.com/DiscordBM/DiscordBM/issues.
+      /// I thought action-row is supposed to only appear at top-level as a container for other components. This is a library decoding issue, please report at: https://github.com/llsc12/Paicord/issues.
       case actionRowIsSupposedToOnlyAppearAtTopLevel
 
       public var description: String {

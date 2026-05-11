@@ -518,3 +518,12 @@ extension RemoteAuthGatewayManager.RemoteAuthPayload.UserPayload {
     )
   }
 }
+
+extension Gateway.CallCreate {
+  mutating func update(with new: Gateway.CallUpdate) {
+    self.channel_id = new.channel_id
+    self.message_id = new.message_id
+    self.region = new.region
+    self.ringing = new.ringing
+  }
+}
