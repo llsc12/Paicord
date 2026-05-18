@@ -15,6 +15,7 @@ ui = "1.11.1"
 kotlinSerialization = "2.3.21"
 kotlinxSerializationCore = "1.11.0"
 androidx-activity = "1.13.0"
+swiftkitCore = "1.0-SNAPSHOT"
 
 [libraries]
 # these icons can also be used later on
@@ -23,6 +24,7 @@ androidx-material3 = { module = "androidx.compose.material3:material3", version.
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "ui" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidx-activity" }
+swiftkit-core = { module = "org.swift.swiftkit:swiftkit-core", version.ref = "swiftkitCore" }
 # use navigation 3 for later(?)
 # androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "nav3Core" }
 # androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "nav3Core" }

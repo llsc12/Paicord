@@ -32,8 +32,10 @@ android {
 }
 
 dependencies {
-    // Compose/Material packages
+    implementation(libs.swiftkit.core)
     implementation(project(":PaicordLib"))
+
+    // Compose/Material packages
     implementation(libs.androidx.ui)
     implementation(platform(libs.compose.bom))
     implementation(libs.androidx.material3)
