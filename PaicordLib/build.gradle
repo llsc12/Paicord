@@ -1,10 +1,10 @@
 import java.nio.file.*
 import org.gradle.internal.os.OperatingSystem
 import groovy.json.JsonSlurper
-import kotlinx.serialization.json.*
+// import kotlinx.serialization.json.*
 
 plugins {
-  alias(libs.plugins.android.library)
+  id 'com.android.library'
 }
 
 android {
@@ -16,13 +16,13 @@ android {
   }
 
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
   }
 }
 
 dependencies {
-  implementation('org.swift.swiftkit:swiftkit-core:1.0-SNAPSHOT')
+  implementation(libs.swiftkit.core)
 }
 
 // Helper function to get swiftly executable path
