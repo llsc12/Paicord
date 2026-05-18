@@ -22,7 +22,7 @@ android {
 }
 
 dependencies {
-  implementation("org.swift.swiftkit:swiftkit-core:1.0-SNAPSHOT")
+  implementation('org.swift.swiftkit:swiftkit-core:1.0-SNAPSHOT')
 }
 
 // Helper function to get swiftly executable path
