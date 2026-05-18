@@ -4,7 +4,7 @@ compileSdk = "37"
 #noinspection UnusedVersionCatalogEntry
 targetSdk = "37"
 #noinspection UnusedVersionCatalogEntry
-minSdk = "24"
+minSdk = "26"
 agp = "9.2.1"
 nav3Core = "1.1.1"
 composeBomVersion = "2026.05.00"
