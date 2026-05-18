@@ -32,7 +32,7 @@ android {
 }
 
 dependencies {
-    implementation(libs.swiftkit.core)
+    implementation("org.swift.swiftkit:swiftkit-core:1.0-SNAPSHOT")
     implementation(project(":PaicordLib"))
 
     // Compose/Material packages
