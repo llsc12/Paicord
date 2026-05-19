@@ -7,7 +7,6 @@ targetSdk = "37"
 minSdk = "28"
 agp = "9.2.1"
 nav3Core = "1.1.1"
-composeBomVersion = "2026.05.00"
 kotlin = "2.3.21"
 material3 = "1.5.0-alpha19"
 materialIconsCore = "1.7.8"
@@ -20,7 +19,6 @@ androidx-activity = "1.13.0"
 # these icons can also be used later on
 # androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "materialIconsCore" }
 androidx-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "ui" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidx-activity" }
 # use navigation 3 for later(?)
@@ -32,3 +30,4 @@ androidx-activity-compose = { group = "androidx.activity", name = "activity-comp
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+android-library = { id = "com.android.library", version.ref = "agp" }

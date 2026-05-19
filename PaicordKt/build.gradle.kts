@@ -37,7 +37,6 @@ dependencies {
 
     // Compose/Material packages
     implementation(libs.androidx.ui)
-    implementation(platform(libs.compose.bom))
     implementation(libs.androidx.material3)
     implementation(libs.androidx.activity.compose)
 

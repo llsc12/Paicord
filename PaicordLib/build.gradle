@@ -1,10 +1,10 @@
 import java.nio.file.*
 import org.gradle.internal.os.OperatingSystem
 import groovy.json.JsonSlurper
-import kotlinx.serialization.json.*
+import kotlinx.serialization.*
 
 plugins {
-  id 'com.android.library'
+  alias(libs.plugins.android.library)
 }
 
 android {
