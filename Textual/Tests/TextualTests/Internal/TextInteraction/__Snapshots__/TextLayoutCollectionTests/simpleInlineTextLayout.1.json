@@ -1,0 +1,253 @@
+[
+  {
+    "attributedString" : [
+      "Hello world!",
+      {
+        "NSColor" : "YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMSAAGGoF8QD05TS2V5ZWRBcmNoaXZlctEICVRyb290gAGjCwwbVSRudWxs2A0ODxAREhMUFRYWFxgZFhpfEBVVSUNvbG9yQ29tcG9uZW50Q291bnRXVUlHcmVlblZVSUJsdWVXVUlBbHBoYVVOU1JHQlYkY2xhc3NVVUlSZWRcTlNDb2xvclNwYWNlEAQiAAAAACI\/gAAARTAgMCAwgAIQAtMcHR4fICJaJGNsYXNzbmFtZVgkY2xhc3Nlc1skY2xhc3NoaW50c1dVSUNvbG9yoh8hWE5TT2JqZWN0oSNXTlNDb2xvcgAIABEAGgAkACkAMgA3AEkATABRAFMAVwBdAG4AhgCOAJUAnQCjAKoAsAC9AL8AxADJAM8A0QDTANoA5QDuAPoBAgEFAQ4BEAAAAAAAAAIBAAAAAAAAACQAAAAAAAAAAAAAAAAAAAEY",
+        "NSFont" : "YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMSAAGGoF8QD05TS2V5ZWRBcmNoaXZlctEICVRyb290gAGvEBALDCEiKDY3ODkbOjs8PURIVSRudWxs2w0ODxAREhMUFRYXGBgZGhscHRseGiBfECJVSUZvbnRNYXhpbXVtUG9pbnRTaXplQWZ0ZXJTY2FsaW5nXxAZVUlGb250UG9pbnRTaXplRm9yU2NhbGluZ18QEFVJRm9udERlc2NyaXB0b3JWTlNOYW1lVk5TU2l6ZVYkY2xhc3NcVUlGb250VHJhaXRzXxAPVUlGb250UG9pbnRTaXplXxAZVUlGb250VGV4dFN0eWxlRm9yU2NhbGluZ1pVSUZvbnROYW1lXFVJU3lzdGVtRm9udCMAAAAAAAAAAIADgAIjQDAAAAAAAACADxAAgACAAgldLlNGVUktUmVndWxhctMjEiQlJidfEBdVSUZvbnREZXNjcmlwdG9yT3B0aW9uc18QGlVJRm9udERlc2NyaXB0b3JBdHRyaWJ1dGVzEoAAhASADoAE0ykqEiswNVdOUy5rZXlzWk5TLm9iamVjdHOkLC0uL4AFgAaAB4AIpDEyMzSACYAKgAuADIANXxATTlNGb250U2l6ZUF0dHJpYnV0ZV8QIk5TQ1RGb250VGFyZ2V0RW52aXJvbm1lbnRBdHRyaWJ1dGVfEB1OU0NURm9udFNpemVDYXRlZ29yeUF0dHJpYnV0ZV8QGE5TQ1RGb250VUlVc2FnZUF0dHJpYnV0ZRADEAJfEBVVSUNURm9udFRleHRTdHlsZUJvZHnSPj9AQVokY2xhc3NuYW1lWCRjbGFzc2VzXE5TRGljdGlvbmFyeaJCQ1xOU0RpY3Rpb25hcnlYTlNPYmplY3TSPj9FRl8QEFVJRm9udERlc2NyaXB0b3KiR0NfEBBVSUZvbnREZXNjcmlwdG9y0z4\/SUpLTFskY2xhc3NoaW50c1ZVSUZvbnSiSkOhTVZOU0ZvbnQACAARABoAJAApADIANwBJAEwAUQBTAGYAbACDAKgAxADXAN4A5QDsAPkBCwEnATIBPwFIAUoBTAFVAVcBWQFbAV0BXgFsAXMBjQGqAa8BsQGzAboBwgHNAdIB1AHWAdgB2gHfAeEB4wHlAecB6QH\/AiQCRAJfAmECYwJ7AoACiwKUAqECpAKxAroCvwLSAtUC6ALvAvsDAgMFAwcAAAAAAAACAQAAAAAAAABOAAAAAAAAAAAAAAAAAAADDg==",
+        "NSParagraphStyle" : "YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMSAAGGoF8QD05TS2V5ZWRBcmNoaXZlctEICVRyb290gAGjCwwVVSRudWxs1A0ODxAREhMUWk5TVGFiU3RvcHNWJGNsYXNzXxATTlNMaW5lQnJlYWtTdHJhdGVneV8QIk5TQWxpZ25tZW50Rm9sbG93c1dyaXRpbmdEaXJlY3Rpb26AAIACEf\/\/CdIWFxgZWiRjbGFzc25hbWVYJGNsYXNzZXNfEBdOU011dGFibGVQYXJhZ3JhcGhTdHlsZaMaGxxfEBdOU011dGFibGVQYXJhZ3JhcGhTdHlsZV8QEE5TUGFyYWdyYXBoU3R5bGVYTlNPYmplY3QACAARABoAJAApADIANwBJAEwAUQBTAFcAXQBmAHEAeACOALMAtQC3ALoAuwDAAMsA1ADuAPIBDAEfAAAAAAAAAgEAAAAAAAAAHQAAAAAAAAAAAAAAAAAAASg="
+      }
+    ],
+    "bounds" : [
+      [
+        0,
+        0.09895833333333215
+      ],
+      [
+        85.7890625,
+        19.09375
+      ]
+    ],
+    "lines" : [
+      {
+        "origin" : [
+          0,
+          15.333333333333332
+        ],
+        "runs" : [
+          {
+            "isRightToLeft" : false,
+            "slices" : [
+              {
+                "characterRange" : [
+                  0,
+                  1
+                ],
+                "typographicBounds" : [
+                  [
+                    0,
+                    0.09895833333333215
+                  ],
+                  [
+                    11.5625,
+                    19.09375
+                  ]
+                ]
+              },
+              {
+                "characterRange" : [
+                  1,
+                  2
+                ],
+                "typographicBounds" : [
+                  [
+                    11.5625,
+                    0.09895833333333215
+                  ],
+                  [
+                    8.828125,
+                    19.09375
+                  ]
+                ]
+              },
+              {
+                "characterRange" : [
+                  2,
+                  3
+                ],
+                "typographicBounds" : [
+                  [
+                    20.390625,
+                    0.09895833333333215
+                  ],
+                  [
+                    3.734375,
+                    19.09375
+                  ]
+                ]
+              },
+              {
+                "characterRange" : [
+                  3,
+                  4
+                ],
+                "typographicBounds" : [
+                  [
+                    24.125,
+                    0.09895833333333215
+                  ],
+                  [
+                    3.734375,
+                    19.09375
+                  ]
+                ]
+              },
+              {
+                "characterRange" : [
+                  4,
+                  5
+                ],
+                "typographicBounds" : [
+                  [
+                    27.859375,
+                    0.09895833333333215
+                  ],
+                  [
+                    9.140625,
+                    19.09375
+                  ]
+                ]
+              },
+              {
+                "characterRange" : [
+                  5,
+                  6
+                ],
+                "typographicBounds" : [
+                  [
+                    37,
+                    0.09895833333333215
+                  ],
+                  [
+                    4.1875,
+                    19.09375
+                  ]
+                ]
+              },
+              {
+                "characterRange" : [
+                  6,
+                  7
+                ],
+                "typographicBounds" : [
+                  [
+                    41.1875,
+                    0.09895833333333215
+                  ],
+                  [
+                    11.765625,
+                    19.09375
+                  ]
+                ]
+              },
+              {
+                "characterRange" : [
+                  7,
+                  8
+                ],
+                "typographicBounds" : [
+                  [
+                    52.953125,
+                    0.09895833333333215
+                  ],
+                  [
+                    9.140625,
+                    19.09375
+                  ]
+                ]
+              },
+              {
+                "characterRange" : [
+                  8,
+                  9
+                ],
+                "typographicBounds" : [
+                  [
+                    62.09375,
+                    0.09895833333333215
+                  ],
+                  [
+                    5.78125,
+                    19.09375
+                  ]
+                ]
+              },
+              {
+                "characterRange" : [
+                  9,
+                  10
+                ],
+                "typographicBounds" : [
+                  [
+                    67.875,
+                    0.09895833333333215
+                  ],
+                  [
+                    3.734375,
+                    19.09375
+                  ]
+                ]
+              },
+              {
+                "characterRange" : [
+                  10,
+                  11
+                ],
+                "typographicBounds" : [
+                  [
+                    71.609375,
+                    0.09895833333333215
+                  ],
+                  [
+                    9.515625,
+                    19.09375
+                  ]
+                ]
+              },
+              {
+                "characterRange" : [
+                  11,
+                  12
+                ],
+                "typographicBounds" : [
+                  [
+                    81.125,
+                    0.09895833333333215
+                  ],
+                  [
+                    4.6640625,
+                    19.09375
+                  ]
+                ]
+              }
+            ],
+            "typographicBounds" : [
+              [
+                0,
+                0.09895833333333215
+              ],
+              [
+                85.7890625,
+                19.09375
+              ]
+            ]
+          }
+        ],
+        "typographicBounds" : [
+          [
+            0,
+            0.09895833333333215
+          ],
+          [
+            85.7890625,
+            19.09375
+          ]
+        ]
+      }
+    ],
+    "origin" : [
+      16,
+      0
+    ]
+  }
+]

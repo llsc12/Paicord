@@ -1,0 +1,3862 @@
+[
+  {
+    "shortcode": "0w0",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/960/original/17db5dd0c4a82af1.png"
+  },
+  {
+    "shortcode": "100a",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/956/original/b98887c601527622.png"
+  },
+  {
+    "shortcode": "100_gay",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/962/original/8f05c64bba0f6929.png"
+  },
+  {
+    "shortcode": "100_valid",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/961/original/b8c6a27f71129417.png"
+  },
+  {
+    "shortcode": "1up",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/957/original/725cb40648a4b6ef.png"
+  },
+  {
+    "shortcode": "4chan",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/958/original/185df11507b670d5.png"
+  },
+  {
+    "shortcode": "9gag",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/959/original/3e7b08048eab10b2.png"
+  },
+  {
+    "shortcode": "aaaa",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/729/original/b981a2c6ab1ef226.png"
+  },
+  {
+    "shortcode": "AAAAAA",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/990/original/2448040038fefd72.png"
+  },
+  {
+    "shortcode": "ablobblewobble",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/997/original/e900939b4bdb9bab.png"
+  },
+  {
+    "shortcode": "ablobbowtie_neon",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/964/original/2be464fd931e72ab.gif"
+  },
+  {
+    "shortcode": "ablobcaramelldansen",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/977/original/4a78d0f9f24c0e04.png"
+  },
+  {
+    "shortcode": "ablobcatangel",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/987/original/c930a1560659d0fa.png"
+  },
+  {
+    "shortcode": "ablobcatattention",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/243/original/a4c4d9160f4af45c.png"
+  },
+  {
+    "shortcode": "ablobcatattentionreverse",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/980/original/caffd06dd8219d0d.png"
+  },
+  {
+    "shortcode": "ablobcatbongo",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/982/original/c6e989295d7f6584.png"
+  },
+  {
+    "shortcode": "ablobcatbongocry",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/985/original/2ea850dad0ffbb20.gif"
+  },
+  {
+    "shortcode": "ablobcatbongotwitter",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/998/original/60e2cbba91ddfae3.gif"
+  },
+  {
+    "shortcode": "ablobcatcoffee",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/983/original/0468d0ace4a67f28.png"
+  },
+  {
+    "shortcode": "ablobcatcry",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/984/original/cc5fe8b3f71dba1e.png"
+  },
+  {
+    "shortcode": "ablobcatenjoy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/965/original/7191bdcc537fdea7.gif"
+  },
+  {
+    "shortcode": "ablobcateyesflip",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/020/427/original/8e630e6ee42b2b71.gif"
+  },
+  {
+    "shortcode": "ablobcatgrumpy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/559/original/24a66f60657634c6.png"
+  },
+  {
+    "shortcode": "ablobcathappypaws",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/994/original/4a5039f7366dc731.png"
+  },
+  {
+    "shortcode": "ablobcatheadbang",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/992/original/5c0b3c34214cc21c.gif"
+  },
+  {
+    "shortcode": "ablobcatheadphonesfast",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/966/original/4e6dd7cae97b53ee.gif"
+  },
+  {
+    "shortcode": "ablobcatheart",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/988/original/a2ff2b4fd65cfb3c.png"
+  },
+  {
+    "shortcode": "ablobcatheartbroken",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/967/original/be9734739e6b346c.png"
+  },
+  {
+    "shortcode": "ablobcatheartsqueeze",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/972/original/cb41e01eeb2dbdf3.png"
+  },
+  {
+    "shortcode": "ablobcathungry",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/168/912/original/1a8fb1822a5f0f14.gif"
+  },
+  {
+    "shortcode": "ablobcatkeyboardbreak",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/560/original/fb45340f3b48c985.gif"
+  },
+  {
+    "shortcode": "ablobcatknitsweats",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/996/original/e7cd92f962e5c1ae.png"
+  },
+  {
+    "shortcode": "ablobcatlurk",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/971/original/f3f1eccf652ee81b.png"
+  },
+  {
+    "shortcode": "ablobcatmelt",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/563/original/2c334e5590fde21c.png"
+  },
+  {
+    "shortcode": "ablobcatmeltwave",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/978/original/7eecfecdfd4e2746.gif"
+  },
+  {
+    "shortcode": "ablobcatmeltwave_rev",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/974/original/568bd204db3a30d1.gif"
+  },
+  {
+    "shortcode": "ablobcatmusic",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/976/original/f5f98e8102f5e8d5.gif"
+  },
+  {
+    "shortcode": "ablobcatneon",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/981/original/7f062d6e2d86d965.png"
+  },
+  {
+    "shortcode": "ablobcatpopcorn",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/046/221/original/73b2a6595485bcd5.gif"
+  },
+  {
+    "shortcode": "ablobcatreach",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/558/original/8e6e72c28f39ae0d.png"
+  },
+  {
+    "shortcode": "ablobcatreachmelt",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/995/original/7378f4e0bf56d91a.png"
+  },
+  {
+    "shortcode": "ablobcatreachreverse",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/973/original/0f07fe33663b4953.png"
+  },
+  {
+    "shortcode": "ablobcattrash",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/692/original/b6993ed3b28ff3b3.png"
+  },
+  {
+    "shortcode": "ablobcatwave",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/680/original/f1b4ad3738541094.png"
+  },
+  {
+    "shortcode": "ablobcatwink",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/989/original/1ab8db297db4177f.png"
+  },
+  {
+    "shortcode": "ablobcool",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/970/original/807d7387e4b3bf5f.png"
+  },
+  {
+    "shortcode": "ablobdj",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/020/422/original/1294a70a20ddefc8.png"
+  },
+  {
+    "shortcode": "ablobeyes",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/020/424/original/02c70ea66d92b372.png"
+  },
+  {
+    "shortcode": "ablobfoxbongo",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/561/original/27706d4ae7379e80.png"
+  },
+  {
+    "shortcode": "ablobfoxbongohyper",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/020/425/original/356790af9fd4f9ee.png"
+  },
+  {
+    "shortcode": "ablobfoxbongoterrified",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/562/original/7897498477b5f027.png"
+  },
+  {
+    "shortcode": "ablobfoxloading",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/564/original/6d06781d5fb7b1e5.png"
+  },
+  {
+    "shortcode": "ablobgrin",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/991/original/e2a273ac27d1e56e.png"
+  },
+  {
+    "shortcode": "ablobhaai",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/574/original/8deb4bf952b6379e.gif"
+  },
+  {
+    "shortcode": "ablobmeltsoblove",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/993/original/f82c65d1cbe04e64.png"
+  },
+  {
+    "shortcode": "ablobpride1",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/575/original/21b39448ee2331fd.png"
+  },
+  {
+    "shortcode": "ablobpride2",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/576/original/a4c52570e93b5c36.png"
+  },
+  {
+    "shortcode": "ablobreach",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/572/original/86ff55334c120d47.png"
+  },
+  {
+    "shortcode": "ablobslurp",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/999/original/fa3f2e4cb5a28fb9.png"
+  },
+  {
+    "shortcode": "ablobspin",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/969/original/58c279a0860e5111.png"
+  },
+  {
+    "shortcode": "ablobstare",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/000/original/a5cc0679f11e4663.gif"
+  },
+  {
+    "shortcode": "ablobthinking",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/986/original/1da8c938db9c343e.png"
+  },
+  {
+    "shortcode": "ablobwave",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/143/original/fcb35e9df5c97648.png"
+  },
+  {
+    "shortcode": "ablobwhistle",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/179/476/original/dc069018d71c9ec4.gif"
+  },
+  {
+    "shortcode": "ablobwink",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/963/original/e29cc4e805a61bf7.png"
+  },
+  {
+    "shortcode": "ablobwoahsnow",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/571/original/abc59587425f3262.png"
+  },
+  {
+    "shortcode": "ablobwobble",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/975/original/28a640154884ca9f.png"
+  },
+  {
+    "shortcode": "ablobwobroll",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/570/original/59d696c02663c078.gif"
+  },
+  {
+    "shortcode": "absolutely_genau",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/577/original/00a8d531e52f3efc.png"
+  },
+  {
+    "shortcode": "abunhd",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/979/original/72aef511e21465dd.png"
+  },
+  {
+    "shortcode": "abunhdcry",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/579/original/31e9e94ffd475c13.png"
+  },
+  {
+    "shortcode": "abunhdhappy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/014/968/original/2e4aef200083d50f.png"
+  },
+  {
+    "shortcode": "abunhdhappyhop",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/027/original/ca7c6d9a3aa6476e.png"
+  },
+  {
+    "shortcode": "abunhdhop",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/026/original/074a5a342d1e74d2.png"
+  },
+  {
+    "shortcode": "abunhdowohop",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/028/original/993278c4b1159eb9.png"
+  },
+  {
+    "shortcode": "abunhdsadpat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/029/original/d100b0308cb0e016.png"
+  },
+  {
+    "shortcode": "abunsmile",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/004/original/0f868647c96e804f.png"
+  },
+  {
+    "shortcode": "abyinc1",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/024/original/ad7df79d106f8329.png"
+  },
+  {
+    "shortcode": "abyinc2",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/033/original/b975220497b1c118.png"
+  },
+  {
+    "shortcode": "acab",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/566/original/736fb8db45c12d3b.png"
+  },
+  {
+    "shortcode": "acat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/030/original/7ca5bd2ae99ebc06.png"
+  },
+  {
+    "shortcode": "ace",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/124/original/4d03a2589ea6fefb.png"
+  },
+  {
+    "shortcode": "acnh",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/567/original/c576232da4c420c3.png"
+  },
+  {
+    "shortcode": "acoin",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/036/original/5a15865d14eddefc.png"
+  },
+  {
+    "shortcode": "ad",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/002/original/f2529399fe2f9c7b.png"
+  },
+  {
+    "shortcode": "ageblobcat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/013/original/870f74b1477dba69.png"
+  },
+  {
+    "shortcode": "agender_flag",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/022/original/3d8086ea71a4ebfb.png"
+  },
+  {
+    "shortcode": "agooglehearts",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/020/428/original/07c029567ab59285.png"
+  },
+  {
+    "shortcode": "agooglethumbsup",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/020/435/original/ae2d1b9a7fc036f1.png"
+  },
+  {
+    "shortcode": "agummyblobblewobble",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/568/original/387d431a196b635f.png"
+  },
+  {
+    "shortcode": "agummyhug",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/141/original/931319e77e273b4f.png"
+  },
+  {
+    "shortcode": "agummywhee",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/020/original/345b242fb43afcf9.png"
+  },
+  {
+    "shortcode": "akkoshrug",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/569/original/8b3bb933f50c7d69.png"
+  },
+  {
+    "shortcode": "akubbi2",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/006/original/e371ebf1b7dfad7d.png"
+  },
+  {
+    "shortcode": "alien_biem",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/578/original/1652ec6f594885cf.gif"
+  },
+  {
+    "shortcode": "alpine",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/152/original/3462faa4eaf95a49.png"
+  },
+  {
+    "shortcode": "alukat3r",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/993/original/3d030cd3122edef9.png"
+  },
+  {
+    "shortcode": "amaze",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/014/original/05ccc29c962c6f3c.png"
+  },
+  {
+    "shortcode": "amazon",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/573/original/1290bd06e7c7ed0e.png"
+  },
+  {
+    "shortcode": "amiga",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/580/original/bf8656a6c1233258.png"
+  },
+  {
+    "shortcode": "amogus",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/731/original/2593d16d62294a3d.png"
+  },
+  {
+    "shortcode": "amongass",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/023/original/7f62aaa968daeafb.png"
+  },
+  {
+    "shortcode": "among_us",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/031/original/a47f9a2cf6dc12b1.png"
+  },
+  {
+    "shortcode": "amongus_emergency_button",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/587/original/f8ad18b60ff4bdef.png"
+  },
+  {
+    "shortcode": "among_us_hammer",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/588/original/c2f93541097c4436.gif"
+  },
+  {
+    "shortcode": "among_us_orange_dance",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/007/original/e5744bc47a467bb9.gif"
+  },
+  {
+    "shortcode": "amongusshy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/020/431/original/a8f56f2465e57f51.gif"
+  },
+  {
+    "shortcode": "among_us_yellow",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/590/original/4474784a9296d178.png"
+  },
+  {
+    "shortcode": "anarch",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/128/original/25dcc4cc4464f20f.png"
+  },
+  {
+    "shortcode": "anarchism",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/010/original/f7a9a9f791dcdb97.png"
+  },
+  {
+    "shortcode": "anarchismred",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/149/original/ed0729e1816c4a4a.png"
+  },
+  {
+    "shortcode": "anarchist_flag",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/584/original/a8ae421443285d9d.png"
+  },
+  {
+    "shortcode": "anarchy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/585/original/1737634cf774ff68.png"
+  },
+  {
+    "shortcode": "ancom",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/586/original/35affc57fbd31381.png"
+  },
+  {
+    "shortcode": "ancomheart",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/011/original/78bbb6ec30233de6.png"
+  },
+  {
+    "shortcode": "android",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/153/original/24c9818d54f2e0c1.png"
+  },
+  {
+    "shortcode": "angery",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/714/original/4b5d62727f7a3cc0.png"
+  },
+  {
+    "shortcode": "AngeryCat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/730/original/2c9d6055af30aaf5.png"
+  },
+  {
+    "shortcode": "angrycat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/589/original/c873e9b9f9c9c75e.png"
+  },
+  {
+    "shortcode": "angry_laugh",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/035/original/409445650ad2c139.png"
+  },
+  {
+    "shortcode": "angryplanet",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/038/original/8e170586b9aeac3b.png"
+  },
+  {
+    "shortcode": "AngryTurtle",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/581/original/5ccac58fb1706821.png"
+  },
+  {
+    "shortcode": "anidab_left",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/583/original/468d1890dad47262.png"
+  },
+  {
+    "shortcode": "anidab_right",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/582/original/0b2d90e20d3276e7.png"
+  },
+  {
+    "shortcode": "annoyingdog",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/025/original/9f2104abdce5b316.png"
+  },
+  {
+    "shortcode": "annoying_dog_hole",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/020/426/original/3b41f5bd8a32d67a.png"
+  },
+  {
+    "shortcode": "anonymous",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/009/original/7fc1d16072b5a087.png"
+  },
+  {
+    "shortcode": "AntennaPod",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/154/original/a05d31e22953b06c.png"
+  },
+  {
+    "shortcode": "antifa",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/130/original/3565417fbb26415d.png"
+  },
+  {
+    "shortcode": "antiverified",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/017/original/adae638159948575.png"
+  },
+  {
+    "shortcode": "aot_sc",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/034/original/1189b7e7c23dc978.png"
+  },
+  {
+    "shortcode": "apple",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/008/original/68fda542507e3198.png"
+  },
+  {
+    "shortcode": "apple_inc",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/019/original/0003369af90fa12e.png"
+  },
+  {
+    "shortcode": "apusheenbake",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/593/original/51dbfb68b0518640.png"
+  },
+  {
+    "shortcode": "apusheenbox",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/012/original/2a4e72a4ebdf285e.png"
+  },
+  {
+    "shortcode": "apusheenbread",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/595/original/a96dd57373aaea7e.png"
+  },
+  {
+    "shortcode": "apusheencomputer",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/040/original/464132726166803d.png"
+  },
+  {
+    "shortcode": "apusheendrool",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/599/original/7e0b2672e1f3b80d.png"
+  },
+  {
+    "shortcode": "apusheenlove",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/015/original/e0416ce9479afa19.png"
+  },
+  {
+    "shortcode": "apusheenmad",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/600/original/1fccdf85e56183a4.png"
+  },
+  {
+    "shortcode": "apusheennoodles",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/039/original/4cb8465720feca1a.png"
+  },
+  {
+    "shortcode": "apusheenpancakes",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/592/original/5347af77f54b2da7.png"
+  },
+  {
+    "shortcode": "apusheenrice",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/594/original/f9ca88810488e8ba.png"
+  },
+  {
+    "shortcode": "apusheensalty",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/591/original/6f3ced0b66f27c72.png"
+  },
+  {
+    "shortcode": "apusheenshocked",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/597/original/21145b95ff16abd6.png"
+  },
+  {
+    "shortcode": "apusheensleep",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/021/original/2193e2a00559d1db.png"
+  },
+  {
+    "shortcode": "arcanya",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/020/432/original/d8d6b89545dfae11.png"
+  },
+  {
+    "shortcode": "archlinux",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/151/original/e07f6a63ecf3c0d4.png"
+  },
+  {
+    "shortcode": "asexual_flag",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/005/original/c2dc0d8d4ce1c7a3.png"
+  },
+  {
+    "shortcode": "asmb3_coinblock",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/016/original/00e368bc4b7876c8.png"
+  },
+  {
+    "shortcode": "aufinity",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/018/original/57cdd239e2f2db8d.png"
+  },
+  {
+    "shortcode": "autism",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/003/original/d02b503f1433d260.png"
+  },
+  {
+    "shortcode": "autumn_book",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/617/original/0a3da8e8a1104d06.png"
+  },
+  {
+    "shortcode": "awesome",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/037/original/68cd747c8a6287f6.png"
+  },
+  {
+    "shortcode": "awesome_rotate",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/064/original/277c2acf772c0880.png"
+  },
+  {
+    "shortcode": "awesome_slide_l",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/615/original/9c6d3340c09499e1.png"
+  },
+  {
+    "shortcode": "awesome_slide_r",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/080/original/2717186a4de76b69.png"
+  },
+  {
+    "shortcode": "awwwblob",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/051/original/d5b8011b88572223.png"
+  },
+  {
+    "shortcode": "aw_yeah",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/620/original/b05aad108e9d3b31.gif"
+  },
+  {
+    "shortcode": "badabing",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/716/original/a46633743c832f4e.png"
+  },
+  {
+    "shortcode": "ball_of_yarn",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/069/original/9a02824021d11f74.png"
+  },
+  {
+    "shortcode": "banhammer",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/616/original/ea71fe6acfabd826.png"
+  },
+  {
+    "shortcode": "barbie",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/082/original/da2f2909465d83e5.png"
+  },
+  {
+    "shortcode": "barbiekalai",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/076/original/0be77f5c90888a1f.png"
+  },
+  {
+    "shortcode": "bat_boy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/053/original/4b0ad7160e4d84ea.png"
+  },
+  {
+    "shortcode": "batm",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/618/original/b7b88cc611243d47.png"
+  },
+  {
+    "shortcode": "batman",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/712/original/df14e5d497a756ce.png"
+  },
+  {
+    "shortcode": "battery_low",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/066/original/e370ccd1597169d2.png"
+  },
+  {
+    "shortcode": "b_cat_nikuq",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/061/original/afdaa0414a7473b8.png"
+  },
+  {
+    "shortcode": "bertinho",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/054/original/7a4535ae2bd5bb85.png"
+  },
+  {
+    "shortcode": "Bhole",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/063/original/6f334539460032ff.png"
+  },
+  {
+    "shortcode": "BigBlobhajHug",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/721/original/3ef6141b816a6bf9.png"
+  },
+  {
+    "shortcode": "birdroll",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/055/original/d18cab24d627af73.gif"
+  },
+  {
+    "shortcode": "birdsite",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/046/original/5bec27138114d242.png"
+  },
+  {
+    "shortcode": "bisexual_flag",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/047/original/1972bb1c9b69c405.png"
+  },
+  {
+    "shortcode": "bitcoin",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/619/original/42f1e41c8dd56d36.png"
+  },
+  {
+    "shortcode": "blabcat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/059/original/2067de3020abf3e2.png"
+  },
+  {
+    "shortcode": "blacker_heart",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/078/original/1c95c3d9aeea1473.png"
+  },
+  {
+    "shortcode": "blahaj",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/049/original/e4d53f5442ed37ee.png"
+  },
+  {
+    "shortcode": "blank",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/048/original/3bb47e82e5f066b9.png"
+  },
+  {
+    "shortcode": "blender",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/045/original/b17d84568c80d4e5.png"
+  },
+  {
+    "shortcode": "BLM",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/132/original/21e5480b2e8a2baa.png"
+  },
+  {
+    "shortcode": "blob0w0",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/075/original/dacfb593b974fbc0.png"
+  },
+  {
+    "shortcode": "blobartist",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/073/original/cfb9a1ac9f017a79.png"
+  },
+  {
+    "shortcode": "blob_aww",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/077/original/56f53dd198fbd5f4.png"
+  },
+  {
+    "shortcode": "blobaww",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/071/original/a65b77bd75751b64.png"
+  },
+  {
+    "shortcode": "blobbeecomfy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/079/original/31f30977ab0f20fd.png"
+  },
+  {
+    "shortcode": "blob_blowing_kiss",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/074/original/a06913f973a131f1.png"
+  },
+  {
+    "shortcode": "blobblush",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/020/429/original/bf74c9d51460846f.png"
+  },
+  {
+    "shortcode": "blobboo",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/065/original/7a6bcae3f8cc66f0.png"
+  },
+  {
+    "shortcode": "blobbounce",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/070/original/7b705465e3ce7b4f.png"
+  },
+  {
+    "shortcode": "blobbuncoffee",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/020/434/original/267a627dc0926a20.png"
+  },
+  {
+    "shortcode": "blobbun_heyes",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/072/original/8a8e5b449e7c3cf5.png"
+  },
+  {
+    "shortcode": "blob_cat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/067/original/da755e32457d0ff7.png"
+  },
+  {
+    "shortcode": "blobcat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/238/original/baa74c38501b1779.png"
+  },
+  {
+    "shortcode": "blobcat3c",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/062/original/d4bec0e20e9de51d.png"
+  },
+  {
+    "shortcode": "blobcatadorable",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/058/original/dad3714fbb71c3fe.png"
+  },
+  {
+    "shortcode": "blobcatadorablepink",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/057/original/e6b8c05c5136446d.png"
+  },
+  {
+    "shortcode": "blobcatadorablepinkpat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/060/original/8348cfd807b6b2af.gif"
+  },
+  {
+    "shortcode": "blobcatamongus",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/056/original/a3f701d1cc0097d1.png"
+  },
+  {
+    "shortcode": "blobcatamused",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/052/original/e6bc66a01b5835bc.png"
+  },
+  {
+    "shortcode": "blobcatangel2",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/068/original/1cf44799901177d4.png"
+  },
+  {
+    "shortcode": "blobcatangry",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/081/original/e7f1266ac6204471.png"
+  },
+  {
+    "shortcode": "blobcatarom",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/050/original/f85b8e5547ec1895.png"
+  },
+  {
+    "shortcode": "blobcataww",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/658/original/0e4589a9ed9b5a17.png"
+  },
+  {
+    "shortcode": "blobcatawwpat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/092/original/657a853690c28002.gif"
+  },
+  {
+    "shortcode": "blobcat_banban",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/098/original/526c403a251018fa.png"
+  },
+  {
+    "shortcode": "blobcatbandage",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/116/original/2387fd64230bcbe2.png"
+  },
+  {
+    "shortcode": "blobcatbath",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/085/original/074a46b75bfab526.png"
+  },
+  {
+    "shortcode": "blobcatbean",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/242/original/b81680458a196006.png"
+  },
+  {
+    "shortcode": "blobcatberetcoffee",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/020/430/original/2d55820c49b386d0.png"
+  },
+  {
+    "shortcode": "blobcatbernie",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/107/original/1c95fabf4f71cbbd.png"
+  },
+  {
+    "shortcode": "blobcatbigfan",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/118/original/4d225a881bd019cc.png"
+  },
+  {
+    "shortcode": "blobcatbigsob",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/086/original/c187edcee6089c6c.png"
+  },
+  {
+    "shortcode": "blobcatbirthday",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/689/original/59c9efab9698475c.png"
+  },
+  {
+    "shortcode": "blobcatblep",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/693/original/d781176c516ee8bf.png"
+  },
+  {
+    "shortcode": "blobcatblep2",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/110/original/29785ebf44675070.png"
+  },
+  {
+    "shortcode": "blobcatblessup",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/093/original/e3cd3108394ef743.png"
+  },
+  {
+    "shortcode": "blobcatblink",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/108/original/7a82fb066dae6b19.png"
+  },
+  {
+    "shortcode": "blobCatBloc",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/239/original/51fb6ce6f14fd2ed.png"
+  },
+  {
+    "shortcode": "blobcatblueegg",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/115/original/2c2803ba5f258cc1.png"
+  },
+  {
+    "shortcode": "blob_cat_blush",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/087/original/9e64c793e0b0914f.png"
+  },
+  {
+    "shortcode": "blobcatboo",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/690/original/209ba308438b4b65.png"
+  },
+  {
+    "shortcode": "blobcatbook",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/100/original/a8e43ea02e57b73e.png"
+  },
+  {
+    "shortcode": "blobcatboopblush",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/245/original/940d32c28ed0ab28.png"
+  },
+  {
+    "shortcode": "blobcatboopglare",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/105/original/9514b111ca17d254.png"
+  },
+  {
+    "shortcode": "blobcatboopwhatsthis",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/109/original/23f9fd0b673a8ec3.png"
+  },
+  {
+    "shortcode": "blobcatbreadpeek",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/106/original/22bb140801b371e8.png"
+  },
+  {
+    "shortcode": "blobcat_burg",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/117/original/fc7a364a08b11b34.png"
+  },
+  {
+    "shortcode": "blobcatcaged",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/099/original/9b6ab4c31c74876c.png"
+  },
+  {
+    "shortcode": "blobcatcamera",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/101/original/a5d715e7bdc573f7.png"
+  },
+  {
+    "shortcode": "blobcatcaviar",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/114/223/original/dd91e10591b42445.png"
+  },
+  {
+    "shortcode": "blobcatcheer",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/676/original/1ba1b65fc21202b8.png"
+  },
+  {
+    "shortcode": "blobcatcode",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/004/817/original/9e5b110592cf7d2a.gif"
+  },
+  {
+    "shortcode": "blobcatcofesip",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/020/423/original/0d15eeb3a0642bc0.png"
+  },
+  {
+    "shortcode": "blobcatcoffee",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/084/original/70c888e55dbe9f7d.png"
+  },
+  {
+    "shortcode": "blobcatcomfaww",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/091/original/956e05a72891eaec.png"
+  },
+  {
+    "shortcode": "blobcatcomfeyes",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/104/original/fd4ed58dce6abf31.png"
+  },
+  {
+    "shortcode": "blobcatcomfjoy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/097/original/fe0e2f2ab792dcad.png"
+  },
+  {
+    "shortcode": "blobcatcomfnight",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/089/original/5c81fa831b6769c4.png"
+  },
+  {
+    "shortcode": "blobcatcomfsneaky",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/094/original/65ea5aad5b664678.png"
+  },
+  {
+    "shortcode": "blobcatcomfsob",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/691/original/b7768c9ff1cecc63.png"
+  },
+  {
+    "shortcode": "blobcatcomfypeek",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/088/original/f0105b4cfec2850f.png"
+  },
+  {
+    "shortcode": "blobcatcookienom",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/096/original/6210477cd42890b6.png"
+  },
+  {
+    "shortcode": "blobcatcool",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/111/original/f1e1d768030554be.png"
+  },
+  {
+    "shortcode": "blobcatcoy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/103/original/a9afa8c7e49916fb.png"
+  },
+  {
+    "shortcode": "blobcatcry",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/095/original/e6d9373100f1db69.png"
+  },
+  {
+    "shortcode": "blobcatcry2",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/112/original/f5c13b16fc2d0a5f.png"
+  },
+  {
+    "shortcode": "blobcatdefecit",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/113/original/6615826a3f1119b6.png"
+  },
+  {
+    "shortcode": "blobcatderpy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/090/original/49802edb499553c9.png"
+  },
+  {
+    "shortcode": "blobcatdisputed",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/114/original/f6fd709e0d663020.png"
+  },
+  {
+    "shortcode": "blobcatdizzy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/673/original/5086ef83ec80b167.png"
+  },
+  {
+    "shortcode": "blobcatdizzy2",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/120/original/cec4b5ecc9ba8dd3.png"
+  },
+  {
+    "shortcode": "blobcatdrool",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/132/original/bfd4a64c3c7013c4.png"
+  },
+  {
+    "shortcode": "blobcatdroolreach",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/681/original/b9359b7f3f73095d.png"
+  },
+  {
+    "shortcode": "blobcatenby",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/674/original/0db1e67cb7267747.png"
+  },
+  {
+    "shortcode": "blobcaterpie",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/149/original/19c0b6a6a5253ff7.png"
+  },
+  {
+    "shortcode": "blobcatevil",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/679/original/d332b67d65839bb2.png"
+  },
+  {
+    "shortcode": "blobcatextremejoy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/145/original/bf510eb5b81a7001.png"
+  },
+  {
+    "shortcode": "blobcateyes",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/659/original/98b091ee15bc7257.png"
+  },
+  {
+    "shortcode": "blobcatfacepalm",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/140/original/065f6fb65f3b86bc.png"
+  },
+  {
+    "shortcode": "blobcatfakeverified",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/244/original/cdcdd988eb8a1b6a.png"
+  },
+  {
+    "shortcode": "blobcatfearful",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/134/original/43b1f69d35e63132.png"
+  },
+  {
+    "shortcode": "blobcatfingerguns",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/660/original/474fef10e9566aaf.png"
+  },
+  {
+    "shortcode": "blobcatfireeyes",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/135/original/d0b2eced87e81806.png"
+  },
+  {
+    "shortcode": "blobcatfistbumpleft",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/144/original/7e912922d068c80c.png"
+  },
+  {
+    "shortcode": "blobcatflamethrower",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/142/original/b1dcf8d6c37e2aea.png"
+  },
+  {
+    "shortcode": "blobcatflipped",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/139/original/3698ff000541b217.png"
+  },
+  {
+    "shortcode": "blobcatflood",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/143/original/015860b1e3b66e07.png"
+  },
+  {
+    "shortcode": "blobcatflower",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/130/original/498efeb7b60aaa17.png"
+  },
+  {
+    "shortcode": "blobcatfluffevil",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/678/original/19d786278a871fc8.png"
+  },
+  {
+    "shortcode": "blobcatgamer",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/119/original/dccb8a86c7e4b408.png"
+  },
+  {
+    "shortcode": "blobcatgiggle",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/237/original/691ff2739e54f81c.png"
+  },
+  {
+    "shortcode": "blobcatglare",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/133/original/3f0ad47358976876.png"
+  },
+  {
+    "shortcode": "blobcatgooglycry",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/147/original/46e97abad7de14e6.png"
+  },
+  {
+    "shortcode": "blobcatgooglyshrug",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/124/original/f365a566bf8fcc8e.png"
+  },
+  {
+    "shortcode": "blobcatgooglytrash",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/684/original/3f6ee96b67537a20.png"
+  },
+  {
+    "shortcode": "blobcatgreen",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/136/original/2de2fcad8e14a68a.png"
+  },
+  {
+    "shortcode": "blobcathappy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/121/original/35e74ac59be4f4f6.png"
+  },
+  {
+    "shortcode": "blobcathappypaws",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/241/original/510c283c7a702e71.png"
+  },
+  {
+    "shortcode": "blobcathcaach",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/138/original/ec4dd54f4d9dcb36.png"
+  },
+  {
+    "shortcode": "blob_cat_heart",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/128/original/d1a95dbe9ef002d3.png"
+  },
+  {
+    "shortcode": "blobcatheart",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/248/original/3fea9e5339d6d1c2.png"
+  },
+  {
+    "shortcode": "blobcatheartbongo",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/129/original/0e12ce937542d594.gif"
+  },
+  {
+    "shortcode": "blobcathearthug",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/122/original/55f72356df071c3e.png"
+  },
+  {
+    "shortcode": "blobcatheartR",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/126/original/1d1b0a9e8edc6159.png"
+  },
+  {
+    "shortcode": "blobcathearts",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/236/original/4ea6029dc0adaf6e.png"
+  },
+  {
+    "shortcode": "blobcat_heart_trans",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/148/original/734f3090bf4a60af.png"
+  },
+  {
+    "shortcode": "blobcathighfive",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/151/original/0fa574a12778a136.png"
+  },
+  {
+    "shortcode": "blobcathug",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/247/original/f1177a6e77981b56.png"
+  },
+  {
+    "shortcode": "blobcathuggies",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/125/original/9bf418f7f341a1cf.png"
+  },
+  {
+    "shortcode": "blobcathungry",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/168/913/original/6d54c7a8f2627174.png"
+  },
+  {
+    "shortcode": "blobcatinlove",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/141/original/157dbc2733757f84.png"
+  },
+  {
+    "shortcode": "blobcatinnocent",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/146/original/01349e4aa8179ae0.png"
+  },
+  {
+    "shortcode": "blobcatjustright",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/661/original/34a04fc8532ae637.png"
+  },
+  {
+    "shortcode": "blobcatknife",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/672/original/0acb4cabddf5dc73.png"
+  },
+  {
+    "shortcode": "blobcatlaugh",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/127/original/660a6c9c4e1caec3.png"
+  },
+  {
+    "shortcode": "blobcatlook",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/150/original/995177f7748de471.png"
+  },
+  {
+    "shortcode": "blobcatlost",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/210/original/9fdd065c75e72a1f.png"
+  },
+  {
+    "shortcode": "blobcatlove",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/187/original/79035ac64b8212d9.png"
+  },
+  {
+    "shortcode": "blobcatlul",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/201/original/843bbbc5cc9e82ff.png"
+  },
+  {
+    "shortcode": "blobcat_melt",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/211/original/5a287aad39bfab13.png"
+  },
+  {
+    "shortcode": "BlobCatMelt",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/198/original/3f6fd18bc6c539fc.png"
+  },
+  {
+    "shortcode": "blobcatmeltcry",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/214/original/3110a94592fc5ee2.png"
+  },
+  {
+    "shortcode": "blobcatmeltlove",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/202/original/23bfd190901e43c4.png"
+  },
+  {
+    "shortcode": "blobcatmeltthumb",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/207/original/14118c01cb9bc417.png"
+  },
+  {
+    "shortcode": "blobcatMeltThumbsUp",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/246/original/ed6834bd7a087c9b.png"
+  },
+  {
+    "shortcode": "blobcatmeowcouple",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/197/original/849fe8d4ff6c4636.png"
+  },
+  {
+    "shortcode": "blob_cat_mlem",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/205/original/3c7ee442b38fe93e.png"
+  },
+  {
+    "shortcode": "blobcat_mlem",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/193/original/ce3846c12d16cbb4.png"
+  },
+  {
+    "shortcode": "BlobCatMlem",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/199/original/9eb873328fad758d.png"
+  },
+  {
+    "shortcode": "blobcatmusic",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/189/original/108d228a25c71cea.png"
+  },
+  {
+    "shortcode": "blobcatnightuwu",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/218/original/9a5e5320592dd3d5.png"
+  },
+  {
+    "shortcode": "blobcatninja",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/221/original/fce9e70d461c2d91.png"
+  },
+  {
+    "shortcode": "blobcatno",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/212/original/eec19f41583e6715.png"
+  },
+  {
+    "shortcode": "blobcatnomcookie",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/666/original/bce800a3bde410e9.png"
+  },
+  {
+    "shortcode": "blobcatnomplant",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/188/original/3836c57c28f904f1.gif"
+  },
+  {
+    "shortcode": "blobcatnotlike",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/219/original/945d58e88a646f3d.png"
+  },
+  {
+    "shortcode": "blobcatnotlikethis",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/687/original/7688d3a2bc0037ca.png"
+  },
+  {
+    "shortcode": "blobcatonfire",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/208/original/00c70f1d11bfc98d.png"
+  },
+  {
+    "shortcode": "blobcat_owo",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/217/original/a0a7d9a344c421df.png"
+  },
+  {
+    "shortcode": "blobcat_pat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/216/original/a88473ea59cf66fc.png"
+  },
+  {
+    "shortcode": "blobcatpats",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/190/original/daf29b92c8353d05.png"
+  },
+  {
+    "shortcode": "blobcatpawmean",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/682/original/196dcdf91f2546ac.png"
+  },
+  {
+    "shortcode": "blobcatpeek",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/204/original/47ea51f85e1d4695.png"
+  },
+  {
+    "shortcode": "blobcatpeekaboo",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/195/original/b38b4d1bc312fc35.png"
+  },
+  {
+    "shortcode": "blobcatpopcorn",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/046/222/original/27f32abe9ec2c89c.png"
+  },
+  {
+    "shortcode": "blobcatpopcornnom",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/220/original/3b6ea48c2c8d6c81.gif"
+  },
+  {
+    "shortcode": "blobcatpopcornsweats",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/222/original/e35ae4360a1f9a58.png"
+  },
+  {
+    "shortcode": "blobcat_popsiclethrower",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/194/original/29915d08efb6392b.png"
+  },
+  {
+    "shortcode": "blobcatpout",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/683/original/3b92654f2aa2489f.png"
+  },
+  {
+    "shortcode": "blobcatPuffyHappyTears",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/206/original/1c5d86b5d182abff.png"
+  },
+  {
+    "shortcode": "blobcatpurple",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/215/original/d708144794a23596.png"
+  },
+  {
+    "shortcode": "blobcatreach",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/667/original/e2f0017814415a62.png"
+  },
+  {
+    "shortcode": "blobcatreachrev",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/203/original/b7b6b616e5eec6b8.png"
+  },
+  {
+    "shortcode": "blobcatread",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/200/original/5a407ad6fe08e318.png"
+  },
+  {
+    "shortcode": "blobcatroll",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/192/original/8613740b1a417c11.gif"
+  },
+  {
+    "shortcode": "blobcatsadpats",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/213/original/4675cbf8c048db5f.png"
+  },
+  {
+    "shortcode": "blobcatsadreach",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/196/original/722163a2a2cc38de.png"
+  },
+  {
+    "shortcode": "blobcatsalmon",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/114/224/original/ab966b4e632376e9.png"
+  },
+  {
+    "shortcode": "blobcatscared",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/668/original/027f16409b1da8f0.png"
+  },
+  {
+    "shortcode": "blobcatscience",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/186/original/4de6e66e45293635.png"
+  },
+  {
+    "shortcode": "blobcatscream",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/669/original/86a4b05340caa881.png"
+  },
+  {
+    "shortcode": "blobcatseaweed",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/114/220/original/02618586c5b4245c.png"
+  },
+  {
+    "shortcode": "blobcatshrug",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/191/original/868532b6ea957459.png"
+  },
+  {
+    "shortcode": "blob_cat_sip",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/209/original/1e636d8251949dcc.png"
+  },
+  {
+    "shortcode": "blobcat_sip",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/225/original/1d40a2b8e41fef8a.png"
+  },
+  {
+    "shortcode": "blobcatsip",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/254/original/ba86819817e47a3a.png"
+  },
+  {
+    "shortcode": "blobcatsleep",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/670/original/d8bd4dec6b2d7ba5.png"
+  },
+  {
+    "shortcode": "blobcatsnapped",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/252/original/673762f980d824ae.png"
+  },
+  {
+    "shortcode": "blob_cat_snuggle",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/244/original/a5fb94bd66d8838b.png"
+  },
+  {
+    "shortcode": "blobcatsnuggle",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/247/original/44c81765e282378f.png"
+  },
+  {
+    "shortcode": "blobcatsnugs",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/248/original/0ea75a3c168013fc.png"
+  },
+  {
+    "shortcode": "blobcatspace",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/671/original/ef7dd49291425f35.png"
+  },
+  {
+    "shortcode": "blobcatsunglasses",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/237/original/97c6f3544f16b756.png"
+  },
+  {
+    "shortcode": "blobcatsushi",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/114/219/original/bb626a0f3002c3f7.png"
+  },
+  {
+    "shortcode": "blobcatsweat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/235/original/f7cd8aced757d1c1.png"
+  },
+  {
+    "shortcode": "blobcatsweats",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/246/original/22b0ab0950bda722.png"
+  },
+  {
+    "shortcode": "blobcattableflip",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/240/original/29d9e9000f928a42.png"
+  },
+  {
+    "shortcode": "blobcattea",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/226/original/4370ea847472cb80.png"
+  },
+  {
+    "shortcode": "blobcatterrified",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/230/original/527479f827829631.png"
+  },
+  {
+    "shortcode": "blobcatthinking",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/675/original/2dc583a832cd086e.png"
+  },
+  {
+    "shortcode": "blobcatthinking2",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/234/original/e6424462bc9e4dfb.png"
+  },
+  {
+    "shortcode": "blobcatthinkingglare",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/236/original/6721e09b6662585b.png"
+  },
+  {
+    "shortcode": "blobcatthinkOwO",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/260/original/c62d26bb36457e12.png"
+  },
+  {
+    "shortcode": "blobcatthinksmart",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/258/original/67c7f356f0fe04df.png"
+  },
+  {
+    "shortcode": "blobcat_thisisfine",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/233/original/1851c9f060576d66.png"
+  },
+  {
+    "shortcode": "blobcatthx",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/257/original/82612a1069f41dc7.png"
+  },
+  {
+    "shortcode": "blobcatuwu",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/685/original/f2b48eb90e61cb34.png"
+  },
+  {
+    "shortcode": "blobcatverified",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/240/original/58ee77c07189bea4.png"
+  },
+  {
+    "shortcode": "blobcatwave",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/227/original/26f908e69e20fdfb.png"
+  },
+  {
+    "shortcode": "blobcatwhat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/249/original/bb309838fa9c555c.png"
+  },
+  {
+    "shortcode": "blobcatwink",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/245/original/0e8f4e3b428fc7cb.png"
+  },
+  {
+    "shortcode": "blobcheer",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/228/original/edd6735c4ac305ec.png"
+  },
+  {
+    "shortcode": "blobcheerwitch",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/223/original/aa691d07a2105ec0.png"
+  },
+  {
+    "shortcode": "blobcoffee",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/251/original/b8220019710ed8e1.png"
+  },
+  {
+    "shortcode": "blobcoffeeraccoon",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/229/original/32191d4070b6b441.png"
+  },
+  {
+    "shortcode": "blobderpverified",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/250/original/f1366f51f7cc8fe7.png"
+  },
+  {
+    "shortcode": "blob_derpy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/255/original/de20ccd234df70fb.png"
+  },
+  {
+    "shortcode": "blobderpy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/224/original/8e71f79d874b66cf.png"
+  },
+  {
+    "shortcode": "blob_dizzy_face",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/259/original/74f3c66bc71ef182.png"
+  },
+  {
+    "shortcode": "blobeyes",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/242/original/e0e66ee0da365fa5.png"
+  },
+  {
+    "shortcode": "blobfacepalm",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/241/original/98e473d5b7031e4a.png"
+  },
+  {
+    "shortcode": "blobfox",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/701/original/82de813ab2e35550.png"
+  },
+  {
+    "shortcode": "blobfox3c",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/727/original/d886c612c9692d11.png"
+  },
+  {
+    "shortcode": "blobfoxangry",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/253/original/6584d223b8210e6f.png"
+  },
+  {
+    "shortcode": "blobfoxannoyed",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/720/original/bb180c430dd0981e.png"
+  },
+  {
+    "shortcode": "blobfoxaww",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/698/original/80a23ca2f3aaa5ae.png"
+  },
+  {
+    "shortcode": "blobfoxbongo",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/704/original/dbc740da6342fb83.png"
+  },
+  {
+    "shortcode": "blobfoxboopfloof",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/729/original/c9345124dcbca24d.png"
+  },
+  {
+    "shortcode": "blobfoxbox",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/692/original/3e3af9c88e3cdc17.png"
+  },
+  {
+    "shortcode": "blobfoxbreadsnoot2googly",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/256/original/4f4af49b1be400d0.png"
+  },
+  {
+    "shortcode": "blobfoxcatsnuggle",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/683/original/9214e3ca09fb0510.png"
+  },
+  {
+    "shortcode": "blobfoxcheer",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/725/original/588da9278e6ac930.png"
+  },
+  {
+    "shortcode": "blobfoxcofe",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/713/original/9fc6a82a7714fed9.png"
+  },
+  {
+    "shortcode": "blobfoxcofecute",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/714/original/ad4d74111396b7cd.png"
+  },
+  {
+    "shortcode": "blobfoxcofeowo",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/691/original/ab02ce4aae732b89.png"
+  },
+  {
+    "shortcode": "blobfoxcomfycomputer",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/726/original/16c0a8a210663037.png"
+  },
+  {
+    "shortcode": "blobfoxcomfysleepy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/690/original/cfc72b3f9fd83a35.png"
+  },
+  {
+    "shortcode": "blobfoxcomputer",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/700/original/10eb58e060984bd9.png"
+  },
+  {
+    "shortcode": "blobfoxcomputerowonotice",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/689/original/aae3cd318bf3b07d.png"
+  },
+  {
+    "shortcode": "blobfoxcute",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/694/original/d8d0eeb8feaa9ddd.png"
+  },
+  {
+    "shortcode": "blobfoxdarkghost",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/243/original/dd983b90079a0b82.png"
+  },
+  {
+    "shortcode": "blobfoxdeadinside",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/688/original/b337137f8da1a57f.png"
+  },
+  {
+    "shortcode": "blobfoxdealwithit",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/696/original/181eb9fa034d7769.png"
+  },
+  {
+    "shortcode": "blobfoxdetective",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/687/original/256967e510aec840.png"
+  },
+  {
+    "shortcode": "blobfoxdevil",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/712/original/c03d36ff2a04191a.png"
+  },
+  {
+    "shortcode": "blobfoxdrakelike",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/238/original/66dc6d28ff2de90e.png"
+  },
+  {
+    "shortcode": "blobfoxevil",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/707/original/4fc1481bf3b34e69.png"
+  },
+  {
+    "shortcode": "blobfoxfacepalm",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/717/original/db3b723e1e885fbc.png"
+  },
+  {
+    "shortcode": "blobfoxfake",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/684/original/65722b89a872a12d.png"
+  },
+  {
+    "shortcode": "blobfoxfingerguns",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/293/original/d8196e44fb2273d7.png"
+  },
+  {
+    "shortcode": "blobfoxfloofhappy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/685/original/aecc37a1613c49d6.png"
+  },
+  {
+    "shortcode": "blobfoxfloofowo",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/686/original/b87726be10f59e3a.png"
+  },
+  {
+    "shortcode": "blobfoxgoogly",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/706/original/efb38bcde7a07a07.png"
+  },
+  {
+    "shortcode": "blobfoxgooglyconfused",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/705/original/26b2eb98b01f7495.png"
+  },
+  {
+    "shortcode": "blobfoxhappy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/722/original/2a14e0bf6b147703.png"
+  },
+  {
+    "shortcode": "blobfoxheartcute",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/693/original/173e9301ce0a3c4b.png"
+  },
+  {
+    "shortcode": "blobfoxinnocentcute",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/703/original/1ddc155603ba380b.png"
+  },
+  {
+    "shortcode": "blobfoxlove",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/710/original/c79d1f42937429ea.png"
+  },
+  {
+    "shortcode": "blobfoxlul",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/724/original/363f72aa81e0046e.png"
+  },
+  {
+    "shortcode": "blobfoxmlem",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/723/original/1b8468acd01e82d0.png"
+  },
+  {
+    "shortcode": "blobfoxowo",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/730/original/0ef29b43ffa98aa4.png"
+  },
+  {
+    "shortcode": "blobfoxpeekowo",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/295/original/817b3f425adec87c.png"
+  },
+  {
+    "shortcode": "blobfoxprelurkcofe",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/702/original/3f57ded76430f636.png"
+  },
+  {
+    "shortcode": "blobfoxreach",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/718/original/312db3ec4040d21d.png"
+  },
+  {
+    "shortcode": "blobfoxreachaww",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/697/original/8ec80a5239611ae3.png"
+  },
+  {
+    "shortcode": "blobfoxsleep",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/699/original/f7e895f721721c96.png"
+  },
+  {
+    "shortcode": "blobfoxsnuggle",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/299/original/831ce2aa9c11bb61.png"
+  },
+  {
+    "shortcode": "blobfoxsweating",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/721/original/bfab0615ccbd28ce.png"
+  },
+  {
+    "shortcode": "blobfoxtea",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/719/original/3c637e504cc44e57.png"
+  },
+  {
+    "shortcode": "blobfoxtea_w_",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/708/original/08088e1319ae7eb3.png"
+  },
+  {
+    "shortcode": "blobfoxthinking",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/695/original/de264b5561746bd9.png"
+  },
+  {
+    "shortcode": "blobfoxthumbsup",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/728/original/7754142acf3bd595.png"
+  },
+  {
+    "shortcode": "blobfoxwave",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/715/original/e3225943a5519fb5.png"
+  },
+  {
+    "shortcode": "blob_grinning_sweat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/269/original/26013af0255ec533.png"
+  },
+  {
+    "shortcode": "Blobhaj",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/728/original/146d4ee3fa5ab3f0.png"
+  },
+  {
+    "shortcode": "BlobhajBlanketBlue",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/715/original/55b79fe0ee4c9519.png"
+  },
+  {
+    "shortcode": "BlobhajfBlobbyHug",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/735/original/9851c0e0689c8335.png"
+  },
+  {
+    "shortcode": "BlobhajHeart",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/719/original/1d96541e278f6fa7.png"
+  },
+  {
+    "shortcode": "BlobhajHoldSassage",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/736/original/02a1e7b54616c187.png"
+  },
+  {
+    "shortcode": "BlobHajMlem",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/717/original/2973642a440cddb4.png"
+  },
+  {
+    "shortcode": "BlobhajPrideHeart",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/718/original/4b260cd085713bbf.png"
+  },
+  {
+    "shortcode": "BlobhajReach",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/711/original/40549d7401ee0c50.png"
+  },
+  {
+    "shortcode": "BlobhajSadReach",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/724/original/eb17cd5e1df1444b.png"
+  },
+  {
+    "shortcode": "BlobhajShock",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/725/original/c6fc9efe81bd358a.png"
+  },
+  {
+    "shortcode": "BlobhajTinyHeart",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/713/original/afd83e462935ec72.png"
+  },
+  {
+    "shortcode": "BlobhajTransPrideHeart",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/734/original/3d943b9b35023b33.png"
+  },
+  {
+    "shortcode": "blobhappy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/261/original/13b5c2c3ecd6cc71.png"
+  },
+  {
+    "shortcode": "blobheart",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/265/original/ce7eb7446ee421db.png"
+  },
+  {
+    "shortcode": "blobheartcat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/266/original/77bb156380148c5c.png"
+  },
+  {
+    "shortcode": "blobjoy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/284/original/800bffade8f6f4a6.png"
+  },
+  {
+    "shortcode": "bloblaugh",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/300/original/0e6027113276edaa.png"
+  },
+  {
+    "shortcode": "bloblewd",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/292/original/2a3fe5239653c32b.png"
+  },
+  {
+    "shortcode": "blobmiou",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/263/original/6226ff0c428f4494.png"
+  },
+  {
+    "shortcode": "blobnogood",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/298/original/a2c4ad8bce573bae.png"
+  },
+  {
+    "shortcode": "blobnom",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/723/original/d1a64694da78fdb7.png"
+  },
+  {
+    "shortcode": "blobnomouth",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/280/original/fd38e01c3f451c3c.png"
+  },
+  {
+    "shortcode": "blobowo",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/297/original/58dc0849270bd41a.png"
+  },
+  {
+    "shortcode": "blobpats",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/722/original/dc1818b4bfdcccfc.png"
+  },
+  {
+    "shortcode": "blobpeek",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/274/original/99e8bbd141397650.png"
+  },
+  {
+    "shortcode": "blobpensive",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/282/original/18fb6c8d5d7597b0.png"
+  },
+  {
+    "shortcode": "blobreach",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/283/original/3508af7cedac79f4.png"
+  },
+  {
+    "shortcode": "blobsad",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/286/original/ab8ae0f24749f787.png"
+  },
+  {
+    "shortcode": "blobshh",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/277/original/9dd959eb625a007f.png"
+  },
+  {
+    "shortcode": "blobsmilehappyeyes",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/301/original/13bd38d21b9376de.png"
+  },
+  {
+    "shortcode": "blobsmirk",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/294/original/6ca8e9c6a6a64044.png"
+  },
+  {
+    "shortcode": "blob_snow",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/275/original/b0b0d764f05a8ee0.png"
+  },
+  {
+    "shortcode": "blobspy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/285/original/135d79a1713d3a85.png"
+  },
+  {
+    "shortcode": "blobsweat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/271/original/2ac945fccf9d53c9.png"
+  },
+  {
+    "shortcode": "blobsweats",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/262/original/d1b87a1434064f75.png"
+  },
+  {
+    "shortcode": "blobthinking",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/287/original/a14382a90a7876f1.png"
+  },
+  {
+    "shortcode": "blobthinkingglare",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/267/original/3c7298fa2736c669.png"
+  },
+  {
+    "shortcode": "blobthinkingsmirk",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/289/original/057e3c1646671332.png"
+  },
+  {
+    "shortcode": "blobthonkang",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/279/original/c5233069035cd2af.png"
+  },
+  {
+    "shortcode": "blobtoofast",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/273/original/d141e76656cd12c0.png"
+  },
+  {
+    "shortcode": "blob_tremble",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/281/original/faedd29af7a0da8c.png"
+  },
+  {
+    "shortcode": "blobturtle",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/276/original/988fae0b131f516b.png"
+  },
+  {
+    "shortcode": "blobugh",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/296/original/1316a4336820c745.png"
+  },
+  {
+    "shortcode": "blobuwu",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/291/original/bf76180b7d4a3e4f.png"
+  },
+  {
+    "shortcode": "blobwhistle",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/179/475/original/b8ea4db430edb1a0.png"
+  },
+  {
+    "shortcode": "blobwizard",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/264/original/da2cc2ff5bda5166.png"
+  },
+  {
+    "shortcode": "blogger",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/272/original/aebf67eaf1a9f323.png"
+  },
+  {
+    "shortcode": "blue_heart",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/278/original/047d37650d4110d4.png"
+  },
+  {
+    "shortcode": "bongoCat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/709/original/41cabf5515754827.png"
+  },
+  {
+    "shortcode": "boobs",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/344/original/c5c48cd6ec3713b1.png"
+  },
+  {
+    "shortcode": "boost_ok",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/315/original/744c6e77a10fb310.png"
+  },
+  {
+    "shortcode": "bounce_canine",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/317/original/e197cd11d016b997.gif"
+  },
+  {
+    "shortcode": "bowie_stardust",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/341/original/a93c8af262590d0f.png"
+  },
+  {
+    "shortcode": "breadified",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/318/original/e8b79e1ee84eefda.png"
+  },
+  {
+    "shortcode": "breathe",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/345/original/e038ba56d12ee27b.png"
+  },
+  {
+    "shortcode": "brian",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/329/original/647a998d3da0ad6a.png"
+  },
+  {
+    "shortcode": "bulbasaurroll",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/327/original/114bf8db72585cf9.gif"
+  },
+  {
+    "shortcode": "bungoogly",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/349/original/a461bd0c7e328501.png"
+  },
+  {
+    "shortcode": "byebrows",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/350/original/7438a2ee55250b21.png"
+  },
+  {
+    "shortcode": "calculator",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/720/original/7b0748305f8a69e8.png"
+  },
+  {
+    "shortcode": "canine_boop",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/316/original/1515c44e36f9fab6.png"
+  },
+  {
+    "shortcode": "capyface",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/339/original/84e4aeb7c650f6d5.png"
+  },
+  {
+    "shortcode": "cassette",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/020/415/original/fa82f09099d22a19.png"
+  },
+  {
+    "shortcode": "catblush",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/313/original/dab5d0820846abf7.png"
+  },
+  {
+    "shortcode": "cate",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/732/original/f8b4a0cb138edde0.png"
+  },
+  {
+    "shortcode": "cathug",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/314/original/ae79ff0ee3de93fc.png"
+  },
+  {
+    "shortcode": "cat_hug_triangle",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/312/original/e31c24f6fc08a47e.png"
+  },
+  {
+    "shortcode": "catjam",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/710/original/2110318dc16cafae.gif"
+  },
+  {
+    "shortcode": "cat_meow",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/343/original/df8a5bd74253366e.png"
+  },
+  {
+    "shortcode": "catmoji_hearts",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/336/original/01e7aa58fc808455.png"
+  },
+  {
+    "shortcode": "catmoji_smile",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/328/original/84ff32ef020d953f.png"
+  },
+  {
+    "shortcode": "catnooo",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/348/original/588fb0d4c5496b2d.gif"
+  },
+  {
+    "shortcode": "catPOWER",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/727/original/1f33bfc00cf243fb.png"
+  },
+  {
+    "shortcode": "catroll",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/331/original/5b41c6135a1f51e3.gif"
+  },
+  {
+    "shortcode": "cat_typing",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/323/original/16bd490fc33d7f4d.gif"
+  },
+  {
+    "shortcode": "cc",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/319/original/4690f2e944d7f354.png"
+  },
+  {
+    "shortcode": "ccby",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/320/original/bdd94d2f67560512.png"
+  },
+  {
+    "shortcode": "ccnc",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/322/original/566f964ca33b7f7d.png"
+  },
+  {
+    "shortcode": "cc_sa",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/321/original/c16ad5a68b00509a.png"
+  },
+  {
+    "shortcode": "charmander",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/347/original/13672258cf2bdeaf.png"
+  },
+  {
+    "shortcode": "chat_jpg",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/324/original/4c5a17dcfa49b28b.png"
+  },
+  {
+    "shortcode": "cheers",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/310/original/7cd04ea266bf8856.gif"
+  },
+  {
+    "shortcode": "chefkiss",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/330/original/eb1f935348c63ecb.png"
+  },
+  {
+    "shortcode": "cherry_heart",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/335/original/ec4ddc04089b628f.png"
+  },
+  {
+    "shortcode": "chickenroll",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/337/original/226b03b75cf84fe9.gif"
+  },
+  {
+    "shortcode": "chloeblob",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/338/original/a9bac5c7bd6eda11.png"
+  },
+  {
+    "shortcode": "clapping",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/342/original/68de57c2b6c6be03.png"
+  },
+  {
+    "shortcode": "clippy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/733/original/038cec58c163af62.png"
+  },
+  {
+    "shortcode": "cmx_doge",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/340/original/cf5a89ab79338f2a.png"
+  },
+  {
+    "shortcode": "cofe",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/346/original/9dd071108679a679.gif"
+  },
+  {
+    "shortcode": "cofe4",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/326/original/75686bea379626ee.png"
+  },
+  {
+    "shortcode": "coffeecup",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/332/original/2118146630217662.png"
+  },
+  {
+    "shortcode": "coffee_hello",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/325/original/841b4d22fb440a6c.gif"
+  },
+  {
+    "shortcode": "coffee_mug",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/334/original/cd755bd6587ec345.png"
+  },
+  {
+    "shortcode": "coffeemug",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/333/original/0d4ffa6bc904c4fe.png"
+  },
+  {
+    "shortcode": "coffeepot",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/379/original/0565a9bf421d3199.png"
+  },
+  {
+    "shortcode": "coffee_swirl",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/377/original/ce5330dec6a64440.png"
+  },
+  {
+    "shortcode": "coffeev60",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/376/original/fa7ad67cc94a7412.gif"
+  },
+  {
+    "shortcode": "coffefied",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/373/original/7f2b67195be8ea93.png"
+  },
+  {
+    "shortcode": "cokkie",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/382/original/58ffd84924728a5e.png"
+  },
+  {
+    "shortcode": "computerfairies",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/726/original/d614b3a07a403a85.png"
+  },
+  {
+    "shortcode": "confused_dog",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/374/original/f2f9f6f06168baca.gif"
+  },
+  {
+    "shortcode": "coochified",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/388/original/7ad5b90241e32f9a.png"
+  },
+  {
+    "shortcode": "coolcat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/390/original/435b5837de41e6ea.png"
+  },
+  {
+    "shortcode": "coolified",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/361/original/a780ad67d1c38173.gif"
+  },
+  {
+    "shortcode": "coronavirus",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/363/original/20d3a46c1b9d5a61.png"
+  },
+  {
+    "shortcode": "cowskel",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/392/original/a5a7ea1552a46e4f.png"
+  },
+  {
+    "shortcode": "coywolf",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/144/original/67765a5f7e3a3818.png"
+  },
+  {
+    "shortcode": "crt_w_noise",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/381/original/31436670cd5189e0.png"
+  },
+  {
+    "shortcode": "crychkat3r",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/996/original/b3be65708ec19844.png"
+  },
+  {
+    "shortcode": "cry_cirno",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/387/original/e55e3601bc38bf81.png"
+  },
+  {
+    "shortcode": "crying_cat_2",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/386/original/a0b4ca9e67a6847e.png"
+  },
+  {
+    "shortcode": "cupofcoffee",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/391/original/fa6c79379399a21e.png"
+  },
+  {
+    "shortcode": "cursed_verified",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/371/original/071e4d89d1f777f7.png"
+  },
+  {
+    "shortcode": "cwy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/385/original/1dc6f7acc8e82dd4.png"
+  },
+  {
+    "shortcode": "dance",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/375/original/3a5dfef36c6d75cf.gif"
+  },
+  {
+    "shortcode": "deadbird",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/189/403/original/c0a3ce610ce905bf.png"
+  },
+  {
+    "shortcode": "debian",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/370/original/626ac89aaa161002.png"
+  },
+  {
+    "shortcode": "debian2",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/366/original/16f7c856307f9a66.png"
+  },
+  {
+    "shortcode": "democracysausage",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/378/original/9cd58884423ba18d.png"
+  },
+  {
+    "shortcode": "diaspora",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/678/original/8b873e4424935d4d.png"
+  },
+  {
+    "shortcode": "discord",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/364/original/b53ea720d7e4a33d.png"
+  },
+  {
+    "shortcode": "doge",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/662/original/13cbe67b559a0b17.png"
+  },
+  {
+    "shortcode": "dogluv",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/365/original/b17da4158ec25533.png"
+  },
+  {
+    "shortcode": "dogroll",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/362/original/ef3d8a02071a8817.gif"
+  },
+  {
+    "shortcode": "drake_dislike",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/078/464/original/81e922e563969c68.png"
+  },
+  {
+    "shortcode": "drake_like",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/389/original/51ddeef48bff1b6f.png"
+  },
+  {
+    "shortcode": "duckduckgo",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/156/original/152f3cd049b61c29.png"
+  },
+  {
+    "shortcode": "duckie",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/380/original/1dc7cf0877d40e4d.png"
+  },
+  {
+    "shortcode": "duck_verified",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/368/original/77e48d93391ade86.png"
+  },
+  {
+    "shortcode": "duolingo",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/394/original/6dfa0248112bb2a8.png"
+  },
+  {
+    "shortcode": "earth_americas",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/157/original/7b12481576e6a168.png"
+  },
+  {
+    "shortcode": "ed_grin",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/057/688/original/a61d80dec8c54750.png"
+  },
+  {
+    "shortcode": "eevee",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/393/original/f55aec7d82cb6f82.gif"
+  },
+  {
+    "shortcode": "eeveecoffee",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/367/original/320a5fcd8ed070e8.png"
+  },
+  {
+    "shortcode": "eichelhaeh3r",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/010/003/original/f79da77c5b34fde0.png"
+  },
+  {
+    "shortcode": "eichkarl_marxt3r",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/037/362/original/cbbf690646fdd429.png"
+  },
+  {
+    "shortcode": "eichkat3r",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/010/005/original/209af17138303115.png"
+  },
+  {
+    "shortcode": "eichkat3r_anzug",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/037/360/original/8fc6828d41a03a26.png"
+  },
+  {
+    "shortcode": "eich_katzo_small",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/999/original/0c8f9abdba489098.png"
+  },
+  {
+    "shortcode": "elmo_fire",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/828/original/e714c92986e7341d.png"
+  },
+  {
+    "shortcode": "enby",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/123/original/50bdb5b4916e8a9e.png"
+  },
+  {
+    "shortcode": "epsi",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/163/935/original/cd60ab226abe0cd5.png"
+  },
+  {
+    "shortcode": "epsi_drink",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/163/938/original/07dcc90cf4815b9c.png"
+  },
+  {
+    "shortcode": "epsi_drink_pixel",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/163/937/original/55564921b3a26282.png"
+  },
+  {
+    "shortcode": "epsi_woozy2",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/163/936/original/3ef5ff6c7265d6bd.png"
+  },
+  {
+    "shortcode": "erogun",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/384/original/e027e07ab0ff4a74.png"
+  },
+  {
+    "shortcode": "europe",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/369/original/8af2816f410f3a62.png"
+  },
+  {
+    "shortcode": "eyeroll",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/372/original/9e077203ff4544da.png"
+  },
+  {
+    "shortcode": "eyes_opposite",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/383/original/4bcf2a0b616aca73.png"
+  },
+  {
+    "shortcode": "facebook",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/408/original/86a20710e567eaf6.png"
+  },
+  {
+    "shortcode": "facepalm",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/403/original/a9dcc7230933b593.png"
+  },
+  {
+    "shortcode": "fake_verified",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/400/original/ac25df9273b0ffc9.png"
+  },
+  {
+    "shortcode": "fatpikachu",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/401/original/d32ddcec774a34d9.png"
+  },
+  {
+    "shortcode": "fatyoshi",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/402/original/2cd4923b571ae6ff.png"
+  },
+  {
+    "shortcode": "fdroid",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/424/original/af2c1dc358f794d3.png"
+  },
+  {
+    "shortcode": "fedi",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/137/original/f7e55ad89a3d4759.png"
+  },
+  {
+    "shortcode": "fediverse",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/397/original/f71d31410d87f82e.png"
+  },
+  {
+    "shortcode": "fedora",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/405/original/2ed187589e3ff1b0.png"
+  },
+  {
+    "shortcode": "femin",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/129/original/2c788704427c2b80.png"
+  },
+  {
+    "shortcode": "ffxivmsq_comp",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/404/original/c6ed90d9de516e3e.png"
+  },
+  {
+    "shortcode": "firefish",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/213/100/original/928c0708e22740bc.png"
+  },
+  {
+    "shortcode": "firefish_bongo",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/213/103/original/de8b0ef7e9c9bd0d.gif"
+  },
+  {
+    "shortcode": "firefish_love_happy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/213/101/original/807a2e1b30d54a48.png"
+  },
+  {
+    "shortcode": "firefish_sad",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/213/099/original/a9c33b3a856bfd69.png"
+  },
+  {
+    "shortcode": "firefish_sleepy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/213/102/original/84503326e5b9838c.png"
+  },
+  {
+    "shortcode": "firefox",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/155/original/9c81fbc45758ec9b.png"
+  },
+  {
+    "shortcode": "flag_eo",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/745/original/13dffe00f8a38245.png"
+  },
+  {
+    "shortcode": "flag_nonbinary",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/406/original/0350bc892aca14b8.png"
+  },
+  {
+    "shortcode": "flan_cheer",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/421/original/cf4294aa29b801d0.png"
+  },
+  {
+    "shortcode": "flan_coffee",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/426/original/11b4a8cd1867b068.png"
+  },
+  {
+    "shortcode": "flan_confused",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/412/original/4c3f600f8e99b76e.png"
+  },
+  {
+    "shortcode": "flan_evil",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/418/original/d6554e1bb28026ba.png"
+  },
+  {
+    "shortcode": "flan_excite",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/428/original/18cb3d61dc3fb5dc.png"
+  },
+  {
+    "shortcode": "flan_executioner",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/427/original/19c77457f5e0dd84.png"
+  },
+  {
+    "shortcode": "flan_hacker",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/398/original/55de29c9eeba9be3.png"
+  },
+  {
+    "shortcode": "flan_headphones",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/416/original/25512b7261ccc39e.png"
+  },
+  {
+    "shortcode": "flan_hurrah",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/413/original/5f7715cb54a5c21c.png"
+  },
+  {
+    "shortcode": "flan_laugh",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/409/original/5c975c8151a7902a.png"
+  },
+  {
+    "shortcode": "flan_molotov",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/407/original/63fdc9ef45cd5512.png"
+  },
+  {
+    "shortcode": "flan_photo",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/415/original/094bf8fb3dbe2b25.png"
+  },
+  {
+    "shortcode": "flan_piteous",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/419/original/4f2c4905fb6ce23b.png"
+  },
+  {
+    "shortcode": "flan_tea",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/411/original/c697a14ecdcea2ab.png"
+  },
+  {
+    "shortcode": "flan_thumbs",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/410/original/55dbab3300da49b4.png"
+  },
+  {
+    "shortcode": "flan_wave",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/142/original/83e5cc03232e6e54.png"
+  },
+  {
+    "shortcode": "flan_wink",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/425/original/2b256ff2fe2bd761.png"
+  },
+  {
+    "shortcode": "flan_XD",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/420/original/2a75373c88cfa195.png"
+  },
+  {
+    "shortcode": "flow_happy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/423/original/55d68b29ceb8cf6b.png"
+  },
+  {
+    "shortcode": "flow_sad",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/417/original/d6d443070ee8b171.png"
+  },
+  {
+    "shortcode": "frogchamp",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/422/original/c52774f4bb8e6909.png"
+  },
+  {
+    "shortcode": "fs_squee",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/429/original/4eed4fbfdddf9e25.png"
+  },
+  {
+    "shortcode": "funk",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/143/original/65162c73d68bc441.png"
+  },
+  {
+    "shortcode": "garfield",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/414/original/caf1199c7ef3c054.png"
+  },
+  {
+    "shortcode": "gatopiensa",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/460/original/6282b4fdca1321de.png"
+  },
+  {
+    "shortcode": "gay",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/469/original/d811417c7806fc33.png"
+  },
+  {
+    "shortcode": "gaysper",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/459/original/9ecfc575753c7a1c.png"
+  },
+  {
+    "shortcode": "gentleblob",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/463/original/fd767157b8d8f480.png"
+  },
+  {
+    "shortcode": "gentoo",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/439/original/d4bb58865bf02514.png"
+  },
+  {
+    "shortcode": "gimp",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/256/original/b4dbb1ec84c4f0be.png"
+  },
+  {
+    "shortcode": "gitea",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/257/original/1bae99d90201e46f.png"
+  },
+  {
+    "shortcode": "github",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/435/original/1a8f2b9d6d154f87.png"
+  },
+  {
+    "shortcode": "gmpride",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/461/original/d068274f70be942e.png"
+  },
+  {
+    "shortcode": "gnomewhite",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/258/original/424230f43371b3bd.png"
+  },
+  {
+    "shortcode": "gnu",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/447/original/e583afe62953c3ed.png"
+  },
+  {
+    "shortcode": "golang",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/458/original/9a587da87249c1b9.png"
+  },
+  {
+    "shortcode": "goldfish",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/437/original/5a23dcd5166d16ef.png"
+  },
+  {
+    "shortcode": "google",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/440/original/0152eef21e0ce041.png"
+  },
+  {
+    "shortcode": "google_maps",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/449/original/789b9f9f1d959abc.png"
+  },
+  {
+    "shortcode": "googleplus",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/442/original/6548a9f2f7c8b113.png"
+  },
+  {
+    "shortcode": "goose",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/465/original/e8b2d2e53325eb27.png"
+  },
+  {
+    "shortcode": "goose_honk",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/457/original/e199c08c504621b5.png"
+  },
+  {
+    "shortcode": "goose_peek",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/456/original/d40143a172683ddc.png"
+  },
+  {
+    "shortcode": "goose_yes",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/464/original/5e80237ab88dc80f.png"
+  },
+  {
+    "shortcode": "guillotine",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/452/original/8633cc4d9f7e6a4b.png"
+  },
+  {
+    "shortcode": "gyn",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/126/original/1ccbf3d3f62dfda9.png"
+  },
+  {
+    "shortcode": "hacker_a",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/140/725/original/ce6c34a13da2be12.png"
+  },
+  {
+    "shortcode": "hacker_b",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/140/723/original/73ff47c59bf64eb7.png"
+  },
+  {
+    "shortcode": "hacker_c",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/140/727/original/ac8ee66da9f9dbc5.png"
+  },
+  {
+    "shortcode": "hacker_d",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/140/732/original/79d3b3dda572be41.png"
+  },
+  {
+    "shortcode": "hacker_e",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/140/729/original/b4c3ae703275b7c7.png"
+  },
+  {
+    "shortcode": "hacker_f",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/140/740/original/0f3500e90bfeef99.png"
+  },
+  {
+    "shortcode": "hacker_g",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/140/734/original/73cec246eb041243.png"
+  },
+  {
+    "shortcode": "hacker_h",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/140/722/original/c7748cb8f722f6fa.png"
+  },
+  {
+    "shortcode": "hacker_i",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/140/728/original/cd138803446991db.png"
+  },
+  {
+    "shortcode": "hacker_j",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/140/739/original/eb095d9b95f7a718.png"
+  },
+  {
+    "shortcode": "hacker_k",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/140/736/original/32f8a958c8bbdfd2.png"
+  },
+  {
+    "shortcode": "hacker_l",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/140/738/original/379959d42fa622b3.png"
+  },
+  {
+    "shortcode": "hacker_m",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/140/720/original/033f057e78bf4d3d.png"
+  },
+  {
+    "shortcode": "hacker_n",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/140/721/original/91e8681901b2d573.png"
+  },
+  {
+    "shortcode": "hacker_o",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/140/724/original/6bd3b298e850e4be.png"
+  },
+  {
+    "shortcode": "hacker_p",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/140/733/original/8d176d27ec0a52df.png"
+  },
+  {
+    "shortcode": "hacker_q",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/140/741/original/528cae091c65eed4.png"
+  },
+  {
+    "shortcode": "hacker_r",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/140/730/original/016781651cfa8893.png"
+  },
+  {
+    "shortcode": "hacker_s",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/140/726/original/7fc79419855d073c.png"
+  },
+  {
+    "shortcode": "hacker_t",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/140/731/original/3fc16d415827d0aa.png"
+  },
+  {
+    "shortcode": "hacker_u",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/140/742/original/760c92b867f0456a.png"
+  },
+  {
+    "shortcode": "hacker_v",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/140/743/original/bd61c4d0a81cbf83.png"
+  },
+  {
+    "shortcode": "hacker_w",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/140/737/original/66c96e31d4922197.png"
+  },
+  {
+    "shortcode": "hacker_x",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/140/744/original/1d566d5ec6106fe3.png"
+  },
+  {
+    "shortcode": "hacker_y",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/140/735/original/b78fb3126d9bf414.png"
+  },
+  {
+    "shortcode": "hacker_z",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/140/745/original/fc0bfa7d9276663d.png"
+  },
+  {
+    "shortcode": "haha",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/466/original/10ceb623fb8fa019.png"
+  },
+  {
+    "shortcode": "HappyTurtle",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/453/original/257189927d79db35.png"
+  },
+  {
+    "shortcode": "heart_ace",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/436/original/9394a087c94e35fe.png"
+  },
+  {
+    "shortcode": "heart_bee",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/444/original/19658e9223a43a5c.png"
+  },
+  {
+    "shortcode": "heart_bi",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/448/original/e39bcb1af72fd954.png"
+  },
+  {
+    "shortcode": "heart_cybre",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/443/original/66b811fbabd5cef6.png"
+  },
+  {
+    "shortcode": "heart_pan",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/438/original/82159201eaee6eda.png"
+  },
+  {
+    "shortcode": "heart_pride",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/455/original/da851131a4e37401.png"
+  },
+  {
+    "shortcode": "heart_sp_bi",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/454/original/aeebd3c9b59ec188.png"
+  },
+  {
+    "shortcode": "heart_sp_les3",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/441/original/1b120dfbfd8ecc04.png"
+  },
+  {
+    "shortcode": "helpdescribe",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/450/original/811262b933af593e.png"
+  },
+  {
+    "shortcode": "hicat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/462/original/cb428c979e364e38.png"
+  },
+  {
+    "shortcode": "hollow_knight",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/172/822/original/b11e97fde76f773f.png"
+  },
+  {
+    "shortcode": "hollowKnight",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/172/823/original/d2868e1e835d69e8.png"
+  },
+  {
+    "shortcode": "icloud",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/446/original/f5642c6ab8d53792.png"
+  },
+  {
+    "shortcode": "idle",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/253/original/730cc656d65013a0.png"
+  },
+  {
+    "shortcode": "iih",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/451/original/8df9d3cce8bc60fc.png"
+  },
+  {
+    "shortcode": "iluvu",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/663/original/a715b77cb13ac5f2.gif"
+  },
+  {
+    "shortcode": "inkscape",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/259/original/f6f88b5236ab5b70.png"
+  },
+  {
+    "shortcode": "insta",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/445/original/7c10e162d2c3522f.png"
+  },
+  {
+    "shortcode": "ironman",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/468/original/29788b0a5a0d001c.png"
+  },
+  {
+    "shortcode": "java",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/664/original/2bc3859732627be9.png"
+  },
+  {
+    "shortcode": "jerrymad",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/046/215/original/a54a421b430039c2.png"
+  },
+  {
+    "shortcode": "jerryroll",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/046/214/original/08dda29c461e3a5c.png"
+  },
+  {
+    "shortcode": "jerryscream",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/046/213/original/8965fa9111ad2787.png"
+  },
+  {
+    "shortcode": "jerryskeptic",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/046/212/original/6c50e34e7f51a068.png"
+  },
+  {
+    "shortcode": "jerrytalk",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/046/211/original/2da7a14eb94447ad.png"
+  },
+  {
+    "shortcode": "joinfediversewiki",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/134/original/6c7d3ef905ea4bac.png"
+  },
+  {
+    "shortcode": "kali_linux",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/467/original/4aaaee3665d04a85.png"
+  },
+  {
+    "shortcode": "keanu_thanks",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/475/original/fa43d0d9b92bb2f2.gif"
+  },
+  {
+    "shortcode": "kirby_fly",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/477/original/6d62147a6f2a7c6d.png"
+  },
+  {
+    "shortcode": "kirby_happy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/478/original/1cadb7d687ee490a.png"
+  },
+  {
+    "shortcode": "kirby_idle",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/473/original/61287b22affb95c9.png"
+  },
+  {
+    "shortcode": "kirbyroll",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/472/original/cd4ca7798f36662b.gif"
+  },
+  {
+    "shortcode": "kirby_walk",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/479/original/7c7ee4cc6606c1c4.png"
+  },
+  {
+    "shortcode": "kofi",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/471/original/3e5b271d2cf3f653.png"
+  },
+  {
+    "shortcode": "laravel",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/476/original/dcd0a99676b3a386.png"
+  },
+  {
+    "shortcode": "legoLogo",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/474/original/b54575fff6c9aec7.png"
+  },
+  {
+    "shortcode": "lesbian_flag",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/148/original/bedd75e69cb488aa.png"
+  },
+  {
+    "shortcode": "lineageos2",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/493/original/89f9fadfb374c865.png"
+  },
+  {
+    "shortcode": "linux",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/254/original/3d96cffd3944cc1d.png"
+  },
+  {
+    "shortcode": "linuxmint",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/498/original/2314d9b9edb35f13.png"
+  },
+  {
+    "shortcode": "loading",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/483/original/276b8d5aca653bcf.png"
+  },
+  {
+    "shortcode": "macos",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/491/original/d254372f2678ba17.png"
+  },
+  {
+    "shortcode": "manjaro",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/499/original/3ddb845751d6255d.png"
+  },
+  {
+    "shortcode": "mario_wave",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/486/original/2b1e8c1395afacd4.gif"
+  },
+  {
+    "shortcode": "masto",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/142/original/ad2a287b047321c2.png"
+  },
+  {
+    "shortcode": "mastodance",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/490/original/1b8edbdd3bea660a.png"
+  },
+  {
+    "shortcode": "masto_doggy",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/009/770/original/c28067d25e9c0563.png"
+  },
+  {
+    "shortcode": "mastodon",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/150/original/eba832913e53f5f4.png"
+  },
+  {
+    "shortcode": "mastodon_oops",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/495/original/9e2cdcc5e4ec2980.png"
+  },
+  {
+    "shortcode": "mastogrin",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/494/original/5ef06d2507127468.png"
+  },
+  {
+    "shortcode": "mastolol2",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/488/original/db15d9399ce04f29.png"
+  },
+  {
+    "shortcode": "mastophant",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/484/original/7b0e5a59302a67d5.png"
+  },
+  {
+    "shortcode": "mastowink",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/492/original/ed0855ccba7ffef0.png"
+  },
+  {
+    "shortcode": "matrix",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/485/original/0222a450a8c6b950.png"
+  },
+  {
+    "shortcode": "maybe_verified",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/507/original/7d662cbbff9e992b.png"
+  },
+  {
+    "shortcode": "meow",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/487/original/ae1ba4769ed55701.png"
+  },
+  {
+    "shortcode": "meowMask",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/496/original/f233fd4e24f2ffa3.png"
+  },
+  {
+    "shortcode": "meowpumpkin",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/489/original/fe5da9e3c6023fb6.png"
+  },
+  {
+    "shortcode": "monero",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/533/original/bc4da0d51fb9cfa0.png"
+  },
+  {
+    "shortcode": "morty",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/020/410/original/d9abcaac0fdaba26.png"
+  },
+  {
+    "shortcode": "mortyderp",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/534/original/39caca7e2e575e8a.png"
+  },
+  {
+    "shortcode": "mortydrunk",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/525/original/d893ae1ddaba93e7.png"
+  },
+  {
+    "shortcode": "mortyheh",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/020/412/original/3e66890edab00bb2.png"
+  },
+  {
+    "shortcode": "mortyscream",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/020/411/original/a6d9761a3cd007dc.png"
+  },
+  {
+    "shortcode": "mortysmile",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/524/original/b779651bc75125aa.png"
+  },
+  {
+    "shortcode": "mortysmug",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/020/413/original/657bb0d78a3ef915.png"
+  },
+  {
+    "shortcode": "ms_aromantic_flag",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/511/original/4eddf165ba8a40e0.png"
+  },
+  {
+    "shortcode": "ms_demisexual_flag",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/537/original/c78d7dc50d60d6cb.png"
+  },
+  {
+    "shortcode": "ms_exclamation_mark_red",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/512/original/59d66b13a0ec246e.png"
+  },
+  {
+    "shortcode": "ms_eyes",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/538/original/98a7051b633264c8.png"
+  },
+  {
+    "shortcode": "ms_genderfluid_flag",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/522/original/16afed2a441b90da.png"
+  },
+  {
+    "shortcode": "ms_niss",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/518/original/2ca5124d064ef4f0.png"
+  },
+  {
+    "shortcode": "ms_robot",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/514/original/a970bb15ef3a467f.png"
+  },
+  {
+    "shortcode": "mstdn",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/504/original/2f280e08be3d4897.png"
+  },
+  {
+    "shortcode": "muss",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/508/original/0313b49f068763c0.png"
+  },
+  {
+    "shortcode": "muwhaha",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/529/original/d00e6acd319d42f3.gif"
+  },
+  {
+    "shortcode": "nato",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/503/original/f4d6790c3b3f337d.png"
+  },
+  {
+    "shortcode": "new",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/531/original/2bba5150c68c26f1.png"
+  },
+  {
+    "shortcode": "nextcloud",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/532/original/61d5576648c5c37e.png"
+  },
+  {
+    "shortcode": "night",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/535/original/c19c19db5d33d689.png"
+  },
+  {
+    "shortcode": "night_ablobcat_attention2",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/515/original/797a13ef147d8ff8.png"
+  },
+  {
+    "shortcode": "nkoLove",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/501/original/ec3a85b2a1488f8d.png"
+  },
+  {
+    "shortcode": "nkoShrug",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/520/original/60ff0d262b25d69f.png"
+  },
+  {
+    "shortcode": "nkotea",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/527/original/a5a5da4585099dd4.png"
+  },
+  {
+    "shortcode": "nkoThink",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/517/original/7c7c94dbc793e947.png"
+  },
+  {
+    "shortcode": "nkoWave",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/141/original/ef9681bb170c9ae4.png"
+  },
+  {
+    "shortcode": "nkoWhaaaat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/516/original/43dd9af03ffb8953.png"
+  },
+  {
+    "shortcode": "no_at",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/147/original/adab746ae5dd1725.png"
+  },
+  {
+    "shortcode": "noding_cat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/521/original/7822fdb476143159.png"
+  },
+  {
+    "shortcode": "notlikemeowcry",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/519/original/e17102eef36a0bd3.png"
+  },
+  {
+    "shortcode": "nttrainbow",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/526/original/81a624444971d837.png"
+  },
+  {
+    "shortcode": "nyancat_rainbow",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/539/original/5937ed892428977e.png"
+  },
+  {
+    "shortcode": "oh_no",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/510/original/39b48764a2e5924d.png"
+  },
+  {
+    "shortcode": "oof",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/502/original/69a7586db36811a7.png"
+  },
+  {
+    "shortcode": "openbsd",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/255/original/801dbabb0eec2da3.png"
+  },
+  {
+    "shortcode": "opensource",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/507/original/05fa4449b16f92a8.png"
+  },
+  {
+    "shortcode": "osm",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/262/original/5c2cc7c85429428c.png"
+  },
+  {
+    "shortcode": "over18",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/020/416/original/fd20807d8321ba15.png"
+  },
+  {
+    "shortcode": "owi",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/528/original/c7a27c90bda59c56.png"
+  },
+  {
+    "shortcode": "owobread",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/505/original/93df144d3f8bfb71.png"
+  },
+  {
+    "shortcode": "owosneakythink",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/530/original/c5679bf15e247a5e.png"
+  },
+  {
+    "shortcode": "pacman",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/506/original/8cb610093e7ed7fe.png"
+  },
+  {
+    "shortcode": "pacmanblinky",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/523/original/cbbe296f38fe8793.png"
+  },
+  {
+    "shortcode": "pansexual_flag",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/513/original/bc5bcb1d86e4599f.png"
+  },
+  {
+    "shortcode": "party",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/500/original/dd3bba1ad704faad.gif"
+  },
+  {
+    "shortcode": "patcat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/536/original/b6384613a2bc14c6.png"
+  },
+  {
+    "shortcode": "patreon",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/544/original/55de74d260bb7c92.png"
+  },
+  {
+    "shortcode": "pax",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/131/original/92acd09fac873a29.png"
+  },
+  {
+    "shortcode": "paypal",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/545/original/2af957d59901c498.png"
+  },
+  {
+    "shortcode": "pblobuwu",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/572/original/0f739644ac6cbfe0.png"
+  },
+  {
+    "shortcode": "picardfacepalm",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/562/original/2163e531766de144.png"
+  },
+  {
+    "shortcode": "pikachuroll",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/559/original/1cd47c0a3d4b436f.gif"
+  },
+  {
+    "shortcode": "pine64",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/250/original/413a66ec2c3ae990.png"
+  },
+  {
+    "shortcode": "pirate",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/553/original/f95c956e275cfc3a.png"
+  },
+  {
+    "shortcode": "pixelfed",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/677/original/30a55421bbeb7f0c.png"
+  },
+  {
+    "shortcode": "playstation",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/551/original/7bd21d31ebc31adf.png"
+  },
+  {
+    "shortcode": "pokeball",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/061/176/original/0e336687da6ddf14.png"
+  },
+  {
+    "shortcode": "pooh_exclamation",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/560/original/edd5825d2ee3814f.png"
+  },
+  {
+    "shortcode": "poohington",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/554/original/69d5931e1bcad267.png"
+  },
+  {
+    "shortcode": "Pooh_wave",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/564/original/588c5d633d3ea211.png"
+  },
+  {
+    "shortcode": "pop_cat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/557/original/209fb4bca2b4227c.gif"
+  },
+  {
+    "shortcode": "pop_os",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/112/644/original/23b33ce70f4b90eb.png"
+  },
+  {
+    "shortcode": "popos",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/112/645/original/22f9a14713879062.png"
+  },
+  {
+    "shortcode": "popOwOs",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/112/646/original/187b4e9ef6d851b8.png"
+  },
+  {
+    "shortcode": "portal",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/571/original/33e1723fcac67fb0.png"
+  },
+  {
+    "shortcode": "prami",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/087/620/original/62b0532071d57cb0.png"
+  },
+  {
+    "shortcode": "psychedelic_cat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/555/original/8c15c169b0df6d91.png"
+  },
+  {
+    "shortcode": "pudding_verified",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/574/original/6271beba51c51273.png"
+  },
+  {
+    "shortcode": "purplebunny",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/552/original/df26074903874f39.png"
+  },
+  {
+    "shortcode": "purple_sparkling_heart",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/547/original/e60b68db54222299.png"
+  },
+  {
+    "shortcode": "pusheenhi",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/566/original/410c5d85a1520ce3.png"
+  },
+  {
+    "shortcode": "pusheensad",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/561/original/813e7f3230b4fe84.png"
+  },
+  {
+    "shortcode": "python",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/249/original/23f489fdd95aa703.png"
+  },
+  {
+    "shortcode": "qt",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/550/original/67e2aa0dd6f10b49.png"
+  },
+  {
+    "shortcode": "queer",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/136/original/aa661f3648d47e4e.png"
+  },
+  {
+    "shortcode": "QueerCat_Ace",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/139/original/eb9b5899067714bb.png"
+  },
+  {
+    "shortcode": "QueerCat_Agender",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/573/original/bd9dbee8f0708dad.png"
+  },
+  {
+    "shortcode": "QueerCat_Bisexual",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/570/original/2c3ac6c82a0916ab.png"
+  },
+  {
+    "shortcode": "QueerCat_Genderfluid",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/140/original/270ad8dfe5c61b31.png"
+  },
+  {
+    "shortcode": "QueerCatHeart_Bisexual",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/549/original/bc3d47869224a736.png"
+  },
+  {
+    "shortcode": "QueerCatHeart_Lesbian",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/565/original/a1691e6b70fc719e.png"
+  },
+  {
+    "shortcode": "QueerCatHeart_Pride",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/569/original/047a9cde21b9b221.png"
+  },
+  {
+    "shortcode": "QueerCat_Pansexual",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/558/original/33d7a3880c954357.png"
+  },
+  {
+    "shortcode": "QueerCat_Pride",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/548/original/3e488a2fcf2de96c.png"
+  },
+  {
+    "shortcode": "question_block",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/546/original/8defe8edadb549f4.png"
+  },
+  {
+    "shortcode": "raspberrypi",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/264/original/fcf2ed53484cb1e3.png"
+  },
+  {
+    "shortcode": "rb_coffee",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/556/original/a4aab737240a7195.png"
+  },
+  {
+    "shortcode": "RedCrystalHeart",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/563/original/ed0b33760f864655.png"
+  },
+  {
+    "shortcode": "red_heart",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/567/original/ead1785d3e17fecd.png"
+  },
+  {
+    "shortcode": "revblobfoxthonking",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/716/original/0d9cad9014efdb01.png"
+  },
+  {
+    "shortcode": "rick",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/020/406/original/2852035599063dd5.png"
+  },
+  {
+    "shortcode": "rickdrink",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/020/408/original/b9fdbb2c589820ae.png"
+  },
+  {
+    "shortcode": "rickhey",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/568/original/79b24bdf9eb444cf.png"
+  },
+  {
+    "shortcode": "rickhey2",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/020/409/original/c56a33336475d486.png"
+  },
+  {
+    "shortcode": "rickroll",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/020/407/original/365df9b5e3ecc683.png"
+  },
+  {
+    "shortcode": "rickwhoah",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/595/original/b7e77b151ce79c88.png"
+  },
+  {
+    "shortcode": "rose_pride",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/584/original/3d7495963db617c6.png"
+  },
+  {
+    "shortcode": "rss",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/603/original/56370e6dbef23c0b.png"
+  },
+  {
+    "shortcode": "rssblobcatgorro",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/615/original/485f00fca7e6b635.png"
+  },
+  {
+    "shortcode": "rust",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/617/original/4605f4c376e9e2ea.png"
+  },
+  {
+    "shortcode": "sad_cat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/580/original/7dfb72829c0e7069.png"
+  },
+  {
+    "shortcode": "sadcat1",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/597/original/071557897127f446.png"
+  },
+  {
+    "shortcode": "sad_dog",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/592/original/d1d6d0bac8777ac4.png"
+  },
+  {
+    "shortcode": "sadturtle",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/596/original/bd17ff43b66f0f0c.png"
+  },
+  {
+    "shortcode": "sans",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/607/original/42d094c758b9ef89.png"
+  },
+  {
+    "shortcode": "sfa",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/590/original/d45c113a73810c15.png"
+  },
+  {
+    "shortcode": "sgtpickles2",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/581/original/7872a6795ea7e2b7.png"
+  },
+  {
+    "shortcode": "she_her",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/587/original/ab05e1bc4ab01c46.png"
+  },
+  {
+    "shortcode": "shrek",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/599/original/8361de5e2ec499dd.png"
+  },
+  {
+    "shortcode": "sidekiq",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/608/original/5072ea9f3e7e63b5.png"
+  },
+  {
+    "shortcode": "sip_epsi",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/163/939/original/54ec7389ac4ed928.png"
+  },
+  {
+    "shortcode": "siren",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/145/original/ac093a9173ff1c6f.png"
+  },
+  {
+    "shortcode": "skymin",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/606/original/1b6e1d34d5aa7357.png"
+  },
+  {
+    "shortcode": "sleep",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/582/original/e9e0aabb2009ba74.png"
+  },
+  {
+    "shortcode": "smo_mario",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/591/original/cd5ec4347283441f.png"
+  },
+  {
+    "shortcode": "solus",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/112/656/original/8483afb1793e02b6.png"
+  },
+  {
+    "shortcode": "sparkles_bi",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/589/original/0d03e904d3b34d42.png"
+  },
+  {
+    "shortcode": "sparkles_blue",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/600/original/dd42b23ba29ecf37.png"
+  },
+  {
+    "shortcode": "sparkles_indigo",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/602/original/8bb48fe9c85af86a.png"
+  },
+  {
+    "shortcode": "sparkles_pan",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/605/original/1388117b02e7d9ff.png"
+  },
+  {
+    "shortcode": "sparkles_pink",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/601/original/a0491dca90a45df5.png"
+  },
+  {
+    "shortcode": "sparkles_trans",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/604/original/20abba5cfba93f26.png"
+  },
+  {
+    "shortcode": "sp_bi",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/586/original/796e151dc7aa7303.png"
+  },
+  {
+    "shortcode": "sp_bl",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/593/original/f1747ab501237b7b.png"
+  },
+  {
+    "shortcode": "sp_dusk",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/611/original/0edb9b0a91918e05.png"
+  },
+  {
+    "shortcode": "spidey",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/618/original/ddcb519d60738825.png"
+  },
+  {
+    "shortcode": "splat_girl",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/585/original/cde694779ff24a80.png"
+  },
+  {
+    "shortcode": "spotify",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/588/original/60c911e56d56dbb1.png"
+  },
+  {
+    "shortcode": "sq_she_her",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/612/original/e1160f73d5863ba4.png"
+  },
+  {
+    "shortcode": "squishygecko",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/609/original/02d9fdd59b3e7c65.png"
+  },
+  {
+    "shortcode": "srofl",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/614/original/a6a18bc0f8a0c97c.png"
+  },
+  {
+    "shortcode": "_stars",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/616/original/3d5b07b5d2198303.png"
+  },
+  {
+    "shortcode": "startrek",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/265/original/b50fd3588a121e99.png"
+  },
+  {
+    "shortcode": "steam",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/613/original/d9976583f7e5d92a.png"
+  },
+  {
+    "shortcode": "sticker_cute",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/583/original/7de86bb40fc331a9.png"
+  },
+  {
+    "shortcode": "sticker_dancingelephant",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/594/original/b3cd16af7c91427d.png"
+  },
+  {
+    "shortcode": "sticker_hatkid",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/598/original/1113e0da62425ecd.png"
+  },
+  {
+    "shortcode": "sticker_pika_bow",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/620/original/324e6f6bb914fcbe.png"
+  },
+  {
+    "shortcode": "sticker_pika_cross",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/619/original/dda0c3eb860c88d4.png"
+  },
+  {
+    "shortcode": "sticker_pika_huh",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/674/original/b22158c7da49558a.gif"
+  },
+  {
+    "shortcode": "sticker_pika_love",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/673/original/ffca004e0bd36c36.png"
+  },
+  {
+    "shortcode": "sticker_pika_silly",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/671/original/efaedb0b3f488f05.png"
+  },
+  {
+    "shortcode": "sticker_pika_wink",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/672/original/cc6a1a9094650816.png"
+  },
+  {
+    "shortcode": "sticker_pika_wow",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/649/original/0365a47a5f0c6600.png"
+  },
+  {
+    "shortcode": "storm_trooper",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/648/original/4d77c6f2f02a0e79.gif"
+  },
+  {
+    "shortcode": "strawberry_boop",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/668/original/eb548769e9efc79a.png"
+  },
+  {
+    "shortcode": "stux",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/430/original/532d82a2034d70da.png"
+  },
+  {
+    "shortcode": "stux_boop",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/431/original/f53c31fd49e3c5b9.png"
+  },
+  {
+    "shortcode": "stuxhost",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/641/original/794094d091b379d7.png"
+  },
+  {
+    "shortcode": "tardis",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/661/original/941d08665a394a47.png"
+  },
+  {
+    "shortcode": "t_blink",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/642/original/56f808461d82ec95.png"
+  },
+  {
+    "shortcode": "tealheart",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/660/original/59c34636305506d3.png"
+  },
+  {
+    "shortcode": "telegram",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/652/original/742b255e5e4fe2c3.png"
+  },
+  {
+    "shortcode": "terminal",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/251/original/c7f5dac2954d97b2.png"
+  },
+  {
+    "shortcode": "tetris",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/263/original/48a87136c6ee9f61.png"
+  },
+  {
+    "shortcode": "thaenkin",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/659/original/4f3edae3cd459581.png"
+  },
+  {
+    "shortcode": "think_bread",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/646/original/217d7ac3ce7ea1d8.png"
+  },
+  {
+    "shortcode": "thinkergunsunglasses",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/654/original/250b838dee78b76c.png"
+  },
+  {
+    "shortcode": "thinking_rms",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/663/original/7288003a7ab2dd13.png"
+  },
+  {
+    "shortcode": "thinking_rotate",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/658/original/91388ac267c17beb.png"
+  },
+  {
+    "shortcode": "thinktink",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/667/original/40fd44b707c9772c.png"
+  },
+  {
+    "shortcode": "thonkpad",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/664/original/0df88af6907c1013.png"
+  },
+  {
+    "shortcode": "thounking",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/656/original/f0ad3e102e95d55b.png"
+  },
+  {
+    "shortcode": "thunderbird",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/260/original/67555933b72a3655.png"
+  },
+  {
+    "shortcode": "toot",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/644/original/054eb38d32834fc8.png"
+  },
+  {
+    "shortcode": "tor",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/011/477/original/24a89d24f15e12df.png"
+  },
+  {
+    "shortcode": "trans",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/122/original/34e1614be8d140c4.png"
+  },
+  {
+    "shortcode": "transgender",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/662/original/dd8856ef9b55eb02.png"
+  },
+  {
+    "shortcode": "trans_heart",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/146/original/474018bbab1051c9.png"
+  },
+  {
+    "shortcode": "troll",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/665/original/4732f0acb85db53e.png"
+  },
+  {
+    "shortcode": "trollkipleur",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/655/original/aa42f097e4ae7a33.png"
+  },
+  {
+    "shortcode": "tux",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/657/original/cd4aa49f18adb9b7.png"
+  },
+  {
+    "shortcode": "twitch",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/650/original/87780693063b3076.png"
+  },
+  {
+    "shortcode": "twitter",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/643/original/cb760213ea1fdd1b.png"
+  },
+  {
+    "shortcode": "tzcat08",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/669/original/f95442b7083b331b.png"
+  },
+  {
+    "shortcode": "tzcat12",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/653/original/a7a0080a4f636168.png"
+  },
+  {
+    "shortcode": "tzcat18",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/647/original/135610f678fabb56.png"
+  },
+  {
+    "shortcode": "tzcat26",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/645/original/9817d3b7d1e8cbf7.png"
+  },
+  {
+    "shortcode": "tzcat33",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/666/original/b172978490721362.png"
+  },
+  {
+    "shortcode": "ublockorigin",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/261/original/39202b28a46d51b9.png"
+  },
+  {
+    "shortcode": "ubuntu",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/651/original/404c57a9d58b4ac4.png"
+  },
+  {
+    "shortcode": "underheart",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/670/original/9ac495cca27c8c5c.png"
+  },
+  {
+    "shortcode": "unverified",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/510/original/3f583b5974a0216d.png"
+  },
+  {
+    "shortcode": "vegan",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/127/original/e6c7b815589bfa2f.png"
+  },
+  {
+    "shortcode": "verialt",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/692/original/797a8b28df7f7634.png"
+  },
+  {
+    "shortcode": "verif_androgine",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/682/original/8f54d29b5e203e71.png"
+  },
+  {
+    "shortcode": "verified",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/511/original/e5121c393a0162bf.png"
+  },
+  {
+    "shortcode": "verified2",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/508/original/829f02c012d1ecc7.png"
+  },
+  {
+    "shortcode": "verified_alt",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/690/original/96956d8d10188902.png"
+  },
+  {
+    "shortcode": "verified_B",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/704/original/3c8684ce53824c2a.png"
+  },
+  {
+    "shortcode": "verified_flashing",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/688/original/86ccf8d3b82454a3.png"
+  },
+  {
+    "shortcode": "verified_gay",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/003/509/original/08dd7a76b98eb09e.png"
+  },
+  {
+    "shortcode": "verified_interrobang",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/030/706/original/6410360da8011ee5.png"
+  },
+  {
+    "shortcode": "verified_neko",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/685/original/ad140b975581bb6f.png"
+  },
+  {
+    "shortcode": "verified_twtr",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/694/original/6815be66886e21b6.png"
+  },
+  {
+    "shortcode": "verigold",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/053/582/original/d4b0e4a4cf3b4b13.png"
+  },
+  {
+    "shortcode": "veristar",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/030/632/original/cc3e74e3d439bf11.png"
+  },
+  {
+    "shortcode": "veri_trek2",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/017/321/original/ba7f79112bfc4382.png"
+  },
+  {
+    "shortcode": "VeryQueer",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/133/original/5b18d9498155ee27.png"
+  },
+  {
+    "shortcode": "vibingcat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/696/original/8152d8c9a7ec3201.png"
+  },
+  {
+    "shortcode": "vim",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/252/original/865e0bcce81221a2.png"
+  },
+  {
+    "shortcode": "vivaldi",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/044/169/original/294996c8efed9b20.png"
+  },
+  {
+    "shortcode": "vivaldi_blue",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/044/168/original/4321d273ec03605c.png"
+  },
+  {
+    "shortcode": "vivaldi_gray",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/044/170/original/24ff0f9b72e96d11.png"
+  },
+  {
+    "shortcode": "voteblue",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/686/original/672e4ea02c77cb6a.png"
+  },
+  {
+    "shortcode": "voteblue2",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/698/original/0d0abd31090d4e19.png"
+  },
+  {
+    "shortcode": "warcraft",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/691/original/5f7b4a8bf0e76a9e.png"
+  },
+  {
+    "shortcode": "wechat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/689/original/a13766d3749c74cc.png"
+  },
+  {
+    "shortcode": "welp",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/697/original/0699c57992d7a4e2.png"
+  },
+  {
+    "shortcode": "WhatAWeek",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/135/original/7868617fdfeba4cd.png"
+  },
+  {
+    "shortcode": "windows",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/683/original/d9346aaee7840cee.png"
+  },
+  {
+    "shortcode": "woozy_epsi",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/163/934/original/e4508940bd231390.png"
+  },
+  {
+    "shortcode": "wp_fedi",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/004/562/original/40343d2ef4d042b7.png"
+  },
+  {
+    "shortcode": "wtf",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/125/original/3b64349df7633178.png"
+  },
+  {
+    "shortcode": "xbox_360_controller",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/693/original/d9875e4c65576109.png"
+  },
+  {
+    "shortcode": "xbox_one_controller_rev_3",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/699/original/1f321b4bee5e3b71.png"
+  },
+  {
+    "shortcode": "xfce",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/000/266/original/e73b69f4ac3d1b44.png"
+  },
+  {
+    "shortcode": "xmpp",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/684/original/1ac3c67d7df2a1f2.png"
+  },
+  {
+    "shortcode": "yanagiyuu_heart3",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/705/original/597f9ef0eee5532d.png"
+  },
+  {
+    "shortcode": "yay",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/695/original/114410c58edc9df5.png"
+  },
+  {
+    "shortcode": "yoshi",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/044/348/original/87bdb70cb7e3a255.png"
+  },
+  {
+    "shortcode": "yoshi_eat",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/700/original/53d5307e6b633618.png"
+  },
+  {
+    "shortcode": "yoshi_egg",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/044/349/original/3c5be6c82b0df810.png"
+  },
+  {
+    "shortcode": "yoshi_tongue_end",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/703/original/b3cc6b800514ee4d.png"
+  },
+  {
+    "shortcode": "yoshi_tongue_mid",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/701/original/60528861f893db4d.png"
+  },
+  {
+    "shortcode": "youtube",
+    "url": "https://s3.masto.ai/custom_emojis/images/000/015/687/original/3491f36442d205ff.png"
+  }
+]

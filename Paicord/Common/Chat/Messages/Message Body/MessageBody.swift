@@ -43,10 +43,9 @@ extension MessageCell {
             } else if !content.isEmpty {
               MarkdownText(
                 content: content,
-                meta: message,
-                channelStore: channelStore
+                channelStore: channelStore,
+                allowsJumboEmoji: true
               )
-              .equatable()
             }
           }
         }

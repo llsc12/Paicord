@@ -1,0 +1,3 @@
+Component,Origin,License,Copyright
+ConcurrencyExtras,https://github.com/pointfreeco/swift-concurrency-extras,MIT,Copyright (c) 2023 Point-Free
+SnapshotTesting,https://github.com/pointfreeco/swift-snapshot-testing,MIT,Copyright (c) 2019 Point-Free, Inc.

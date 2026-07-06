@@ -34,6 +34,7 @@
 		57F5AF512E7CBC7700AD5674 /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57F5AF502E7CBC7700AD5674 /* LoginViewModel.swift */; };
 		57F5AF532E7CBDD000AD5674 /* AccountPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57F5AF522E7CBDD000AD5674 /* AccountPicker.swift */; };
 		57F5AF552E7CBDF400AD5674 /* MFAView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57F5AF542E7CBDF400AD5674 /* MFAView.swift */; };
+		7D5FF55A0BE87899C3684382 /* Textual in Frameworks */ = {isa = PBXBuildFile; productRef = 8C1C53B8654B3E3FFA5055A8 /* Textual */; };
 		8702A5382EAA6753008DD55A /* MemberRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8702A5372EAA6751008DD55A /* MemberRowView.swift */; };
 		A20BAF032FA751E000B337A6 /* ProfileBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20BAF022FA751DA00B337A6 /* ProfileBannerView.swift */; };
 		A2C21A1E2FA8150200B0F069 /* SettingsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2C21A1D2FA8150000B0F069 /* SettingsSheet.swift */; };
@@ -44,7 +45,6 @@
 		AA078FC72EC80D3C00EDFFA8 /* LocalConsoleManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA078FC62EC80D3A00EDFFA8 /* LocalConsoleManager.swift */; };
 		AA078FCA2EC8220E00EDFFA8 /* PaicordSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA078FC92EC8220900EDFFA8 /* PaicordSection.swift */; };
 		AA0BAA792ECE9A3600365661 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0BAA782ECE9A3100365661 /* Color.swift */; };
-		AA0C43D72E9F190B000FA834 /* AttributedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0C43D62E9F18AD000FA834 /* AttributedText.swift */; };
 		AA1097142E64C181005BC3D2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA1097102E64C181005BC3D2 /* Assets.xcassets */; };
 		AA1097152E64C181005BC3D2 /* LargeBaseplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1097042E64C181005BC3D2 /* LargeBaseplate.swift */; };
 		AA1097172E64C181005BC3D2 /* SmallBaseplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1097062E64C181005BC3D2 /* SmallBaseplate.swift */; };
@@ -55,7 +55,6 @@
 		AA10971D2E64C18C005BC3D2 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA10971C2E64C189005BC3D2 /* ChatView.swift */; };
 		AA1378062E967A4A00100969 /* ProcessInfo+previews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1378042E96798000100969 /* ProcessInfo+previews.swift */; };
 		AA1378092E969A9000100969 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = AA1378082E969A9000100969 /* Lottie */; };
-		AA13780B2E969D6100100969 /* DiscordMarkdownParser in Frameworks */ = {isa = PBXBuildFile; productRef = AA13780A2E969D6100100969 /* DiscordMarkdownParser */; };
 		AA13A1E32EA83766005A3613 /* TypingIndicatorBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA13A1E22EA83766005A3613 /* TypingIndicatorBar.swift */; };
 		AA1579362F3220D50097C0FA /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = AA1579352F3220D50097C0FA /* Localizable.xcstrings */; };
 		AA1878F32E81A30C009C7E40 /* GuildView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA1878F22E81A305009C7E40 /* GuildView.swift */; };
@@ -199,7 +198,6 @@
 		AA078FC62EC80D3A00EDFFA8 /* LocalConsoleManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalConsoleManager.swift; sourceTree = "<group>"; };
 		AA078FC92EC8220900EDFFA8 /* PaicordSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaicordSection.swift; sourceTree = "<group>"; };
 		AA0BAA782ECE9A3100365661 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
-		AA0C43D62E9F18AD000FA834 /* AttributedText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributedText.swift; sourceTree = "<group>"; };
 		AA1096DB2E63BE84005BC3D2 /* Paicord.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Paicord.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA1097042E64C181005BC3D2 /* LargeBaseplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeBaseplate.swift; sourceTree = "<group>"; };
 		AA1097062E64C181005BC3D2 /* SmallBaseplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmallBaseplate.swift; sourceTree = "<group>"; };
@@ -328,7 +326,7 @@
 				572B694C2E7079FB00BCED00 /* PaicordLib in Frameworks */,
 				AA9C818C2E6702930086B1DA /* SwiftUIIntrospect in Frameworks */,
 				57CDD87F2E71CB6000022203 /* HCaptcha in Frameworks */,
-				AA13780B2E969D6100100969 /* DiscordMarkdownParser in Frameworks */,
+				7D5FF55A0BE87899C3684382 /* Textual in Frameworks */,
 				AAB22FDB2EAD86B700413310 /* ColorCube in Frameworks */,
 				AAB22FD82EAD0A2400413310 /* SwiftPrettyPrint in Frameworks */,
 				AAEEC7222E6515C400EB5FC9 /* KeychainAccess in Frameworks */,
@@ -516,7 +514,6 @@
 			isa = PBXGroup;
 			children = (
 				57A55C562E7560CC005C8226 /* MarkdownText.swift */,
-				AA0C43D62E9F18AD000FA834 /* AttributedText.swift */,
 			);
 			path = Markdown;
 			sourceTree = "<group>";
@@ -1030,7 +1027,7 @@
 				57CDD87E2E71CB6000022203 /* HCaptcha */,
 				AA1878F82E81FC1A009C7E40 /* FLEX */,
 				AA1378082E969A9000100969 /* Lottie */,
-				AA13780A2E969D6100100969 /* DiscordMarkdownParser */,
+				8C1C53B8654B3E3FFA5055A8 /* Textual */,
 				AA5CA6572E9D2CBA00C7C82A /* HighlightSwift */,
 				AA5CA65F2E9D435800C7C82A /* SDWebImageSwiftUI */,
 				AA21D2822EAA557C00C75093 /* Sparkle */,
@@ -1237,7 +1234,6 @@
 				57F5AF4B2E7CB13F00AD5674 /* Commands.swift in Sources */,
 				AADD7F8D2E99EB0B0025B644 /* Attachments.swift in Sources */,
 				57AA8A032E7875D100B4CA9C /* Sidebar.swift in Sources */,
-				AA0C43D72E9F190B000FA834 /* AttributedText.swift in Sources */,
 				AAD446A42ED0B631006CB07C /* ShellView.swift in Sources */,
 				AA47AF342EDEF1DC008A50C9 /* LanguageSection.swift in Sources */,
 				AA74E43F2EBE26E30031B285 /* PlaceholderMessageCell.swift in Sources */,
@@ -1540,7 +1536,7 @@
 		};
 		579DF3492E6D9B9800BD8B97 /* XCRemoteSwiftPackageReference "SwiftUIX" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SwiftUIX/SwiftUIX";
+			repositoryURL = "https://github.com/yume190/SwiftUIX";
 			requirement = {
 				branch = master;
 				kind = branch;
@@ -1701,14 +1697,14 @@
 			package = 57CDD87D2E71CB6000022203 /* XCRemoteSwiftPackageReference "hcaptcha" */;
 			productName = HCaptcha;
 		};
+		8C1C53B8654B3E3FFA5055A8 /* Textual */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Textual;
+		};
 		AA1378082E969A9000100969 /* Lottie */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = AA1378072E969A9000100969 /* XCRemoteSwiftPackageReference "lottie-spm" */;
 			productName = Lottie;
-		};
-		AA13780A2E969D6100100969 /* DiscordMarkdownParser */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = DiscordMarkdownParser;
 		};
 		AA1878F82E81FC1A009C7E40 /* FLEX */ = {
 			isa = XCSwiftPackageProductDependency;
