@@ -1539,7 +1539,7 @@
 			repositoryURL = "https://github.com/llsc12/SwiftUIX";
 			requirement = {
 				kind = revision;
-				revision = d4aeb53666f407297c6ec8d6f673abead5f5dc26;
+				revision = 5596922e2a2daef2e084b4a62713de1615e664d5;
 			};
 		};
 		57CDD87D2E71CB6000022203 /* XCRemoteSwiftPackageReference "hcaptcha" */ = {

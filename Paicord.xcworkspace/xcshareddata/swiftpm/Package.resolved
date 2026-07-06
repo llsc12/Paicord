@@ -418,7 +418,7 @@
     {
       "identity" : "swift-syntax",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-syntax.git",
+      "location" : "https://github.com/swiftlang/swift-syntax",
       "state" : {
         "revision" : "4799286537280063c85a32f09884cfbca301b1a1",
         "version" : "602.0.0"
@@ -492,8 +492,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/llsc12/SwiftUIX",
       "state" : {
-        "branch" : "master",
-        "revision" : "d4aeb53666f407297c6ec8d6f673abead5f5dc26"
+        "revision" : "5596922e2a2daef2e084b4a62713de1615e664d5"
       }
     },
     {
