@@ -274,11 +274,11 @@ public struct DiscordUser: Sendable, Codable, Equatable, Hashable {
 
     /// https://docs.discord.food/resources/user#profile-effect-structure
     public struct Effect: Sendable, Codable, Equatable, Hashable {
-      public var id: AnySnowflake
+      public var sku_id: SKUSnowflake
       public var expires_at: DiscordTimestamp?
 
-      public init(id: AnySnowflake, expires_at: DiscordTimestamp? = nil) {
-        self.id = id
+      public init(id: SKUSnowflake, expires_at: DiscordTimestamp? = nil) {
+        self.sku_id = id
         self.expires_at = expires_at
       }
     }
