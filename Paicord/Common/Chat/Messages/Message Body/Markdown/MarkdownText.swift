@@ -443,3 +443,8 @@ enum PaicordChatLink {
   MarkdownText(content: "Hey <@123>, use `git status` to check for `uncommitted` changes")
     .padding()
 }
+
+#Preview("Dash line is not a heading") {
+  MarkdownText(content: "test\n---\ntest")
+    .padding()
+}

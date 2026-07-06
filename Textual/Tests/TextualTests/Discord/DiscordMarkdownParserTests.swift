@@ -5,6 +5,21 @@ import Testing
 
 @MainActor
 struct DiscordMarkdownParserTests {
+  @Test func dashLineIsNotASetextHeadingOrThematicBreak() throws {
+    // Discord has no setext headings and no thematic breaks — "---" on its own line (and its
+    // preceding line) should render as plain, literal text, not turn "test" into a heading and
+    // swallow the dashes.
+    let result = try DiscordMarkdownParser().attributedString(for: "test\n---\ntest")
+    let runs = Array(result.runs)
+
+    #expect(String(result.characters[...]) == "test\n---\ntest")
+    #expect(
+      runs.allSatisfy { run in
+        !(run.presentationIntent?.components.contains { $0.kind == .header(level: 2) } ?? false)
+      }
+    )
+  }
+
   @Test func plainUnderline() throws {
     let result = try DiscordMarkdownParser().attributedString(for: "__underline__")
     let runs = Array(result.runs)

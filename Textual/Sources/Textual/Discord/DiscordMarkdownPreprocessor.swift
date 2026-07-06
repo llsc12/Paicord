@@ -247,7 +247,7 @@ public enum DiscordMarkdown {
         continue
       }
 
-      let line = preservingLeadingWhitespace(in: line)
+      let line = preservingLeadingWhitespace(in: escapingThematicBreakLikeLines(line))
 
       var processed: String
       if let content = stripSubtextMarker(line) {
@@ -286,6 +286,17 @@ public enum DiscordMarkdown {
       return line
     }
     return String(repeating: "\u{00A0}", count: leadingSpaceCount) + rest
+  }
+
+  private static func escapingThematicBreakLikeLines(_ line: String) -> String {
+    let leadingSpaces = line.prefix(while: { $0 == " " })
+    let rest = line.dropFirst(leadingSpaces.count)
+    guard leadingSpaces.count <= 3, let marker = rest.first, "-_*=".contains(marker),
+      rest.allSatisfy({ $0 == marker })
+    else {
+      return line
+    }
+    return String(leadingSpaces) + "\\" + String(rest)
   }
 
   private static func stripSubtextMarker(_ line: String) -> String? {
