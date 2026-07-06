@@ -55,6 +55,8 @@ extension MemberSidebarView {
         .scrollTargetLayout()
         .padding(.horizontal, 2)
       }
+      // macos 26/27 bug workaround
+      .padding(.top, 1)
       .scrollPosition(id: $upperBound, anchor: .bottom)
       .task(id: scrollPairs) {
         await channelStore.requestMemberListRange(scrollPairs)

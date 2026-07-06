@@ -35,6 +35,8 @@ extension MemberSidebarView {
           }
         }
       }
+      // macos 26/27 bug workaround
+      .padding(.top, 1)
       .background(
         Profile.ThemeColorsBackground(
           colors: profile?.user_profile?.theme_colors
@@ -110,7 +112,6 @@ extension MemberSidebarView {
 
         if let bio = profileMeta?.bio ?? profile?.user_profile?.bio {
           MarkdownText(content: bio)
-            .equatable()
         }
       }
     }
