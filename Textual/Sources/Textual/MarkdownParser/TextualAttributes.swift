@@ -34,12 +34,12 @@ extension AttributeScopes {
       public static let name = "Textual.Subtext"
     }
 
-    /// Marks a `.link`-attributed span (for example, a Discord mention) whose foreground/background
-    /// colors were already set at parse time and shouldn't be recolored by ``InlineStyle``'s `link`
-    /// property at render time.
-    public enum MentionAttribute: AttributedStringKey {
+    /// Marks a `.link`-attributed span (for example, a Discord mention or a revealed spoiler)
+    /// whose foreground/background colors were already set at parse time and shouldn't be
+    /// recolored by ``InlineStyle``'s `link` property at render time.
+    public enum PreStyledLinkAttribute: AttributedStringKey {
       public typealias Value = Bool
-      public static let name = "Textual.Mention"
+      public static let name = "Textual.PreStyledLink"
     }
 
     /// A property for accessing an attachment attribute.
@@ -54,8 +54,8 @@ extension AttributeScopes {
     /// A property for accessing the subtext attribute.
     public let subtext: SubtextAttribute
 
-    /// A property for accessing the mention attribute.
-    public let mention: MentionAttribute
+    /// A property for accessing the pre-styled-link attribute.
+    public let preStyledLink: PreStyledLinkAttribute
 
     public let foundation: AttributeScopes.FoundationAttributes
   }

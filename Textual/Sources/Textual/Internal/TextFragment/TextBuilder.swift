@@ -86,6 +86,18 @@ extension Text {
             )
           )
         }
+      } else if #available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *),
+        environment.roundedBackgroundStyle != nil, let backgroundColor = run.backgroundColor
+      {
+        // `RoundedInlineBackground` draws this run's background as a separate, corner-radiused
+        // shape instead — strip the flat attribute here so it isn't also painted underneath by
+        // `Text` itself, and carry the color forward via a custom attribute (`Text.Layout.Run`
+        // only exposes custom attributes, not raw Foundation ones, so this is the only way for
+        // that overlay to find the run and its color again later).
+        var substring = AttributedString(attributedString[run.range])
+        substring.backgroundColor = nil
+        text = Text(substring)
+          .customAttribute(InlineBackgroundAttribute(color: backgroundColor))
       } else {
         text = Text(AttributedString(attributedString[run.range]))
       }

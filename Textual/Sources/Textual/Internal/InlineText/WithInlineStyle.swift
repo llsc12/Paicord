@@ -71,7 +71,7 @@ struct WithInlineStyle<Content: View>: View {
         }
       }
 
-      if run.link != nil, run.textual.mention != true {
+      if run.link != nil, run.textual.preStyledLink != true {
         style.link.apply(in: &attributes, environment: environment)
       }
 

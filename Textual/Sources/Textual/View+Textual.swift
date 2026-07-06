@@ -174,6 +174,14 @@ extension TextualNamespace where Base: View {
     #endif
   }
 
+  /// Sets the style used to draw a rounded background behind any run with a `backgroundColor`
+  /// attribute — inline code spans and custom entities from a `SyntaxExtension` (mentions, tags,
+  /// etc.) alike — in ``InlineText`` and ``StructuredText``. Pass `nil` (the default) to fall
+  /// back to each run rendering its `backgroundColor` as a flat rectangle.
+  public func roundedBackgroundStyle(_ style: RoundedBackgroundStyle?) -> some View {
+    base.environment(\.roundedBackgroundStyle, style)
+  }
+
   /// Sets the spacing used between table cells in ``StructuredText``.
   public func tableCellSpacing(
     horizontal: CGFloat? = nil,

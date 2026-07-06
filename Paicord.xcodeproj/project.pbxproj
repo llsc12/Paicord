@@ -1536,10 +1536,10 @@
 		};
 		579DF3492E6D9B9800BD8B97 /* XCRemoteSwiftPackageReference "SwiftUIX" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/yume190/SwiftUIX";
+			repositoryURL = "https://github.com/llsc12/SwiftUIX";
 			requirement = {
-				branch = master;
-				kind = branch;
+				kind = revision;
+				revision = d4aeb53666f407297c6ec8d6f673abead5f5dc26;
 			};
 		};
 		57CDD87D2E71CB6000022203 /* XCRemoteSwiftPackageReference "hcaptcha" */ = {

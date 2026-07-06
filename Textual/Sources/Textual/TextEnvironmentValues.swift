@@ -26,6 +26,10 @@ public struct TextEnvironmentValues: Hashable, Sendable {
   /// The current color scheme contrast in the environment.
   public var colorSchemeContrast: ColorSchemeContrast
 
+  /// The style used to draw a rounded background behind runs with a `backgroundColor`
+  /// attribute (inline code, mentions, and other custom entities), if set.
+  public var roundedBackgroundStyle: RoundedBackgroundStyle?
+
   /// A smaller environment value set used for color resolution.
   public var colorEnvironment: ColorEnvironmentValues {
     .init(
@@ -41,7 +45,8 @@ public struct TextEnvironmentValues: Hashable, Sendable {
     emojiProperties: EmojiProperties = .init(),
     mathProperties: MathProperties = .init(),
     colorScheme: ColorScheme = .light,
-    colorSchemeContrast: ColorSchemeContrast = .standard
+    colorSchemeContrast: ColorSchemeContrast = .standard,
+    roundedBackgroundStyle: RoundedBackgroundStyle? = nil
   ) {
     self.font = font
     self.dynamicTypeSize = dynamicTypeSize
@@ -50,6 +55,7 @@ public struct TextEnvironmentValues: Hashable, Sendable {
     self.mathProperties = mathProperties
     self.colorScheme = colorScheme
     self.colorSchemeContrast = colorSchemeContrast
+    self.roundedBackgroundStyle = roundedBackgroundStyle
   }
 }
 
@@ -62,7 +68,8 @@ extension EnvironmentValues {
       emojiProperties: emojiProperties,
       mathProperties: mathProperties,
       colorScheme: colorScheme,
-      colorSchemeContrast: colorSchemeContrast
+      colorSchemeContrast: colorSchemeContrast,
+      roundedBackgroundStyle: roundedBackgroundStyle
     )
   }
 }

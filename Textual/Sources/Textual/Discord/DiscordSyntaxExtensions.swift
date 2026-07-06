@@ -156,18 +156,25 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
         string: "textual-discord://spoiler/\(content.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? "")"
       )
 
+      attributes.textual.preStyledLink = true
+
       guard revealed.contains(content) else {
-        // Any `.link`-attributed run gets its foreground color overridden by `InlineStyle`'s
-        // link color (a "keep new" merge, see WithInlineStyle.swift) — so matching foreground to
-        // background to hide the text doesn't survive rendering. Instead, don't put the real
-        // text on screen at all: substitute fixed-width filler characters (same count, so the
-        // box is roughly the right width) with just a background color. There's nothing real to
-        // leak through regardless of what happens to the foreground color.
+        // Render the real content (not filler characters) so it gets normal glyph-based layout
+        // bounds — space-like filler characters (e.g. U+2007) can end up with oversized
+        // "trailing whitespace" typographic bounds when more text follows on the same line,
+        // which both mis-sizes the drawn background and breaks tap hit-testing for what comes
+        // after. Foreground now safely matches the background instead (rather than leaving
+        // nothing to leak): `preStyledLink` above stops `InlineStyle`'s link color from
+        // overriding it, which is what made the filler-character workaround necessary before.
         attributes.backgroundColor = .gray
-        let filler = String(repeating: "\u{2007}", count: content.count)
-        return AttributedString(filler, attributes: attributes)
+        attributes.foregroundColor = .gray
+        return AttributedString(content, attributes: attributes)
       }
 
+      // Revealed spoilers keep a faint tint of their original background instead of reverting to
+      // plain text, matching Discord's own look.
+      attributes.foregroundColor = .white
+      attributes.backgroundColor = Color.gray.opacity(0.1)
       return AttributedString(content, attributes: attributes)
     }
   }

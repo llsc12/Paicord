@@ -20,6 +20,9 @@ struct MarkdownText: View {
   @State private var revealedSpoilers: Set<String> = []
   @State private var userPopover: PartialUser?
 
+  @State private var documentFrame: CGRect = .zero
+  @State private var tapLocalPoint: CGPoint = .zero
+
   init(
     content: String,
     channelStore: ChannelStore? = nil,
@@ -45,24 +48,54 @@ struct MarkdownText: View {
       parser: .discordMarkdown(syntaxExtensions: syntaxExtensions),
       revision: revision
     )
-    .textual.structuredTextStyle(.discord)
     .textual.inlineStyle(inlineStyle)
+    .textual.structuredTextStyle(.discord)
     .textual.highlighterTheme(highlighterTheme)
     .textual.codeBlockStyle(PaicordCodeBlockStyle())
     .textual.emojiProperties(
       allowsJumboEmoji && DiscordMarkdown.isEmojiOnlyContent(content)
         ? .discordJumbo : .discordStandard
     )
+    .textual.roundedBackgroundStyle(RoundedBackgroundStyle(cornerRadius: 4, padding: 1))
     .textual.textSelection(.enabled)
     .foregroundStyle(foregroundColorOverride ?? theme.markdown.text)
-    .environment(\.openURL, OpenURLAction { handleURL($0) })
-    .popover(item: $userPopover) { user in
-      ProfilePopoutView(
-        guild: channelStore?.guildStore,
-        member: channelStore?.guildStore?.members[user.id],
-        user: user
-      )
+    .background(
+      GeometryReader { geometry in
+        Color.clear
+          .onChange(of: geometry.frame(in: .global), initial: true) { _, newValue in
+            documentFrame = newValue
+          }
+      }
+    )
+    .popover(
+      isPresented: isPopoverPresented,
+      attachmentAnchor: .rect(.rect(CGRect(origin: tapLocalPoint, size: .zero)))
+    ) {
+      if let userPopover {
+        ProfilePopoutView(
+          guild: channelStore?.guildStore,
+          member: channelStore?.guildStore?.members[userPopover.id],
+          user: userPopover
+        )
+      }
     }
+    .textual.onEntityTap { url, bounds in
+      handleTap(url: url, bounds: bounds)
+    }
+    .environment(
+      \.openURL,
+      OpenURLAction { url in
+        url.scheme == "textual-discord" || PaicordChatLink(url: url) != nil
+          ? .handled : .systemAction
+      }
+    )
+  }
+
+  private var isPopoverPresented: Binding<Bool> {
+    Binding(
+      get: { userPopover != nil },
+      set: { if !$0 { userPopover = nil } }
+    )
   }
 
   // MARK: - Styling
@@ -128,7 +161,7 @@ struct MarkdownText: View {
 
   // MARK: - Link handling
 
-  private func handleURL(_ url: URL) -> OpenURLAction.Result {
+  private func handleTap(url: URL, bounds: CGRect) {
     if url.scheme == "textual-discord" {
       if url.host == "spoiler",
         let encoded = url.pathComponents.last,
@@ -136,11 +169,10 @@ struct MarkdownText: View {
       {
         revealedSpoilers.insert(text)
       }
-      return .handled
     }
 
     guard let cmd = PaicordChatLink(url: url) else {
-      return .systemAction
+      return
     }
     let gw = GatewayStore.shared
 
@@ -149,13 +181,14 @@ struct MarkdownText: View {
       if let user = gw.user.users[userID] {
         ImpactGenerator.impact(style: .light)
         userPopover = user
+        tapLocalPoint = CGPoint(
+          x: bounds.midX - documentFrame.minX,
+          y: bounds.minY - documentFrame.minY
+        )
       }
     default:
       print("[MarkdownText] Unhandled special link: \(cmd)")
-      return .discarded
     }
-
-    return .handled
   }
 
   private struct PaicordCodeBlockStyle: StructuredText.CodeBlockStyle {
@@ -204,7 +237,7 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
     ) -> AttributedString {
       var attributes = base
       attributes.link = URL(string: link)
-      attributes.textual.mention = true
+      attributes.textual.preStyledLink = true
       attributes.foregroundColor = foreground
       attributes.backgroundColor = background
       attributes.inlinePresentationIntent = .stronglyEmphasized
@@ -404,4 +437,9 @@ enum PaicordChatLink {
       return nil
     }
   }
+}
+
+#Preview("Rounded backgrounds") {
+  MarkdownText(content: "Hey <@123>, use `git status` to check for `uncommitted` changes")
+    .padding()
 }
