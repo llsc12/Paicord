@@ -284,7 +284,8 @@ public enum DiscordMarkdown {
     let leadingSpaceCount = line.prefix { $0 == " " }.count
     let rest = line.dropFirst(leadingSpaceCount)
     // A line that's nothing but spaces has no content whose indentation needs preserving.
-    guard leadingSpaceCount > 0, !rest.isEmpty else {
+    guard leadingSpaceCount > 0, !rest.isEmpty, rest.firstMatch(of: /^(?:[-*+]|\d{1,9}[.)])[ \t]/) == nil
+    else {
       return line
     }
     return String(repeating: "\u{00A0}", count: leadingSpaceCount) + rest
