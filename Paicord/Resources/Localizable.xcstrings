@@ -1,6 +1,5 @@
 {
-  "sourceLanguage": "en",
-  "strings": {
+  "sourceLanguage" : "en", "strings" : {
     "": {
       "localizations": {
         "de": {
@@ -677,6 +676,16 @@
         }
       }
     },
+    "just slid into the server." : {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "",
+            "state": "notTranslated"
+          }
+        }
+      }
+    },
     "Login requires MFA to continue.": {
       "localizations": {
         "de": {
@@ -827,16 +836,6 @@
         }
       }
     },
-    "Private Profile": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "value": "",
-            "state": "notTranslated"
-          }
-        }
-      }
-    },
     "Profile": {
       "localizations": {
         "de": {
@@ -853,6 +852,16 @@
           "stringUnit": {
             "state": "notTranslated",
             "value": ""
+          }
+        }
+      }
+    },
+    "Private Profile" : {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "",
+            "state": "notTranslated"
           }
         }
       }
@@ -1117,16 +1126,6 @@
         }
       }
     },
-    "Unsupported embed type: %@": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "value": "",
-            "state": "notTranslated"
-          }
-        }
-      }
-    },
     "Update Available": {
       "localizations": {
         "de": {
@@ -1153,6 +1152,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bilder hochladen"
+          }
+        }
+      }
+    },
+    "Unsupported embed type: %@" : {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "value": "",
+            "state": "notTranslated"
           }
         }
       }
@@ -1329,26 +1338,11 @@
         }
       }
     },
-    "just slid into the server.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "notTranslated",
-            "value": ""
-          }
-        }
-      }
-    },
     "wip bro go do totp": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "notTranslated",
-            "value": ""
-          }
-        }
+      "localizations" : {
+        "de" : { "stringUnit" : {"state" : "notTranslated", "value" : ""} }
       }
     }
-  },
-  "version": "1.1"
+  }
+  , "version" : "1.1"
 }
