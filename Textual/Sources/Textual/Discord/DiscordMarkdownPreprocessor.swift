@@ -247,7 +247,9 @@ public enum DiscordMarkdown {
         continue
       }
 
-      let line = preservingLeadingWhitespace(in: escapingThematicBreakLikeLines(line))
+      let line = preservingLeadingWhitespace(
+        in: escapingTableDelimiterLines(escapingDeepHeadingLines(escapingThematicBreakLikeLines(line)))
+      )
 
       var processed: String
       if let content = stripSubtextMarker(line) {
@@ -297,6 +299,37 @@ public enum DiscordMarkdown {
       return line
     }
     return String(leadingSpaces) + "\\" + String(rest)
+  }
+
+  private static func escapingDeepHeadingLines(_ line: String) -> String {
+    let leadingSpaces = line.prefix(while: { $0 == " " })
+    let rest = line.dropFirst(leadingSpaces.count)
+    let hashes = rest.prefix(while: { $0 == "#" })
+    let afterHashes = rest.dropFirst(hashes.count)
+    guard leadingSpaces.count <= 3, (4...6).contains(hashes.count),
+      afterHashes.isEmpty || afterHashes.first == " "
+    else {
+      return line
+    }
+    return String(leadingSpaces) + "\\" + String(rest)
+  }
+
+  private static func escapingTableDelimiterLines(_ line: String) -> String {
+    let cells = line.trimmingCharacters(in: .whitespaces).split(separator: "|")
+    guard line.contains("|"), !cells.isEmpty,
+      cells.allSatisfy({ cell in
+        var s = cell.trimmingCharacters(in: .whitespaces)[...]
+        if s.first == ":" { s = s.dropFirst() }
+        if s.last == ":" { s = s.dropLast() }
+        return !s.isEmpty && s.allSatisfy { $0 == "-" }
+      }),
+      let firstPipe = line.firstIndex(of: "|")
+    else {
+      return line
+    }
+    var escaped = line
+    escaped.insert("\\", at: firstPipe)
+    return escaped
   }
 
   private static func stripSubtextMarker(_ line: String) -> String? {

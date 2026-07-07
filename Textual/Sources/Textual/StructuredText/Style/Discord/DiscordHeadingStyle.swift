@@ -2,9 +2,6 @@ import SwiftUI
 
 extension StructuredText {
   /// A heading style inspired by Discord's rendering.
-  ///
-  /// Discord only visually distinguishes 3 heading levels (`#`, `##`, `###`) — deeper levels
-  /// clamp to the smallest heading size rather than shrinking further.
   public struct DiscordHeadingStyle: HeadingStyle {
     private static let fontScales: [CGFloat] = [1.5, 1.25, 1.1]
 

@@ -20,6 +20,35 @@ struct DiscordMarkdownParserTests {
     )
   }
 
+  @Test func fourOrMoreHashesIsNotAHeading() throws {
+    let result = try DiscordMarkdownParser().attributedString(for: "#### H4\n##### H5\n###### H6")
+    let runs = Array(result.runs)
+
+    #expect(String(result.characters[...]) == "#### H4\n##### H5\n###### H6")
+    #expect(runs.allSatisfy { run in
+      guard let intent = run.presentationIntent else { return true }
+      return !intent.components.contains { component in
+        if case .header = component.kind { return true }
+        return false
+      }
+    })
+  }
+
+  @Test func tableSyntaxIsNotATable() throws {
+    let input = "| a | b |\n| --- | --- |\n| 1 | 2 |"
+    let result = try DiscordMarkdownParser().attributedString(for: input)
+    let runs = Array(result.runs)
+
+    #expect(String(result.characters[...]) == input)
+    #expect(runs.allSatisfy { run in
+      guard let intent = run.presentationIntent else { return true }
+      return !intent.components.contains { component in
+        if case .table = component.kind { return true }
+        return false
+      }
+    })
+  }
+
   @Test func plainUnderline() throws {
     let result = try DiscordMarkdownParser().attributedString(for: "__underline__")
     let runs = Array(result.runs)

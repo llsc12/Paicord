@@ -159,13 +159,6 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
       attributes.textual.preStyledLink = true
 
       guard revealed.contains(content) else {
-        // Render the real content (not filler characters) so it gets normal glyph-based layout
-        // bounds — space-like filler characters (e.g. U+2007) can end up with oversized
-        // "trailing whitespace" typographic bounds when more text follows on the same line,
-        // which both mis-sizes the drawn background and breaks tap hit-testing for what comes
-        // after. Foreground now safely matches the background instead (rather than leaving
-        // nothing to leak): `preStyledLink` above stops `InlineStyle`'s link color from
-        // overriding it, which is what made the filler-character workaround necessary before.
         attributes.backgroundColor = .gray
         attributes.foregroundColor = .gray
         return AttributedString(content, attributes: attributes)
