@@ -968,6 +968,18 @@ extension ChannelStore {
 }
 
 extension ChannelStore {
+  typealias MixedItem = Gateway.GuildMemberListUpdate.MemberListOp
+    .GuildMemberListMixedItem
+
+  @Observable
+  final class MemberListRow {
+    var item: MixedItem?
+
+    init(_ item: MixedItem? = nil) {
+      self.item = item
+    }
+  }
+
   // class representing member list items and where the groups lie
   @Observable
   class MemberListAccumulator {
@@ -988,10 +1000,18 @@ extension ChannelStore {
       self.primaryChannelStore = primaryChannelStore
     }
 
-    private var items: [Int: MixedItem] = [:]
+    private var items: [Int: MemberListRow] = [:]
 
-    subscript(row index: Int) -> MixedItem? {
+    func row(at index: Int) -> MemberListRow? {
       items[index]
+    }
+
+    private func setItem(_ item: MixedItem, at index: Int) {
+      if let existing = items[index] {
+        existing.item = item
+      } else {
+        items[index] = MemberListRow(item)
+      }
     }
 
     func update(with update: Gateway.GuildMemberListUpdate) {
@@ -1004,11 +1024,11 @@ extension ChannelStore {
       for op in update.ops {
         switch op {
         case .sync(let pair, let newItems):
-          for i in pair.first..<pair.second {
+          for i in pair.first...pair.second {
             items.removeValue(forKey: i)
           }
           for (i, item) in newItems.enumerated() {
-            items[pair.first + i] = item
+            setItem(item, at: pair.first + i)
           }
           let members = newItems.compactMap { item -> Guild.Member? in
             if case .member(let member) = item { return member }
@@ -1016,7 +1036,7 @@ extension ChannelStore {
           }
           handleMemberData(members)
         case .insert(let index, let item):
-          var updated: [Int: MixedItem] = [:]
+          var updated: [Int: MemberListRow] = [:]
           for (key, value) in items {
             if key >= index {
               updated[key + 1] = value
@@ -1024,20 +1044,20 @@ extension ChannelStore {
               updated[key] = value
             }
           }
-          updated[index] = item
+          updated[index] = MemberListRow(item)
           items = updated
           if case .member(let member) = item {
             handleMemberData(member)
           }
         case .update(let index, let item):
-          items[index] = item
+          setItem(item, at: index)
           if case .member(let member) = item {
             handleMemberData(member)
           }
         case .delete(let index):
           items.removeValue(forKey: index)
           // Shift everything above down by 1
-          var updated: [Int: MixedItem] = [:]
+          var updated: [Int: MemberListRow] = [:]
           for (key, value) in items {
             if key > index {
               updated[key - 1] = value
@@ -1047,7 +1067,7 @@ extension ChannelStore {
           }
           items = updated
         case .invalidate(let range):
-          for i in range.first..<range.second {
+          for i in range.first...range.second {
             items.removeValue(forKey: i)
           }
         }
@@ -1072,8 +1092,5 @@ extension ChannelStore {
         primaryChannelStore.gateway?.user.presences[user.id] = member.presence
       }
     }
-
-    typealias MixedItem = Gateway.GuildMemberListUpdate.MemberListOp
-      .GuildMemberListMixedItem
   }
 }
