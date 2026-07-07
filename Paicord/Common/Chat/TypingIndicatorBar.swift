@@ -22,7 +22,7 @@ extension ChatView {
           gw.user.users[$0]
         }
         let typingUsernames = typingUsers.compactMap {
-          vm.guildStore?.members[$0.id]?.nick ?? $0.global_name ?? $0.username
+          vm.guildStore?.member($0.id)?.nick ?? $0.global_name ?? $0.username
         }
         if !typingUsernames.isEmpty {
           HStack {

@@ -23,14 +23,14 @@ enum PermissionsHelper {
 
     // get @everyone role
     let everyoneRoleID: RoleSnowflake = .init(guild.guild!.id.rawValue)
-    guard let everyoneRole = guild.roles[everyoneRoleID] else {
+    guard let everyoneRole = guild.role(everyoneRoleID) else {
       return .none
     }
 
     var permissions = everyoneRole.permissions
 
     for roleID in member.roles ?? [] {
-      if let role = guild.roles[roleID] {
+      if let role = guild.role(roleID) {
         permissions.formUnion(role.permissions)
       }
     }
@@ -147,7 +147,7 @@ extension GuildStore {
     // fetch member first ofc
     guard
       let memberID = self.gateway?.user.currentUser?.id,
-      let member = self.members[memberID]
+      let member = self.member(memberID)
     else {
       return true
     }
@@ -174,7 +174,7 @@ extension GuildStore {
     _ permission: Permission
   ) -> Bool {
     // fetch member first ofc
-    guard let member = self.members[memberID] else {
+    guard let member = self.member(memberID) else {
       return true
     }
     // if channel is nil, compute base permissions and compare

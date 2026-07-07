@@ -10,6 +10,8 @@ import Collections
 import Foundation
 import PaicordLib
 
+typealias PresenceBox = ObservableBox<Gateway.PresenceUpdate>
+
 @Observable
 class CurrentUserStore: DiscordDataStore {
   // MARK: - Protocol Properties
@@ -21,12 +23,37 @@ class CurrentUserStore: DiscordDataStore {
   var guilds: [GuildSnowflake: Guild] = [:]
   var privateChannels: OrderedDictionary<ChannelSnowflake, DiscordChannel> = [:]
   var relationships: [UserSnowflake: DiscordRelationship] = [:]
-  var presences: [UserSnowflake: Gateway.PresenceUpdate] = [:]
+  private var presenceBoxes: [UserSnowflake: PresenceBox] = [:]
   var users: [UserSnowflake: PartialUser] = [:]
   var sessions: [Gateway.Session] = []
   var emojis: [GuildSnowflake: [EmojiSnowflake: Emoji]] = [:]
   var stickers: [GuildSnowflake: [StickerSnowflake: Sticker]] = [:]
   var premiumKind: DiscordUser.PremiumKind = .none
+
+  // MARK: - Presence boxed helpers
+  
+  /// Get a box for this presence data. Store the box and read the underlying value.
+  func presenceBox(for id: UserSnowflake) -> PresenceBox? {
+    presenceBoxes[id]
+  }
+
+  /// Get presence data directly, non-updating.
+  func presence(_ id: UserSnowflake) -> Gateway.PresenceUpdate? {
+    presenceBoxes[id]?.value
+  }
+
+  /// Set the presence data of a box.
+  @discardableResult
+  func setPresence(_ presence: Gateway.PresenceUpdate, for id: UserSnowflake) -> PresenceBox {
+    if let box = presenceBoxes[id] {
+      box.value = presence
+      return box
+    } else {
+      let box = PresenceBox(presence)
+      presenceBoxes[id] = box
+      return box
+    }
+  }
 
   // MARK: - Protocol Methods
 
@@ -114,7 +141,9 @@ class CurrentUserStore: DiscordDataStore {
     relationships = readyData.relationships.reduce(into: [:]) { $0[$1.id] = $1 }
     users = readyData.relationships.reduce(into: [:]) { $0[$1.id] = $1.user }
 
-    presences = readyData.presences.reduce(into: [:]) { $0[$1.user.id] = $1 }
+    for presence in readyData.presences {
+      setPresence(presence, for: presence.user.id)
+    }
 
     users[readyData.user.id] = readyData.user.toPartialUser()
     users = readyData.presences.reduce(into: users) { $0[$1.user.id] = $1.user }
@@ -186,7 +215,7 @@ class CurrentUserStore: DiscordDataStore {
 
   private func handlePresenceUpdate(_ presence: Gateway.PresenceUpdate) {
     guard presence.guild_id == nil else { return }
-    presences[presence.user.id] = presence
+    setPresence(presence, for: presence.user.id)
     users[presence.user.id] = presence.user
   }
 

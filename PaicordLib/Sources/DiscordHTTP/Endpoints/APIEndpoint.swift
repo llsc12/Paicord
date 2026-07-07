@@ -451,7 +451,7 @@ public enum APIEndpoint: Endpoint {
   case __DO_NOT_USE_THIS_CASE
 
   var urlPrefix: String {
-    "https://discord.com/api/v\(DiscordGlobalConfiguration.apiVersion)/"
+    "\(DiscordGlobalConfiguration.apiBaseURL)/v\(DiscordGlobalConfiguration.apiVersion)/"
   }
 
   public var url: String {

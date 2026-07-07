@@ -47,7 +47,7 @@ struct MessageCell: View {
     let mentionedEveryone: Bool = message.mention_everyone
     let mentionedUserByRole: Bool = {
       let usersRoles =
-        channelStore.guildStore?.members[currentUserID]?.roles ?? []
+        channelStore.guildStore?.member(currentUserID)?.roles ?? []
       for roleID in message.mention_roles {
         if usersRoles.contains(roleID) {
           return true

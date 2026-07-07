@@ -49,7 +49,11 @@ extension MemberSidebarView {
       ScrollView {
         LazyVStack(alignment: .leading, spacing: 2) {
           ForEach(0...accumulator.rowCount, id: \.self) { itemIndex in
-            cell(itemIndex)
+            MemberListCell(
+              row: accumulator.row(at: itemIndex),
+              accumulator: accumulator,
+              guildStore: guildStore
+            )
           }
         }
         .scrollTargetLayout()
@@ -59,49 +63,69 @@ extension MemberSidebarView {
       .padding(.top, 1)
       .scrollPosition(id: $upperBound, anchor: .bottom)
       .task(id: scrollPairs) {
+        do {
+          try await Task.sleep(for: .milliseconds(300))
+        } catch {
+          return
+        }
         await channelStore.requestMemberListRange(scrollPairs)
       }
     }
+  }
 
-    @ViewBuilder
-    func cell(_ itemIndex: Int) -> some View {
+  private struct MemberListCell: View {
+    let row: ChannelStore.MemberListRow?
+    let accumulator: ChannelStore.MemberListAccumulator
+    let guildStore: GuildStore
+
+    var body: some View {
       HStack(alignment: .bottom) {
-        if let item = accumulator[row: itemIndex] {
-          switch item {
-          case .member(let member):
-            if let user = member.user {
-              MemberRowView(member: member.toPartialMember(), user: user)
-            }
-          case .group(let group):
-            if let group = accumulator.groups[group.id] {
-              let text: Text = {
-                if let role = guildStore.roles[group.id] {
-                  return (Text(verbatim: role.name) + Text(verbatim: " - \(group.count)"))
-                } else {
-                  let name: String = group.id.rawValue.capitalized
-                  return Text(verbatim: "\(name) - \(group.count)")
-                }
-              }()
-
-              text
-                .font(.headline)
-                .fontWeight(.semibold)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
-                .frame(
-                  maxWidth: .infinity,
-                  maxHeight: .infinity,
-                  alignment: .bottomLeading
-                )
-                .padding([.bottom, .leading], 6)
-            } else {
-              // idk man
-              Text(verbatim: "\(group.id.rawValue)")
-            }
+        switch row?.value {
+        case .member(let member):
+          if let user = member.user {
+            MemberRowView(member: member.toPartialMember(), user: user)
           }
+        case .group(let group):
+          GroupHeaderCell(groupID: group.id, accumulator: accumulator, guildStore: guildStore)
+        case nil:
+          EmptyView()
         }
       }
       .frame(height: 45)
+    }
+  }
+
+  private struct GroupHeaderCell: View {
+    let groupID: RoleSnowflake
+    let accumulator: ChannelStore.MemberListAccumulator
+    let guildStore: GuildStore
+
+    var body: some View {
+      if let group = accumulator.groups[groupID] {
+        let text: Text = {
+          if let role = guildStore.role(groupID) {
+            return (Text(verbatim: role.name) + Text(verbatim: " - \(group.count)"))
+          } else {
+            let name: String = groupID.rawValue.capitalized
+            return Text(verbatim: "\(name) - \(group.count)")
+          }
+        }()
+
+        text
+          .font(.headline)
+          .fontWeight(.semibold)
+          .foregroundStyle(.secondary)
+          .lineLimit(1)
+          .frame(
+            maxWidth: .infinity,
+            maxHeight: .infinity,
+            alignment: .bottomLeading
+          )
+          .padding([.bottom, .leading], 6)
+      } else {
+        // idk man
+        Text(verbatim: "\(groupID.rawValue)")
+      }
     }
   }
 }

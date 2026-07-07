@@ -147,7 +147,7 @@ enum Profile {
               let status = gw.presence.currentClientStatus
               return (status)
             } else {
-              let presence = gw.user.presences[user.id]
+              let presence = gw.user.presence(user.id)
               return (presence?.status)
             }
           }()
