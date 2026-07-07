@@ -1,9 +1,9 @@
 import DiscordModels
 
 private let baseURLs = (
-  authorization: "https://discord.com/api/oauth2/authorize",
-  token: "https://discord.com/api/oauth2/token",
-  tokenRevocation: "https://discord.com/api/oauth2/token/revoke"
+  authorization: "\(DiscordGlobalConfiguration.apiBaseURL)/oauth2/authorize",
+  token: "\(DiscordGlobalConfiguration.apiBaseURL)/oauth2/token",
+  tokenRevocation: "\(DiscordGlobalConfiguration.apiBaseURL)/oauth2/token/revoke"
 )
 
 /// For now, only to be able to make bot auth urls dynamically, on demand.
