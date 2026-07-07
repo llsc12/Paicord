@@ -141,27 +141,41 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
     }
   }
 
+  public static func spoilerRevealKey(index: Int, text: String) -> String {
+    "\(index)\u{1F}\(text)"
+  }
+
   /// Replaces spoiler syntax (`||text||`) with a tappable, initially-obscured span.
   ///
   /// Spoiler content is rendered as plain text (no nested inline formatting is parsed inside a
-  /// spoiler in this version). `revealed` identifies spoilers by their exact source text — a
-  /// consumer keeps a `Set` of revealed spoilers and re-applies this extension when it changes.
-  /// Tapping a spoiler (revealed or not) surfaces as a link tap to
-  /// `textual-discord://spoiler/{text}` via ``TextualNamespace/onEntityTap(_:)``.
+  /// spoiler in this version). `revealed` identifies spoilers by ``spoilerRevealKey(index:text:)``
+  /// (not by text alone — two spoilers with identical text in the same message are separate
+  /// occurrences) — a consumer keeps a `Set` of revealed keys and re-applies this extension when
+  /// it changes. Tapping a spoiler (revealed or not) surfaces as a link tap to
+  /// `textual-discord://spoiler/{text}?index={n}` via ``TextualNamespace/onEntityTap(_:)``; build
+  /// the reveal key from that URL with ``spoilerRevealKey(index:text:)``.
   public static func discordSpoilers(revealed: Set<String>) -> Self {
-    .init(patterns: [.discordSpoiler]) { token, attributes in
+    var occurrenceCounts: [String: Int] = [:]
+
+    return .init(patterns: [.discordSpoiler]) { token, attributes in
       guard let content = token.capturedContent else {
         return nil
       }
 
+      let index = occurrenceCounts[content, default: 0]
+      occurrenceCounts[content] = index + 1
+
       var attributes = attributes
-      attributes.link = URL(
-        string: "textual-discord://spoiler/\(content.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? "")"
-      )
+      var linkComponents = URLComponents()
+      linkComponents.scheme = "textual-discord"
+      linkComponents.host = "spoiler"
+      linkComponents.path = "/\(content.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? "")"
+      linkComponents.queryItems = [URLQueryItem(name: "index", value: String(index))]
+      attributes.link = linkComponents.url
 
       attributes.textual.preStyledLink = true
 
-      guard revealed.contains(content) else {
+      guard revealed.contains(spoilerRevealKey(index: index, text: content)) else {
         attributes.backgroundColor = .gray
         attributes.foregroundColor = .gray
         return AttributedString(content, attributes: attributes)

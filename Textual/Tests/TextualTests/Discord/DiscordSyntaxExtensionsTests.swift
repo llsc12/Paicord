@@ -91,3 +91,53 @@ struct DiscordMentionSyntaxExtensionTests {
     #expect(formatter.plainText() == "ping <@123> please")
   }
 }
+
+@MainActor
+struct DiscordSpoilerSyntaxExtensionTests {
+  private func parse(_ markdown: String, revealed: Set<String> = []) throws -> AttributedString {
+    let parser = AttributedStringMarkdownParser(
+      baseURL: nil,
+      syntaxExtensions: [.discordSpoilers(revealed: revealed)]
+    )
+    return try parser.attributedString(for: DiscordMarkdown.preprocess(markdown))
+  }
+
+  @Test func hiddenSpoilerMatchesForegroundToBackground() throws {
+    let result = try parse("||secret||")
+    let spoilerRun = try #require(result.runs.first { $0.link != nil })
+    #expect(spoilerRun.foregroundColor == spoilerRun.backgroundColor)
+  }
+
+  @Test func revealedSpoilerUsesItsOwnKey() throws {
+    let key = AttributedStringMarkdownParser.SyntaxExtension.spoilerRevealKey(
+      index: 0, text: "secret")
+    let result = try parse("||secret||", revealed: [key])
+    let spoilerRun = try #require(result.runs.first { $0.link != nil })
+    #expect(spoilerRun.foregroundColor != spoilerRun.backgroundColor)
+  }
+
+  @Test func duplicateSpoilerTextGetsDistinctIndices() throws {
+    let result = try parse("||same|| ||same||")
+    let spoilerRuns = result.runs.filter { $0.link != nil }
+    #expect(spoilerRuns.count == 2)
+
+    let indices = spoilerRuns.map { run in
+      URLComponents(url: run.link!, resolvingAgainstBaseURL: false)?
+        .queryItems?.first { $0.name == "index" }?.value
+    }
+    #expect(indices == ["0", "1"])
+  }
+
+  @Test func revealingOneOccurrenceLeavesTheDuplicateHidden() throws {
+    let firstKey = AttributedStringMarkdownParser.SyntaxExtension.spoilerRevealKey(
+      index: 0, text: "same")
+    let result = try parse("||same|| ||same||", revealed: [firstKey])
+    let spoilerRuns = result.runs.filter { $0.link != nil }
+    #expect(spoilerRuns.count == 2)
+
+    let first = spoilerRuns[0]
+    let second = spoilerRuns[1]
+    #expect(first.foregroundColor != first.backgroundColor)
+    #expect(second.foregroundColor == second.backgroundColor)
+  }
+}

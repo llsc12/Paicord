@@ -277,8 +277,8 @@ public struct DiscordUser: Sendable, Codable, Equatable, Hashable {
       public var sku_id: SKUSnowflake
       public var expires_at: DiscordTimestamp?
 
-      public init(id: SKUSnowflake, expires_at: DiscordTimestamp? = nil) {
-        self.sku_id = id
+      public init(sku_id: SKUSnowflake, expires_at: DiscordTimestamp? = nil) {
+        self.sku_id = sku_id
         self.expires_at = expires_at
       }
     }

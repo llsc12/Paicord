@@ -7,6 +7,7 @@
 
 import PaicordLib
 import SwiftUI
+import SwiftUIX
 import Textual
 
 struct MarkdownText: View {
@@ -20,7 +21,7 @@ struct MarkdownText: View {
   @State private var revealedSpoilers: Set<String> = []
   @State private var userPopover: PartialUser?
 
-  @State private var documentFrame: CGRect = .zero
+  @ViewStorage private var documentFrame: CGRect = .zero
   @State private var tapLocalPoint: CGPoint = .zero
 
   init(
@@ -61,10 +62,8 @@ struct MarkdownText: View {
     .foregroundStyle(foregroundColorOverride ?? theme.markdown.text)
     .background(
       GeometryReader { geometry in
-        Color.clear
-          .onChange(of: geometry.frame(in: .global), initial: true) { _, newValue in
-            documentFrame = newValue
-          }
+        documentFrame = geometry.frame(in: .global)
+        return Color.clear
       }
     )
     .popover(
@@ -165,9 +164,14 @@ struct MarkdownText: View {
     if url.scheme == "textual-discord" {
       if url.host == "spoiler",
         let encoded = url.pathComponents.last,
-        let text = encoded.removingPercentEncoding
+        let text = encoded.removingPercentEncoding,
+        let indexString = URLComponents(url: url, resolvingAgainstBaseURL: false)?
+          .queryItems?.first(where: { $0.name == "index" })?.value,
+        let index = Int(indexString)
       {
-        revealedSpoilers.insert(text)
+        revealedSpoilers.insert(
+          AttributedStringMarkdownParser.SyntaxExtension.spoilerRevealKey(index: index, text: text)
+        )
       }
     }
 
