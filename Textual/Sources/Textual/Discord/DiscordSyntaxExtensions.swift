@@ -165,9 +165,11 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
       }
 
       // Revealed spoilers keep a faint tint of their original background instead of reverting to
-      // plain text, matching Discord's own look.
-      attributes.foregroundColor = .white
+      // plain text, matching Discord's own look. A `.link` attribute renders blue by default
+      // regardless of `preStyledLink` (that only stops `InlineStyle` from applying its own link
+      // color), so foregroundColor still needs an explicit adaptive value here.
       attributes.backgroundColor = Color.gray.opacity(0.1)
+      attributes.foregroundColor = Color.primary
       return AttributedString(content, attributes: attributes)
     }
   }

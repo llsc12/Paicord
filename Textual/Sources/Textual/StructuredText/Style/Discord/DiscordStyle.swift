@@ -14,7 +14,7 @@ extension StructuredText {
     public let blockQuoteStyle: DiscordBlockQuoteStyle = .discord
     public let codeBlockStyle: DiscordCodeBlockStyle = .discord
     public let listItemStyle: DefaultListItemStyle = .default
-    public let unorderedListMarker: SymbolListMarker = .disc
+    public let unorderedListMarker: HierarchicalSymbolListMarker = .init(.disc, .circle, clamps: true)
     public let orderedListMarker: DecimalListMarker = .decimal
     public let tableStyle: DefaultTableStyle = .default
     public let tableCellStyle: DefaultTableCellStyle = .default

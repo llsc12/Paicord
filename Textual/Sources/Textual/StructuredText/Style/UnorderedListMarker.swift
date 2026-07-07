@@ -86,22 +86,31 @@ extension StructuredText.UnorderedListMarker where Self == StructuredText.Symbol
 // MARK: - Hierarchical
 
 extension StructuredText {
-  /// A marker that cycles through a list of symbol markers based on indentation level.
+  /// A marker that cycles through (or clamps to) a list of symbol markers based on indentation
+  /// level.
   public struct HierarchicalSymbolListMarker: UnorderedListMarker {
     private let markers: [SymbolListMarker]
+    private let clamps: Bool
 
     /// Creates a hierarchical marker from a variadic list of markers.
-    public init(_ markers: SymbolListMarker...) {
-      self.init(markers: markers)
+    ///
+    /// - Parameter clamps: When `true`, levels deeper than `markers` all use the last marker
+    ///   instead of cycling back to the first (e.g. disc, circle, circle, circle, ...).
+    public init(_ markers: SymbolListMarker..., clamps: Bool = false) {
+      self.init(markers: markers, clamps: clamps)
     }
 
-    init(markers: [SymbolListMarker]) {
+    init(markers: [SymbolListMarker], clamps: Bool = false) {
       self.markers = markers
+      self.clamps = clamps
     }
 
     public func makeBody(configuration: Configuration) -> some View {
-      markers[(configuration.indentationLevel - 1) % markers.count]
-        .makeBody(configuration: configuration)
+      let index =
+        clamps
+        ? min(configuration.indentationLevel - 1, markers.count - 1)
+        : (configuration.indentationLevel - 1) % markers.count
+      markers[index].makeBody(configuration: configuration)
     }
   }
 }
