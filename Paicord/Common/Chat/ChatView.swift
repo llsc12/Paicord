@@ -107,6 +107,8 @@ struct ChatView: View {
         }
         .scrollTargetLayout()
       }
+      // macos 26/27 bug workaround
+      .safeAreaPadding(.top, 1)
       #if os(macOS)
         // esc to scroll to bottom of chat, its a little jank
         .focusable()
@@ -297,7 +299,7 @@ struct ChatView: View {
     ackTask = Task {
       try? await Task.sleep(for: .seconds(1.5))
       Task.detached {
-        try await gw.client.triggerTypingIndicator(channelId: .makeFake())
+        try? await gw.client.triggerTypingIndicator(channelId: .makeFake())
       }
     }
   }

@@ -183,7 +183,6 @@ extension ChatView {
               .foregroundStyle(.secondary)
               .lineLimit(1)
             MarkdownText(content: msg.content, channelStore: channelStore)
-              .equatable()
               .lineLimit(1)
               .frame(maxWidth: .infinity, alignment: .leading)
           }
@@ -302,18 +301,8 @@ extension ChatView {
 
     @ViewBuilder var content: some View {
       VStack(alignment: .leading, spacing: 4) {
-        #if os(iOS)
-          let attr: [NSAttributedString.Key: Any?] = [
-            .foregroundColor: error != nil ? UIColor.red : nil
-          ]
-        #else
-          let attr: [NSAttributedString.Key: Any?] = [
-            .foregroundColor: error != nil ? NSColor.red : nil
-          ]
-        #endif
-        MarkdownText(content: message.content ?? "", channelStore: channelStore)
-          .baseAttributes(attr as [NSAttributedString.Key: Any])
-          .equatable()
+        MarkdownText(content: message.content ?? "", channelStore: channelStore, allowsJumboEmoji: true)
+          .errorColor(error != nil ? .red : nil)
           .frame(maxWidth: .infinity, alignment: .leading)
       }
       .opacity(0.6)  // indicate pending state

@@ -205,11 +205,13 @@ class GuildStore: DiscordDataStore {
       "[GuildStore] Received members chunk with \(membersChunk.members.count) members for guild \(membersChunk.guild_id.rawValue)"
     )
     guard membersChunk.guild_id == guildId else { return }
+    var updated = members
     for member in membersChunk.members {
       if let user = member.user {
-        members[user.id] = member.toPartialMember()
+        updated[user.id] = member.toPartialMember()
       }
     }
+    members = updated
   }
 
   private func handleGuildRoleCreate(_ roleCreate: Gateway.GuildRole) {

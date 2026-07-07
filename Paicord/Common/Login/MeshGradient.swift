@@ -8,12 +8,7 @@
 
 import MeshGradient
 import simd
-
-import struct SwiftUI.Environment
-import struct SwiftUI.EnvironmentValues
-import struct SwiftUI.Group
-import struct SwiftUI.State
-import protocol SwiftUI.View
+import SwiftUI
 
 extension LoginView {
   struct MeshGradientBackground: View {
@@ -42,7 +37,7 @@ extension LoginView {
     }
 
     // This methods prepares the grid model that will be sent to metal for rendering
-    func generatePlainGrid(size: Int = 6) -> Grid<ControlPoint> {
+    func generatePlainGrid(size: Int = 6) -> MeshGradient::Grid<ControlPoint> {
       let preparationGrid = Grid<MeshColor>(
         repeating: .zero,
         width: size,
