@@ -1,5 +1,17 @@
 import Foundation
 
+// dm ordering issue came from incorrect logic
+// string comp != int comp
+// regression from switching to string backed storage
+extension String {
+  fileprivate func snowflakeCompare(_ other: String) -> Bool {
+    if self.count != other.count {
+      return self.count < other.count
+    }
+    return self < other
+  }
+}
+
 public protocol SnowflakeProtocol:
   Sendable,
   Codable,
@@ -87,7 +99,7 @@ extension SnowflakeProtocol {
 /// ```
 public struct Snowflake<Tag>: SnowflakeProtocol {
   public static func < (lhs: Snowflake<Tag>, rhs: Snowflake<Tag>) -> Bool {
-    lhs.rawValue < rhs.rawValue
+    lhs.rawValue.snowflakeCompare(rhs.rawValue)
   }
 
   public let rawValue: String
@@ -132,7 +144,7 @@ extension Snowflake: CodingKeyRepresentable {
 /// ```
 public struct AnySnowflake: SnowflakeProtocol {
   public static func < (lhs: AnySnowflake, rhs: AnySnowflake) -> Bool {
-    lhs.rawValue < rhs.rawValue
+    lhs.rawValue.snowflakeCompare(rhs.rawValue)
   }
 
   public let rawValue: String
