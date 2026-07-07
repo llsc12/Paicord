@@ -303,7 +303,7 @@
 
       let formatter = Formatter(attributedText)
       pasteboard.setString(formatter.plainText(), forType: .string)
-      pasteboard.setString(formatter.html(), forType: .html)
+//      pasteboard.setString(formatter.html(), forType: .html) // we don't want html copying
     }
   }
 

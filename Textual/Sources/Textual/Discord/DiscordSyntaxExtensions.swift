@@ -38,12 +38,15 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
       switch token.type {
       case .discordUserMention:
         attributes.link = URL(string: "textual-discord://mention/user/\(id)")
+        attributes.textual.copyText = "<@\(id)>"
         return AttributedString("@\(userName(id) ?? id)", attributes: attributes)
       case .discordChannelMention:
         attributes.link = URL(string: "textual-discord://mention/channel/\(id)")
+        attributes.textual.copyText = "<#\(id)>"
         return AttributedString("#\(channelName(id) ?? id)", attributes: attributes)
       case .discordRoleMention:
         attributes.link = URL(string: "textual-discord://mention/role/\(id)")
+        attributes.textual.copyText = "<@&\(id)>"
         return AttributedString("@\(roleName(id) ?? id)", attributes: attributes)
       default:
         return nil

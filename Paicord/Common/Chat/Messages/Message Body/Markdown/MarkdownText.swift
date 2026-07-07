@@ -231,6 +231,7 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
     func mention(
       text: String,
       link: String,
+      copyText: String,
       foreground: Color,
       background: Color,
       base: AttributeContainer
@@ -238,6 +239,7 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
       var attributes = base
       attributes.link = URL(string: link)
       attributes.textual.preStyledLink = true
+      attributes.textual.copyText = copyText
       attributes.foregroundColor = foreground
       attributes.backgroundColor = background
       attributes.inlinePresentationIntent = .stronglyEmphasized
@@ -258,6 +260,7 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
       return mention(
         text: "@\(name)",
         link: "paicord://mention/user/\(id)",
+        copyText: "<@\(id)>",
         foreground: defaultForeground,
         background: defaultBackground,
         base: base
@@ -270,6 +273,7 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
       return mention(
         text: "#\(name)",
         link: "paicord://mention/channel/\(id)",
+        copyText: "<#\(id)>",
         foreground: defaultForeground,
         background: defaultBackground,
         base: base
@@ -282,6 +286,7 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
         return mention(
           text: "@\(id)",
           link: "paicord://mention/role/\(id)",
+          copyText: "<@&\(id)>",
           foreground: defaultForeground,
           background: defaultBackground,
           base: base
@@ -291,6 +296,7 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
       return mention(
         text: "@\(role.name)",
         link: "paicord://mention/role/\(id)",
+        copyText: "<@&\(id)>",
         foreground: color ?? defaultForeground,
         background: color.map { $0.opacity(0.08) } ?? defaultBackground,
         base: base
@@ -301,6 +307,7 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
       mention(
         text: "@everyone",
         link: "paicord://mention/everyone",
+        copyText: "@everyone",
         foreground: defaultForeground,
         background: defaultBackground,
         base: base
@@ -311,6 +318,7 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
       mention(
         text: "@here",
         link: "paicord://mention/here",
+        copyText: "@here",
         foreground: defaultForeground,
         background: defaultBackground,
         base: base

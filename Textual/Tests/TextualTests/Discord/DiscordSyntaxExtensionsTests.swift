@@ -49,3 +49,45 @@ struct DiscordEmojiSyntaxExtensionTests {
     #expect(emojiRun.textual.emojiURL == URL(string: "https://cdn.discordapp.com/emojis/12345.png"))
   }
 }
+
+@MainActor
+struct DiscordMentionSyntaxExtensionTests {
+  private func parse(_ markdown: String) throws -> AttributedString {
+    let parser = AttributedStringMarkdownParser(
+      baseURL: nil,
+      syntaxExtensions: [
+        .discordMentions(
+          userName: { _ in "user" },
+          channelName: { _ in "channel" },
+          roleName: { _ in "role" }
+        )
+      ]
+    )
+    return try parser.attributedString(for: DiscordMarkdown.preprocess(markdown))
+  }
+
+  @Test func userMentionCopiesTheRawEntity() throws {
+    let result = try parse("<@123>")
+    let mentionRun = try #require(result.runs.first { $0.link != nil })
+    #expect(String(result[mentionRun.range].characters[...]) == "@user")
+    #expect(mentionRun.textual.copyText == "<@123>")
+  }
+
+  @Test func channelMentionCopiesTheRawEntity() throws {
+    let result = try parse("<#456>")
+    let mentionRun = try #require(result.runs.first { $0.link != nil })
+    #expect(mentionRun.textual.copyText == "<#456>")
+  }
+
+  @Test func roleMentionCopiesTheRawEntity() throws {
+    let result = try parse("<@&789>")
+    let mentionRun = try #require(result.runs.first { $0.link != nil })
+    #expect(mentionRun.textual.copyText == "<@&789>")
+  }
+
+  @Test func plainTextExportUsesTheRawEntity() throws {
+    let result = try parse("ping <@123> please")
+    let formatter = Formatter(result)
+    #expect(formatter.plainText() == "ping <@123> please")
+  }
+}

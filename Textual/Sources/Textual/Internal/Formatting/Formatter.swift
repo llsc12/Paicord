@@ -339,7 +339,6 @@ extension Formatter.InlineNode {
     let intent = attributedString.inlinePresentationIntent ?? []
 
     var node: Self
-
     if let attachment = attributedString.textual.attachment {
       node = .attachment(attachment)
     } else if intent.contains(.lineBreak) {
@@ -348,6 +347,8 @@ extension Formatter.InlineNode {
       node = .text(" ")
     } else if intent.contains(.code) {
       node = .code(String(attributedString.characters[...]))
+    } else if let copyText = attributedString.textual.copyText {
+      node = .text(copyText)
     } else {
       node = .text(String(attributedString.characters[...]))
     }

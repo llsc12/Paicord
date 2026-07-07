@@ -25,7 +25,7 @@
           .filter { $1.attributedString === input }
           .map(\.0)
 
-        return input.applyingAttachments(in: lines)
+        return input.applyingAttachments(in: lines).applyingCopyText(in: lines)
       }
 
       return .init(
@@ -140,6 +140,29 @@
 
       return result
     }
+
+    fileprivate func applyingCopyText(in lines: [Text.Layout.Line]) -> NSAttributedString {
+      guard lines.containsCopyText else {
+        return self
+      }
+
+      let result = NSMutableAttributedString(attributedString: self)
+
+      for line in lines {
+        for run in line {
+          let ranges = run.characterRanges
+          guard
+            let copyText = run.copyText,
+            let start = ranges.first?.lowerBound,
+            let end = ranges.last?.upperBound
+          else { continue }
+
+          result.addAttribute(.textual.copyText, value: copyText, range: NSRange(start..<end))
+        }
+      }
+
+      return result
+    }
   }
 
   @available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
@@ -148,6 +171,14 @@
       self.contains { line in
         line.contains { run in
           run.attachment != nil
+        }
+      }
+    }
+
+    fileprivate var containsCopyText: Bool {
+      self.contains { line in
+        line.contains { run in
+          run.copyText != nil
         }
       }
     }

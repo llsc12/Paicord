@@ -42,6 +42,13 @@ extension AttributeScopes {
       public static let name = "Textual.PreStyledLink"
     }
 
+    /// Overrides a run's plain-text export (copy, share, drag) with different text than what's
+    /// actually rendered.
+    public enum CopyTextAttribute: AttributedStringKey {
+      public typealias Value = String
+      public static let name = "Textual.CopyText"
+    }
+
     /// A property for accessing an attachment attribute.
     public let attachment: AttachmentAttribute
 
@@ -56,6 +63,9 @@ extension AttributeScopes {
 
     /// A property for accessing the pre-styled-link attribute.
     public let preStyledLink: PreStyledLinkAttribute
+
+    /// A property for accessing the copy-text attribute.
+    public let copyText: CopyTextAttribute
 
     public let foundation: AttributeScopes.FoundationAttributes
   }

@@ -89,7 +89,7 @@
         [
           [
             UTType.plainText.identifier: formatter.plainText(),
-            UTType.html.identifier: formatter.html(),
+//            UTType.html.identifier: formatter.html(), // we don't want html copying 
           ]
         ]
       )
