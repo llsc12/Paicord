@@ -50,7 +50,7 @@ extension ChatView {
         || message.content?.contains("@here") == true
       let mentionedUserByRole: Bool = {
         let usersRoles =
-          channelStore?.guildStore?.members[currentUserID]?.roles ?? []
+          channelStore?.guildStore?.member(currentUserID)?.roles ?? []
         for roleID in usersRoles {
           if message.content?.contains("<@&\(roleID)>") == true {
             return true
@@ -224,7 +224,7 @@ extension ChatView {
       } label: {
         let guildstoremember =
           gw.user.currentUser != nil
-          ? channelStore.guildStore?.members[gw.user.currentUser!.id] : nil
+          ? channelStore.guildStore?.member(gw.user.currentUser!.id) : nil
         Profile.Avatar(
           member: guildstoremember,
           user: gw.user.currentUser?.toPartialUser()
@@ -238,7 +238,7 @@ extension ChatView {
         if let userId = gw.user.currentUser?.id, let user = gw.user.currentUser {
           ProfilePopoutView(
             guild: channelStore.guildStore,
-            member: channelStore.guildStore?.members[userId],
+            member: channelStore.guildStore?.member(userId),
             user: user.toPartialUser()
           )
         }
@@ -255,8 +255,8 @@ extension ChatView {
         if let guildStore = channelStore.guildStore,
           let userID = gw.user.currentUser?.id
         {
-          let member = guildStore.members[userID]
-          let color = member?.roles?.compactMap { guildStore.roles[$0] }
+          let member = guildStore.member(userID)
+          let color = member?.roles?.compactMap { guildStore.role($0) }
             .sorted(by: { $0.position > $1.position })
             .compactMap { $0.color.value != 0 ? $0.color : nil }
             .first?.asColor()

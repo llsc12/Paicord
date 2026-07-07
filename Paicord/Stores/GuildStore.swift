@@ -11,6 +11,9 @@ import Foundation
 import PaicordLib
 import SwiftPrettyPrint
 
+typealias MemberBox = ObservableBox<Guild.PartialMember>
+typealias RoleBox = ObservableBox<Role>
+
 @Observable
 class GuildStore: DiscordDataStore {
   // MARK: - Protocol Properties
@@ -21,10 +24,87 @@ class GuildStore: DiscordDataStore {
   let guildId: GuildSnowflake
   var guild: Guild?
   var channels: [ChannelSnowflake: DiscordChannel] = [:]
-  var members: [UserSnowflake: Guild.PartialMember] = [:]
-  var roles: OrderedDictionary<RoleSnowflake, Role> = [:]
+  private var memberBoxes: [UserSnowflake: MemberBox] = [:]
+  private var roleBoxes: OrderedDictionary<RoleSnowflake, RoleBox> = [:]
   var presences: [UserSnowflake: Gateway.PresenceUpdate] = [:]
   var voiceStates: [UserSnowflake: VoiceState] = [:]
+
+  // MARK: - Member boxed helpers
+
+  /// Get a box for this member data. Store the box and read the underlying value.
+  func memberBox(for id: UserSnowflake) -> MemberBox? {
+    memberBoxes[id]
+  }
+
+  /// Number of stored members
+  var memberCount: Int {
+    memberBoxes.count
+  }
+
+  /// Get member data directly, non-updating.
+  func member(_ id: UserSnowflake) -> Guild.PartialMember? {
+    memberBoxes[id]?.value
+  }
+
+  /// Set the member data of a box.
+  @discardableResult
+  func setMember(_ member: Guild.PartialMember, for id: UserSnowflake) -> MemberBox {
+    if let box = memberBoxes[id] {
+      box.value = member
+      return box
+    } else {
+      let box = MemberBox(member)
+      memberBoxes[id] = box
+      return box
+    }
+  }
+
+  /// Merges member data into the value in the box.
+  func mergeMember(_ incoming: Guild.PartialMember, for id: UserSnowflake) {
+    if let box = memberBoxes[id] {
+      box.value.update(with: incoming)
+    } else {
+      memberBoxes[id] = MemberBox(incoming)
+    }
+  }
+
+  // MARK: - Role boxed helpers
+
+  /// Get a box for this role. Store the box and read the underlying value.
+  func roleBox(for id: RoleSnowflake) -> RoleBox? {
+    roleBoxes[id]
+  }
+
+  /// Number of stored roles
+  var roleCount: Int {
+    roleBoxes.count
+  }
+
+  /// Get role data directly, non-updating.
+  func role(_ id: RoleSnowflake) -> Role? {
+    roleBoxes[id]?.value
+  }
+
+  /// Set the role data of a box.
+  @discardableResult
+  func setRole(_ role: Role, insertingAt index: Int? = nil) -> RoleBox {
+    if let box = roleBoxes[role.id] {
+      box.value = role
+      return box
+    } else {
+      let box = RoleBox(role)
+      if let index {
+        roleBoxes.updateValue(box, forKey: role.id, insertingAt: index)
+      } else {
+        roleBoxes[role.id] = box
+      }
+      return box
+    }
+  }
+
+  func removeRole(_ id: RoleSnowflake) {
+    roleBoxes.removeValue(forKey: id)
+  }
 
   // MARK: - Initializers, setup etc.
 
@@ -53,13 +133,13 @@ class GuildStore: DiscordDataStore {
       }
     }
     for role in guildRoles {
-      roles[role.id] = role
+      setRole(role)
     }
 
     // members (usually the connected user only)
     guild.members?.forEach { member in
       if let user = member.user {
-        members[user.id] = member.toPartialMember()
+        setMember(member.toPartialMember(), for: user.id)
       }
     }
   }
@@ -156,9 +236,9 @@ class GuildStore: DiscordDataStore {
 
     // Update cached roles
     let guildRoles = updatedGuild.roles
-    roles.removeAll()
+    roleBoxes.removeAll()
     for role in guildRoles {
-      roles[role.id] = role
+      setRole(role)
     }
   }
 
@@ -166,8 +246,8 @@ class GuildStore: DiscordDataStore {
     // Guild was deleted or became unavailable, clear all data
     guild = nil
     channels.removeAll()
-    members.removeAll()
-    roles.removeAll()
+    memberBoxes.removeAll()
+    roleBoxes.removeAll()
     presences.removeAll()
     voiceStates.removeAll()
   }
@@ -185,17 +265,17 @@ class GuildStore: DiscordDataStore {
   }
 
   private func handleGuildMemberAdd(_ memberAdd: Gateway.GuildMemberAdd) {
-    members[memberAdd.user.id] = memberAdd.toMember().toPartialMember()
+    setMember(memberAdd.toMember().toPartialMember(), for: memberAdd.user.id)
   }
 
   private func handleGuildMemberUpdate(_ memberUpdate: Gateway.GuildMemberAdd) {
-    members[memberUpdate.user.id] = memberUpdate.toMember().toPartialMember()
+    setMember(memberUpdate.toMember().toPartialMember(), for: memberUpdate.user.id)
   }
 
   private func handleGuildMemberRemove(
     _ memberRemove: Gateway.GuildMemberRemove
   ) {
-    members.removeValue(forKey: memberRemove.user.id)
+    memberBoxes.removeValue(forKey: memberRemove.user.id)
   }
 
   private func handleGuildMembersChunk(
@@ -205,70 +285,67 @@ class GuildStore: DiscordDataStore {
       "[GuildStore] Received members chunk with \(membersChunk.members.count) members for guild \(membersChunk.guild_id.rawValue)"
     )
     guard membersChunk.guild_id == guildId else { return }
-    var updated = members
+    // Existing members update their own box in place (no invalidation beyond that one view);
+    // only genuinely new members touch `memberBoxes`' structure, and even that's one invalidation
+    // per new member instead of per chunk-wide reassignment.
     for member in membersChunk.members {
       if let user = member.user {
-        updated[user.id] = member.toPartialMember()
+        setMember(member.toPartialMember(), for: user.id)
       }
     }
-    members = updated
   }
 
   private func handleGuildRoleCreate(_ roleCreate: Gateway.GuildRole) {
     // insert role based on position
     let newRole = roleCreate.role
     var inserted = false
-    for (index, existingRole) in roles.values.enumerated() {
+    for (index, existingRole) in roleBoxes.values.map(\.value).enumerated() {
       if newRole.position > existingRole.position
         || (newRole.position == existingRole.position
           && newRole.id.rawValue < existingRole.id.rawValue)
       {
-        roles.updateValue(newRole, forKey: newRole.id, insertingAt: index)
+        setRole(newRole, insertingAt: index)
       }
       inserted = true
       break
     }
     // if not inserted, it means it's the lowest role but unlikely since @everyone exists. whatever.
     if !inserted {
-      roles[newRole.id] = newRole
+      setRole(newRole)
     }
   }
 
   private func handleGuildRoleUpdate(_ roleUpdate: Gateway.GuildRole) {
     // compare positions and remove and re-insert if position changed
-    if let existingRole = roles[roleUpdate.role.id],
+    if let existingRole = role(roleUpdate.role.id),
       existingRole.position != roleUpdate.role.position
     {
-      roles.removeValue(forKey: roleUpdate.role.id)
+      removeRole(roleUpdate.role.id)
       // re-insert based on new position
       let newRole = roleUpdate.role
       var inserted = false
-      for (index, existingRole) in roles.values.enumerated() {
+      for (index, existingRole) in roleBoxes.values.map(\.value).enumerated() {
         if newRole.position > existingRole.position
           || (newRole.position == existingRole.position
             && newRole.id.rawValue < existingRole.id.rawValue)
         {
-          roles.updateValue(
-            newRole,
-            forKey: newRole.id,
-            insertingAt: index
-          )
+          setRole(newRole, insertingAt: index)
           inserted = true
           break
         }
       }
       // if not inserted, it means it's the lowest role but unlikely since @everyone exists. whatever.
       if !inserted {
-        roles[newRole.id] = newRole
+        setRole(newRole)
       }
     } else {
       // position didn't change, just update
-      roles[roleUpdate.role.id] = roleUpdate.role
+      setRole(roleUpdate.role)
     }
   }
 
   private func handleGuildRoleDelete(_ roleDelete: Gateway.GuildRoleDelete) {
-    roles.removeValue(forKey: roleDelete.role_id)
+    removeRole(roleDelete.role_id)
   }
 
   private func handlePresenceUpdate(_ presence: Gateway.PresenceUpdate) {

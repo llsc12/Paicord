@@ -60,7 +60,7 @@ extension MessageCell {
               if let userId = message.author?.id, let user = message.author {
                 ProfilePopoutView(
                   guild: channelStore.guildStore,
-                  member: channelStore.guildStore?.members[userId]
+                  member: channelStore.guildStore?.member(userId)
                   ?? message.member,
                   user: user.toPartialUser()
                 )

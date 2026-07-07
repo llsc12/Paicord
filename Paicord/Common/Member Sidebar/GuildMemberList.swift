@@ -80,7 +80,7 @@ extension MemberSidebarView {
 
     var body: some View {
       HStack(alignment: .bottom) {
-        switch row?.item {
+        switch row?.value {
         case .member(let member):
           if let user = member.user {
             MemberRowView(member: member.toPartialMember(), user: user)
@@ -103,7 +103,7 @@ extension MemberSidebarView {
     var body: some View {
       if let group = accumulator.groups[groupID] {
         let text: Text = {
-          if let role = guildStore.roles[groupID] {
+          if let role = guildStore.role(groupID) {
             return (Text(verbatim: role.name) + Text(verbatim: " - \(group.count)"))
           } else {
             let name: String = groupID.rawValue.capitalized

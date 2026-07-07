@@ -231,14 +231,14 @@ class ChannelStore: DiscordDataStore {
     if let guildStore, let authorId = message.author?.id,
       let member = message.member
     {
-      guildStore.members[authorId, default: member].update(with: member)
+      guildStore.mergeMember(member, for: authorId)
     }
 
     // Get unknown member data from mentions if we have a guild store
     if let guildStore {
       var unknownMemberIds: Set<UserSnowflake> = []
       for mention in messageData.mentions {
-        if guildStore.members[mention.id] == nil {
+        if guildStore.member(mention.id) == nil {
           unknownMemberIds.insert(mention.id)
         }
       }
@@ -275,7 +275,7 @@ class ChannelStore: DiscordDataStore {
     if let guildStore {
       var unknownMemberIds: Set<UserSnowflake> = []
       for mention in message.mentions ?? [] {
-        if guildStore.members[mention.id] == nil {
+        if guildStore.member(mention.id) == nil {
           unknownMemberIds.insert(mention.id)
         }
       }
@@ -308,7 +308,7 @@ class ChannelStore: DiscordDataStore {
       let userId = member.user?.id
     {
       // Update guild member info
-      guildStore.members[userId, default: member].update(with: member)
+      guildStore.mergeMember(member, for: userId)
     }
     if let user = reactionAdd.member?.user?.toPartialUser(), let gateway {
       // Update user info
@@ -639,7 +639,7 @@ class ChannelStore: DiscordDataStore {
               .compactMap {
                 $0
               }
-          }.flatMap { $0 }.filter { guildStore.members[$0] == nil }
+          }.flatMap { $0 }.filter { guildStore.member($0) == nil }
         )
         if !unknownMembers.isEmpty {
           print(
@@ -971,14 +971,7 @@ extension ChannelStore {
   typealias MixedItem = Gateway.GuildMemberListUpdate.MemberListOp
     .GuildMemberListMixedItem
 
-  @Observable
-  final class MemberListRow {
-    var item: MixedItem?
-
-    init(_ item: MixedItem? = nil) {
-      self.item = item
-    }
-  }
+  typealias MemberListRow = ObservableBox<MixedItem?>
 
   // class representing member list items and where the groups lie
   @Observable
@@ -1008,7 +1001,7 @@ extension ChannelStore {
 
     private func setItem(_ item: MixedItem, at index: Int) {
       if let existing = items[index] {
-        existing.item = item
+        existing.value = item
       } else {
         items[index] = MemberListRow(item)
       }
@@ -1084,12 +1077,13 @@ extension ChannelStore {
         // add member data to guildstore and user data to user store
         guard let user = member.user?.toPartialUser() else { continue }
         let member = member.toPartialMember()
-        primaryChannelStore.guildStore?.members[user.id, default: member]
-          .update(with: member)
+        primaryChannelStore.guildStore?.mergeMember(member, for: user.id)
         primaryChannelStore.gateway?.user.users[user.id, default: user].update(
           with: user
         )
-        primaryChannelStore.gateway?.user.presences[user.id] = member.presence
+        if let presence = member.presence {
+          primaryChannelStore.gateway?.user.setPresence(presence, for: user.id)
+        }
       }
     }
   }

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		571AE5B12FFD7726006D609C /* ObservableBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 571AE5B02FFD7726006D609C /* ObservableBox.swift */; };
 		5724CD6F2E733D0E00931FEF /* MFASheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5724CD6E2E733D0900931FEF /* MFASheet.swift */; };
 		572B694C2E7079FB00BCED00 /* PaicordLib in Frameworks */ = {isa = PBXBuildFile; productRef = 572B694B2E7079FB00BCED00 /* PaicordLib */; };
 		5783AA902E6B8F6500F73F6D /* MeshGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 5783AA8F2E6B8F6500F73F6D /* MeshGradient */; };
@@ -166,6 +167,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		571AE5B02FFD7726006D609C /* ObservableBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservableBox.swift; sourceTree = "<group>"; };
 		5724CD6E2E733D0900931FEF /* MFASheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MFASheet.swift; sourceTree = "<group>"; };
 		5783AA932E6B8FCD00F73F6D /* MeshGradient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeshGradient.swift; sourceTree = "<group>"; };
 		578E1CE02E67780B00C6DEA3 /* GradientText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientText.swift; sourceTree = "<group>"; };
@@ -375,6 +377,7 @@
 				57A4E7132E6B44BC00470131 /* Extensions */,
 				AA7B38F12EB37F9500CA4A3C /* PermsHelper.swift */,
 				AAB50A5D2E9B21AE0048E8B0 /* Thumbhash.swift */,
+				571AE5B02FFD7726006D609C /* ObservableBox.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -1119,6 +1122,7 @@
 			files = (
 				AA1378062E967A4A00100969 /* ProcessInfo+previews.swift in Sources */,
 				AAC07FC32F2D9E460077B8FA /* DownloadButton.swift in Sources */,
+				571AE5B12FFD7726006D609C /* ObservableBox.swift in Sources */,
 				AA1097152E64C181005BC3D2 /* LargeBaseplate.swift in Sources */,
 				AAB50A562E9AD4680048E8B0 /* StickersView.swift in Sources */,
 				AA1097172E64C181005BC3D2 /* SmallBaseplate.swift in Sources */,

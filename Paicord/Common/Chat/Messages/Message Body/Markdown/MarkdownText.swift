@@ -73,7 +73,7 @@ struct MarkdownText: View {
       if let userPopover {
         ProfilePopoutView(
           guild: channelStore?.guildStore,
-          member: channelStore?.guildStore?.members[userPopover.id],
+          member: channelStore?.guildStore?.member(userPopover.id),
           user: userPopover
         )
       }
@@ -132,8 +132,8 @@ struct MarkdownText: View {
   private var revision: RevisionSignature {
     RevisionSignature(
       userCount: GatewayStore.shared.user.users.count,
-      memberCount: guildStore?.members.count,
-      roleCount: guildStore?.roles.count,
+      memberCount: guildStore?.memberCount,
+      roleCount: guildStore?.roleCount,
       channelCount: guildStore?.channels.count,
       themeID: theme.id,
       revealedSpoilers: revealedSpoilers
@@ -257,7 +257,7 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
       let userID = UserSnowflake(id)
       let name: String
       if let user = gw.user.users[userID] {
-        name = guildStore?.members[userID]?.nick ?? user.global_name ?? user.username ?? id
+        name = guildStore?.member(userID)?.nick ?? user.global_name ?? user.username ?? id
       } else {
         name = id
       }
@@ -286,7 +286,7 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
 
     let roleMention = Self(regex: /<@&(\d+)>/, tokenType: "paicordRoleMention") { id, base in
       let roleID = RoleSnowflake(id)
-      guard let role = guildStore?.roles[roleID] else {
+      guard let role = guildStore?.role(roleID) else {
         return mention(
           text: "@\(id)",
           link: "paicord://mention/role/\(id)",
