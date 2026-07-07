@@ -48,6 +48,15 @@ struct DiscordEmojiSyntaxExtensionTests {
     let emojiRun = try #require(result.runs.first { $0.textual.emojiURL != nil })
     #expect(emojiRun.textual.emojiURL == URL(string: "https://cdn.discordapp.com/emojis/12345.png"))
   }
+
+  @Test func adjacentIdenticalEmojiStayAsSeparateRuns() throws {
+    // Three back-to-back, otherwise attribute-identical emoji runs would silently coalesce into
+    // one via AttributedString's attribute-equality-based run grouping, leaving only one
+    // attachment resolved for all three — see `RunDiscriminatorAttribute`.
+    let result = try parse("<:pepe:12345><:pepe:12345><:pepe:12345>")
+    let emojiRuns = result.runs.filter { $0.textual.emojiURL != nil }
+    #expect(emojiRuns.count == 3)
+  }
 }
 
 @MainActor

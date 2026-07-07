@@ -28,7 +28,9 @@ extension AttributedStringMarkdownParser {
       let sadDog = try #require(expected.range(of: "sad_dog"))
 
       expected[doge].textual.emojiURL = Fixtures.dogeEmoji.url
+      expected[doge].textual.runDiscriminator = 0
       expected[sadDog].textual.emojiURL = Fixtures.sadDogEmoji.url
+      expected[sadDog].textual.runDiscriminator = 1
 
       // when
       let output = try processor.expand(input)
@@ -46,6 +48,7 @@ extension AttributedStringMarkdownParser {
 
       let doge = try #require(expected.range(of: "doge", options: .backwards))
       expected[doge].textual.emojiURL = Fixtures.dogeEmoji.url
+      expected[doge].textual.runDiscriminator = 0
 
       // when
       let output = try processor.expand(input)
@@ -77,6 +80,7 @@ extension AttributedStringMarkdownParser {
 
       let doge = try #require(expected.range(of: "doge", options: .backwards))
       expected[doge].textual.emojiURL = Fixtures.dogeEmoji.url
+      expected[doge].textual.runDiscriminator = 0
 
       // when
       let output = try processor.expand(input)
@@ -108,6 +112,7 @@ extension AttributedStringMarkdownParser {
 
       let doge = try #require(expected.range(of: "doge", options: .backwards))
       expected[doge].textual.emojiURL = Fixtures.dogeEmoji.url
+      expected[doge].textual.runDiscriminator = 0
 
       // when
       let output = try processor.expand(input)

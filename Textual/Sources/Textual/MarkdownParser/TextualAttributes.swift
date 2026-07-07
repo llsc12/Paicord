@@ -49,6 +49,12 @@ extension AttributeScopes {
       public static let name = "Textual.CopyText"
     }
 
+    /// Used to prevent the merging of runs we want to keep distinct.
+    public enum RunDiscriminatorAttribute: AttributedStringKey {
+      public typealias Value = Int
+      public static let name = "Textual.RunDiscriminator"
+    }
+
     /// A property for accessing an attachment attribute.
     public let attachment: AttachmentAttribute
 
@@ -66,6 +72,9 @@ extension AttributeScopes {
 
     /// A property for accessing the copy-text attribute.
     public let copyText: CopyTextAttribute
+
+    /// A property for accessing the run-discriminator attribute.
+    public let runDiscriminator: RunDiscriminatorAttribute
 
     public let foundation: AttributeScopes.FoundationAttributes
   }

@@ -27,6 +27,7 @@ extension AttributedStringMarkdownParser {
       }
 
       var output = AttributedString()
+      var runDiscriminator = 0
 
       for run in attributedString.runs {
         if run.isPreformatted {
@@ -41,8 +42,10 @@ extension AttributedStringMarkdownParser {
           } else {
             for token in tokens {
               if let syntaxExtension = syntaxExtensions.firstMatching(token.type),
-                let replacement = syntaxExtension.replace(token, run.attributes)
+                var replacement = syntaxExtension.replace(token, run.attributes)
               {
+                replacement.textual.runDiscriminator = runDiscriminator
+                runDiscriminator += 1
                 output.append(replacement)
               } else {
                 // Append the token content without replacing
