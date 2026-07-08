@@ -1033,7 +1033,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1640;
-				LastUpgradeCheck = 2600;
+				LastUpgradeCheck = 2700;
 				TargetAttributes = {
 					AA1096DA2E63BE84005BC3D2 = {
 						CreatedOnToolsVersion = 16.4;
@@ -1512,7 +1512,7 @@
 		};
 		579DF3492E6D9B9800BD8B97 /* XCRemoteSwiftPackageReference "SwiftUIX" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SwiftUIX/SwiftUIX";
+			repositoryURL = "https://github.com/llsc12/SwiftUIX";
 			requirement = {
 				branch = master;
 				kind = branch;
