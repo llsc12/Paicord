@@ -257,6 +257,7 @@ public enum APIEndpoint: Endpoint {
   /// https://discord.com/developers/docs/resources/channel
 
   case getMessage(channelId: ChannelSnowflake, messageId: MessageSnowflake)
+  case acknowledgeMessage(channelId: ChannelSnowflake, messageId: MessageSnowflake)
   case listMessageReactionsByEmoji(
     channelId: ChannelSnowflake,
     messageId: MessageSnowflake,
@@ -866,6 +867,10 @@ public enum APIEndpoint: Endpoint {
       let channelId = channelId.rawValue
       let messageId = messageId.rawValue
       suffix = "channels/\(channelId)/messages/\(messageId)"
+    case .acknowledgeMessage(let channelId, let messageId):
+      let channelId = channelId.rawValue
+      let messageId = messageId.rawValue
+      suffix = "channels/\(channelId)/messages/\(messageId)/ack"
     case .listMessageReactionsByEmoji(
       let channelId,
       let messageId,
@@ -1575,6 +1580,10 @@ public enum APIEndpoint: Endpoint {
       let channelId = channelId.rawValue
       let messageId = messageId.rawValue
       suffix = "channels/\(channelId)/messages/\(messageId)"
+    case .acknowledgeMessage(let channelId, let messageId):
+      let channelId = channelId.rawValue
+      let messageId = messageId.rawValue
+      suffix = "channels/\(channelId)/messages/\(messageId)/ack"
     case .listMessageReactionsByEmoji(
       let channelId,
       let messageId,
@@ -1986,6 +1995,7 @@ public enum APIEndpoint: Endpoint {
     case .updateOwnGuildMember: return .PATCH
     case .deleteGuildMember: return .DELETE
     case .getMessage: return .GET
+    case .acknowledgeMessage: return .POST
     case .listMessageReactionsByEmoji: return .GET
     case .listMessages: return .GET
     case .addMessageReaction: return .PUT
@@ -2178,6 +2188,7 @@ public enum APIEndpoint: Endpoint {
     case .updateOwnGuildMember: return true
     case .deleteGuildMember: return true
     case .getMessage: return true
+    case .acknowledgeMessage: return true
     case .listMessageReactionsByEmoji: return true
     case .listMessages: return true
     case .addMessageReaction: return true
@@ -2370,6 +2381,7 @@ public enum APIEndpoint: Endpoint {
     case .updateOwnGuildMember: return true
     case .deleteGuildMember: return true
     case .getMessage: return true
+    case .acknowledgeMessage: return true
     case .listMessageReactionsByEmoji: return true
     case .listMessages: return true
     case .addMessageReaction: return true
@@ -2711,6 +2723,8 @@ public enum APIEndpoint: Endpoint {
       return [guildId.rawValue, userId.rawValue]
     case .getMessage(let channelId, let messageId):
       return [channelId.rawValue, messageId.rawValue]
+    case .acknowledgeMessage(let channelId, let messageId):
+      return [channelId.rawValue, messageId.rawValue]
     case .listMessageReactionsByEmoji(
       let channelId,
       let messageId,
@@ -3010,6 +3024,7 @@ public enum APIEndpoint: Endpoint {
     case .updateOwnGuildMember: return 104
     case .deleteGuildMember: return 105
     case .getMessage: return 106
+    case .acknowledgeMessage: return 185
     case .listMessageReactionsByEmoji: return 107
     case .listMessages: return 108
     case .addMessageReaction: return 109
@@ -3406,6 +3421,9 @@ public enum APIEndpoint: Endpoint {
     case .getMessage(let channelId, let messageId):
       return
         "getMessage(channelId.rawValue: \(channelId.rawValue), messageId.rawValue: \(messageId.rawValue))"
+    case .acknowledgeMessage(let channelId, let messageId):
+      return
+        "acknowledgeMessage(channelId.rawValue: \(channelId.rawValue), messageId.rawValue: \(messageId.rawValue))"
     case .listMessageReactionsByEmoji(
       let channelId,
       let messageId,

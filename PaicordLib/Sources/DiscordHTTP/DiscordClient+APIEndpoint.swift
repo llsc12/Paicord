@@ -692,6 +692,17 @@ extension DiscordClient {
     )
   }
 
+  /// https://docs.discord.food/topics/read-state#acknowledge-message
+  @inlinable
+  public func acknowledgeMessage(
+    channelId: ChannelSnowflake,
+    messageId: MessageSnowflake,
+    payload: Payloads.AcknowledgeMessage
+  ) async throws -> DiscordHTTPResponse {
+    let endpoint = APIEndpoint.acknowledgeMessage(channelId: channelId, messageId: messageId)
+    return try await self.send(request: .init(to: endpoint), payload: payload)
+  }
+
   /// https://discord.com/developers/docs/resources/channel#bulk-delete-messages
   @inlinable
   public func bulkDeleteMessages(
