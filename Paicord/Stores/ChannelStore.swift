@@ -227,6 +227,22 @@ class ChannelStore: DiscordDataStore {
     currentChannel.last_message_id = message.id
     channel = currentChannel
 
+    // sending a message in a channel counts as reading up to it
+    if message.author?.id == gateway?.user.currentUser?.id {
+      gateway?.readStates.applyAck(channelId: channelId, messageId: message.id)
+      if let client = gateway?.client {
+        let channelId = channelId
+        let messageId = message.id
+        Task.detached {
+          try? await client.acknowledgeMessage(
+            channelId: channelId,
+            messageId: messageId,
+            payload: Payloads.AcknowledgeMessage()
+          )
+        }
+      }
+    }
+
     // Update guild member info if we have a guild store
     if let guildStore, let authorId = message.author?.id,
       let member = message.member

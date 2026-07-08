@@ -44,9 +44,25 @@ class ReadStateStore: DiscordDataStore {
       $0[$1.id] = $1
     }
   }
-  
 
   private func handleMessageAcknowledge(_ ackData: Gateway.MessageAcknowledge) {
+    applyAck(channelId: ackData.channel_id, messageId: ackData.message_id)
+  }
 
+  /// Marks a channel as read up to a given message. Called after we send an ack
+  /// ourselves, and when a `MESSAGE_ACK` event arrives from another client.
+  func applyAck(channelId: ChannelSnowflake, messageId: MessageSnowflake) {
+    let key = AnySnowflake(channelId)
+    if readStates[key] != nil {
+      readStates[key]?.last_message_id = messageId
+    } else {
+      readStates[key] = Gateway.ReadState(id: key, last_message_id: messageId)
+    }
+  }
+
+  func isUnread(channelId: ChannelSnowflake, lastMessageId: MessageSnowflake?) -> Bool {
+    guard let lastMessageId else { return false }
+    guard let acked = readStates[AnySnowflake(channelId)]?.last_message_id else { return true }
+    return lastMessageId > acked
   }
 }

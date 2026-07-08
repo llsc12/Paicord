@@ -16,12 +16,16 @@ struct ChannelButton: View {
   var channels: [ChannelSnowflake: DiscordChannel]
   var channel: DiscordChannel
 
+  var isUnread: Bool {
+    gw.readStates.isUnread(channelId: channel.id, lastMessageId: channel.last_message_id)
+  }
+
   var body: some View {
     // switch channel type
+    let selected = appState.selectedChannel == channel.id
     switch channel.type {
     case .dm:
       textChannelButton { hovered in
-        let selected = appState.selectedChannel == channel.id
         HStack {
           if let user = channel.recipients?.first {
             Profile.AvatarWithPresence(
@@ -37,6 +41,7 @@ struct ChannelButton: View {
               $0.global_name ?? $0.username
             }).joined(separator: ", ") ?? "Unknown Channel"
           )
+          .foregroundStyle(isUnread || selected ? .primary : .secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .frame(height: 38)
@@ -52,6 +57,14 @@ struct ChannelButton: View {
           }
         }
         .clipShape(.rounded)
+        .overlay(alignment: .leading) {
+          if isUnread {
+            Circle()
+              .fill(.primary)
+              .frame(width: 8, height: 8)
+              .offset(x: -8)
+          }
+        }
       }
       .tint(.primary)
       .padding(.horizontal, 4)
@@ -114,10 +127,19 @@ struct ChannelButton: View {
               $0.global_name ?? $0.username
             }).joined(separator: ", ") ?? "Unknown Group DM"
           )
+          .foregroundStyle(isUnread || selected ? .primary : .secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .frame(height: 38)
         .padding(4)
+        .overlay(alignment: .leading) {
+          if isUnread {
+            Circle()
+              .fill(.primary)
+              .frame(width: 8, height: 8)
+              .offset(x: -8)
+          }
+        }
       }
       .tint(.primary)
       .padding(.horizontal, 4)
@@ -138,9 +160,18 @@ struct ChannelButton: View {
             .imageScale(.medium)
           Text(channel.name ?? "unknown")
         }
+        .foregroundStyle(isUnread || selected ? .primary : .secondary)
         .frame(maxWidth: .infinity, alignment: .leading)
         .minHeight(35)
         .padding(.horizontal, 12)
+        .overlay(alignment: .leading) {
+          if isUnread {
+            Circle()
+              .fill(.primary)
+              .frame(width: 8, height: 8)
+              .offset(x: -8)
+          }
+        }
       }
       .tint(.primary)
     case .guildAnnouncement:
@@ -150,9 +181,18 @@ struct ChannelButton: View {
             .imageScale(.medium)
           Text(channel.name ?? "unknown")
         }
+        .foregroundStyle(isUnread || selected ? .primary : .secondary)
         .frame(maxWidth: .infinity, alignment: .leading)
         .minHeight(35)
         .padding(.horizontal, 12)
+        .overlay(alignment: .leading) {
+          if isUnread {
+            Circle()
+              .fill(.primary)
+              .frame(width: 8, height: 8)
+              .offset(x: -8)
+          }
+        }
       }
       .tint(.primary)
     case .guildVoice:
@@ -178,9 +218,18 @@ struct ChannelButton: View {
             Text(verbatim: "\(channel.type!)")
           }
         }
+        .foregroundStyle(isUnread || selected ? .primary : .secondary)
         .frame(maxWidth: .infinity, alignment: .leading)
         .minHeight(35)
         .padding(.horizontal, 12)
+        .overlay(alignment: .leading) {
+          if isUnread {
+            Circle()
+              .fill(.primary)
+              .frame(width: 8, height: 8)
+              .offset(x: -8)
+          }
+        }
       }
       .tint(.primary)
       .disabled(true)
@@ -343,7 +392,7 @@ struct ChannelButton: View {
               }
             }
           }
-        }.clipped()
+        }
       }
     }
   }
