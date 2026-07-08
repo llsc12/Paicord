@@ -151,6 +151,9 @@ struct LoginForm: View {
               .fill(.clear)
           }
           .padding(.bottom, 10)
+          .onSubmit {
+            passwordFocused = true
+          }
 
           Text("Password")
           SecureField(text: $viewModel.password)
@@ -168,6 +171,11 @@ struct LoginForm: View {
                   lineWidth: 1
                 )
                 .fill(.clear)
+            }
+            .onSubmit {
+              Task { // FIXME: this and login button need to share tasks for blocking login button spam when tasks are ongoing from here.
+                await viewModel.loginAction()
+              }
             }
 
           ForgotPasswordButton(viewModel: viewModel)
