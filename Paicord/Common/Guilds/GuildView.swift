@@ -19,9 +19,15 @@ struct GuildView: View {
       VStack(spacing: 0) {
         Utils.GuildBannerURL(guild: guild, animated: true) { bannerURL in
           if let bannerURL {
-            AnimatedImage(url: bannerURL)
-              .resizable()
-              .aspectRatio(16 / 9, contentMode: .fill)
+            Color.clear
+              .aspectRatio(16 / 9, contentMode: .fit)
+              .overlay(
+                AnimatedImage(url: bannerURL)
+                  .resizable()
+                  .scaledToFill()
+              )
+              .frame(maxWidth: .infinity)
+              .clipped()
           }
         }
 

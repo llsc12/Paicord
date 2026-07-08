@@ -50,9 +50,15 @@ extension MemberSidebarView {
         WebImage(url: bannerURL) { phase in
           switch phase {
           case .success(let image):
-            image
-              .resizable()
-              .aspectRatio(3, contentMode: .fill)
+            Color.clear
+              .aspectRatio(3, contentMode: .fit)
+              .overlay(
+                image
+                  .resizable()
+                  .scaledToFill()
+              )
+              .frame(maxWidth: .infinity)
+              .clipped()
           default:
             let color =
               profile?.user_profile?.accent_color ?? user.accent_color
