@@ -8,7 +8,20 @@
 
 import MeshGradient
 import simd
+
+// cant cleanly compile on older xcode versions bc no :: syntax
+#if compiler(>=6.2)
+import protocol SwiftUI.View
+import struct SwiftUI.State
+import struct SwiftUI.Group
+import struct SwiftUI.Environment
+
+fileprivate typealias MeshGrid = Grid<ControlPoint>
+#else
 import SwiftUI
+
+fileprivate typealias MeshGrid = MeshGradient::Grid<ControlPoint>
+#endif
 
 extension LoginView {
   struct MeshGradientBackground: View {
@@ -37,7 +50,7 @@ extension LoginView {
     }
 
     // This methods prepares the grid model that will be sent to metal for rendering
-    func generatePlainGrid(size: Int = 6) -> MeshGradient::Grid<ControlPoint> {
+    fileprivate func generatePlainGrid(size: Int = 6) -> MeshGrid {
       let preparationGrid = Grid<MeshColor>(
         repeating: .zero,
         width: size,
