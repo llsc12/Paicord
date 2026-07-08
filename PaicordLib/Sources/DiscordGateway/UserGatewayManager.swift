@@ -601,13 +601,7 @@ extension UserGatewayManager {
         )
       )
     )
-    let opcode = Gateway.Opcode.identify
-    self.send(
-      message: .init(
-        payload: resume,
-        opcode: .init(encodedWebSocketOpcode: opcode.rawValue)!
-      )
-    )
+    self.send(message: .init(payload: resume, opcode: .text))
 
     /// Invalidate `sequenceNumber` info for the next connection, incase this one fails.
     /// This will be a notice for the next connection to
