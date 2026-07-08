@@ -2074,7 +2074,7 @@ extension Gateway {
   /// dolfies notes (as much as i understood):
   /// we request channels in the guild to get member lists for, discord sends us this payload containing groups of members and associated cell counts.
   /// the requesting happens via the UpdateGuildSubscriptions payload above, with the channels field and intpairs for the ranges you require visible rows of.
-  ///
+  /// each channel that has different permission sets will usually have their own member list. so public channels all share one member list id and private ones vary by permissions.
   public struct GuildMemberListUpdate: Sendable, Codable {
     public var ops: [MemberListOp]
     public var online_count: Int
@@ -2274,10 +2274,10 @@ extension Gateway {
 
   public struct UserApplicationIdentityUpdate: Sendable, Codable {
     public var application_id: ApplicationSnowflake
-    public var username: String
+    public var username: String?
     public var user_id: UserSnowflake
     public var avatar_hash: String?
-    public var metadata: String
+    public var metadata: String?
   }
 
   public struct VoiceChannelStartTimeUpdate: Sendable, Codable {
