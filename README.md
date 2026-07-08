@@ -49,7 +49,7 @@ If you've enjoyed using Paicord, I would apprecate a [sponsor](https://github.co
 
 ## References
 
-Paicord uses modified versions of [DiscordBM](https://github.com/DiscordBM/DiscordBM) and [SwiftMarkdownParser](https://github.com/sciasxp/SwiftMarkdownParser). These other references are mentioned since I read their code to learn from others.
+Paicord uses modified versions of [DiscordBM](https://github.com/DiscordBM/DiscordBM) and [Textual](https://github.com/gonzalezreal/textual). These other references are mentioned since I read their code to learn from others.
 
 - [Accord](https://github.com/tealbathingsuit/accord)
 - [Swiftcord](https://github.com/SwiftcordApp/Swiftcord)
