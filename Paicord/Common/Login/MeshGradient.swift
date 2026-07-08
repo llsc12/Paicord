@@ -7,13 +7,9 @@
 //
 
 import MeshGradient
+import struct MeshGradient.Grid
 import simd
-
-import struct SwiftUI.Environment
-import struct SwiftUI.EnvironmentValues
-import struct SwiftUI.Group
-import struct SwiftUI.State
-import protocol SwiftUI.View
+import SwiftUI
 
 extension LoginView {
   struct MeshGradientBackground: View {
