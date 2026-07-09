@@ -81,7 +81,7 @@ let package = Package(
       url: "https://github.com/apple/swift-crypto.git",
       "1.0.0"..<"5.0.0"
     ),
-    .package(url: "https://github.com/swiftlang/swift-java", branch: "main"),
+    .package(path: "/Users/lakhanlothiyi/Documents/GitHub/swift-java"),
     .package(url: "https://github.com/swiftlang/swift-java-jni-core", branch: "main") // temporary
   ],
   targets: [

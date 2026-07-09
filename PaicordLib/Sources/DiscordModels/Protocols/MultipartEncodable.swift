@@ -74,6 +74,14 @@ public struct RawFile: Sendable, Encodable, MultipartPartConvertible, Hashable {
     self.data = data
     self.filename = filename
   }
+  
+  /// Alternative initialiser for java bridging.
+  /// - Parameters:
+  ///   - data: The file's contents.
+  ///     - filename: The name of the file **including extension**.
+  public init(data: Data, filename: String) {
+    self.init(data: ByteBuffer(data: data), filename: filename)
+  }
 
   /// - Parameters:
   ///   - data: The file's contents.
@@ -90,6 +98,16 @@ public struct RawFile: Sendable, Encodable, MultipartPartConvertible, Hashable {
       })
     let `extension` = format.map({ ".\($0.key)" }) ?? ""
     self.filename = nameNoExtension + `extension`
+  }
+
+  
+  /// Alternative initialiser for java bridging.
+  /// - Parameters:
+  ///   - data: The file's contents.
+  ///   - nameNoExtension: The file's name without the extension.
+  ///   - contentType: The content type header containing the file's extension.
+  public init(data: Data, nameNoExtension: String, contentType: String) {
+    self.init(data: ByteBuffer(data: data), nameNoExtension: nameNoExtension, contentType: contentType)
   }
 
   public var multipart: MultipartPart? {
