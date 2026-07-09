@@ -496,11 +496,11 @@ extension Interaction {
       return nil
     }
 
-    var v2: Void? {
+    var v2: Bool {
       if case .v2 = self {
-        return ()
+        return true
       }
-      return nil
+      return false
     }
 
     public static func == (
@@ -531,14 +531,14 @@ extension Interaction {
     }
 
     case legacy([ActionRow])
-    case v2(Void)  // Placeholder for future v2 components
+    case v2  // Placeholder for future v2 components
 
     public init(from decoder: any Decoder) throws {
       var container = try decoder.unkeyedContainer()
       if let actionRows = try? container.decode([ActionRow].self) {
         self = .legacy(actionRows)
       } else {
-        self = .v2(())
+        self = .v2
       }
     }
 
