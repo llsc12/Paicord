@@ -15,6 +15,7 @@ import UInt128
 #endif
 
 #if os(Android)
+  import Android
   import Bionic
 #endif
 
@@ -367,7 +368,7 @@ public enum SuperProperties {
     return version
   }
 
-  #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS) || os(visionOS)
+  #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS) || os(visionOS) || os(Android)
     public static func kernel_version() -> String {
       var systemInfo = utsname()
       uname(&systemInfo)
