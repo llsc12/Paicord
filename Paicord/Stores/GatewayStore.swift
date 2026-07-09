@@ -167,6 +167,11 @@ final class GatewayStore {
 
   private var subscribedGuilds: Set<GuildSnowflake> = []
   private var guilds: [GuildSnowflake: GuildStore] = [:]
+
+  func existingGuildStore(for id: GuildSnowflake) -> GuildStore? {
+    guilds[id]
+  }
+
   func getGuildStore(for id: GuildSnowflake) -> GuildStore {
     defer {
       if !subscribedGuilds.contains(id) {

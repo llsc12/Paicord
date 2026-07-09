@@ -43,7 +43,15 @@ struct GuildButton: View {
         .padding(-2)
     } else {
       // either a guild or DMs
+      let badgeCount = guild.map(mentionCount) ?? 0
       guildButton(from: guild)
+        .reverseMask(alignment: .bottomTrailing) {
+          if badgeCount > 0 {
+            Circle()
+              .frame(width: 20, height: 20)
+              .offset(x: 2, y: 2)
+          }
+        }
         .onHover { isHovering = $0 }
         .overlay(alignment: .leading) {
           let height: CGFloat = {
@@ -65,6 +73,9 @@ struct GuildButton: View {
             .frame(height: height)
             .offset(x: -14 + (height == 0 ? -8 : 0))
             .animation(.default, value: height)
+        }
+        .overlay(alignment: .bottomTrailing) {
+          MentionCountBadge(count: badgeCount)
         }
     }
   }
@@ -89,6 +100,12 @@ struct GuildButton: View {
       }
     }
     @State var isHovering: Bool = false
+
+    var folderMentionCount: Int {
+      guilds.reduce(0) {
+        $0 + GuildButton.mentionCount($1, readStates: gw.readStates)
+      }
+    }
 
     init(
       id: Int64,
@@ -170,6 +187,13 @@ struct GuildButton: View {
           }
         }
         .buttonStyle(.borderless)
+        .reverseMask(alignment: .bottomTrailing) {
+          if !isExpanded, folderMentionCount > 0 {
+            Circle()
+              .frame(width: 20, height: 20)
+              .offset(x: 2, y: 2)
+          }
+        }
         .onHover { self.isHovering = $0 }
         .overlay(alignment: .leading) {
           let height: CGFloat = {
@@ -191,6 +215,11 @@ struct GuildButton: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .offset(x: -12 + (height == 0 ? -8 : 0))
             .animation(.default, value: height)
+        }
+        .overlay(alignment: .bottomTrailing) {
+          if !isExpanded {
+            MentionCountBadge(count: folderMentionCount)
+          }
         }
 
         if isExpanded {
@@ -393,6 +422,20 @@ struct GuildButton: View {
         channelId: channel.id,
         lastMessageId: channel.last_message_id
       )
+    }
+  }
+
+  func mentionCount(_ guild: Guild) -> Int {
+    GuildButton.mentionCount(guild, readStates: gw.readStates)
+  }
+
+  static func mentionCount(_ guild: Guild, readStates: ReadStateStore) -> Int {
+    (guild.channels ?? []).reduce(0) { partial, channel in
+      guard channel.type == .guildText || channel.type == .guildAnnouncement
+      else {
+        return partial
+      }
+      return partial + readStates.mentionCount(channelId: channel.id)
     }
   }
 }

@@ -20,6 +20,10 @@ struct ChannelButton: View {
     gw.readStates.isUnread(channelId: channel.id, lastMessageId: channel.last_message_id)
   }
 
+  var mentionCount: Int {
+    gw.readStates.mentionCount(channelId: channel.id)
+  }
+
   var body: some View {
     // switch channel type
     let selected = appState.selectedChannel == channel.id
@@ -159,6 +163,10 @@ struct ChannelButton: View {
           Image(systemName: "number")
             .imageScale(.medium)
           Text(channel.name ?? "unknown")
+          if mentionCount > 0 {
+            Spacer(minLength: 4)
+            MentionCountBadge(count: mentionCount)
+          }
         }
         .foregroundStyle(isUnread || selected ? .primary : .secondary)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -180,6 +188,10 @@ struct ChannelButton: View {
           Image(systemName: "megaphone.fill")
             .imageScale(.medium)
           Text(channel.name ?? "unknown")
+          if mentionCount > 0 {
+            Spacer(minLength: 4)
+            MentionCountBadge(count: mentionCount)
+          }
         }
         .foregroundStyle(isUnread || selected ? .primary : .secondary)
         .frame(maxWidth: .infinity, alignment: .leading)
