@@ -47,17 +47,29 @@ public struct DiscordUser: Sendable, Codable, Equatable, Hashable {
   }
 
   /// https://discord.com/developers/docs/resources/user#user-object-premium-types
-  @UnstableEnum<Int>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<Int64>
+  #else
+    @UnstableEnum<Int>
+  #endif
   public enum PremiumKind: Sendable, Codable {
     case none  // 0
     case nitroClassic  // 1
     case nitro  // 2
     case nitroBasic  // 3
-    case __undocumented(Int)
+    #if Non64BitSystemsCompatibility
+      case __undocumented(Int64)
+    #else
+      case __undocumented(Int)
+    #endif
   }
 
   /// https://discord.com/developers/docs/resources/user#user-object-user-flags
-  @UnstableEnum<UInt>
+  #if Non64BitSystemsCompatibility
+    @UnstableEnum<UInt64>
+  #else
+    @UnstableEnum<UInt>
+  #endif
   public enum Flag: Sendable {
     case staff  // 0
     case partner  // 1
@@ -74,7 +86,12 @@ public struct DiscordUser: Sendable, Codable, Equatable, Hashable {
     case certifiedModerator  // 18
     case botHttpInteractions  // 19
     case activeDeveloper  // 22
-    case __undocumented(UInt)
+
+    #if Non64BitSystemsCompatibility
+      case __undocumented(UInt64)
+    #else
+      case __undocumented(UInt)
+    #endif
   }
 
   /// https://discord.com/developers/docs/resources/user#avatar-decoration-data-object
@@ -178,17 +195,26 @@ public struct DiscordUser: Sendable, Codable, Equatable, Hashable {
     public var premium_type: PremiumKind?
     public var premium_since: DiscordTimestamp?
     public var premium_guild_since: DiscordTimestamp?
+    public var `private`: Bool?
 
     public init(
-      application: ProfileApplication? = nil, user: PartialUser, user_profile: Metadata? = nil,
-      badges: [Badge]? = nil, guild_member: Guild.Member? = nil,
-      guild_member_profile: Metadata? = nil, guild_badges: [Badge]? = nil,
-      legacy_username: String? = nil, mutual_guilds: [MutualGuild]? = nil,
-      mutual_friends: [PartialUser]? = nil, mutual_friends_count: Int? = nil,
+      application: ProfileApplication? = nil,
+      user: PartialUser,
+      user_profile: Metadata? = nil,
+      badges: [Badge]? = nil,
+      guild_member: Guild.Member? = nil,
+      guild_member_profile: Metadata? = nil,
+      guild_badges: [Badge]? = nil,
+      legacy_username: String? = nil,
+      mutual_guilds: [MutualGuild]? = nil,
+      mutual_friends: [PartialUser]? = nil,
+      mutual_friends_count: Int? = nil,
       connected_accounts: [PartialConnection]? = nil,
       application_role_connections: [ApplicationRoleConnection]? = nil,
-      premium_type: PremiumKind? = nil, premium_since: DiscordTimestamp? = nil,
-      premium_guild_since: DiscordTimestamp? = nil
+      premium_type: PremiumKind? = nil,
+      premium_since: DiscordTimestamp? = nil,
+      premium_guild_since: DiscordTimestamp? = nil,
+      private: Bool? = nil
     ) {
       self.application = application
       self.user = user
@@ -206,6 +232,7 @@ public struct DiscordUser: Sendable, Codable, Equatable, Hashable {
       self.premium_type = premium_type
       self.premium_since = premium_since
       self.premium_guild_since = premium_guild_since
+      self.private = `private`
     }
 
     /// https://docs.discord.food/resources/user#profile-application-structure
@@ -227,9 +254,13 @@ public struct DiscordUser: Sendable, Codable, Equatable, Hashable {
       public var profile_effect: Effect?
 
       public init(
-        guild_id: GuildSnowflake? = nil, pronouns: String? = nil, bio: String? = nil,
-        banner: String? = nil, accent_color: DiscordColor? = nil,
-        theme_colors: [DiscordColor]? = nil, profile_effect: Effect? = nil
+        guild_id: GuildSnowflake? = nil,
+        pronouns: String? = nil,
+        bio: String? = nil,
+        banner: String? = nil,
+        accent_color: DiscordColor? = nil,
+        theme_colors: [DiscordColor]? = nil,
+        profile_effect: Effect? = nil
       ) {
         self.guild_id = guild_id
         self.pronouns = pronouns
@@ -243,11 +274,11 @@ public struct DiscordUser: Sendable, Codable, Equatable, Hashable {
 
     /// https://docs.discord.food/resources/user#profile-effect-structure
     public struct Effect: Sendable, Codable, Equatable, Hashable {
-      public var id: AnySnowflake
+      public var sku_id: SKUSnowflake
       public var expires_at: DiscordTimestamp?
 
-      public init(id: AnySnowflake, expires_at: DiscordTimestamp? = nil) {
-        self.id = id
+      public init(sku_id: SKUSnowflake, expires_at: DiscordTimestamp? = nil) {
+        self.sku_id = sku_id
         self.expires_at = expires_at
       }
     }
@@ -259,7 +290,12 @@ public struct DiscordUser: Sendable, Codable, Equatable, Hashable {
       public var icon: String
       public var link: String?
 
-      public init(id: AnySnowflake, description: String, icon: String, link: String? = nil) {
+      public init(
+        id: AnySnowflake,
+        description: String,
+        icon: String,
+        link: String? = nil
+      ) {
         self.id = id
         self.description = description
         self.icon = icon
@@ -402,8 +438,11 @@ extension DiscordUser {
     /// E.g.: `case epicGames`'s value should be just `epicgames` like in the docs?
     @UnstableEnum<String>
     public enum Service: Sendable, Codable {
+      case amazonMusic  // "Amazon Music"
       case battleNet  // "Battle.net"
       case bungie  // "Bungie.net"
+      case bluesky  // "Bluesky"
+      case crunchyroll  // "Crunchyroll"
       case domain  // Domain
       case ebay  // "eBay"
       case epicGames  // "Epic Games"
@@ -411,10 +450,12 @@ extension DiscordUser {
       case github  // "GitHub"
       case instagram  // "Instagram"
       case leagueOfLegends  // "League of Legends"
+      case mastodon  // "Mastodon"
       case paypal  // "PayPal"
       case playstation  // "PlayStation Network"
       case reddit  // "Reddit"
       case riotGames  // "Riot Games"
+      case roblox  // "Roblox"
       case spotify  // "Spotify"
       case skype  // "Skype"
       case steam  // "Steam"
@@ -427,15 +468,23 @@ extension DiscordUser {
     }
 
     /// https://discord.com/developers/docs/resources/user#connection-object-visibility-types
-    @UnstableEnum<Int>
+    #if Non64BitSystemsCompatibility
+      @UnstableEnum<Int64>
+    #else
+      @UnstableEnum<Int>
+    #endif
     public enum VisibilityKind: Sendable, Codable {
       case none  // 0
       case everyone  // 1
-      case __undocumented(Int)
+      #if Non64BitSystemsCompatibility
+        case __undocumented(Int64)
+      #else
+        case __undocumented(Int)
+      #endif
     }
 
     public var id: String
-    public var name: String
+    public var name: String?
     public var type: Service
     public var revoked: Bool?
     public var integrations: [PartialIntegration]?
@@ -449,7 +498,7 @@ extension DiscordUser {
   /// https://docs.discord.food/resources/connected-accounts#partial-connection-structure
   public struct PartialConnection: Sendable, Codable, Equatable, Hashable {
     public var id: String
-    public var name: String
+    public var name: String?
     public var type: Connection.Service
     public var verified: Bool
   }

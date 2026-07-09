@@ -1,5 +1,6 @@
-@testable import PaicordLib
 import XCTest
+
+@testable import PaicordLib
 
 class SnowflakeTests: XCTestCase {
   let messageSnowflake: MessageSnowflake = "1030118727418646629"
@@ -145,17 +146,17 @@ class SnowflakeTests: XCTestCase {
 
     _ = try SnowflakeInfo(timestamp: 0, workerId: 0, processId: 0, sequenceNumber: .min)
   }
-  
+
   func testMemberListIDSnowflakes() throws {
     let memberListSnowflake: MemberListSnowflake = .init("3991716185")
     let everyoneListSnowflake: MemberListSnowflake = .init("everyone")
     print(memberListSnowflake, everyoneListSnowflake)
   }
-  
+
   func testMurmurHash() {
     let testString = "Hello, World!"
     let hash = murmurhash32(key: testString)
     print("\(testString) -> \(hash)")
-    XCTAssertEqual(hash, 592631239)
+    XCTAssertEqual(hash, 592_631_239)
   }
 }

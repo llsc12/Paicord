@@ -39,7 +39,7 @@ public struct Emoji: Sendable, Codable, Equatable, Hashable {
 
 /// A reaction emoji.
 public struct Reaction: Sendable, Codable, Hashable {
-  
+
   private enum Base: Sendable, Codable, Hashable {
     case unicodeEmoji(String)
     case guildEmoji(name: String?, id: EmojiSnowflake)

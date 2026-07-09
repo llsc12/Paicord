@@ -190,7 +190,7 @@ public struct Gateway: Sendable, Codable {
 
       case updateGuildSubscriptions(UpdateGuildSubscriptions)
       case guildMemberListUpdate(GuildMemberListUpdate)
-        case guildJoinRequestUpdate(GuildJoinRequestUpdate)
+      case guildJoinRequestUpdate(GuildJoinRequestUpdate)
 
       //			case guildPowerupEntitlementsCreate // TODO
       //			case guildPowerupEntitlementsDelete // TODO

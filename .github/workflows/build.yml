@@ -26,6 +26,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: 'true'
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Certificates
         uses: apple-actions/import-codesign-certs@v5
@@ -70,6 +72,13 @@ jobs:
           key: deriveddata-macos-${{ hashFiles('.github/workflows/build.yml') }}
           restore-keys: |
             deriveddata-macos
+
+      - name: Force Git to use HTTPS
+        run: |
+          # rewrite any git@github.com:... clones to https://github.com/...
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+          # optional: debug the rule
+          git config --get-regexp '^url\.' || true
 
       - name: Build macOS .app
         run: |
@@ -176,6 +185,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: 'true'
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Disable Swift macro plugin consent prompt
         run: |
@@ -223,6 +234,13 @@ jobs:
           key: deriveddata-ios-${{ hashFiles('.github/workflows/build.yml') }}
           restore-keys: |
             deriveddata-ios
+
+      - name: Force Git to use HTTPS
+        run: |
+          # rewrite any git@github.com:... clones to https://github.com/...
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+          # optional: debug the rule
+          git config --get-regexp '^url\.' || true
 
       - name: Build iOS .ipa
         run: |

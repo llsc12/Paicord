@@ -18,6 +18,10 @@ import UInt128
   import Bionic
 #endif
 
+#if canImport(WatchKit)
+  import WatchKit
+#endif
+
 // Discord clients send a horrific header containing your host machine information,
 // this is used for anti-abuse systems. It is sent at IDENTIFY in gateway and with all API requests as
 // the `X-Super-Properties` header. This extension adds the extra data. The definition only has initializer
@@ -141,6 +145,7 @@ public enum SuperProperties {
 
   public enum ContextPropertyContext {
     case createMessage
+    case createDM
   }
   public static func GenerateContextPropertiesHeader(
     context: ContextPropertyContext
@@ -148,6 +153,7 @@ public enum SuperProperties {
     let dict: [String: Any] =
       switch context {
       case .createMessage: ["location": "chat_input"]
+      case .createDM: [:]
       }
     let data = try! JSONSerialization.data(withJSONObject: dict, options: [])
     return data.base64EncodedString()
@@ -200,6 +206,10 @@ public enum SuperProperties {
 
   public static func chromeVer() -> String {
     "138.0.7204.251"
+  }
+
+  public static func chromeMajorVer() -> String {
+    chromeVer().split(separator: ".").first.map(String.init) ?? "138"
   }
 
   public static func webkitVer() -> String {
@@ -321,20 +331,20 @@ public enum SuperProperties {
   public static func client_version() -> String {
     switch Gateway.Identify.ConnectionProperties.__defaultOS {
     case "iOS", "watchOS":
-      return "310.3"
+      return "323.0"
     case "Mac OS X":
-      return "0.0.372"
+      return "0.0.384"
     default:
-      return "0.0.372"
+      return "0.0.384"
     }
   }
 
   public static func client_build_number() -> Int? {
     switch Gateway.Identify.ConnectionProperties.__defaultOS {
     case "iOS", "watchOS":
-      return 91102
+      return 98117
     case "Mac OS X":
-      return 485097
+      return 526941
     default:
       return nil
     }
@@ -348,10 +358,8 @@ public enum SuperProperties {
     #if os(macOS)
       return _launch_signature.uuidString.lowercased()
     #elseif os(iOS) || os(watchOS)
-      // TODO: ios follows a different format, using an integer. not sure how this is generated yet.
-      // for now, i was told its safe to use macos one instead.
-      //    return nil
-      return _launch_signature.uuidString.lowercased()
+      // discord's iOS client stubbed this with the current date in nanoseconds.
+      return String(Int64(Date.now.timeIntervalSince1970 * 1_000_000_000))
     #else
       return nil
     #endif
@@ -401,9 +409,16 @@ public enum SuperProperties {
   }
 
   public static func device_vendor_id() -> String? {
-    #if os(iOS) || os(watchOS)
+    #if os(iOS)
       DispatchQueue.main.sync {
         if let uuid = UIDevice.current.identifierForVendor {
+          return uuid.uuidString.uppercased()
+        }
+        return UUID().uuidString.uppercased()  // fallback
+      }
+    #elseif os(watchOS)
+      DispatchQueue.main.sync {
+        if let uuid = WKInterfaceDevice.current().identifierForVendor {
           return uuid.uuidString.uppercased()
         }
         return UUID().uuidString.uppercased()  // fallback

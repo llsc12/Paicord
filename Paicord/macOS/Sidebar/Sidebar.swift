@@ -30,25 +30,6 @@ struct SidebarView: View {
   @ViewBuilder
   var guildScroller: some View {
     GuildScrollBar()
-      .scrollIndicators(.hidden)
-      .scrollviewForceDisableScrollBars()
-  }
-}
-
-extension View {
-  fileprivate func scrollviewForceDisableScrollBars() -> some View {
-    #if os(macOS)
-      self
-        .introspect(.scrollView, on: .macOS(.v14...)) { scrollView in
-          scrollView.hasVerticalScroller = false
-          scrollView.hasHorizontalScroller = false
-          scrollView.scrollerStyle = .overlay
-          scrollView.autohidesScrollers = true
-          scrollView.verticalScroller?.alphaValue = 0
-          scrollView.horizontalScroller?.alphaValue = 0
-        }
-    #else
-      self
-    #endif
+      .scrollIndicators(.never)
   }
 }

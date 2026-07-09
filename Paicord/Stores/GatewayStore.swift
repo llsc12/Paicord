@@ -72,7 +72,11 @@ final class GatewayStore {
       token: account.token,
       captchaCallback: captchaCallback,
       mfaCallback: mfaCallback,
-      stateCallback: { [weak self] in self?.state = $0 }
+      stateCallback: { [weak self] state in
+        Task { @MainActor in
+          self?.state = state
+        }
+      }
     )
     setupEventHandling()
     await gateway?.connect()
@@ -112,6 +116,7 @@ final class GatewayStore {
     readStates.setGateway(self)
     presence.setGateway(self)
     messageDrain.setGateway(self)
+    switcher.setGateway(self)
 
     // Update existing channel stores
     for channelStore in channels.values {
@@ -125,18 +130,16 @@ final class GatewayStore {
   }
 
   func resetStores() {
-    user = CurrentUserStore()
-    settings = SettingsStore()
-    userGuildSettings = UserGuildSettingsStore()
-    readStates = ReadStateStore()
-    presence = PresenceStore()
-    messageDrain = MessageDrainStore()
+    user = .init()
+    settings = .init()
+    userGuildSettings = .init()
+    readStates = .init()
+    presence = .init()
+    messageDrain = .init()
+    switcher = .init()
     channels = [:]
     guilds = [:]
     subscribedGuilds = []
-    _ = PaicordAppState.instances.mapValues { appState in
-      appState.resetStore()
-    }
   }
 
   // MARK: - Data Stores
@@ -149,6 +152,7 @@ final class GatewayStore {
   let externalBadges = ExternalBadgeStore()
   var presence = PresenceStore()
   var messageDrain = MessageDrainStore()
+  var switcher = QuickSwitcherProviderStore()
 
   private var channels: [ChannelSnowflake: ChannelStore] = [:]
   func getChannelStore(for id: ChannelSnowflake, from guild: GuildStore? = nil)

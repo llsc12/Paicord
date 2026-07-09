@@ -62,18 +62,12 @@ struct PaicordApp: App {
         userDriverDelegate: nil
       )
     #endif
-
-    NSTextAttachment.registerViewProviderClass(
-      EmojiAttachmentViewProvider.self,
-      forFileType: "public.item"
-    )
   }
 
   #if canImport(Sparkle) && !DEBUG
     private let updaterController: SPUStandardUpdaterController
   #endif
 
-  @Environment(\.openWindow) var openWindow
   @Environment(\.theme) var theme
 
   var body: some Scene {
@@ -100,12 +94,6 @@ struct PaicordApp: App {
       #endif
       .commands {
         PaicordCommands()
-        CommandGroup(replacing: .appSettings) {
-          Button("Settings") {
-            openWindow(id: "settings")
-          }
-          .keyboardShortcut(",", modifiers: .command)
-        }
       }
     #endif
     .environment(\.challenges, challenges)

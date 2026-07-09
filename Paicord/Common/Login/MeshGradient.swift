@@ -38,7 +38,7 @@ extension LoginView {
     }
 
     // This methods prepares the grid model that will be sent to metal for rendering
-    func generatePlainGrid(size: Int = 6) -> Grid<ControlPoint> {
+    fileprivate func generatePlainGrid(size: Int = 6) -> MeshGrid {
       let preparationGrid = Grid<MeshColor>(
         repeating: .zero,
         width: size,

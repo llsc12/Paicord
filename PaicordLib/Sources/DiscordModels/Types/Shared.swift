@@ -281,22 +281,22 @@ public struct DiscordTimestamp: Codable, Hashable {
   public init(from decoder: any Decoder) throws {
     let container = try decoder.singleValueContainer()
     if let string = try? container.decode(String.self) {
-      
+
       let startIndex = string.startIndex
       func index(_ offset: Int) -> String.Index {
         string.index(startIndex, offsetBy: offset)
       }
-      
+
       let components: DateComponents
-      
+
       if string.count == 32 {
         guard let year = Int(string[startIndex...index(3)]),
-              let month = Int(string[index(5)...index(6)]),
-              let day = Int(string[index(8)...index(9)]),
-              let hour = Int(string[index(11)...index(12)]),
-              let minute = Int(string[index(14)...index(15)]),
-              let second = Int(string[index(17)...index(18)]),
-              let microSecond = Int(string[index(20)...index(25)])
+          let month = Int(string[index(5)...index(6)]),
+          let day = Int(string[index(8)...index(9)]),
+          let hour = Int(string[index(11)...index(12)]),
+          let minute = Int(string[index(14)...index(15)]),
+          let second = Int(string[index(17)...index(18)]),
+          let microSecond = Int(string[index(20)...index(25)])
         else {
           throw DecodingError.unexpectedFormat(container.codingPath, string)
         }
@@ -312,11 +312,11 @@ public struct DiscordTimestamp: Codable, Hashable {
         )
       } else if string.count == 25 {
         guard let year = Int(string[startIndex...index(3)]),
-              let month = Int(string[index(5)...index(6)]),
-              let day = Int(string[index(8)...index(9)]),
-              let hour = Int(string[index(11)...index(12)]),
-              let minute = Int(string[index(14)...index(15)]),
-              let second = Int(string[index(17)...index(18)])
+          let month = Int(string[index(5)...index(6)]),
+          let day = Int(string[index(8)...index(9)]),
+          let hour = Int(string[index(11)...index(12)]),
+          let minute = Int(string[index(14)...index(15)]),
+          let second = Int(string[index(17)...index(18)])
         else {
           throw DecodingError.unexpectedFormat(container.codingPath, string)
         }
@@ -851,18 +851,9 @@ extension DereferenceBox: Hashable where C: Hashable {
 //MARK: +Calendar
 
 extension Calendar {
-  #if compiler(>=5.10) && compiler(<6.0)
-    /// It's safe the way DiscordBM uses it.
-    nonisolated(unsafe) static let utc: Calendar = {
-      var calendar = Calendar(identifier: .gregorian)
-      calendar.timeZone = .init(identifier: "UTC")!
-      return calendar
-    }()
-  #else
-    static let utc: Calendar = {
-      var calendar = Calendar(identifier: .gregorian)
-      calendar.timeZone = .init(identifier: "UTC")!
-      return calendar
-    }()
-  #endif
+  static let utc: Calendar = {
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.timeZone = .init(identifier: "UTC")!
+    return calendar
+  }()
 }

@@ -55,8 +55,10 @@ struct RootView: View {
             LargeBaseplate()
           }
         }
+        .quickSwitcher()
         .sponsorSheet()
         .updateSheet()
+        .settingsSheet()
         .task {
           appState.loadPrevGuild()
           #if os(iOS)
@@ -66,9 +68,10 @@ struct RootView: View {
       }
     }
     .environment(\.appState, appState)
+    .focusedSceneValue(\.appState, appState)
     .navigationTitle(Text(verbatim: ""))
     .animation(.default, value: gatewayStore.state.hashValue)
-    .fontDesign(.rounded)
+//    .fontDesign(.rounded) // causes issues with markdown
     .modifier(
       PaicordSheetsAlerts(
         gatewayStore: gatewayStore,
@@ -77,12 +80,6 @@ struct RootView: View {
       )
     )
     .onAppear { setupGatewayCallbacks() }
-    .onAppear {
-      PaicordAppState.instances[appState.id] = appState
-    }
-    .onDisappear {
-      PaicordAppState.instances.removeValue(forKey: appState.id)
-    }
     #if os(macOS)
       .introspect(.window, on: .macOS(.v14...)) { window in
         self.window = window

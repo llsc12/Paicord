@@ -24,7 +24,7 @@ extension MessageCell {
         } label: {
           let guildstoremember =
             message.author != nil
-            ? guildStore?.members[message.author!.id] : nil
+            ? guildStore?.member(message.author!.id) : nil
           Profile.Avatar(
             member: guildstoremember ?? message.member,
             user: message.author?.toPartialUser()
@@ -37,7 +37,7 @@ extension MessageCell {
           if let userId = message.author?.id, let user = message.author {
             ProfilePopoutView(
               guild: guildStore,
-              member: guildStore?.members[userId] ?? message.member,
+              member: guildStore?.member(userId) ?? message.member,
               user: user.toPartialUser()
             )
           }
@@ -58,8 +58,8 @@ extension MessageCell {
           profileOpen = true
         } label: {
           if let guildStore, let userID = message.author?.id {
-            let member = guildStore.members[userID] ?? message.member
-            let color = member?.roles?.compactMap { guildStore.roles[$0] }
+            let member = guildStore.member(userID) ?? message.member
+            let color = member?.roles?.compactMap { guildStore.role($0) }
               .sorted(by: { $0.position > $1.position })
               .compactMap { $0.color.value != 0 ? $0.color : nil }
               .first?.asColor()

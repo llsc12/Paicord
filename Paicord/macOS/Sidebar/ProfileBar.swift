@@ -32,7 +32,7 @@ struct ProfileBar: View {
               member: nil,
               user: user
             )
-            .maxHeight(40)
+            .maxHeight(30)
             .profileAnimated(barHovered)
             .profileShowsAvatarDecoration()
           }
@@ -72,32 +72,33 @@ struct ProfileBar: View {
           .background(.black.opacity(0.001))
           .onHover { showingUsername = $0 }
           .animation(.spring(), value: showingUsername)
-        }
+          .frame(maxWidth: .infinity, alignment: .leading)
+        }.contentShape(.rect)
       }
       .buttonStyle(.plain)
       .popover(isPresented: $showingPopover) {
         ProfileButtonPopout()
       }
 
-      Spacer()
-
-      #if os(macOS)
-        Button {
-          openWindow(id: "settings")
-        } label: {
-          Image(systemName: "gearshape.fill")
-            .font(.title2)
-            .padding(5)
-            .background(.ultraThinMaterial)
-            .clipShape(.circle)
-        }
-        .buttonStyle(.borderless)
-      #elseif os(iOS)
-        /// targetting ipad here, ios wouldnt have this at all
-        // do something
-      #endif
+      Button {
+#if os(macOS)
+        openWindow(id: "settings")
+#elseif os(iOS)
+        NotificationCenter.default.post(
+          name: .presentSettingsSheet,
+          object: nil
+        )
+#endif
+      } label: {
+        Image(systemName: "gearshape.fill")
+          .font(.title2)
+          .padding(5)
+          .background(.ultraThinMaterial)
+          .clipShape(.circle)
+      }
+      .buttonStyle(.borderless)
     }
-    .padding(10)
+    .padding(8)
     .background {
       if let nameplate = gw.user.currentUser?.collectibles?.nameplate {
         Profile.NameplateView(nameplate: nameplate)

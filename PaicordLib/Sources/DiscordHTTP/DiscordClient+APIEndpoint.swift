@@ -2,12 +2,7 @@ import DiscordModels
 import Foundation
 import NIOHTTP1
 
-#if compiler(>=5.10)
-  /// It's safe the way DiscordBM uses it.
-  nonisolated(unsafe) private let iso8601DateFormatter = ISO8601DateFormatter()
-#else
-  private let iso8601DateFormatter = ISO8601DateFormatter()
-#endif
+nonisolated(unsafe) private let iso8601DateFormatter = ISO8601DateFormatter()
 
 /// MARK: - +APIEndpoint
 extension DiscordClient {
@@ -2017,6 +2012,18 @@ extension DiscordClient {
     )
   }
 
+  /// https://discord.com/developers/docs/resources/guild#get-user-voice-state
+  @inlinable
+  public func getVoiceState(
+    guildId: GuildSnowflake,
+    userId: UserSnowflake
+  ) async throws -> DiscordClientResponse<VoiceState> {
+    let endpoint = APIEndpoint.getVoiceState(guildId: guildId, userId: userId)
+    return try await self.send(
+      request: .init(to: endpoint)
+    )
+  }
+
   /// https://discord.com/developers/docs/resources/guild#modify-user-voice-state
   @inlinable
   public func updateVoiceState(
@@ -2718,8 +2725,16 @@ extension DiscordClient {
   ) async throws -> DiscordClientResponse<DiscordChannel> {
     let endpoint = APIEndpoint.createDm
     return try await self.send(
-      request: .init(to: endpoint),
-      payload: payload
+      request: .init(
+        to: endpoint,
+        headers: [
+          "X-Context-Properties":
+            SuperProperties.GenerateContextPropertiesHeader(
+              context: .createDM
+            )
+        ]
+      ),
+      payload: payload,
     )
   }
 

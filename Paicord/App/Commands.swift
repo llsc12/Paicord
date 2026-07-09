@@ -8,14 +8,52 @@
 
 import SwiftUI
 
-// TODO: Make more account related commands etc
-
 struct PaicordCommands: Commands {
   @Environment(\.gateway) var gatewayStore
-  @Environment(\.appState) var appState
+#if os(macOS)
+  @Environment(\.openWindow) var openWindow
+#endif
+  @FocusedValue(\.appState) var appState
 
   var body: some Commands {
+    CommandGroup(replacing: .appSettings) {
+      Button("Settings") {
+#if os(macOS)
+        openWindow(id: "settings")
+#elseif os(iOS)
+        NotificationCenter.default.post(
+          name: .presentSettingsSheet,
+          object: nil
+        )
+#endif
+      }
+      .keyboardShortcut(",", modifiers: .command)
+      .disabled(gatewayStore.state != .connected)
+    }
+
     CommandMenu("Account") {
+      Menu("Switch Account") {
+        ForEach(gatewayStore.accounts.accounts, id: \.id) { account in
+          Button(account.user.username) {
+            Task {
+              appState?.showingQuickSwitcher = false
+              gatewayStore.accounts.currentAccountID = nil
+              await gatewayStore.disconnectIfNeeded()
+              gatewayStore.resetStores()
+              PaicordAppState.instances.values.forEach { $0.resetStore() }
+              gatewayStore.accounts.currentAccountID = account.id
+            }
+          }
+          .disabled(
+            gatewayStore.accounts.currentAccountID == account.id
+          )
+        }
+      }
+      .disabled(
+        gatewayStore.accounts.accounts.count <= 1
+          || gatewayStore.state != .connected
+      )
+
       Button("Log Out") {
         Task {
           if let current = gatewayStore.accounts.currentAccount {
@@ -24,18 +62,28 @@ struct PaicordCommands: Commands {
           }
         }
       }
+      .disabled(
+        gatewayStore.accounts.currentAccountID == nil 
+      )
     }
     // add reload button to the system's View menu
     CommandGroup(after: .toolbar) {
       Button("Reload") {
+        appState?.showingQuickSwitcher = false
         Task {
           await gatewayStore.disconnectIfNeeded()
           gatewayStore.resetStores()
-          PaicordAppState.instances.values.forEach { $0.resetStore() }
+          //          PaicordAppState.instances.values.forEach { $0.resetStore() }
           await gatewayStore.connectIfNeeded()
         }
       }
       .keyboardShortcut("r", modifiers: [.command, .shift])
+      .disabled(gatewayStore.state != .connected)
+
+      Button("Quick Switcher") {
+        appState?.showingQuickSwitcher.toggle()
+      }
+      .keyboardShortcut("k", modifiers: [.command])
       .disabled(gatewayStore.state != .connected)
     }
   }

@@ -79,6 +79,11 @@ struct ProfilePopoutView: View {
       .overlay(.ultraThinMaterial)
     )
     .ignoresSafeArea(.container, edges: .bottom)
+    .overlay(alignment: .top) {
+      if (profile?.private == true) {
+        ProfileBannerView()
+      }
+    }
     .environment(\.colorScheme, colorScheme ?? systemColorScheme)
     #if os(iOS)
       .presentationBackground(.ultraThinMaterial)
@@ -187,7 +192,6 @@ struct ProfilePopoutView: View {
         : profileMeta?.bio ?? profile?.user_profile?.bio
       {
         MarkdownText(content: bio, channelStore: channel)
-          .equatable()
       }
     }
   }

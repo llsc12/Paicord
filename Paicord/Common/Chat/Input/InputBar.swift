@@ -492,7 +492,7 @@ extension ChatView {
               guard let author = message.author else {
                 return Text("Unknown User").bold()
               }
-              if let member = vm.guildStore?.members[author.id]
+              if let member = vm.guildStore?.member(author.id)
                 ?? message.member
               {
                 return Text(

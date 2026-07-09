@@ -156,7 +156,6 @@ struct ProfileView: View {
         : profileMeta?.bio ?? profile?.user_profile?.bio
       {
         MarkdownText(content: bio)
-          .equatable()
       }
     }
   }
