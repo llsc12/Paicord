@@ -109,7 +109,7 @@ class ReadStateStore: DiscordDataStore {
     if messageData.mention_everyone { return true }
     if messageData.mentions.contains(where: { $0.id == currentUserId }) { return true }
     if !messageData.mention_roles.isEmpty, let guildStore {
-      let myRoles = guildStore.members[currentUserId]?.roles ?? []
+      let myRoles = guildStore.member(currentUserId)?.roles ?? []
       if myRoles.contains(where: { messageData.mention_roles.contains($0) }) { return true }
     }
     return false
