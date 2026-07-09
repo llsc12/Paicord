@@ -84,6 +84,14 @@ class PresenceStore: DiscordDataStore {
       }) {
         self.currentClientStatusActivity = existingActivity
       }
+    } else if let userSettings = data.user_settings_proto, userSettings.hasStatus
+    {
+      let statusSettings = userSettings.status
+      if let status = statusSettings.gatewayStatus {
+        self.currentClientStatus = status
+      }
+      self.currentClientStatusActivity =
+        statusSettings.gatewayCustomStatusActivity()
     }
     // use stored presence if any to update our presence
     Task {
