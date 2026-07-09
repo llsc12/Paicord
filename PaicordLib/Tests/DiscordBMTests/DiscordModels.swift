@@ -31,6 +31,21 @@ class DiscordModelsTests: XCTestCase {
     XCTAssertNil(emptySettings.gatewayStatus)
   }
 
+  func testPreloadedUserSettingsStatusSettingsGatewayStatusExpiry() throws {
+    var statusSettings =
+      DiscordProtos_DiscordUsers_V1_PreloadedUserSettings.StatusSettings()
+    statusSettings.status.value = "dnd"
+    statusSettings.statusExpiresAtMs = 1
+
+    XCTAssertNil(statusSettings.gatewayStatus)
+
+    statusSettings.statusExpiresAtMs = UInt64(
+      Date().addingTimeInterval(60).timeIntervalSince1970 * 1_000
+    )
+
+    XCTAssertEqual(statusSettings.gatewayStatus, .doNotDisturb)
+  }
+
   func testPreloadedUserSettingsCustomStatusGatewayActivity() throws {
     var customStatus =
       DiscordProtos_DiscordUsers_V1_PreloadedUserSettings.CustomStatus()

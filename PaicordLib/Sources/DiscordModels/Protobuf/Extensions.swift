@@ -12,6 +12,7 @@ import Foundation
 extension DiscordProtos_DiscordUsers_V1_PreloadedUserSettings.StatusSettings {
   public var gatewayStatus: Gateway.Status? {
     guard hasStatus else { return nil }
+    guard !statusIsExpired() else { return nil }
 
     switch status.value {
     case "online":
@@ -59,6 +60,12 @@ extension DiscordProtos_DiscordUsers_V1_PreloadedUserSettings.StatusSettings {
     guard expiresAtMs != 0 else { return false }
     let nowMs = UInt64(now.timeIntervalSince1970 * 1_000)
     return expiresAtMs <= nowMs
+  }
+
+  private func statusIsExpired(now: Date = Date()) -> Bool {
+    guard statusExpiresAtMs != 0 else { return false }
+    let nowMs = UInt64(now.timeIntervalSince1970 * 1_000)
+    return statusExpiresAtMs <= nowMs
   }
 }
 
