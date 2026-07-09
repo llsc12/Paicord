@@ -62,7 +62,7 @@ let package = Package(
     .package(url: "https://github.com/jpsim/Yams.git", from: "5.0.5"),
     .package(
       url: "https://github.com/swiftlang/swift-syntax.git",
-      "509.0.0"..<"603.0.0"
+      "603.0.0"..<"604.0.0"
     ),
     .package(url: "https://github.com/facebook/zstd.git", from: "1.5.7"),
     .package(
