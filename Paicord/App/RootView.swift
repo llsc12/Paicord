@@ -59,6 +59,7 @@ struct RootView: View {
         .sponsorSheet()
         .updateSheet()
         .attachmentViewer()
+        .settingsSheet()
         .task {
           appState.loadPrevGuild()
           #if os(iOS)
@@ -71,7 +72,6 @@ struct RootView: View {
     .focusedSceneValue(\.appState, appState)
     .navigationTitle(Text(verbatim: ""))
     .animation(.default, value: gatewayStore.state.hashValue)
-    .fontDesign(.rounded)
     .modifier(
       PaicordSheetsAlerts(
         gatewayStore: gatewayStore,

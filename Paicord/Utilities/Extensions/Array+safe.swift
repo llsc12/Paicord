@@ -6,13 +6,14 @@
 //  Copyright © 2025 Lakhan Lothiyi.
 //
 
-import Collections
+import OrderedCollections
 
 extension OrderedDictionary.Elements {
   subscript(safe index: Int) -> Element? {
     (startIndex..<endIndex).contains(index) ? self[index] : nil
   }
 }
+
 extension Array {
   subscript(safe index: Index) -> Element? {
     indices.contains(index) ? self[index] : nil

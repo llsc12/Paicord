@@ -886,7 +886,7 @@ public struct DefaultDiscordClient: DiscordClient {
       headers.add(name: "Sec-CH-UA-Platform", value: "\"macOS\"")  // in speechmarks
       headers.add(
         name: "Sec-CH-UA",
-        value: "\"Not:A-Brand\";v=\"24\", \"Chromium\";v=\"134\"")  // in speechmarks
+        value: "\"Not)A;Brand\";v=\"8\", \"Chromium\";v=\"\(SuperProperties.chromeMajorVer())\"")  // in speechmarks
       /// dolfies says this being static is ok, though im thinking about login flows bc it'd have like https://discord.com/login as referer
       headers.add(name: "Referer", value: "https://discord.com/channels/@me")
       headers.add(name: "Origin", value: "https://discord.com")

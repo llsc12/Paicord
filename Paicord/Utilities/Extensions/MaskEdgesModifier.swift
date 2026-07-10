@@ -92,7 +92,7 @@ public struct ScrollFadeMask<Content: View>: View {
               // report via preference
               let frame = gp.frame(in: .named(spaceName))
               DispatchQueue.main.async {
-                // We update state on main thread to ensure smooth UI updates
+                // update state on main thread to ensure smooth UI updates
                 self.contentFrame = frame
               }
               return Color.clear
@@ -101,6 +101,8 @@ public struct ScrollFadeMask<Content: View>: View {
       }
       .padding(.zero)
     }
+    // macos 26/27 bug workaround
+    .padding(.top, 1)
     .coordinateSpace(name: spaceName)
     .background(
       GeometryReader { gp -> Color in

@@ -6,7 +6,7 @@ A  native Discord client written in Swift using SwiftUI, with a goal of feature 
 
 > [!NOTE]
 >
-> Paicord is still in development! Expect a number of issues or unimplemented features. If you encounter a bug, please create an issue! There was previously a note about MFA support, however MFA has been updated to support SMS and backup codes in addition to the already existing TOTP support, alongside QR Code logins.
+> Paicord is still in development! Expect a number of issues or unimplemented features. If you encounter a bug, please create an issue!
 
 <img width="371" height="298" alt="screenshot of Paicord" src="https://github.com/user-attachments/assets/d6b73ecb-c008-412e-9715-5817954f93f2" />
 
@@ -25,11 +25,11 @@ We have subprojects in the works to port the client to other platforms natively 
 
 ## Installing
 
-There nightly releases of Paicord built from source when source successfully compiles.
+These downloads are nightly releases of Paicord, built from source.
 
-| iOS (17.0+)                                                  | macOS (14.0+)                                                |
-| ------------------------------------------------------------ | ------------------------------------------------------------ |
-| [Download iOS Artifact](https://nightly.link/llsc12/Paicord/workflows/build/main/Paicord-iOS) | [Download macOS Artifact](https://nightly.link/llsc12/Paicord/workflows/build/main/Paicord-macOS) |
+| iOS (17.0+)                                                  | macOS (14.0+)                                                | Linux |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| [Download iOS Artifact](https://nightly.link/llsc12/Paicord/workflows/build/main/Paicord-iOS) | [Download macOS Artifact](https://nightly.link/llsc12/Paicord/workflows/build/main/Paicord-macOS) | TBA |
 
 
 ## Sponsoring
@@ -39,17 +39,17 @@ If you've enjoyed using Paicord, I would apprecate a [sponsor](https://github.co
 [![Github-sponsors](https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#EA4AAA)](https://github.com/sponsors/llsc12)
 ## Star History
 
-<a href="https://www.star-history.com/#llsc12/Paicord&type=date&legend=top-left">
+<a href="https://www.star-history.com/?repos=llsc12%2Fpaicord&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=llsc12/Paicord&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=llsc12/Paicord&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=llsc12/Paicord&type=date&legend=top-left" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=llsc12/paicord&type=date&theme=dark&legend=top-left&sealed_token=5D01_R-EeDxO5XXBNqQrIXBQM5yB66HmS-rl78xyyHv39Vx67iUbxaR0p649moIaIJQoPeaTV13Ole6JxpmtJ78_oLemoOto3ww2_2AxTu5VyRCtptN0qNJvNaTKNPtednFDJXmmbPHC1A5CUrTV43kuXsvc3NbEOuPG37MpDyq1w68HWBDe6B1IOATo" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=llsc12/paicord&type=date&legend=top-left&sealed_token=5D01_R-EeDxO5XXBNqQrIXBQM5yB66HmS-rl78xyyHv39Vx67iUbxaR0p649moIaIJQoPeaTV13Ole6JxpmtJ78_oLemoOto3ww2_2AxTu5VyRCtptN0qNJvNaTKNPtednFDJXmmbPHC1A5CUrTV43kuXsvc3NbEOuPG37MpDyq1w68HWBDe6B1IOATo" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=llsc12/paicord&type=date&legend=top-left&sealed_token=5D01_R-EeDxO5XXBNqQrIXBQM5yB66HmS-rl78xyyHv39Vx67iUbxaR0p649moIaIJQoPeaTV13Ole6JxpmtJ78_oLemoOto3ww2_2AxTu5VyRCtptN0qNJvNaTKNPtednFDJXmmbPHC1A5CUrTV43kuXsvc3NbEOuPG37MpDyq1w68HWBDe6B1IOATo" />
  </picture>
 </a>
 
 ## References
 
-Paicord uses modified versions of [DiscordBM](https://github.com/DiscordBM/DiscordBM) and [SwiftMarkdownParser](https://github.com/sciasxp/SwiftMarkdownParser). These other references are mentioned since I read their code to learn from others.
+Paicord uses modified versions of [DiscordBM](https://github.com/DiscordBM/DiscordBM) and [Textual](https://github.com/gonzalezreal/textual). These other references are mentioned since I read their code to learn from others.
 
 - [Accord](https://github.com/tealbathingsuit/accord)
 - [Swiftcord](https://github.com/SwiftcordApp/Swiftcord)

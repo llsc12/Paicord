@@ -161,7 +161,6 @@ extension MessageCell {
 
                 if let desc = embed.description {
                   MarkdownText(content: desc, channelStore: channelStore)
-                    .equatable()
                 }
               }
               .padding(.trailing, embed.thumbnail == nil ? 40 : 0)
@@ -192,7 +191,7 @@ extension MessageCell {
                           .font(.headline)
                           .fontWeight(.semibold)
                         MarkdownText(content: field.value)
-                          .equatable()
+                          .fixedSize(horizontal: false, vertical: true)
                       }
                     }
                   }
@@ -204,7 +203,7 @@ extension MessageCell {
                       .font(.headline)
                       .fontWeight(.semibold)
                     MarkdownText(content: field.value)
-                      .equatable()
+                      .fixedSize(horizontal: false, vertical: true)
                   }
                 }
               }

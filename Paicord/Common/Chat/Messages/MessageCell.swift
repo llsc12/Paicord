@@ -53,11 +53,7 @@ struct MessageCell: View {
       return true
     }
 
-    guard let member = channelStore.guildStore?.members[currentUserID] else {
-      return false
-    }
-
-    let userRoles = Set(member.roles ?? [])
+    let userRoles = channelStore.guildStore?.member(currentUserID)?.roles ?? []
     for roleID in message.mention_roles {
       if userRoles.contains(roleID) { return true }
     }
@@ -71,6 +67,7 @@ struct MessageCell: View {
         priorMessage?.timestamp.date ?? .distantPast
       ) < 300 && message.referenced_message == nil
       && message.type == .default
+      && priorMessage?.type != .guildMemberJoin
 
     Group {
       // Content
@@ -84,6 +81,9 @@ struct MessageCell: View {
         .equatable()
       case .chatInputCommand:
         ChatInputCommandMessage(message: message, channelStore: channelStore)
+          .equatable()
+      case .guildMemberJoin:
+        GuildMemberJoinMessage(message: message, channelStore: channelStore)
           .equatable()
       default:
         HStack {

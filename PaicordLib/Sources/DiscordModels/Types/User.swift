@@ -195,6 +195,7 @@ public struct DiscordUser: Sendable, Codable, Equatable, Hashable {
     public var premium_type: PremiumKind?
     public var premium_since: DiscordTimestamp?
     public var premium_guild_since: DiscordTimestamp?
+    public var `private`: Bool?
 
     public init(
       application: ProfileApplication? = nil,
@@ -212,7 +213,8 @@ public struct DiscordUser: Sendable, Codable, Equatable, Hashable {
       application_role_connections: [ApplicationRoleConnection]? = nil,
       premium_type: PremiumKind? = nil,
       premium_since: DiscordTimestamp? = nil,
-      premium_guild_since: DiscordTimestamp? = nil
+      premium_guild_since: DiscordTimestamp? = nil,
+      private: Bool? = nil
     ) {
       self.application = application
       self.user = user
@@ -230,6 +232,7 @@ public struct DiscordUser: Sendable, Codable, Equatable, Hashable {
       self.premium_type = premium_type
       self.premium_since = premium_since
       self.premium_guild_since = premium_guild_since
+      self.private = `private`
     }
 
     /// https://docs.discord.food/resources/user#profile-application-structure
@@ -271,11 +274,11 @@ public struct DiscordUser: Sendable, Codable, Equatable, Hashable {
 
     /// https://docs.discord.food/resources/user#profile-effect-structure
     public struct Effect: Sendable, Codable, Equatable, Hashable {
-      public var id: AnySnowflake
+      public var sku_id: SKUSnowflake
       public var expires_at: DiscordTimestamp?
 
-      public init(id: AnySnowflake, expires_at: DiscordTimestamp? = nil) {
-        self.id = id
+      public init(sku_id: SKUSnowflake, expires_at: DiscordTimestamp? = nil) {
+        self.sku_id = sku_id
         self.expires_at = expires_at
       }
     }
@@ -481,7 +484,7 @@ extension DiscordUser {
     }
 
     public var id: String
-    public var name: String
+    public var name: String?
     public var type: Service
     public var revoked: Bool?
     public var integrations: [PartialIntegration]?
@@ -495,7 +498,7 @@ extension DiscordUser {
   /// https://docs.discord.food/resources/connected-accounts#partial-connection-structure
   public struct PartialConnection: Sendable, Codable, Equatable, Hashable {
     public var id: String
-    public var name: String
+    public var name: String?
     public var type: Connection.Service
     public var verified: Bool
   }

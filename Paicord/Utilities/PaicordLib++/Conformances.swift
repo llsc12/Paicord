@@ -14,8 +14,6 @@ extension DiscordProtos_DiscordUsers_V1_PreloadedUserSettings.GuildFolder:
   @retroactive Identifiable
 {}
 
-extension Guild: @retroactive Identifiable {}
-
 extension DiscordChannel: @retroactive Identifiable {}
 
 extension Snowflake: @retroactive Identifiable {

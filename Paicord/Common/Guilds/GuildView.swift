@@ -67,6 +67,8 @@ struct GuildView: View {
         .padding(.vertical, 4)
       }
     }
+    // macos 26/27 bug workaround
+    .padding(.top, 1)
     .frame(maxWidth: .infinity)
     .background(theme.common.secondaryBackground.opacity(0.5))
     .roundedCorners(radius: 10, corners: .topLeft)

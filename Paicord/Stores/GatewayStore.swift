@@ -72,7 +72,11 @@ final class GatewayStore {
       token: account.token,
       captchaCallback: captchaCallback,
       mfaCallback: mfaCallback,
-      stateCallback: { [weak self] in self?.state = $0 }
+      stateCallback: { [weak self] state in
+        Task { @MainActor in
+          self?.state = state
+        }
+      }
     )
     setupEventHandling()
     await gateway?.connect()
