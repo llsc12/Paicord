@@ -43,6 +43,10 @@ struct MarkdownText: View {
 
   private var guildStore: GuildStore? { channelStore?.guildStore }
 
+  private var isJumboEmoji: Bool {
+    allowsJumboEmoji && DiscordMarkdown.isEmojiOnlyContent(content)
+  }
+
   var body: some View {
     StructuredText(
       content,
@@ -53,10 +57,7 @@ struct MarkdownText: View {
     .textual.structuredTextStyle(.discord)
     .textual.highlighterTheme(highlighterTheme)
     .textual.codeBlockStyle(PaicordCodeBlockStyle())
-    .textual.emojiProperties(
-      allowsJumboEmoji && DiscordMarkdown.isEmojiOnlyContent(content)
-        ? .discordJumbo : .discordStandard
-    )
+    .textual.emojiProperties(isJumboEmoji ? .discordJumbo : .discordStandard)
     .textual.roundedBackgroundStyle(RoundedBackgroundStyle(cornerRadius: 4, padding: 1))
     .textual.textSelection(.enabled)
     .foregroundStyle(foregroundColorOverride ?? theme.markdown.text)
@@ -146,9 +147,11 @@ struct MarkdownText: View {
       theme: theme
     )
     extensions.append(
-      .discordEmoji { id, animated in
+      .discordEmoji(jumbo: isJumboEmoji) { id, animated, jumbo in
+        // apparently using gif files is unreliable now. discord cdn amazing fr
         let base = CDNEndpoint.customEmoji(emojiId: EmojiSnowflake(id)).url
-        return URL(string: base + (animated ? ".gif" : ".png") + "?size=44")!
+        let size = jumbo ? 96 : 44
+        return URL(string: base + ".webp?size=\(size)&animated=\(animated)")!
       }
     )
     extensions.append(.discordTimestamps)

@@ -15,20 +15,21 @@ import SwiftUI
 extension EmojiProperties {
   /// The standard inline emoji size Discord uses inside ordinary text.
   public static var discordStandard: Self {
-    .init()
+    .init(
+      size: .fontScaled(width: 1.4, height: 1.4),
+      baselineOffset: .fontScaled(-0.2)
+    )
   }
 
   /// Discord's larger "jumbo" emoji size, used when a message consists only of emoji.
   ///
   /// Scales relative to the current font (roughly double the standard inline size) so it stays
-  /// proportionate across Dynamic Type sizes and custom fonts, but never resolves smaller than
-  /// Discord's own fixed 44x44 — matching Discord's own app at typical/small text sizes, while
-  /// still growing further at larger Dynamic Type sizes instead of staying pinned at 44x44.
+  /// proportionate across Dynamic Type sizes and custom fonts.
   public static var discordJumbo: Self {
     .init(
-      size: .fontScaled(width: 2, height: 2),
-      baselineOffset: .fontScaled(-0.2),
-      minimumSize: CGSize(width: 44, height: 44)
+      size: .fontScaled(width: 3, height: 3),
+      baselineOffset: .fontScaled(-0.2)
+//      minimumSize: CGSize(width: 44, height: 44)
     )
   }
 }
