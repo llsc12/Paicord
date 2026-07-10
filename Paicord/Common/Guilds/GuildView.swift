@@ -19,9 +19,15 @@ struct GuildView: View {
       VStack(spacing: 0) {
         Utils.GuildBannerURL(guild: guild, animated: true) { bannerURL in
           if let bannerURL {
-            AnimatedImage(url: bannerURL)
-              .resizable()
-              .aspectRatio(16 / 9, contentMode: .fill)
+            Color.clear
+              .aspectRatio(16 / 9, contentMode: .fit)
+              .overlay(
+                AnimatedImage(url: bannerURL)
+                  .resizable()
+                  .scaledToFill()
+              )
+              .frame(maxWidth: .infinity)
+              .clipped()
           }
         }
 
@@ -46,7 +52,6 @@ struct GuildView: View {
         // also, while sorting ($0.position ?? 0) < ($1.position ?? 0), sort channels to the top and categories to the bottom
         let uncategorizedChannels = guild.channels.values
           .filter { $0.parent_id == nil }
-          //          .sorted { ($0.position ?? 0) < ($1.position ?? 0) }
           .sorted { lhs, rhs in
             let lhsIsCategory = lhs.type == .guildCategory
             let rhsIsCategory = rhs.type == .guildCategory

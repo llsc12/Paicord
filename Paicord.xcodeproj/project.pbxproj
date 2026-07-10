@@ -10,6 +10,7 @@
 		571AE5B12FFD7726006D609C /* ObservableBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 571AE5B02FFD7726006D609C /* ObservableBox.swift */; };
 		5724CD6F2E733D0E00931FEF /* MFASheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5724CD6E2E733D0900931FEF /* MFASheet.swift */; };
 		572B694C2E7079FB00BCED00 /* PaicordLib in Frameworks */ = {isa = PBXBuildFile; productRef = 572B694B2E7079FB00BCED00 /* PaicordLib */; };
+		575DA6A030006C3D00CBA394 /* MentionCountBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 575DA69F30006C3D00CBA394 /* MentionCountBadge.swift */; };
 		5783AA902E6B8F6500F73F6D /* MeshGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 5783AA8F2E6B8F6500F73F6D /* MeshGradient */; };
 		5783AA922E6B8F6500F73F6D /* MeshGradientCHeaders in Frameworks */ = {isa = PBXBuildFile; productRef = 5783AA912E6B8F6500F73F6D /* MeshGradientCHeaders */; };
 		5783AA942E6B8FD100F73F6D /* MeshGradient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5783AA932E6B8FCD00F73F6D /* MeshGradient.swift */; };
@@ -169,6 +170,7 @@
 /* Begin PBXFileReference section */
 		571AE5B02FFD7726006D609C /* ObservableBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservableBox.swift; sourceTree = "<group>"; };
 		5724CD6E2E733D0900931FEF /* MFASheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MFASheet.swift; sourceTree = "<group>"; };
+		575DA69F30006C3D00CBA394 /* MentionCountBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentionCountBadge.swift; sourceTree = "<group>"; };
 		5783AA932E6B8FCD00F73F6D /* MeshGradient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeshGradient.swift; sourceTree = "<group>"; };
 		578E1CE02E67780B00C6DEA3 /* GradientText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientText.swift; sourceTree = "<group>"; };
 		57A4E70A2E6B315C00470131 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
@@ -905,6 +907,7 @@
 				AAFC9DD92EB7DAE200BB8028 /* VariableBlurView.swift */,
 				57DA042B2E79B25F00DB4C7C /* AsyncButton.swift */,
 				578E1CE02E67780B00C6DEA3 /* GradientText.swift */,
+				575DA69F30006C3D00CBA394 /* MentionCountBadge.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -1056,7 +1059,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1640;
-				LastUpgradeCheck = 2600;
+				LastUpgradeCheck = 2700;
 				TargetAttributes = {
 					AA1096DA2E63BE84005BC3D2 = {
 						CreatedOnToolsVersion = 16.4;
@@ -1176,6 +1179,7 @@
 				AA47AF322EDEF1D5008A50C9 /* KeybindsSection.swift in Sources */,
 				AABED5A02E7F48FD005BDD63 /* CurrentUserStore.swift in Sources */,
 				AA74E43D2EBD0DFE0031B285 /* BitField.swift in Sources */,
+				575DA6A030006C3D00CBA394 /* MentionCountBadge.swift in Sources */,
 				AA47AF192EDEEFC5008A50C9 /* ContentSocialSection.swift in Sources */,
 				AAA9EEFA2F22FD2900770CAD /* ScanQRSection.swift in Sources */,
 				57F5AF4D2E7CB14A00AD5674 /* PaicordSheetsAlerts.swift in Sources */,

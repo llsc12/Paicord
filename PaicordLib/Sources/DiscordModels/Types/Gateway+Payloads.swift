@@ -1979,6 +1979,26 @@ extension Gateway {
     public var last_pin_timestamp: DiscordTimestamp?
     public var flags: IntBitField<Flags>?
 
+    public init(
+      id: AnySnowflake,
+      read_state_type: IntBitField<Kind>? = nil,
+      last_message_id: MessageSnowflake? = nil,
+      last_acked_id: AnySnowflake? = nil,
+      mention_count: Int? = nil,
+      badge_count: Int? = nil,
+      last_pin_timestamp: DiscordTimestamp? = nil,
+      flags: IntBitField<Flags>? = nil
+    ) {
+      self.id = id
+      self.read_state_type = read_state_type
+      self.last_message_id = last_message_id
+      self.last_acked_id = last_acked_id
+      self.mention_count = mention_count
+      self.badge_count = badge_count
+      self.last_pin_timestamp = last_pin_timestamp
+      self.flags = flags
+    }
+
     #if Non64BitSystemsCompatibility
       @UnstableEnum<UInt64>
     #else
@@ -2017,13 +2037,16 @@ extension Gateway {
     }
   }
 
-  /// https://docs.discord.food/topics/read-state#acknowledge-message
+  /// https://docs.discord.food/topics/gateway-events#message-ack
   public struct MessageAcknowledge: Sendable, Codable {
-    public var token: String?
+    public var ack_type: ReadState.Kind?
+    public var channel_id: ChannelSnowflake
+    public var message_id: MessageSnowflake
     public var manual: Bool?
     public var mention_count: Int?
     public var flags: IntBitField<ReadState.Flags>?
     public var last_viewed: Int?
+    public var version: Int
   }
 
   /// https://docs.discord.food/topics/gateway-events#channel-pins-ack
@@ -2142,7 +2165,7 @@ extension Gateway {
   /// dolfies notes (as much as i understood):
   /// we request channels in the guild to get member lists for, discord sends us this payload containing groups of members and associated cell counts.
   /// the requesting happens via the UpdateGuildSubscriptions payload above, with the channels field and intpairs for the ranges you require visible rows of.
-  ///
+  /// each channel that has different permission sets will usually have their own member list. so public channels all share one member list id and private ones vary by permissions.
   public struct GuildMemberListUpdate: Sendable, Codable {
     public var ops: [MemberListOp]
     public var online_count: Int

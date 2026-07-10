@@ -223,6 +223,11 @@ class GuildStore: DiscordDataStore {
             handleVoiceStateUpdate(voiceState)
           }
 
+        case .messageCreate(let message):
+          if message.guild_id == guildId {
+            handleMessageCreate(message)
+          }
+
         default:
           break
         }
@@ -262,6 +267,10 @@ class GuildStore: DiscordDataStore {
 
   private func handleChannelDelete(_ channel: DiscordChannel) {
     channels.removeValue(forKey: channel.id)
+  }
+
+  private func handleMessageCreate(_ message: Gateway.MessageCreate) {
+    channels[message.channel_id]?.last_message_id = message.id
   }
 
   private func handleGuildMemberAdd(_ memberAdd: Gateway.GuildMemberAdd) {

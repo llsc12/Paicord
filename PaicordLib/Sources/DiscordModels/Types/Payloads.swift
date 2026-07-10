@@ -1892,6 +1892,31 @@ public enum Payloads {
     }
   }
 
+  /// https://docs.discord.food/topics/read-state#acknowledge-message
+  public struct AcknowledgeMessage: Sendable, Codable, ValidatablePayload {
+    public var token: String?
+    public var manual: Bool?
+    public var mention_count: Int?
+    public var flags: IntBitField<Gateway.ReadState.Flags>?
+    public var last_viewed: Int?
+
+    public init(
+      token: String? = nil,
+      manual: Bool? = nil,
+      mention_count: Int? = nil,
+      flags: IntBitField<Gateway.ReadState.Flags>? = nil,
+      last_viewed: Int? = nil
+    ) {
+      self.token = token
+      self.manual = manual
+      self.mention_count = mention_count
+      self.flags = flags
+      self.last_viewed = last_viewed
+    }
+
+    public func validate() -> [ValidationFailure] {}
+  }
+
   /// https://discord.com/developers/docs/resources/channel#edit-channel-permissions-json-params
   public struct EditChannelPermissions: Sendable, Codable, ValidatablePayload {
     public var type: DiscordChannel.Overwrite.Kind
