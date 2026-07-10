@@ -1,10 +1,91 @@
 import DiscordHTTP
+import Foundation
 import NIOCore
 import XCTest
 
 @testable import DiscordModels
 
 class DiscordModelsTests: XCTestCase {
+
+  func testPreloadedUserSettingsStatusSettingsGatewayStatus() throws {
+    var statusSettings =
+      DiscordProtos_DiscordUsers_V1_PreloadedUserSettings.StatusSettings()
+
+    statusSettings.status.value = "online"
+    XCTAssertEqual(statusSettings.gatewayStatus, .online)
+
+    statusSettings.status.value = "idle"
+    XCTAssertEqual(statusSettings.gatewayStatus, .afk)
+
+    statusSettings.status.value = "dnd"
+    XCTAssertEqual(statusSettings.gatewayStatus, .doNotDisturb)
+
+    statusSettings.status.value = "invisible"
+    XCTAssertEqual(statusSettings.gatewayStatus, .invisible)
+
+    statusSettings.status.value = "something-new"
+    XCTAssertEqual(statusSettings.gatewayStatus, .online)
+
+    let emptySettings =
+      DiscordProtos_DiscordUsers_V1_PreloadedUserSettings.StatusSettings()
+    XCTAssertNil(emptySettings.gatewayStatus)
+  }
+
+  func testPreloadedUserSettingsStatusSettingsGatewayStatusExpiry() throws {
+    var statusSettings =
+      DiscordProtos_DiscordUsers_V1_PreloadedUserSettings.StatusSettings()
+    statusSettings.status.value = "dnd"
+    statusSettings.statusExpiresAtMs = 1
+
+    XCTAssertNil(statusSettings.gatewayStatus)
+
+    statusSettings.statusExpiresAtMs = UInt64(
+      Date().addingTimeInterval(60).timeIntervalSince1970 * 1_000
+    )
+
+    XCTAssertEqual(statusSettings.gatewayStatus, .doNotDisturb)
+  }
+
+  func testPreloadedUserSettingsCustomStatusGatewayActivity() throws {
+    var customStatus =
+      DiscordProtos_DiscordUsers_V1_PreloadedUserSettings.CustomStatus()
+    customStatus.text = "writing tests"
+    customStatus.emojiID = 123
+    customStatus.emojiName = "pencil"
+
+    var statusSettings =
+      DiscordProtos_DiscordUsers_V1_PreloadedUserSettings.StatusSettings()
+    statusSettings.customStatus = customStatus
+
+    let activity = try XCTUnwrap(
+      statusSettings.gatewayCustomStatusActivity(
+        now: Date(timeIntervalSince1970: 1_000)
+      )
+    )
+
+    XCTAssertEqual(activity.name, "Custom Status")
+    XCTAssertEqual(activity.type, .custom)
+    XCTAssertEqual(activity.state, "writing tests")
+    XCTAssertEqual(activity.emoji?.id?.rawValue, "123")
+    XCTAssertEqual(activity.emoji?.name, "pencil")
+  }
+
+  func testPreloadedUserSettingsCustomStatusGatewayActivityExpiry() throws {
+    var customStatus =
+      DiscordProtos_DiscordUsers_V1_PreloadedUserSettings.CustomStatus()
+    customStatus.text = "expired"
+    customStatus.expiresAtMs = 999
+
+    var statusSettings =
+      DiscordProtos_DiscordUsers_V1_PreloadedUserSettings.StatusSettings()
+    statusSettings.customStatus = customStatus
+
+    XCTAssertNil(
+      statusSettings.gatewayCustomStatusActivity(
+        now: Date(timeIntervalSince1970: 1)
+      )
+    )
+  }
 
   func testEventDecode() throws {
 
