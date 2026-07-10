@@ -11,16 +11,17 @@ import simd
 
 // cant cleanly compile on older xcode versions bc no :: syntax
 #if compiler(>=6.2)
+import SwiftUI
+
+fileprivate typealias MeshGrid = MeshGradient::Grid<ControlPoint>
+#else
+
 import protocol SwiftUI.View
 import struct SwiftUI.State
 import struct SwiftUI.Group
 import struct SwiftUI.Environment
 
 fileprivate typealias MeshGrid = Grid<ControlPoint>
-#else
-import SwiftUI
-
-fileprivate typealias MeshGrid = MeshGradient::Grid<ControlPoint>
 #endif
 
 extension LoginView {

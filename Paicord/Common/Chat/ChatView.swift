@@ -246,9 +246,12 @@ struct ChatView: View {
         return
       }
       let pending: MessageSnowflake? = info["id"] as? MessageSnowflake
+      let resolvedId = pending ?? orderedMessages.last?.id
       withAnimation(immediate ? .default : nil) {
-        self.currentScrollPosition =
-          pending ?? orderedMessages.last?.id ?? self.currentScrollPosition
+        self.currentScrollPosition = resolvedId ?? self.currentScrollPosition
+      }
+      if let resolvedId {
+        acknowledge(messageId: resolvedId)
       }
     }  // handle scroll to bottom event
     .onReceive(
@@ -294,13 +297,21 @@ struct ChatView: View {
   //  }
 
   @State var ackTask: Task<Void, Error>? = nil
-  private func acknowledge() {
+  private func acknowledge(messageId: MessageSnowflake) {
+    guard gw.readStates.isUnread(channelId: vm.channelId, lastMessageId: messageId) else {
+      return
+    }
+    let channelId = vm.channelId
     ackTask?.cancel()
     ackTask = Task {
       try? await Task.sleep(for: .seconds(1.5))
-      Task.detached {
-        try? await gw.client.triggerTypingIndicator(channelId: .makeFake())
-      }
+      guard !Task.isCancelled else { return }
+      try await gw.client.acknowledgeMessage(
+        channelId: channelId,
+        messageId: messageId,
+        payload: Payloads.AcknowledgeMessage()
+      )
+      gw.readStates.applyAck(channelId: channelId, messageId: messageId)
     }
   }
 }

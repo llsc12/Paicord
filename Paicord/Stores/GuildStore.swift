@@ -223,6 +223,11 @@ class GuildStore: DiscordDataStore {
             handleVoiceStateUpdate(voiceState)
           }
 
+        case .messageCreate(let message):
+          if message.guild_id == guildId {
+            handleMessageCreate(message)
+          }
+
         default:
           break
         }
@@ -262,6 +267,10 @@ class GuildStore: DiscordDataStore {
 
   private func handleChannelDelete(_ channel: DiscordChannel) {
     channels.removeValue(forKey: channel.id)
+  }
+
+  private func handleMessageCreate(_ message: Gateway.MessageCreate) {
+    channels[message.channel_id]?.last_message_id = message.id
   }
 
   private func handleGuildMemberAdd(_ memberAdd: Gateway.GuildMemberAdd) {
@@ -419,7 +428,7 @@ class GuildStore: DiscordDataStore {
     // also the gateway doesnt take member list ids, we send channel snowflakes
     let subscriptions: [ChannelSnowflake: [IntPair]] =
       subscribedMemberListIDs.reduce(into: [:]) { partialResult, element in
-        let memberListId = element.key
+//        let memberListId = element.key
         let channelSnowflake = element.value.channelID
         partialResult[channelSnowflake] = element.value.ranges
       }

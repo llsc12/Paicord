@@ -42,31 +42,41 @@ struct GuildButton: View {
       FolderButtons(id: folder.id.value, folder: folder, guilds: guilds)
         .padding(-2)
     } else {
-      let height: CGFloat = {
-        // if the guild is selected
-        if appState.selectedGuild == guild?.id {
-          return 38
-        } else if isHovering {
-          return 20
-        } else if /* if theres unreads TODO */
-        false {
-          return 8
-        } else {
-          return 0
-        }
-      }()
       // either a guild or DMs
+      let badgeCount = guild.map(mentionCount) ?? 0
       guildButton(from: guild)
-      .onHover { isHovering = $0 }
+        .reverseMask(alignment: .bottomTrailing) {
+          if badgeCount > 0 {
+            Circle()
+              .frame(width: 20, height: 20)
+              .offset(x: 2, y: 2)
+          }
+        }
+        .onHover { isHovering = $0 }
         .overlay(alignment: .leading) {
+          let height: CGFloat = {
+            // if the guild is selected
+            if appState.selectedGuild == guild?.id {
+              return 38
+            } else if isHovering {
+              return 20
+            } else if let guild, hasUnreadChannels(guild) {
+              return 8
+            } else {
+              return 0
+            }
+          }()
+
           Capsule()
             .fill(.primary)
             .frame(width: 8)
             .frame(height: height)
-            //            .opacity(height == 0 ? 0 : 1)
             .offset(x: -14 + (height == 0 ? -8 : 0))
+            .animation(.default, value: height)
         }
-        .animation(.default, value: height)
+        .overlay(alignment: .bottomTrailing) {
+          MentionCountBadge(count: badgeCount)
+        }
     }
   }
 
@@ -87,6 +97,13 @@ struct GuildButton: View {
           isExpanded,
           forKey: "GuildFolders.\(id).isExpanded"
         )
+      }
+    }
+    @State var isHovering: Bool = false
+
+    var folderMentionCount: Int {
+      guilds.reduce(0) {
+        $0 + GuildButton.mentionCount($1, readStates: gw.readStates)
       }
     }
 
@@ -170,6 +187,40 @@ struct GuildButton: View {
           }
         }
         .buttonStyle(.borderless)
+        .reverseMask(alignment: .bottomTrailing) {
+          if !isExpanded, folderMentionCount > 0 {
+            Circle()
+              .frame(width: 20, height: 20)
+              .offset(x: 2, y: 2)
+          }
+        }
+        .onHover { self.isHovering = $0 }
+        .overlay(alignment: .leading) {
+          let height: CGFloat = {
+            if isExpanded {  // priority
+              return 0
+            } else if isHovering {
+              return 20
+            } else if guilds.contains(where: {
+              GuildButton.hasUnreadChannels($0, readStates: gw.readStates)
+            }) {
+              return 8
+            } else {
+              return 0
+            }
+          }()
+          Capsule()
+            .fill(.primary)
+            .frame(width: 8, height: height)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .offset(x: -12 + (height == 0 ? -8 : 0))
+            .animation(.default, value: height)
+        }
+        .overlay(alignment: .bottomTrailing) {
+          if !isExpanded {
+            MentionCountBadge(count: folderMentionCount)
+          }
+        }
 
         if isExpanded {
           let guilds: [Guild] = folder.guildIds.compactMap { guildID in
@@ -218,6 +269,7 @@ struct GuildButton: View {
         AnimatedImage(url: url)
           .resizable()
           .scaledToFill()
+          .aspectRatio(1, contentMode: .fit)
           .clipShape(.circle)
       } else {
         Rectangle()
@@ -351,6 +403,39 @@ struct GuildButton: View {
         string: CDNEndpoint.guildIcon(guildId: id, icon: icon).url
           + ".png?size=128&animated=false"
       )
+    }
+  }
+
+  func hasUnreadChannels(_ guild: Guild) -> Bool {
+    GuildButton.hasUnreadChannels(guild, readStates: gw.readStates)
+  }
+
+  static func hasUnreadChannels(_ guild: Guild, readStates: ReadStateStore)
+    -> Bool
+  {
+    (guild.channels ?? []).contains { channel in
+      guard channel.type == .guildText || channel.type == .guildAnnouncement
+      else {
+        return false
+      }
+      return readStates.isUnread(
+        channelId: channel.id,
+        lastMessageId: channel.last_message_id
+      )
+    }
+  }
+
+  func mentionCount(_ guild: Guild) -> Int {
+    GuildButton.mentionCount(guild, readStates: gw.readStates)
+  }
+
+  static func mentionCount(_ guild: Guild, readStates: ReadStateStore) -> Int {
+    (guild.channels ?? []).reduce(0) { partial, channel in
+      guard channel.type == .guildText || channel.type == .guildAnnouncement
+      else {
+        return partial
+      }
+      return partial + readStates.mentionCount(channelId: channel.id)
     }
   }
 }
