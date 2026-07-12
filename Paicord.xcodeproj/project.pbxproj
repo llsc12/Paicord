@@ -93,7 +93,6 @@
 		AA49F5172EF2CF7200C46339 /* NitroHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA49F5162EF2CF6E00C46339 /* NitroHelper.swift */; };
 		AA5CA6522E9BCCFF00C7C82A /* Maths.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5CA6512E9BCCFC00C7C82A /* Maths.swift */; };
 		AA5CA6542E9BD37D00C7C82A /* ComponentsV2.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5CA6532E9BD37500C7C82A /* ComponentsV2.swift */; };
-		AA5CA6582E9D2CBA00C7C82A /* HighlightSwift in Frameworks */ = {isa = PBXBuildFile; productRef = AA5CA6572E9D2CBA00C7C82A /* HighlightSwift */; };
 		AA5CA6602E9D435800C7C82A /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = AA5CA65F2E9D435800C7C82A /* SDWebImageSwiftUI */; };
 		AA5DC55A2E9482ED00D81EB5 /* MessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5DC5592E9482ED00D81EB5 /* MessageCell.swift */; };
 		AA5F76EB2F3E5E2100A7A003 /* QuickSwitcherProviderStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5F76EA2F3E5E1900A7A003 /* QuickSwitcherProviderStore.swift */; };
@@ -318,7 +317,6 @@
 				AA5CA6602E9D435800C7C82A /* SDWebImageSwiftUI in Frameworks */,
 				AA8ABAD22F2A7A0800557278 /* MijickCamera in Frameworks */,
 				5783AA902E6B8F6500F73F6D /* MeshGradient in Frameworks */,
-				AA5CA6582E9D2CBA00C7C82A /* HighlightSwift in Frameworks */,
 				AA1878F92E81FC1A009C7E40 /* FLEX in Frameworks */,
 				AA8ABACC2F2A794E00557278 /* SwiftEmojiIndex in Frameworks */,
 				AA8ABACA2F2A794E00557278 /* SwiftEmoji in Frameworks */,
@@ -1034,7 +1032,6 @@
 				AA1878F82E81FC1A009C7E40 /* FLEX */,
 				AA1378082E969A9000100969 /* Lottie */,
 				8C1C53B8654B3E3FFA5055A8 /* Textual */,
-				AA5CA6572E9D2CBA00C7C82A /* HighlightSwift */,
 				AA5CA65F2E9D435800C7C82A /* SDWebImageSwiftUI */,
 				AA21D2822EAA557C00C75093 /* Sparkle */,
 				AAB22FD72EAD0A2400413310 /* SwiftPrettyPrint */,
@@ -1084,7 +1081,6 @@
 				57CDD87D2E71CB6000022203 /* XCRemoteSwiftPackageReference "hcaptcha" */,
 				AA1878F72E81FC1A009C7E40 /* XCRemoteSwiftPackageReference "FLEX" */,
 				AA1378072E969A9000100969 /* XCRemoteSwiftPackageReference "lottie-spm" */,
-				AA5CA6562E9D2CBA00C7C82A /* XCRemoteSwiftPackageReference "HighlightSwift" */,
 				AA5CA65E2E9D435800C7C82A /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 				AA21D2812EAA557C00C75093 /* XCRemoteSwiftPackageReference "Sparkle" */,
 				AAB22FD62EAD0A2300413310 /* XCRemoteSwiftPackageReference "SwiftPrettyPrint" */,
@@ -1590,14 +1586,6 @@
 				minimumVersion = 1.2.0;
 			};
 		};
-		AA5CA6562E9D2CBA00C7C82A /* XCRemoteSwiftPackageReference "HighlightSwift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/llsc12/HighlightSwift";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
 		AA5CA65E2E9D435800C7C82A /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI";
@@ -1728,11 +1716,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AA47AF602EDF1FF7008A50C9 /* XCRemoteSwiftPackageReference "Conditionals" */;
 			productName = Conditionals;
-		};
-		AA5CA6572E9D2CBA00C7C82A /* HighlightSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = AA5CA6562E9D2CBA00C7C82A /* XCRemoteSwiftPackageReference "HighlightSwift" */;
-			productName = HighlightSwift;
 		};
 		AA5CA65F2E9D435800C7C82A /* SDWebImageSwiftUI */ = {
 			isa = XCSwiftPackageProductDependency;
