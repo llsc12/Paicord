@@ -46,6 +46,14 @@ struct MarkdownText: View {
   private var isJumboEmoji: Bool {
     allowsJumboEmoji && DiscordMarkdown.isEmojiOnlyContent(content)
   }
+  
+  private var handleInteractions: Bool = true
+  
+  func handlesInteractions(_ bool: Bool = true) -> Self {
+    var copy = self
+    copy.handleInteractions = bool
+    return copy
+  }
 
   var body: some View {
     StructuredText(
@@ -80,12 +88,14 @@ struct MarkdownText: View {
       }
     }
     .textual.onEntityTap { url, bounds in
+      if !handleInteractions { return }
       handleTap(url: url, bounds: bounds)
     }
     .environment(
       \.openURL,
       OpenURLAction { url in
-        url.scheme == "textual-discord" || PaicordChatLink(url: url) != nil
+        if !handleInteractions { return .handled }
+        return url.scheme == "textual-discord" || PaicordChatLink(url: url) != nil
           ? .handled : .systemAction
       }
     )
