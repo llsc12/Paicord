@@ -125,20 +125,37 @@ public struct StructuredText: View {
   }
 
   public var body: some View {
-    WithAttachments(attributedString) {
-      BlockContent(content: $0)
-        .modifier(TextSelectionInteraction())
-        .modifier(TextSelectionCoordination())
+    if #available(macOS 26.0, *) { // fixes a warning.
+      WithAttachments(attributedString) {
+        BlockContent(content: $0)
+          .modifier(TextSelectionInteraction())
+          .modifier(TextSelectionCoordination())
+      }
+      .coordinateSpace(.textContainer)
+      .onChange(of: markup, initial: true) {
+        markupDidChange(markup)
+      }
+      .onChange(of: revision) {
+        markupDidChange(markup)
+      }
+      // Disable line limit to avoid per-fragment truncation
+      .lineLimit(nil)
+    } else {
+      WithAttachments(attributedString) {
+        BlockContent(content: $0)
+          .modifier(TextSelectionInteraction())
+          .modifier(TextSelectionCoordination())
+      }
+      .coordinateSpace(.textContainer)
+      .onChange(of: markup, initial: true) {
+        markupDidChange(markup)
+      }
+      .onChange(of: revision) {
+        markupDidChange(markup)
+      }
+      // Disable line limit to avoid per-fragment truncation
+      .lineLimit(nil)
     }
-    .coordinateSpace(.textContainer)
-    .onChange(of: markup, initial: true) {
-      markupDidChange(markup)
-    }
-    .onChange(of: revision) {
-      markupDidChange(markup)
-    }
-    // Disable line limit to avoid per-fragment truncation
-    .lineLimit(nil)
   }
 
   private func markupDidChange(_ markup: String) {

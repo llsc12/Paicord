@@ -13,6 +13,8 @@ import SwiftUIX
 final class PaicordAppState {
   // each window gets its own app state
   static var instances: [UUID: PaicordAppState] = [:]
+  
+  static var sharedEphemeral = PaicordAppState()
 
   init() {
     Self.instances[id] = self
