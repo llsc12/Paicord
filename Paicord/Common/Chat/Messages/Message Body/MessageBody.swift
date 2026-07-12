@@ -114,3 +114,14 @@ extension MessageCell {
     }
   }
 }
+
+#Preview {
+  @Previewable @State var yea = false
+  Text("gm")
+    .popover(isPresented: $yea) {
+      MarkdownText.EmojiDetailsView.init(emoji: .init(id: .init("724374128777494608"), name: "AyameLove"))
+    }
+    .onAppear {
+      yea = true
+    }
+}

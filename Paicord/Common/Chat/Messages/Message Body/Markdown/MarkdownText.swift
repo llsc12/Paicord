@@ -9,6 +9,7 @@ import PaicordLib
 import SwiftUI
 import SwiftUIX
 import Textual
+import SDWebImageSwiftUI
 
 struct MarkdownText: View {
   let content: String
@@ -20,6 +21,7 @@ struct MarkdownText: View {
   @Environment(\.theme) var theme
   @State private var revealedSpoilers: Set<String> = []
   @State private var userPopover: PartialUser?
+  @State private var emojiPopover: DiscordModels.Emoji?
 
   @ViewStorage private var documentFrame: CGRect = .zero
   @State private var tapLocalPoint: (point: CGPoint, size: CGSize) = (.zero, .zero)
@@ -68,6 +70,7 @@ struct MarkdownText: View {
     .textual.emojiProperties(isJumboEmoji ? .discordJumbo : .discordStandard)
     .textual.roundedBackgroundStyle(RoundedBackgroundStyle(cornerRadius: 4, padding: 1))
     .textual.textSelection(.enabled)
+    .textual.overflowMode(.wrap)
     .foregroundStyle(foregroundColorOverride ?? theme.markdown.text)
     .background(
       GeometryReader { geometry in
@@ -77,7 +80,8 @@ struct MarkdownText: View {
     )
     .popover(
       isPresented: isPopoverPresented,
-      attachmentAnchor: .rect(.rect(CGRect(origin: tapLocalPoint.point, size: tapLocalPoint.size)))
+      attachmentAnchor: .rect(.rect(CGRect(origin: tapLocalPoint.point, size: tapLocalPoint.size))),
+      arrowEdge: popoverEdgePreference
     ) {
       if let userPopover {
         ProfilePopoutView(
@@ -85,6 +89,8 @@ struct MarkdownText: View {
           member: channelStore?.guildStore?.member(userPopover.id),
           user: userPopover
         )
+      } else if let emojiPopover {
+        EmojiDetailsView(emoji: emojiPopover)
       }
     }
     .textual.onEntityTap { url, bounds in
@@ -103,9 +109,43 @@ struct MarkdownText: View {
 
   private var isPopoverPresented: Binding<Bool> {
     Binding(
-      get: { userPopover != nil },
-      set: { if !$0 { userPopover = nil } }
+      get: { userPopover != nil || emojiPopover != nil },
+      set: { if !$0 { userPopover = nil; emojiPopover = nil } }
     )
+  }
+  
+  private var popoverEdgePreference: Edge? {
+    if userPopover != nil {
+      return nil
+    } else if emojiPopover != nil {
+      return .trailing
+    } else {
+      return nil
+    }
+  }
+  
+  // MARK: - Supplementary Views
+  
+  struct EmojiDetailsView: View {
+    var emoji: DiscordModels.Emoji
+    var body: some View {
+      if let id = emoji.id, let name = emoji.name {
+        let animated = emoji.animated ?? false
+        HStack {
+          let url = URL(string: CDNEndpoint.customEmoji(emojiId: id).url + ".\(animated ? "gif" : "png")?size=96&animated=\(animated)")
+          WebImage(url: url)
+            .resizable()
+            .scaledToFit()
+            .frame(width: 44, height: 44)
+          
+          VStack {
+            Text(":\(name):")
+            Text("")
+          }
+        }
+        .padding(8)
+      }
+    }
   }
 
   // MARK: - Styling
@@ -185,6 +225,24 @@ struct MarkdownText: View {
         revealedSpoilers.insert(
           AttributedStringMarkdownParser.SyntaxExtension.spoilerRevealKey(index: index, text: text)
         )
+      } else if url.host == "emoji",
+                let encoded = url.pathComponents.last,
+                let text = encoded.removingPercentEncoding,
+                let query = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems,
+                let name = query.first(where: { $0.name == "name" })?.value,
+                let animatedString = query.first(where: { $0.name == "animated" })?.value,
+                let animated: Bool = Bool(animatedString)
+      {
+        let emoji = Emoji(id: .init(text), name: name, animated: animated)
+        ImpactGenerator.impact(style: .light)
+        emojiPopover = emoji
+        tapLocalPoint = (CGPoint(
+          x: bounds.minX - documentFrame.minX,
+          y: bounds.minY - documentFrame.minY
+        ), CGSize(
+          width: bounds.width,
+          height: bounds.height
+        ))
       }
     }
 
@@ -465,14 +523,4 @@ enum PaicordChatLink {
       return nil
     }
   }
-}
-
-#Preview("Rounded backgrounds") {
-  MarkdownText(content: "Hey <@123>, use `git status` to check for `uncommitted` changes")
-    .padding()
-}
-
-#Preview("Dash line is not a heading") {
-  MarkdownText(content: "test\n---\ntest")
-    .padding()
 }
