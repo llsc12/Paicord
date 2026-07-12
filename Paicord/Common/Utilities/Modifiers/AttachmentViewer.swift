@@ -55,10 +55,10 @@ private struct AttachmentViewerModifier: ViewModifier {
               isPresented: $appState.showingAttachmentViewer
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .transition(.opacity.combined(with: .scale))
+            .transition(.opacity.combined(with: .scale(0.9)))
           }
         }
-        .animation(.default, value: appState.showingAttachmentViewer)
+        .animation(.default.speed(1.5), value: appState.showingAttachmentViewer)
     #else
       content
         .sheet(isPresented: $appState.showingAttachmentViewer) {
