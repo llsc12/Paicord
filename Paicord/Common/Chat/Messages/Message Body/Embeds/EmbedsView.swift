@@ -54,7 +54,7 @@ extension MessageCell {
           case .link:
             LinkEmbedView(embed: embed, items: embedData.items)
           default:
-            Text("Unsupported embed type: \(embed.type)")
+            Text("Unsupported embed type: \(embed.type.debugDescription)")
           }
         }
         .debugRender()

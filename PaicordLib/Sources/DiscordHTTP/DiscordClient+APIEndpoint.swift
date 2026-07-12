@@ -804,9 +804,7 @@ extension DiscordClient {
   public func triggerTypingIndicator(channelId: ChannelSnowflake) async throws
     -> DiscordHTTPResponse
   {
-    #warning(
-      "impl typing indicator occasional response body. it usually 204's but can 200 with cooldown data."
-    )
+    // TODO: May need response data structs 
     let endpoint = APIEndpoint.triggerTypingIndicator(channelId: channelId)
     return try await self.send(request: .init(to: endpoint))
   }
