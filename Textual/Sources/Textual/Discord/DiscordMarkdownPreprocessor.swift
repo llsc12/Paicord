@@ -374,7 +374,8 @@ public enum DiscordMarkdown {
       "\(protectedTokenStart)\(match.1)\(protectedTokenEnd)"
     }
     line.replace(noEmbedLinkPattern) { match in
-      "\(protectedTokenStart)\(match.1)\(protectedTokenEnd)"
+      let escaped = match.1.replacing("/", with: "\\/")
+      return "\(protectedTokenStart)\(escaped)\(protectedTokenEnd)"
     }
     return line
   }
