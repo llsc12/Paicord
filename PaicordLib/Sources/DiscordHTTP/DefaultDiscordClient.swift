@@ -455,14 +455,20 @@ public struct DefaultDiscordClient: DiscordClient {
       if let captchaData = extractCaptchaChallenge(from: response) {
         if let captchaHeaderData = await captchaCallback?(captchaData) {
           headers.replaceOrAdd(
-            name: "X-Captcha-Key", value: captchaHeaderData.solutionToken)
+            name: "X-Captcha-Key",
+            value: captchaHeaderData.solutionToken
+          )
           if let sessionID = captchaHeaderData.captchaSessionId {
             headers.replaceOrAdd(
-              name: "X-Captcha-Session-Id", value: sessionID)
+              name: "X-Captcha-Session-Id",
+              value: sessionID
+            )
           }
           if let rqToken = captchaHeaderData.captchaRqtoken {
             headers.replaceOrAdd(
-              name: "X-Captcha-Rqtoken", value: rqToken)
+              name: "X-Captcha-Rqtoken",
+              value: rqToken
+            )
           }
           challengeSolved = true
         }
@@ -470,7 +476,10 @@ public struct DefaultDiscordClient: DiscordClient {
 
       if let mfaHeader = extractMFAVerification(from: response) {
         if let mfaResponse = await mfaCallback?(mfaHeader) {
-          headers.replaceOrAdd(name: "X-Discord-MFA-Authorization", value: mfaResponse.token)
+          headers.replaceOrAdd(
+            name: "X-Discord-MFA-Authorization",
+            value: mfaResponse.token
+          )
           challengeSolved = true
         }
       }
@@ -853,10 +862,12 @@ public struct DefaultDiscordClient: DiscordClient {
       let json = try? JSONSerialization.jsonObject(with: data, options: [])
         as? [String: Any],  // error object but with mfa field
       json["code"] as? Int == 60003,  // MFA required error code
-      let mfa = json["mfa"] as? String,  // MFA verification request object
-      let mfaData = mfa.data(using: .utf8),
+      let mfa = json["mfa"] as? [String: Any],
+      let mfaData = try? JSONSerialization.data(withJSONObject: mfa),
       let mfaRequest = try? DiscordGlobalConfiguration.decoder.decode(
-        MFAVerificationData.self, from: mfaData)
+        MFAVerificationData.self,
+        from: mfaData
+      )
     else { return nil }
 
     return mfaRequest
@@ -886,7 +897,9 @@ public struct DefaultDiscordClient: DiscordClient {
       headers.add(name: "Sec-CH-UA-Platform", value: "\"macOS\"")  // in speechmarks
       headers.add(
         name: "Sec-CH-UA",
-        value: "\"Not)A;Brand\";v=\"8\", \"Chromium\";v=\"\(SuperProperties.chromeMajorVer())\"")  // in speechmarks
+        value:
+          "\"Not)A;Brand\";v=\"8\", \"Chromium\";v=\"\(SuperProperties.chromeMajorVer())\""
+      )  // in speechmarks
       /// dolfies says this being static is ok, though im thinking about login flows bc it'd have like https://discord.com/login as referer
       headers.add(name: "Referer", value: "https://discord.com/channels/@me")
       headers.add(name: "Origin", value: "https://discord.com")

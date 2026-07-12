@@ -47,16 +47,22 @@ extension DiscordClient {
   @inlinable
   public func verifySendSMS(
     ticket: Secret,
-    fingerprint: String
+    fingerprint: String? = nil
   ) async throws -> DiscordClientResponse<UserAuthenticationMFASMS> {
+    if case .userNone = self.authentication {
+      // idk if this is like super bad or not
+      assert(
+        fingerprint?.isEmpty == false,
+        "verifySendSMS needs a real fingerprint when called from the unauthenticated login client."
+      )
+    }
     let endpoint = UserAPIEndpoint.verifySendSMS
+    var headers: HTTPHeaders = [:]
+    if let fingerprint {
+      headers.replaceOrAdd(name: "X-Fingerprint", value: fingerprint)
+    }
     return try await self.send(
-      request: .init(
-        to: endpoint,
-        headers: [
-          "X-Fingerprint": fingerprint
-        ]
-      ),
+      request: .init(to: endpoint, headers: headers),
       payload: Payloads.AuthenticationMFASendSMS(
         ticket: ticket
       )

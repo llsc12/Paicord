@@ -52,6 +52,7 @@
       }
     },
     " Unsupported message type %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1284,6 +1285,7 @@
       }
     },
     "wip bro go do totp" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
