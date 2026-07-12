@@ -22,8 +22,8 @@ struct MarkdownText: View {
   @State private var userPopover: PartialUser?
 
   @ViewStorage private var documentFrame: CGRect = .zero
-  @State private var tapLocalPoint: CGPoint = .zero
-
+  @State private var tapLocalPoint: (point: CGPoint, size: CGSize) = (.zero, .zero)
+  
   init(
     content: String,
     channelStore: ChannelStore? = nil,
@@ -69,7 +69,7 @@ struct MarkdownText: View {
     )
     .popover(
       isPresented: isPopoverPresented,
-      attachmentAnchor: .rect(.rect(CGRect(origin: tapLocalPoint, size: .zero)))
+      attachmentAnchor: .rect(.rect(CGRect(origin: tapLocalPoint.point, size: tapLocalPoint.size)))
     ) {
       if let userPopover {
         ProfilePopoutView(
@@ -188,10 +188,13 @@ struct MarkdownText: View {
       if let user = gw.user.users[userID] {
         ImpactGenerator.impact(style: .light)
         userPopover = user
-        tapLocalPoint = CGPoint(
-          x: bounds.midX - documentFrame.minX,
+        tapLocalPoint = (CGPoint(
+          x: bounds.minX - documentFrame.minX,
           y: bounds.minY - documentFrame.minY
-        )
+        ), CGSize(
+          width: bounds.width,
+          height: bounds.height
+        ))
       }
     default:
       print("[MarkdownText] Unhandled special link: \(cmd)")
