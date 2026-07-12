@@ -50,7 +50,7 @@ extension Gateway.Identify.ConnectionProperties {
     self.browser_version = SuperProperties.browser_version()
     self.os_sdk_version = SuperProperties.os_sdk_version()
     self.client_build_number = SuperProperties.client_build_number()
-    self.native_build_number = nil
+    self.native_build_number = SuperProperties.native_build_number()
     self.client_launch_id = SuperProperties.client_launch_id()
     self.launch_signature = SuperProperties.launch_signature()
     self.device_vendor_id = SuperProperties.device_vendor_id()
@@ -160,6 +160,7 @@ public enum SuperProperties {
   }
 
   /// If ws is false this will never return nil.
+  /// ios app doesn't specify browser_user_agent when identifying in gateway.
   public static func useragent(ws: Bool) -> String? {
     // for these useragents, we will sub in values from the other functions
     #if os(macOS)
@@ -204,16 +205,8 @@ public enum SuperProperties {
     #endif
   }
 
-  public static func chromeVer() -> String {
-    "138.0.7204.251"
-  }
-
   public static func chromeMajorVer() -> String {
     chromeVer().split(separator: ".").first.map(String.init) ?? "138"
-  }
-
-  public static func webkitVer() -> String {
-    "537.36"
   }
 
   public static func device() -> String? {
@@ -292,6 +285,14 @@ public enum SuperProperties {
     #endif
   }
 
+  public static func chromeVer() -> String {
+    "138.0.7204.251"
+  }
+
+  public static func webkitVer() -> String {
+    "537.36"
+  }
+  
   public static func os_arch() -> String? {
     #if os(macOS)  // discord only wants to see what arch their mac client is running on
       #if arch(x86_64)
@@ -331,20 +332,31 @@ public enum SuperProperties {
   public static func client_version() -> String {
     switch Gateway.Identify.ConnectionProperties.__defaultOS {
     case "iOS", "watchOS":
-      return "323.0"
+      return "336.0"
     case "Mac OS X":
-      return "0.0.384"
+      return "0.0.398"
     default:
-      return "0.0.384"
+      return "0.0.398"
     }
   }
 
   public static func client_build_number() -> Int? {
     switch Gateway.Identify.ConnectionProperties.__defaultOS {
     case "iOS", "watchOS":
-      return 98117
+      return 105180
     case "Mac OS X":
-      return 526941
+      return 575562
+    default:
+      return nil
+    }
+  }
+  
+  public static func native_build_number() -> Int? {
+    switch Gateway.Identify.ConnectionProperties.__defaultOS {
+    case "iOS", "watchOS":
+      return nil
+    case "Mac OS X":
+      return 85861
     default:
       return nil
     }
