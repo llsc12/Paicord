@@ -306,7 +306,7 @@ struct ChatView: View {
     ackTask = Task {
       try? await Task.sleep(for: .seconds(1.5))
       guard !Task.isCancelled else { return }
-      try await gw.client.acknowledgeMessage(
+      _ = try await gw.client.acknowledgeMessage(
         channelId: channelId,
         messageId: messageId,
         payload: Payloads.AcknowledgeMessage()
