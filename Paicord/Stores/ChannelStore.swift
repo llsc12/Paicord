@@ -998,7 +998,23 @@ extension ChannelStore {
     var groups:
       OrderedDictionary<RoleSnowflake, Gateway.GuildMemberListUpdate.GroupCount> =
         [:]
+    {
+      didSet {
+        var boundaries: [(start: Int, id: RoleSnowflake)] = []
+        var offset = 0
+        for (id, group) in groups {
+          boundaries.append((start: offset, id: id))
+          offset += 1 + group.count
+        }
+        groupRowBoundaries = boundaries
+      }
+    }
+    private var groupRowBoundaries: [(start: Int, id: RoleSnowflake)] = []
+    
+    /// Number of members in the list.
     var memberCount: Int = 0
+    
+    /// Number of online members in the list.
     var onlineCount: Int = 0
 
     /// Total number of items in the member list, groups and members. Used to pregen rows.
@@ -1011,9 +1027,32 @@ extension ChannelStore {
     }
 
     private var items: [Int: MemberListRow] = [:]
-
+    
+    /// Get the row of member list.
+    /// - Parameter index: The index of the row to retrieve.
+    /// - Returns: A mixed item, either group heading or member data.
     func row(at index: Int) -> MemberListRow? {
       items[index]
+    }
+    
+    /// Get the group a row index belongs to.
+    /// - Parameter rowIndex: The index for lookup.
+    /// - Returns: The group ID of the row.
+    func group(of rowIndex: Int) -> RoleSnowflake? {
+      // the one time ive ever used ts
+      var low = 0
+      var high = groupRowBoundaries.count - 1
+      var result: RoleSnowflake? = nil
+      while low <= high {
+        let mid = (low + high) / 2
+        if groupRowBoundaries[mid].start <= rowIndex {
+          result = groupRowBoundaries[mid].id
+          low = mid + 1
+        } else {
+          high = mid - 1
+        }
+      }
+      return result
     }
 
     private func setItem(_ item: MixedItem, at index: Int) {

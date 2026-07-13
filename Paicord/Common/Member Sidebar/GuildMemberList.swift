@@ -54,6 +54,8 @@ extension MemberSidebarView {
               accumulator: accumulator,
               guildStore: guildStore
             )
+            .environment(\.memberListItemIndex, itemIndex)
+            .environment(\.memberListAccumulator, accumulator)
           }
         }
         .scrollTargetLayout()
@@ -86,7 +88,7 @@ extension MemberSidebarView {
             MemberRowView(member: member.toPartialMember(), user: user)
           }
         case .group(let group):
-          GroupHeaderCell(groupID: group.id, accumulator: accumulator, guildStore: guildStore)
+          GroupHeaderCell(groupID: group.id, guildStore: guildStore)
         case nil:
           EmptyView()
         }
@@ -97,7 +99,7 @@ extension MemberSidebarView {
 
   private struct GroupHeaderCell: View {
     let groupID: RoleSnowflake
-    let accumulator: ChannelStore.MemberListAccumulator
+    @Environment(\.memberListAccumulator) var accumulator: ChannelStore.MemberListAccumulator!
     let guildStore: GuildStore
 
     var body: some View {
@@ -128,4 +130,9 @@ extension MemberSidebarView {
       }
     }
   }
+}
+
+extension EnvironmentValues {
+  @Entry var memberListItemIndex: Int?
+  @Entry var memberListAccumulator: ChannelStore.MemberListAccumulator?
 }

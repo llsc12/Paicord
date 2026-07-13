@@ -10,13 +10,40 @@ import SwiftUIX
 
 extension MemberSidebarView {
   struct MemberRowView: View {
+    @Environment(\.gateway) var gw
     @Environment(\.guildStore) var guildStore
+    @Environment(\.memberListAccumulator) var accumulator: ChannelStore.MemberListAccumulator?
+    @Environment(\.memberListItemIndex) var row: Int?
+    
     var member: Guild.PartialMember?
     var user: DiscordUser
 
     @State var isHovering: Bool = false
     @State var showPopover: Bool = false
-
+    
+    var isOffline: Bool {
+      let status: Gateway.Status? = {
+        if user.id == gw.user.currentUser?.id {
+          let status = gw.presence.currentClientStatus
+          return (status)
+        } else {
+          let presence = gw.user.presence(user.id)
+          return (presence?.status)
+        }
+      }()
+      if let status {
+        return status == .offline
+      } else { return true }
+    }
+    
+    var isOfflineGroupMember: Bool {
+      if let accumulator, let row {
+        return accumulator.group(of: row)?.rawValue == "offline"
+      } else {
+        return false // idk
+      }
+    }
+    
     var body: some View {
       Button {
         showPopover = true
@@ -27,6 +54,7 @@ extension MemberSidebarView {
             user: member?.user ?? user,
           )
           .profileShowsAvatarDecoration()
+          .profileHidesOfflinePresence(true)
           .padding(2)
 
           Group {
@@ -41,7 +69,7 @@ extension MemberSidebarView {
               Text(
                 member?.nick ?? user.global_name ?? user.username
               )
-              .foregroundStyle(color != nil ? color! : .primary)
+              .foregroundStyle(color != nil ? color! : .secondary)
             } else {
               Text(user.global_name ?? user.username)
             }
@@ -56,10 +84,12 @@ extension MemberSidebarView {
         .background {
           if let nameplate = user.collectibles?.nameplate {
             Profile.NameplateView(nameplate: nameplate)
-              .opacity(isHovering ? 0.5 : 0.2)
+              .nameplateAnimated(isHovering)
+              .opacity(isHovering ? 0.8 : 0.5)
               .transition(.opacity.animation(.default))
           }
         }
+        .opacity(isOffline && !isHovering ? isOfflineGroupMember ? 0.3 : 1 : 1)
         .background(
           Group {
             if isHovering {
