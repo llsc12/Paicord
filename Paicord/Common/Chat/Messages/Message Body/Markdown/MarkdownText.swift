@@ -128,22 +128,163 @@ struct MarkdownText: View {
   
   struct EmojiDetailsView: View {
     var emoji: DiscordModels.Emoji
+    @Environment(\.gateway) var gw
+    @Environment(\.appState) var appState
+
+    @State private var source: SourceState = .loading
+
+    private enum SourceState {
+      case loading
+      case ownGuild(id: GuildSnowflake, name: String, icon: String?)
+      case currentGuild(id: GuildSnowflake, name: String, icon: String?)
+      case foreignGuild(EmojiSource.GuildSource)
+      case application(EmojiSource.ApplicationSource)
+      case unavailable
+    }
+
     var body: some View {
       if let id = emoji.id, let name = emoji.name {
         let animated = emoji.animated ?? false
-        HStack {
-          let url = URL(string: CDNEndpoint.customEmoji(emojiId: id).url + ".\(animated ? "gif" : "png")?size=96&animated=\(animated)")
-          WebImage(url: url)
-            .resizable()
-            .scaledToFit()
-            .frame(width: 44, height: 44)
-          
-          VStack {
-            Text(":\(name):")
-            Text("")
+        VStack(alignment: .leading, spacing: 0) {
+          HStack {
+            let url = URL(string: CDNEndpoint.customEmoji(emojiId: id).url + ".\(animated ? "gif" : "png")?size=96&animated=\(animated)")
+            WebImage(url: url)
+              .resizable()
+              .scaledToFit()
+              .frame(width: 44, height: 44)
+
+            VStack(alignment: .leading) {
+              Text(":\(name):")
+                .bold()
+              sourceDetail
+                .fixedSize(horizontal: false, vertical: true)
+            }
+          }
+          .padding(12)
+
+          sourceRow
+        }
+        .frame(minWidth: 290, maxWidth: 290, alignment: .leading)
+        .task(id: id) {
+          await loadSource(id: id)
+        }
+      }
+    }
+
+    @ViewBuilder
+    private var sourceDetail: some View {
+      switch source {
+      case .loading:
+        ProgressView()
+      case .ownGuild:
+        Text("This emoji is from one of your servers. Type its name in the chat bar to use it.")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+      case .currentGuild:
+        Text("This emoji is from this server. You can use it everywhere.")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+      case .foreignGuild:
+        Text("Want to use this emoji everywhere? Join the server.")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+      case .application(let app):
+        Text("This emoji is from the \(app.name) app")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+      case .unavailable:
+        Text("This emoji is from a server that is either invite-only or unavailable.")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+      }
+    }
+
+
+    @ViewBuilder
+    private var sourceRow: some View {
+      switch source {
+      case .loading, .application(_), .unavailable:
+        EmptyView()
+      case .currentGuild(let id, let name, let icon), .ownGuild(let id, let name, let icon):
+        let guild = gw.user.guilds[id]
+        guildRow(name: name, icon: icon, guildId: id, hasDiscovery: guild?.features.contains(.discoverable) ?? false)
+      case .foreignGuild(let guild):
+        guildRow(name: guild.name, icon: guild.icon, guildId: guild.id, hasDiscovery: guild.features.contains(.discoverable))
+      }
+    }
+    
+    @ViewBuilder
+    private func guildRow(name: String, icon: String?, guildId: GuildSnowflake?, hasDiscovery: Bool) -> some View {
+      VStack(alignment: .leading) {
+        Text("This emoji is from")
+          .font(.callout.bold())
+          .foregroundStyle(.secondary)
+        
+        HStack(spacing: 4) {
+          if let icon, let guildId {
+            let url = URL(string: CDNEndpoint.guildIcon(guildId: guildId, icon: icon).url + ".webp?size=128&animated=true")
+            WebImage(url: url)
+              .resizable()
+              .scaledToFit()
+              .frame(width: 36, height: 36)
+              .clipShape(.rounded)
+              .padding(.trailing, 6)
+          }
+          VStack(alignment: .leading) {
+            Text(name)
+              .font(.headline.bold())
+            HStack {
+              if hasDiscovery {
+                Text("Discoverable")
+              } else {
+                Text("Invite-Only Server")
+              }
+            }
+            .font(.caption)
           }
         }
-        .padding(8)
+      }
+      .padding(12)
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .background(.black.tertiary)
+    }
+
+    private func loadSource(id: EmojiSnowflake) async {
+      // check locally first
+      if let guild = GatewayStore.shared.user.guilds.values.first(where: {
+        $0.emojis.contains(where: { $0.id == id })
+      }) {
+        if appState.selectedGuild == guild.id {
+          source = .currentGuild(id: guild.id, name: guild.name, icon: guild.icon)
+        } else {
+          source = .ownGuild(id: guild.id, name: guild.name, icon: guild.icon)
+        }
+        return
+      }
+
+      // load source
+      do {
+        let req = try await gw.client.getEmojiSource(emojiID: id)
+        if let error = req.asError() { throw error }
+        let data = try req.decode()
+        switch data.type {
+        case .guild:
+          if let guild = data.guild {
+            source = .foreignGuild(guild)
+          } else {
+            source = .unavailable
+          }
+        case .application:
+          if let application = data.application {
+            source = .application(application)
+          } else {
+            source = .unavailable
+          }
+        default:
+          source = .unavailable
+        }
+      } catch {
+        source = .unavailable
       }
     }
   }

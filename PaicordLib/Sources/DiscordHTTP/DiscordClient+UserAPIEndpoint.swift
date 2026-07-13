@@ -147,6 +147,19 @@ extension DiscordClient {
     )
   }
 
+  // MARK: - Emoji
+  /// https://docs.discord.food/resources/emoji
+
+  /// Returns an object containing information on the guild or application that owns the given emoji.
+  /// https://docs.discord.food/resources/emoji#get-emoji-source
+  @inlinable
+  public func getEmojiSource(emojiID: EmojiSnowflake) async throws
+    -> DiscordClientResponse<EmojiSource>
+  {
+    let endpoint = UserAPIEndpoint.getEmojiSource(emojiId: emojiID)
+    return try await self.send(request: .init(to: endpoint))
+  }
+
   // MARK: - Applications
   /// https://docs.discord.food/resources/application
 

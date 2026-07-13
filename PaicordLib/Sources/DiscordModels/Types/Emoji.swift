@@ -120,3 +120,77 @@ public struct Reaction: Sendable, Codable, Hashable {
     }
   }
 }
+
+/// Describes the guild or application that owns a custom emoji.
+/// https://docs.discord.food/resources/emoji#get-emoji-source
+public struct EmojiSource: Sendable, Codable {
+  public var type: SourceType
+  public var guild: GuildSource?
+  public var application: ApplicationSource?
+
+  public init(
+    type: SourceType,
+    guild: GuildSource? = nil,
+    application: ApplicationSource? = nil
+  ) {
+    self.type = type
+    self.guild = guild
+    self.application = application
+  }
+
+  @UnstableEnum<String>
+  public enum SourceType: Sendable, Codable {
+    case guild // GUILD
+    case application // APPLICATION
+    case __undocumented(String)
+  }
+
+  /// https://docs.discord.food/resources/emoji#emoji-guild-structure
+  public struct GuildSource: Sendable, Codable {
+    public var id: GuildSnowflake
+    public var name: String
+    public var icon: String?
+    public var description: String?
+    public var features: [Guild.Feature]
+    public var emojis: [Emoji]
+    public var premium_tier: Guild.PremiumTier
+    public var premium_subscription_count: Int
+    public var approximate_member_count: Int
+    public var approximate_presence_count: Int
+
+    public init(
+      id: GuildSnowflake,
+      name: String,
+      icon: String? = nil,
+      description: String? = nil,
+      features: [Guild.Feature],
+      emojis: [Emoji],
+      premium_tier: Guild.PremiumTier,
+      premium_subscription_count: Int,
+      approximate_member_count: Int,
+      approximate_presence_count: Int
+    ) {
+      self.id = id
+      self.name = name
+      self.icon = icon
+      self.description = description
+      self.features = features
+      self.emojis = emojis
+      self.premium_tier = premium_tier
+      self.premium_subscription_count = premium_subscription_count
+      self.approximate_member_count = approximate_member_count
+      self.approximate_presence_count = approximate_presence_count
+    }
+  }
+
+  /// https://docs.discord.food/resources/emoji#emoji-application-structure
+  public struct ApplicationSource: Sendable, Codable {
+    public var id: ApplicationSnowflake
+    public var name: String
+
+    public init(id: ApplicationSnowflake, name: String) {
+      self.id = id
+      self.name = name
+    }
+  }
+}

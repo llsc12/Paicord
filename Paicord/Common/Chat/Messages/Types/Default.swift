@@ -40,7 +40,7 @@ extension MessageCell {
       let name =
         ref.member?.nick ?? ref.author?.global_name ?? ref.author?.username
         ?? "Unknown"
-      let content = ref.content
+      let content = ref.content.components(separatedBy: "\n").first ?? ref.content
       return (name: "\(mention)\(name)", content: content)
     }
 

@@ -72,6 +72,9 @@
         }
       }
     },
+    ":%@:" : {
+
+    },
     ":3" : {
       "localizations" : {
         "de" : {
@@ -693,6 +696,9 @@
         }
       }
     },
+    "Loading..." : {
+
+    },
     "Log In" : {
       "localizations" : {
         "de" : {
@@ -1083,6 +1089,15 @@
         }
       }
     },
+    "This emoji is from a server that is either invite-only or unavailable." : {
+
+    },
+    "This emoji is from the %@ app" : {
+
+    },
+    "This emoji is from this server. You can use it everywhere." : {
+
+    },
     "This MFA method is not currently supported." : {
       "localizations" : {
         "de" : {
@@ -1233,6 +1248,9 @@
           }
         }
       }
+    },
+    "Want to use this emoji everywhere? Join the server." : {
+
     },
     "We're so excited to see you again!" : {
       "localizations" : {
