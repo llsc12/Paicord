@@ -43,7 +43,7 @@ extension MessageCell {
         Group {
           switch embed.type {
           case .rich, .article:
-            EmbedView(embed: embed, message: message)
+            EmbedView(embed: embed, items: embedData.items, message: message)
           case .image:
             if let image = embed.image ?? embed.thumbnail {
               Button {
@@ -334,6 +334,7 @@ extension MessageCell {
                 .overlay {
                   mediaButton(item)
                 }
+                .aspectRatio(1.2, contentMode: .fit)
                 .clipShape(.rect(cornerRadius: 4))
             }
           }
@@ -849,7 +850,7 @@ extension [Embed] {
     for embed in self {
       // ensure type is rich, url is the same as focused embed, has image. every other field nil. else add embed as new entry.
       if let currentEmbedFocused = combined.last?.embed,  // 2nd embed or later.
-        currentEmbedFocused.type == .link,
+         currentEmbedFocused.type == .link || currentEmbedFocused.type == .rich,
         embed.type == .rich,
         let image = embed.image,
         embed.url == currentEmbedFocused.url,
@@ -863,7 +864,7 @@ extension [Embed] {
       {
         combined[combined.count - 1].items.append(image)
       } else {
-        // first embed.
+        // first embed, it will have new items in the second pass if necessary.
         let items = embed.image.map { [$0] } ?? []
         combined.append((embed: embed, items: items))
       }

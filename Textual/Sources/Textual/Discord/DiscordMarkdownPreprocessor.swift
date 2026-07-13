@@ -51,6 +51,8 @@ public enum DiscordMarkdown {
   static let protectedTokenStart: Character = "\u{E002}"
   static let protectedTokenEnd: Character = "\u{E003}"
 
+  static let emphasisFlankingFixMarker: Character = "\u{E004}"
+
   /// Rewrites raw Discord message content so it parses correctly through
   /// `StructuredText`/`AttributedStringMarkdownParser`.
   public static func preprocess(_ raw: String) -> String {
@@ -259,6 +261,7 @@ public enum DiscordMarkdown {
       }
 
       processed = convertingUnderlineMarkers(in: processed)
+      processed = fixingEmphasisFlanking(in: processed)
 
       if !processed.isEmpty {
         // A CommonMark hard-break: forces this line break to survive as a real line break
@@ -359,6 +362,17 @@ public enum DiscordMarkdown {
 
   private static var underlinePattern: Regex<(Substring, Substring)> {
     /__([^_]+?)__/
+  }
+
+  private static func fixingEmphasisFlanking(in line: String) -> String {
+    guard line.contains("**") || line.contains("__") else { return line }
+    return line.replacing(emphasisFlankingFixPattern) { match in
+      "\(match.1)\(emphasisFlankingFixMarker)\(match.2)"
+    }
+  }
+
+  private static var emphasisFlankingFixPattern: Regex<(Substring, Substring, Substring)> {
+    /([^\x20\t\S])(\*\*|__)/
   }
 
   // MARK: Autolink-ambiguous tokens
