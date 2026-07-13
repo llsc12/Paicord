@@ -54,13 +54,13 @@ public actor UserGatewayManager: GatewayManager {
   let logger: Logger
 
   //MARK: Event streams
-  var eventsStreamContinuations = [AsyncStream<Gateway.Event>.Continuation]()
-  var eventsParseFailureContinuations = [
-    AsyncStream<(any Error, ByteBuffer)>.Continuation
-  ]()
+  nonisolated let eventsStreamContinuations = ContinuationBox<Gateway.Event>()
+  nonisolated let eventsParseFailureContinuations = ContinuationBox<
+    (any Error, ByteBuffer)
+  >()
 
   /// An async sequence of Gateway events.
-  public var events: DiscordAsyncSequence<Gateway.Event> {
+  public nonisolated var events: DiscordAsyncSequence<Gateway.Event> {
     DiscordAsyncSequence<Gateway.Event>(
       base: AsyncStream<Gateway.Event> { continuation in
         self.eventsStreamContinuations.append(continuation)
@@ -68,7 +68,7 @@ public actor UserGatewayManager: GatewayManager {
     )
   }
   /// An async sequence of Gateway event parse failures.
-  public var eventFailures: DiscordAsyncSequence<(any Error, ByteBuffer)> {
+  public nonisolated var eventFailures: DiscordAsyncSequence<(any Error, ByteBuffer)> {
     DiscordAsyncSequence<(any Error, ByteBuffer)>(
       base: AsyncStream<(any Error, ByteBuffer)> { continuation in
         self.eventsParseFailureContinuations.append(continuation)
@@ -661,9 +661,7 @@ extension UserGatewayManager {
         ]
       )
       Task { await self.processEvent(event) }
-      for continuation in self.eventsStreamContinuations {
-        continuation.yield(event)
-      }
+      self.eventsStreamContinuations.yieldToAll(event)
     } catch {
       self.logger.debug(
         "Failed to decode event",
@@ -671,9 +669,7 @@ extension UserGatewayManager {
           "error": .string("\(error)")
         ]
       )
-      for continuation in self.eventsParseFailureContinuations {
-        continuation.yield((error, buffer))
-      }
+      self.eventsParseFailureContinuations.yieldToAll((error, buffer))
     }
   }
 

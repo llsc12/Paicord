@@ -102,8 +102,9 @@ class ChannelStore: DiscordDataStore {
       self.hasLatestMessages = true
       self.loadingMessagesTask = nil
     }
+    let events = gateway.events
     eventTask = Task { @MainActor in
-      for await event in await gateway.events {
+      for await event in events {
         switch event.data {
         // Channel updates
         case .channelUpdate(let updatedChannel):

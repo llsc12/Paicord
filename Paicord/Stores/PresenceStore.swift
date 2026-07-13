@@ -20,9 +20,10 @@ class PresenceStore: DiscordDataStore {
   var eventTask: Task<Void, Never>?
 
   func setupEventHandling() {
+    guard let gateway = gateway?.gateway else { return }
+    let events = gateway.events
     eventTask = Task { @MainActor in
-      guard let gateway = gateway?.gateway else { return }
-      for await event in await gateway.events {
+      for await event in events {
         switch event.data {
         case .ready(let readyData):
           handleReady(readyData)

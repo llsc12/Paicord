@@ -148,9 +148,9 @@ class GuildStore: DiscordDataStore {
 
   func setupEventHandling() {
     guard let gateway = gateway?.gateway else { return }
-
+    let events = gateway.events
     eventTask = Task { @MainActor in
-      for await event in await gateway.events {
+      for await event in events {
         switch event.data {
         case .guildUpdate(let updatedGuild):
           if updatedGuild.id == guildId {

@@ -15,10 +15,10 @@ import struct NIOCore.ByteBuffer
     /// The identification payload that is sent to Discord.
     nonisolated var identifyPayload: Gateway.Identify { get }
     /// An stream of Gateway events.
-    var events: DiscordAsyncSequence<Gateway.Event> { get async }
+    nonisolated var events: DiscordAsyncSequence<Gateway.Event> { get }
     /// An stream of Gateway event parse failures.
-    var eventFailures: DiscordAsyncSequence<(any Error, ByteBuffer)> {
-      get async
+    nonisolated var eventFailures: DiscordAsyncSequence<(any Error, ByteBuffer)> {
+      get
     }
     /// Connects to Discord.
     func connect() async
@@ -49,10 +49,10 @@ import struct NIOCore.ByteBuffer
     /// The identification payload that is sent to Discord.
     nonisolated var identifyPayload: Gateway.Identify { get }
     /// An stream of Gateway events.
-    var events: DiscordAsyncSequence<Gateway.Event> { get async }
+    nonisolated var events: DiscordAsyncSequence<Gateway.Event> { get }
     /// An stream of Gateway event parse failures.
-    var eventFailures: DiscordAsyncSequence<(any Error, ByteBuffer)> {
-      get async
+    nonisolated var eventFailures: DiscordAsyncSequence<(any Error, ByteBuffer)> {
+      get
     }
     /// Connects to Discord.
     func connect() async
@@ -77,15 +77,11 @@ import struct NIOCore.ByteBuffer
 
 /// Default implementations to not break people's code.
 extension GatewayManager {
-  public var events: DiscordAsyncSequence<Gateway.Event> {
-    get async {
-      await self.events
-    }
+  public nonisolated var events: DiscordAsyncSequence<Gateway.Event> {
+    self.events
   }
 
-  public var eventFailures: DiscordAsyncSequence<(any Error, ByteBuffer)> {
-    get async {
-      await self.eventFailures
-    }
+  public nonisolated var eventFailures: DiscordAsyncSequence<(any Error, ByteBuffer)> {
+    self.eventFailures
   }
 }

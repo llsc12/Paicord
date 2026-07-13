@@ -91,21 +91,23 @@ final class GatewayStore {
   }
 
   func setupEventHandling() {
-    eventTask = Task { @MainActor in
-      guard let gateway else { return }
-      for await event in await gateway.events {
-        switch event.data {
-        case .ready(let readyData):
-          handleReady(readyData)
-        default: break
+    if let gateway {
+      let events = gateway.events
+      eventTask = Task { @MainActor in
+        for await event in events {
+          switch event.data {
+          case .ready(let readyData):
+            handleReady(readyData)
+          default: break
+          }
         }
       }
-    }
 
-    errorTask = Task { @MainActor in
-      guard let gateway else { return }
-      for await (error, buffer) in await gateway.eventFailures {
-        print("[GatewayStore Error]", String(buffer: buffer), error)
+      let eventFailures = gateway.eventFailures
+      errorTask = Task { @MainActor in
+        for await (error, buffer) in eventFailures {
+          print("[GatewayStore Error]", String(buffer: buffer), error)
+        }
       }
     }
 
