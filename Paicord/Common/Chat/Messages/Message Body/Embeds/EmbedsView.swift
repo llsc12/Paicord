@@ -17,6 +17,7 @@ import SwiftUIX
 extension MessageCell {
   struct EmbedsView: View {
     var embeds: [Embed]
+    var message: DiscordChannel.PartialMessage? = nil
 
     private let maxWidth: CGFloat = 500
     private let maxHeight: CGFloat = 300
@@ -24,14 +25,16 @@ extension MessageCell {
     var body: some View {
       LazyVStack(alignment: .leading, spacing: 8) {
         ForEach(embeds.combineEmbedRuns(), id: \.embed) { embed in
-          EmbedRow(embedData: embed)
+          EmbedRow(embedData: embed, message: message)
         }
       }
       .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     struct EmbedRow: View {
+      @Environment(\.appState) var appState
       let embedData: (embed: Embed, items: [Embed.Media])
+      var message: DiscordChannel.PartialMessage? = nil
       var embed: Embed {
         embedData.embed
       }
@@ -40,19 +43,29 @@ extension MessageCell {
         Group {
           switch embed.type {
           case .rich, .article:
-            EmbedView(embed: embed)
+            EmbedView(embed: embed, message: message)
           case .image:
             if let image = embed.image ?? embed.thumbnail {
-              AttachmentsView.AttachmentSizedView(attachment: image) {
-                AttachmentsView.AttachmentItemPreview(attachment: image)
+              Button {
+                openViewer(showing: [image], at: 0)
+              } label: {
+                AttachmentsView.AttachmentSizedView(attachment: image) {
+                  AttachmentsView.AttachmentItemPreview(attachment: image)
+                }
               }
+              .buttonStyle(.plain)
             }
           case .gifv:
             if let video = embed.video {
-              AttachmentsView.GifvView(media: video, staticMedia: embed.image)
+              Button {
+                openViewer(showing: [GifvAttachmentMedia(media: video)], at: 0)
+              } label: {
+                AttachmentsView.GifvView(media: video, staticMedia: embed.image)
+              }
+              .buttonStyle(.plain)
             }
           case .link:
-            LinkEmbedView(embed: embed, items: embedData.items)
+            LinkEmbedView(embed: embed, items: embedData.items, message: message)
           default:
             Text("Unsupported embed type: \(embed.type.debugDescription)")
           }
@@ -60,20 +73,41 @@ extension MessageCell {
         .debugRender()
         .debugCompute()
       }
+
+      private func openViewer(showing items: [DiscordMedia], at index: Int) {
+        appState.attachmentViewerAttachments = items
+        appState.attachmentViewerIndex = index
+        appState.attachmentViewerContextMessage = message
+        appState.showingAttachmentViewer = true
+      }
     }
 
     struct EmbedView: View {
       let embed: Embed
       let items: [Embed.Media]
+      var message: DiscordChannel.PartialMessage? = nil
 
-      init(embed: Embed, items: [Embed.Media] = []) {
+      init(
+        embed: Embed,
+        items: [Embed.Media] = [],
+        message: DiscordChannel.PartialMessage? = nil
+      ) {
         self.embed = embed
         self.items = items
+        self.message = message
       }
 
+      @Environment(\.appState) var appState
       @Environment(\.userInterfaceIdiom) var idiom
       @Environment(\.channelStore) var channelStore
       @Environment(\.theme) var theme
+
+      private func openViewer(showing items: [DiscordMedia], at index: Int) {
+        appState.attachmentViewerAttachments = items
+        appState.attachmentViewerIndex = index
+        appState.attachmentViewerContextMessage = message
+        appState.showingAttachmentViewer = true
+      }
 
       private var embedWidth: CGFloat {
         switch idiom {
@@ -166,11 +200,16 @@ extension MessageCell {
               .padding(.trailing, embed.thumbnail == nil ? 40 : 0)
 
               if embed.type != .article, let thumbnail = embed.thumbnail {
-                AttachmentsView.AttachmentItemPreview(attachment: thumbnail)
-                  .scaledToFill()
-                  .frame(width: 72, height: 72)
-                  .clipped()
-                  .cornerRadius(6)
+                Button {
+                  openViewer(showing: [thumbnail], at: 0)
+                } label: {
+                  AttachmentsView.AttachmentItemPreview(attachment: thumbnail)
+                    .scaledToFill()
+                    .frame(width: 72, height: 72)
+                    .clipped()
+                    .cornerRadius(6)
+                }
+                .buttonStyle(.plain)
               }
             }
 
@@ -215,9 +254,14 @@ extension MessageCell {
               (embed.type == .article
                 ? embed.image ?? embed.thumbnail : embed.image)
             {
-              AttachmentsView.AttachmentSizedView(attachment: image) {
-                AttachmentsView.AttachmentItemPreview(attachment: image)
+              Button {
+                openViewer(showing: [image], at: 0)
+              } label: {
+                AttachmentsView.AttachmentSizedView(attachment: image) {
+                  AttachmentsView.AttachmentItemPreview(attachment: image)
+                }
               }
+              .buttonStyle(.plain)
             }
 
             if embed.footer != nil || embed.timestamp != nil {
@@ -255,21 +299,40 @@ extension MessageCell {
         .clipShape(.rounded)
       }
 
+      private func openViewer(tapping item: Embed.Media) {
+        openViewer(showing: items, at: items.firstIndex(of: item) ?? 0)
+      }
+
+      @ViewBuilder
+      private func mediaButton(_ item: Embed.Media) -> some View {
+        Button {
+          openViewer(tapping: item)
+        } label: {
+          AttachmentsView.AttachmentItemPreview(attachment: item)
+            .scaledToFill()
+        }
+        .buttonStyle(.plain)
+      }
+
       @ViewBuilder var images: some View {
         switch items.count {
         case 0: EmptyView()
         case 1:
-          AttachmentsView.AttachmentSizedView(attachment: items[0]) {
-            AttachmentsView.AttachmentItemPreview(attachment: items[0])
+          Button {
+            openViewer(tapping: items[0])
+          } label: {
+            AttachmentsView.AttachmentSizedView(attachment: items[0]) {
+              AttachmentsView.AttachmentItemPreview(attachment: items[0])
+            }
           }
+          .buttonStyle(.plain)
           .clipShape(.rounded)
         case 2:
           HStack(spacing: 4) {
             ForEach(items.prefix(2), id: \.hashValue) { item in
               Color.almostClear
                 .overlay {
-                  AttachmentsView.AttachmentItemPreview(attachment: item)
-                    .scaledToFill()
+                  mediaButton(item)
                 }
                 .clipShape(.rect(cornerRadius: 4))
             }
@@ -280,8 +343,7 @@ extension MessageCell {
             if let item = items.first {
               Color.almostClear
                 .overlay {
-                  AttachmentsView.AttachmentItemPreview(attachment: item)
-                    .scaledToFill()
+                  mediaButton(item)
                 }
                 .clipShape(.rect(cornerRadius: 4))
             }
@@ -290,8 +352,7 @@ extension MessageCell {
               ForEach(items.suffix(2), id: \.hashValue) { item in
                 Color.almostClear
                   .overlay {
-                    AttachmentsView.AttachmentItemPreview(attachment: item)
-                      .scaledToFill()
+                    mediaButton(item)
                   }
                   .aspectRatio(1.6, contentMode: .fit)
                   .clipShape(.rect(cornerRadius: 4))
@@ -305,8 +366,7 @@ extension MessageCell {
               ForEach(items.prefix(2), id: \.hashValue) { item in
                 Color.almostClear
                   .overlay {
-                    AttachmentsView.AttachmentItemPreview(attachment: item)
-                      .scaledToFill()
+                    mediaButton(item)
                   }
                   .aspectRatio(1.6, contentMode: .fit)
                   .clipShape(.rect(cornerRadius: 4))
@@ -317,8 +377,7 @@ extension MessageCell {
               ForEach(items.suffix(2), id: \.hashValue) { item in
                 Color.almostClear
                   .overlay {
-                    AttachmentsView.AttachmentItemPreview(attachment: item)
-                      .scaledToFill()
+                    mediaButton(item)
                   }
                   .aspectRatio(1.6, contentMode: .fit)
                   .clipShape(.rect(cornerRadius: 4))
@@ -334,6 +393,7 @@ extension MessageCell {
     struct LinkEmbedView: View {
       var embed: Embed
       var items: [Embed.Media] = []
+      var message: DiscordChannel.PartialMessage? = nil
 
       var linkType: SpecialLinkType { .init(embed: embed) }
 
@@ -351,7 +411,7 @@ extension MessageCell {
           case .appleMusicAlbum:
             appleMusicAlbum(linkType.embedURL(colorScheme: cs))
           case .unknown:
-            EmbedView(embed: embed, items: items)
+            EmbedView(embed: embed, items: items, message: message)
           }
         }
         .frame(maxHeight: 350)

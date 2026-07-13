@@ -25,25 +25,14 @@ extension MessageCell {
     var previewableAttachments: [DiscordChannel.Message.Attachment] = []
     var audioAttachments: [DiscordChannel.Message.Attachment] = []
     var fileAttachments: [DiscordChannel.Message.Attachment] = []
+    var viewableAttachments: [DiscordChannel.Message.Attachment] = []
 
     init(
       message: DiscordChannel.PartialMessage,
       attachments: [DiscordChannel.Message.Attachment]
     ) {
       self.message = message
-      for att in attachments {
-        if let type = UTType(mimeType: att.content_type ?? ""),
-          AttachmentItemPreview.supportedTypes.contains(type)
-        {
-          previewableAttachments.append(att)
-        } else if let type = UTType(mimeType: att.content_type ?? ""),
-          AttachmentAudioPlayer.supportedTypes.contains(type)
-        {
-          audioAttachments.append(att)
-        } else {
-          fileAttachments.append(att)
-        }
-      }
+      self.classify(attachments)
     }
 
     init(
@@ -51,26 +40,27 @@ extension MessageCell {
       attachments: [DiscordChannel.Message.Attachment]
     ) {
       self.message = message.toPartialMessage()
+      self.classify(attachments)
+    }
+
+    private mutating func classify(
+      _ attachments: [DiscordChannel.Message.Attachment]
+    ) {
       for att in attachments {
-        if let type = UTType(mimeType: att.content_type ?? ""),
-          AttachmentItemPreview.supportedTypes.contains(type)
-        {
+        switch att.mediaKind {
+        case .image, .video:
           previewableAttachments.append(att)
-        } else if let type = UTType(mimeType: att.content_type ?? ""),
-          AttachmentAudioPlayer.supportedTypes.contains(type)
-        {
+          viewableAttachments.append(att)
+        case .audio:
           audioAttachments.append(att)
-        } else {
+          viewableAttachments.append(att)
+        case .other:
           fileAttachments.append(att)
         }
       }
     }
 
-    @AppStorage("Paicord.Chat.Attachments.ShowMosaic") var showMosaic: Bool =
-      false
-
-    private let maxMosaicWidth: CGFloat = 500
-    private let tileSpacing: CGFloat = 2
+    @AppStorage("Paicord.Chat.Attachments.ShowMosaic") var showMosaic: Bool = true
 
     var body: some View {
       VStack(alignment: .leading) {
@@ -104,8 +94,14 @@ extension MessageCell {
 
     @ViewBuilder
     var mosaic: some View {
-      #warning("Do this soon")
-      list
+      if previewableAttachments.count == 1 { // full size single-attachment case
+        list
+      } else {
+        AttachmentMosaic(
+          items: previewableAttachments,
+          onTap: openViewer
+        )
+      }
     }
 
     @ViewBuilder
@@ -113,10 +109,7 @@ extension MessageCell {
       ForEach(previewableAttachments.indices, id: \.self) { i in
         let attachment = previewableAttachments[i]
         Button {
-          appState.attachmentViewerIndex = i
-          appState.attachmentViewerAttachments = previewableAttachments
-          appState.attachmentViewerContextMessage = message
-          appState.showingAttachmentViewer = true
+          openViewer(on: attachment)
         } label: {
           AttachmentSizedView(attachment: attachment) {
             AttachmentItemPreview(
@@ -128,6 +121,15 @@ extension MessageCell {
         .debugRender()
         .debugCompute()
       }
+    }
+
+    private func openViewer(on attachment: DiscordChannel.Message.Attachment) {
+      appState.attachmentViewerIndex = viewableAttachments.firstIndex(where: {
+        $0.id == attachment.id
+      })
+      appState.attachmentViewerAttachments = viewableAttachments
+      appState.attachmentViewerContextMessage = message
+      appState.showingAttachmentViewer = true
     }
 
     /// Designed to ensure attachments have a deterministic size, not using maxWidth/maxHeight
@@ -165,17 +167,137 @@ extension MessageCell {
       }
     }
 
-    /// Handles images, videos
-    struct AttachmentItemPreview: View {
-      static let supportedTypes: [UTType] = [
-        .png,
-        .jpeg,
-        .gif,
-        .webP,
-        .mpeg4Movie,
-        .quickTimeMovie,
+    struct AttachmentMosaic: View {
+      let items: [DiscordChannel.Message.Attachment]
+      var spacing: CGFloat = 4
+      var maxWidth: CGFloat = 500
+      var maxHeight: CGFloat = 350
+      var maxHeightLarge: CGFloat = 840
+      let onTap: (DiscordChannel.Message.Attachment) -> Void
+
+      private static let rowLayouts: [Int: [Int]] = [
+        1: [1],
+        2: [2],
+        4: [2, 2],
+        5: [2, 3],
+        6: [3, 3],
+        8: [4, 4],
+        9: [3, 3, 3],
       ]
 
+      var body: some View {
+        if items.isEmpty {
+          EmptyView() // ???
+        } else if items.count == 3 {
+          HStack(spacing: spacing) {
+            tile(items[0], contentMode: .fill)
+            VStack(spacing: spacing) {
+              tile(items[1])
+              tile(items[2])
+            }
+          }
+          .aspectRatio(Self.threeItemAspectRatio, contentMode: .fit)
+          .frame(maxWidth: maxWidth, maxHeight: maxHeight)
+          .clipShape(.rounded)
+        } else if items.count == 7 {
+          VStack(spacing: spacing) {
+            tile(items[0], aspectRatio: Self.heroAspectRatio)
+            HStack(spacing: spacing) {
+              tile(items[1])
+              tile(items[2])
+              tile(items[3])
+            }
+            HStack(spacing: spacing) {
+              tile(items[4])
+              tile(items[5])
+              tile(items[6])
+            }
+          }
+          .frame(maxWidth: maxWidth, maxHeight: maxHeight)
+          .clipShape(.rounded)
+        } else if items.count == 10 {
+          VStack(spacing: spacing) {
+            tile(items[0], aspectRatio: Self.heroAspectRatio)
+            HStack(spacing: spacing) {
+              tile(items[1])
+              tile(items[2])
+              tile(items[3])
+            }
+            HStack(spacing: spacing) {
+              tile(items[4])
+              tile(items[5])
+              tile(items[6])
+            }
+            HStack(spacing: spacing) {
+              tile(items[7])
+              tile(items[8])
+              tile(items[9])
+            }
+          }
+          .frame(maxWidth: maxWidth, maxHeight: maxHeightLarge)
+          .clipShape(.rounded)
+        } else {
+          let rows = Self.rowLayouts[items.count] ?? [items.count]
+
+          VStack(spacing: spacing) {
+            ForEach(Array(rowRanges(for: rows).enumerated()), id: \.offset) { _, range in
+              HStack(spacing: spacing) {
+                ForEach(range, id: \.self) { i in
+                  tile(items[i])
+                }
+              }
+            }
+          }
+          .frame(maxWidth: maxWidth, maxHeight: items.count >= 7 ? maxHeightLarge : maxHeight)
+          .clipShape(.rounded)
+        }
+      }
+
+      private func rowRanges(for rows: [Int]) -> [Range<Int>] {
+        var ranges: [Range<Int>] = []
+        var start = 0
+        for count in rows {
+          ranges.append(start..<(start + count))
+          start += count
+        }
+        return ranges
+      }
+
+      // measuring the images in the mosaics in discord are about 1.04 aspect ratio.
+      private static let tileAspectRatio: CGFloat = 1.04
+      // some tiles like the top tile in the 7 item layout have different sizing.
+      private static let heroAspectRatio: CGFloat = 2.0
+      // three item aspect ratio of the toplevel container.
+      private static let threeItemAspectRatio: CGFloat = 1.5
+
+      @ViewBuilder
+      private func tile(
+        _ attachment: DiscordChannel.Message.Attachment,
+        aspectRatio: CGFloat? = Self.tileAspectRatio,
+        contentMode: ContentMode = .fit
+      ) -> some View {
+        Button {
+          onTap(attachment)
+        } label: {
+          Group {
+            if let aspectRatio {
+              Color.almostClear.aspectRatio(aspectRatio, contentMode: contentMode)
+            } else {
+              Color.almostClear
+            }
+          }
+          .overlay {
+            AttachmentItemPreview(attachment: attachment)
+              .scaledToFill()
+          }
+          .clipShape(.rect(cornerRadius: 4))
+          .clipped()
+        }
+        .buttonStyle(.plain)
+      }
+    }
+
+    struct AttachmentItemPreview: View {
       var attachment: DiscordMedia
 
       var displayPoster = false
@@ -316,14 +438,6 @@ extension MessageCell {
     }
 
     struct AttachmentAudioPlayer: View {
-      static let supportedTypes: [UTType] = [
-        .mp3,
-        .mpeg4Audio,
-        .init(mimeType: "audio/wav", conformingTo: .audio)!,
-        .init(mimeType: "audio/flac", conformingTo: .audio)!,
-        .init(mimeType: "audio/ogg", conformingTo: .audio)!,
-      ]
-
       @Environment(\.theme) var theme
       var attachment: DiscordChannel.Message.Attachment
       var player: AVPlayer

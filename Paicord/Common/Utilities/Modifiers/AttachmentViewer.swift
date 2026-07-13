@@ -39,7 +39,7 @@ private struct AttachmentViewerModifier: ViewModifier {
       content
         .overlay {
           if appState.showingAttachmentViewer {
-            Color.black.opacity(0.25)
+            Color.black.opacity(0.75)
               .onTapGesture {
                 appState.showingAttachmentViewer = false
               }
@@ -118,16 +118,17 @@ private struct AttachmentViewer: View {
     for attachment: DiscordMedia,
     isPresented: Binding<Bool>
   ) -> some View {
-    switch attachment.type {
-    case .mpeg4Movie, .quickTimeMovie, .mp3, .mpeg4Audio,
-      .init(mimeType: "audio/wav", conformingTo: .audio)!,
-      .init(mimeType: "audio/flac", conformingTo: .audio)!,
-      .init(mimeType: "audio/ogg", conformingTo: .audio)!:
-      VideoPlayerView(attachment: attachment)
-    case .png, .jpeg, .jpeg, .webP, .gif:
-      ZoomableImageView(attachment: attachment, isPresented: isPresented)
-    default:
-      Text("Unsupported attachment type")
+    if attachment.isGifv {
+      ZoomableGifvView(attachment: attachment, isPresented: isPresented)
+    } else {
+      switch attachment.mediaKind {
+      case .video, .audio:
+        VideoPlayerView(attachment: attachment)
+      case .image:
+        ZoomableImageView(attachment: attachment, isPresented: isPresented)
+      case .other:
+        Text("Unsupported attachment type")
+      }
     }
   }
 
@@ -677,6 +678,435 @@ private struct ZoomableImageView: View {
         if newX != currentOrigin.x || newY != currentOrigin.y {
           scroll(to: NSPoint(x: newX, y: newY))
         }
+      }
+    }
+  #endif
+}
+
+// gifv version
+private struct ZoomableGifvView: View {
+  let attachment: DiscordMedia
+  @Binding var isPresented: Bool
+  var body: some View {
+    #if os(iOS)
+      IOSZoomableGifvView(attachment: attachment)
+    #elseif os(macOS)
+      MacOSZoomableGifvView(attachment: attachment, isPresented: $isPresented)
+    #endif
+  }
+
+  static func fittedSize(for aspectRatio: CGFloat?, in bounds: CGSize) -> CGSize {
+    guard bounds.width > 0, bounds.height > 0 else { return .zero }
+    let ratio = aspectRatio ?? (bounds.width / bounds.height)
+    if bounds.width / bounds.height > ratio {
+      return CGSize(width: bounds.height * ratio, height: bounds.height)
+    } else {
+      return CGSize(width: bounds.width, height: bounds.width / ratio)
+    }
+  }
+
+  #if os(iOS)
+    struct IOSZoomableGifvView: UIViewRepresentable {
+      let attachment: DiscordMedia
+      var url: URL? {
+        URL(string: attachment.proxyurl)
+      }
+
+      func makeUIView(context: Context) -> UIScrollView {
+        let scrollView = UIScrollView()
+        scrollView.delegate = context.coordinator
+        scrollView.maximumZoomScale = 8.0
+        scrollView.minimumZoomScale = 1.0
+        scrollView.zoomScale = 1.0
+        scrollView.bouncesZoom = true
+        scrollView.bounces = true
+        scrollView.alwaysBounceHorizontal = false
+        scrollView.alwaysBounceVertical = false
+        scrollView.showsHorizontalScrollIndicator = false
+        scrollView.showsVerticalScrollIndicator = false
+
+        let playerView = GifvPlayerView()
+        playerView.isUserInteractionEnabled = false
+        playerView.translatesAutoresizingMaskIntoConstraints = true
+        playerView.frame = .zero
+        playerView.autoresizingMask = []
+
+        scrollView.addSubview(playerView)
+
+        context.coordinator.playerView = playerView
+        context.coordinator.scrollView = scrollView
+
+        let doubleTap = UITapGestureRecognizer(
+          target: context.coordinator,
+          action: #selector(Coordinator.handleDoubleTap(_:))
+        )
+        doubleTap.numberOfTapsRequired = 2
+        scrollView.addGestureRecognizer(doubleTap)
+
+        if let url {
+          context.coordinator.attach(url: url, to: playerView)
+        }
+
+        return scrollView
+      }
+
+      func updateUIView(_ uiView: UIScrollView, context: Context) {
+        guard let playerView = context.coordinator.playerView else { return }
+        uiView.layoutIfNeeded()
+        let fittedSize = ZoomableGifvView.fittedSize(
+          for: attachment.aspectRatio,
+          in: uiView.bounds.size
+        )
+        guard fittedSize != .zero, playerView.frame.size != fittedSize else { return }
+        playerView.frame = CGRect(origin: .zero, size: fittedSize)
+        uiView.contentSize = fittedSize
+        context.coordinator.centerVideo(in: uiView)
+      }
+
+      func makeCoordinator() -> Coordinator { Coordinator() }
+
+      class Coordinator: NSObject, UIScrollViewDelegate {
+        var playerView: GifvPlayerView?
+        weak var scrollView: UIScrollView?
+        private var player: AVPlayer?
+        private var loopObserver: NSObjectProtocol?
+
+        func attach(url: URL, to playerView: GifvPlayerView) {
+          let item = AVPlayerItem(url: url)
+          let player = AVPlayer(playerItem: item)
+          playerView.player = player
+          self.player = player
+          loopObserver = NotificationCenter.default.addObserver(
+            forName: .AVPlayerItemDidPlayToEndTime,
+            object: item,
+            queue: .main
+          ) { _ in
+            player.seek(to: .zero)
+            player.play()
+          }
+          player.play()
+        }
+
+        func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+          playerView
+        }
+
+        func scrollViewDidZoom(_ scrollView: UIScrollView) {
+          centerVideo(in: scrollView)
+        }
+
+        func centerVideo(in scrollView: UIScrollView) {
+          let boundsSize = scrollView.bounds.size
+          let contentSize = scrollView.contentSize
+          let horizontalPadding = max((boundsSize.width - contentSize.width) / 2.0, 0)
+          let verticalPadding = max((boundsSize.height - contentSize.height) / 2.0, 0)
+          scrollView.contentInset = UIEdgeInsets(
+            top: verticalPadding,
+            left: horizontalPadding,
+            bottom: verticalPadding,
+            right: horizontalPadding
+          )
+        }
+
+        @objc func handleDoubleTap(_ gesture: UITapGestureRecognizer) {
+          guard let scrollView = gesture.view as? UIScrollView else { return }
+
+          if scrollView.zoomScale > scrollView.minimumZoomScale {
+            scrollView.setZoomScale(scrollView.minimumZoomScale, animated: true)
+          } else {
+            let point = gesture.location(in: playerView)
+            let newZoom = min(scrollView.maximumZoomScale, 3.0)
+            let scrollSize = CGSize(
+              width: scrollView.bounds.width / newZoom,
+              height: scrollView.bounds.height / newZoom
+            )
+            var origin = CGPoint(
+              x: point.x - scrollSize.width / 2,
+              y: point.y - scrollSize.height / 2
+            )
+            origin.x = max(origin.x, 0)
+            origin.y = max(origin.y, 0)
+            scrollView.zoom(
+              to: CGRect(origin: origin, size: scrollSize),
+              animated: true
+            )
+          }
+        }
+
+        deinit {
+          if let loopObserver {
+            NotificationCenter.default.removeObserver(loopObserver)
+          }
+          player?.pause()
+        }
+      }
+    }
+
+    final class GifvPlayerView: UIView {
+      override class var layerClass: AnyClass { AVPlayerLayer.self }
+      var player: AVPlayer? {
+        get { (layer as? AVPlayerLayer)?.player }
+        set {
+          (layer as? AVPlayerLayer)?.player = newValue
+          (layer as? AVPlayerLayer)?.videoGravity = .resizeAspect
+        }
+      }
+    }
+  #elseif os(macOS)
+    struct MacOSZoomableGifvView: NSViewRepresentable {
+      let attachment: DiscordMedia
+      @Binding var isPresented: Bool
+      var url: URL? {
+        URL(string: attachment.proxyurl)
+      }
+
+      func makeNSView(context: Context) -> NSScrollView {
+        let scrollView = GifvScrollView()
+        scrollView.onLayout = { [weak scrollView, coordinator = context.coordinator] in
+          guard let scrollView else { return }
+          coordinator.applyLayout(aspectRatio: attachment.aspectRatio, in: scrollView)
+        }
+        scrollView.wantsLayer = true
+        scrollView.layer?.backgroundColor = .clear
+
+        scrollView.drawsBackground = false
+        scrollView.borderType = .noBorder
+
+        scrollView.allowsMagnification = true
+        scrollView.maxMagnification = 8.0
+        scrollView.minMagnification = 1.0
+        scrollView.hasHorizontalScroller = false
+        scrollView.hasVerticalScroller = false
+
+        let clipView = ZoomableImageView.NoScrollClipView()
+        clipView.drawsBackground = false
+        scrollView.contentView = clipView
+
+        let playerView = GifvPlayerView()
+
+        let containerView = ZoomableImageView.FlippedView()
+        containerView.wantsLayer = true
+        containerView.layer?.backgroundColor = .clear
+        containerView.addSubview(playerView)
+        scrollView.documentView = containerView
+
+        context.coordinator.playerView = playerView
+        context.coordinator.containerView = containerView
+        context.coordinator.scrollView = scrollView
+
+        let doubleTap = NSClickGestureRecognizer(
+          target: context.coordinator,
+          action: #selector(Coordinator.handleDoubleTap(_:))
+        )
+        doubleTap.numberOfClicksRequired = 2
+        scrollView.addGestureRecognizer(doubleTap)
+
+        let panGesture = NSPanGestureRecognizer(
+          target: context.coordinator,
+          action: #selector(Coordinator.handlePan(_:))
+        )
+        scrollView.addGestureRecognizer(panGesture)
+
+        let backgroundTap = NSClickGestureRecognizer(
+          target: context.coordinator,
+          action: #selector(Coordinator.handleBackgroundTap(_:))
+        )
+        backgroundTap.numberOfClicksRequired = 1
+        scrollView.addGestureRecognizer(backgroundTap)
+
+        if let url {
+          context.coordinator.attach(url: url, to: playerView)
+        }
+
+        return scrollView
+      }
+
+      func updateNSView(_ nsView: NSScrollView, context: Context) {
+        context.coordinator.applyLayout(aspectRatio: attachment.aspectRatio, in: nsView)
+      }
+
+      func makeCoordinator() -> Coordinator {
+        Coordinator(isPresented: $isPresented)
+      }
+
+      class Coordinator: NSObject {
+        var playerView: GifvPlayerView?
+        var containerView: NSView?
+        weak var scrollView: NSScrollView?
+        private var player: AVPlayer?
+        private var loopObserver: NSObjectProtocol?
+        var isPresented: Binding<Bool>
+
+        init(isPresented: Binding<Bool>) {
+          self.isPresented = isPresented
+        }
+
+        func applyLayout(aspectRatio: CGFloat?, in scrollView: NSScrollView) {
+          guard let playerView, let containerView else { return }
+          let bounds = scrollView.bounds.size
+          let fittedSize = ZoomableGifvView.fittedSize(for: aspectRatio, in: bounds)
+          guard fittedSize != .zero else { return }
+          let origin = CGPoint(
+            x: (bounds.width - fittedSize.width) / 2,
+            y: (bounds.height - fittedSize.height) / 2
+          )
+          let newFrame = CGRect(origin: origin, size: fittedSize)
+          guard playerView.frame != newFrame else { return }
+          containerView.frame = CGRect(origin: .zero, size: bounds)
+          playerView.frame = newFrame
+        }
+
+        func attach(url: URL, to playerView: GifvPlayerView) {
+          let item = AVPlayerItem(url: url)
+          let player = AVPlayer(playerItem: item)
+          playerView.player = player
+          self.player = player
+          loopObserver = NotificationCenter.default.addObserver(
+            forName: .AVPlayerItemDidPlayToEndTime,
+            object: item,
+            queue: .main
+          ) { _ in
+            player.seek(to: .zero)
+            player.play()
+          }
+          player.play()
+        }
+
+        @objc func handleBackgroundTap(_ gesture: NSClickGestureRecognizer) {
+          guard let playerView, let containerView else { return }
+          let clickInContainer = gesture.location(in: containerView)
+          if !playerView.frame.contains(clickInContainer) {
+            isPresented.wrappedValue = false
+          }
+        }
+
+        @objc func handleDoubleTap(_ gesture: NSClickGestureRecognizer) {
+          guard let scrollView else { return }
+
+          if scrollView.magnification > 1.0 {
+            scrollView.animator().magnification = 1.0
+          } else {
+            var point = gesture.location(in: scrollView)
+            point.y = scrollView.bounds.height - point.y
+            let newMag: CGFloat = 3.0
+            scrollView.animator().setMagnification(newMag, centeredAt: point)
+          }
+        }
+
+        @objc func handlePan(_ gesture: NSPanGestureRecognizer) {
+          guard let scrollView, let playerView else { return }
+          let mag = scrollView.magnification
+          guard mag > 1.0 else { return }
+
+          let videoFrame = playerView.frame
+          let visibleDocWidth = scrollView.contentView.bounds.width
+          let visibleDocHeight = scrollView.contentView.bounds.height
+
+          let fitsX = videoFrame.width <= visibleDocWidth
+          let minScrollX: CGFloat
+          let maxScrollX: CGFloat
+          if fitsX {
+            let center = videoFrame.midX - visibleDocWidth / 2
+            minScrollX = center
+            maxScrollX = center
+          } else {
+            minScrollX = videoFrame.minX
+            maxScrollX = videoFrame.maxX - visibleDocWidth
+          }
+          let fitsY = videoFrame.height <= visibleDocHeight
+          let minScrollY: CGFloat
+          let maxScrollY: CGFloat
+          if fitsY {
+            let center = videoFrame.midY - visibleDocHeight / 2
+            minScrollY = center
+            maxScrollY = center
+          } else {
+            minScrollY = videoFrame.minY
+            maxScrollY = videoFrame.maxY - visibleDocHeight
+          }
+
+          switch gesture.state {
+          case .began, .changed:
+            let translation = gesture.translation(in: scrollView)
+            let scale = 1.0 / mag
+            let currentOrigin = scrollView.contentView.bounds.origin
+            let newX = min(
+              max(minScrollX, currentOrigin.x - translation.x * scale),
+              maxScrollX
+            )
+            let newY = min(
+              max(minScrollY, currentOrigin.y - translation.y * scale),
+              maxScrollY
+            )
+            scrollView.contentView.scroll(to: CGPoint(x: newX, y: newY))
+            gesture.setTranslation(.zero, in: scrollView)
+          default:
+            let currentOrigin = scrollView.contentView.bounds.origin
+            let clampedOrigin = CGPoint(
+              x: min(max(minScrollX, currentOrigin.x), maxScrollX),
+              y: min(max(minScrollY, currentOrigin.y), maxScrollY)
+            )
+            if clampedOrigin != currentOrigin {
+              NSView.animate(
+                withDuration: 0.2,
+                delay: 0,
+                options: .curveEaseOut
+              ) {
+                scrollView.contentView.bounds.origin = clampedOrigin
+              }
+            }
+          }
+        }
+
+        deinit {
+          if let loopObserver {
+            NotificationCenter.default.removeObserver(loopObserver)
+          }
+          player?.pause()
+        }
+      }
+    }
+
+    final class GifvScrollView: NSScrollView {
+      var onLayout: (() -> Void)?
+      override func layout() {
+        super.layout()
+        onLayout?()
+      }
+    }
+
+    final class GifvPlayerView: NSView {
+      override init(frame frameRect: CGRect) {
+        super.init(frame: frameRect)
+        wantsLayer = true
+      }
+      required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        wantsLayer = true
+      }
+
+      var player: AVPlayer? {
+        didSet { updatePlayerLayer() }
+      }
+
+      private var playerLayer: AVPlayerLayer?
+
+      override func layout() {
+        super.layout()
+        playerLayer?.frame = bounds
+      }
+
+      private func updatePlayerLayer() {
+        playerLayer?.removeFromSuperlayer()
+        guard let player = player else {
+          playerLayer = nil
+          return
+        }
+        let pl = AVPlayerLayer(player: player)
+        pl.frame = bounds
+        pl.videoGravity = .resizeAspect
+        layer?.addSublayer(pl)
+        playerLayer = pl
       }
     }
   #endif

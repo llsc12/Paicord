@@ -46,6 +46,11 @@ protocol DiscordMedia {
   var width: Int? { get }
   var placeholder: String? { get }
   var content_type: String? { get }
+  var isGifv: Bool { get }
+}
+
+extension DiscordMedia {
+  var isGifv: Bool { false }
 }
 
 extension Embed.Media: DiscordMedia {
@@ -59,9 +64,24 @@ extension DiscordChannel.Message.Attachment: DiscordMedia {
   }
 }
 
+struct GifvAttachmentMedia: DiscordMedia {
+  let media: Embed.Media
+
+  var proxyurl: String { media.proxyurl }
+  var height: Int? { media.height }
+  var width: Int? { media.width }
+  var placeholder: String? { media.placeholder }
+  var content_type: String? { media.content_type }
+  var isGifv: Bool { true }
+}
+
 extension DiscordMedia {
   var type: UTType {
     if let mimeType = content_type, let type = UTType(mimeType: mimeType) {
+      return type
+    } else if let ext = proxyurl.split(separator: ".").last.map(String.init),
+      let type = UTType(filenameExtension: String(ext.prefix { $0.isLetter || $0.isNumber }))
+    {
       return type
     } else {
       return .data
@@ -74,6 +94,29 @@ extension DiscordMedia {
     } else {
       return nil
     }
+  }
+
+  var mediaKind: MediaKind {
+    if type.conforms(to: .image) || type.conforms(to: .gif) {
+      return .image
+    } else if type.conforms(to: .movie) || type.conforms(to: .video) {
+      return .video
+    } else if type.conforms(to: .audio) {
+      return .audio
+    } else {
+      return .other
+    }
+  }
+}
+
+enum MediaKind {
+  case image
+  case video
+  case audio
+  case other
+
+  var isViewableMedia: Bool {
+    self != .other
   }
 }
 
