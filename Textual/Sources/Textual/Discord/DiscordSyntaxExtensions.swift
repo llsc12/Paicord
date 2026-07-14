@@ -66,8 +66,13 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
   ///   the same technique `discordMentions`/`discordSpoilers` use, just combined with an
   ///   attachment here instead of used on its own.
   public static func discordEmoji(
-    cdnURL: @escaping @Sendable (_ id: String, _ animated: Bool) -> URL = { id, animated in
-      URL(string: "https://cdn.discordapp.com/emojis/\(id).\(animated ? "gif" : "png")")!
+    jumbo: Bool = false,
+    cdnURL: @escaping @Sendable (_ id: String, _ animated: Bool, _ jumbo: Bool) -> URL = {
+      id, animated, jumbo in
+      URL(
+        string:
+          "https://cdn.discordapp.com/emojis/\(id).webp?size=\(jumbo ? 88 : 44)&animated=\(animated)"
+      )!
     }
   ) -> Self {
     .init(patterns: [.discordEmoji]) { token, attributes in
@@ -83,7 +88,7 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
       }
       let name = components[nameIndex]
 
-      var attributes = attributes.emojiURL(cdnURL(String(id), animated))
+      var attributes = attributes.emojiURL(cdnURL(String(id), animated, jumbo))
       var linkComponents = URLComponents()
       linkComponents.scheme = "textual-discord"
       linkComponents.host = "emoji"
@@ -121,7 +126,8 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
       let format = components.count > 1 ? String(components[1]) : "f"
       let date = Date(timeIntervalSince1970: epoch)
 
-      return AttributedString(DiscordTimestampFormatter.string(for: date, format: format), attributes: attributes)
+      return AttributedString(
+        DiscordTimestampFormatter.string(for: date, format: format), attributes: attributes)
     }
   }
 
@@ -169,7 +175,8 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
       var linkComponents = URLComponents()
       linkComponents.scheme = "textual-discord"
       linkComponents.host = "spoiler"
-      linkComponents.path = "/\(content.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? "")"
+      linkComponents.path =
+        "/\(content.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? "")"
       linkComponents.queryItems = [URLQueryItem(name: "index", value: String(index))]
       attributes.link = linkComponents.url
 

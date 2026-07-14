@@ -57,11 +57,11 @@ public protocol AttachmentLoader: Sendable {
 }
 
 private struct ImageAttachmentLoaderKey: EnvironmentKey {
-  nonisolated(unsafe) static let defaultValue: any AttachmentLoader = .image()
+  static let defaultValue: any AttachmentLoader = .image()
 }
 
 private struct EmojiAttachmentLoaderKey: EnvironmentKey {
-  nonisolated(unsafe) static let defaultValue: any AttachmentLoader = .emoji()
+  static let defaultValue: any AttachmentLoader = .emoji()
 }
 
 extension EnvironmentValues {

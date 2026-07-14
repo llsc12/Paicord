@@ -37,11 +37,32 @@ public struct DiscordMarkdownParser: MarkupParser {
 
   public func attributedString(for input: String) throws -> AttributedString {
     let parsed = try base.attributedString(for: DiscordMarkdown.preprocess(input))
-    return applyingUnderline(to: parsed)
+    return strippingEmphasisFlankingFixMarker(from: applyingUnderline(to: parsed))
+  }
+
+  private func strippingEmphasisFlankingFixMarker(
+    from attributedString: AttributedString
+  ) -> AttributedString {
+    guard
+      attributedString.characters.contains(DiscordMarkdown.emphasisFlankingFixMarker)
+    else {
+      return attributedString
+    }
+
+    var output = attributedString
+    while let index = output.characters.firstIndex(
+      of: DiscordMarkdown.emphasisFlankingFixMarker
+    ) {
+      output.characters.remove(at: index)
+    }
+    return output
   }
 
   private func applyingUnderline(to attributedString: AttributedString) -> AttributedString {
-    guard attributedString.runs.contains(where: { $0.inlinePresentationIntent?.contains(.inlineHTML) == true })
+    guard
+      attributedString.runs.contains(where: {
+        $0.inlinePresentationIntent?.contains(.inlineHTML) == true
+      })
     else {
       return attributedString
     }

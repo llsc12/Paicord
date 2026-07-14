@@ -1,4 +1,3 @@
-
 /// https://discord.com/developers/docs/resources/subscription#subscription-object
 public struct Subscription: Sendable, Codable {
 

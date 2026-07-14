@@ -6,7 +6,6 @@
 //  Copyright © 2025 Lakhan Lothiyi.
 //
 
-import HighlightSwift
 import Playgrounds
 import SwiftUIX
 
@@ -185,81 +184,6 @@ extension Theming {
 
       /// Border that goes around code blocks.
       let codeBlockBorder: Color
-
-      let codeBlockSyntaxTheme: SyntaxTheme
-
-      enum SyntaxTheme: Sendable, Codable, Hashable, Equatable {
-        case a11y
-        case atomOne
-        case classic
-        case edge
-        case github
-        case google
-        case gradient
-        case grayscale
-        case harmonic16
-        case heetch
-        case horizon
-        case humanoid
-        case ia
-        case isblEditor
-        case kimbie
-        case nnfx
-        case pandaSyntax
-        case papercolor
-        case paraiso
-        case qtcreator
-        case silk
-        case solarFlare
-        case solarized
-        case stackoverflow
-        case standard
-        case summerfruit
-        case synthMidnightTerminal
-        case tokyoNight
-        case unikitty
-        case xcode
-
-        case custom(lightCSS: String, darkCSS: String)
-
-        var highlightTheme: CodeTextColors {
-          switch self {
-          case .a11y: .theme(.a11y)
-          case .atomOne: .theme(.atomOne)
-          case .classic: .theme(.classic)
-          case .edge: .theme(.edge)
-          case .github: .theme(.github)
-          case .google: .theme(.google)
-          case .gradient: .theme(.gradient)
-          case .grayscale: .theme(.grayscale)
-          case .harmonic16: .theme(.harmonic16)
-          case .heetch: .theme(.heetch)
-          case .horizon: .theme(.horizon)
-          case .humanoid: .theme(.humanoid)
-          case .ia: .theme(.ia)
-          case .isblEditor: .theme(.isblEditor)
-          case .kimbie: .theme(.kimbie)
-          case .nnfx: .theme(.nnfx)
-          case .pandaSyntax: .theme(.pandaSyntax)
-          case .papercolor: .theme(.papercolor)
-          case .paraiso: .theme(.paraiso)
-          case .qtcreator: .theme(.qtcreator)
-          case .silk: .theme(.silk)
-          case .solarFlare: .theme(.solarFlare)
-          case .solarized: .theme(.solarized)
-          case .stackoverflow: .theme(.stackoverflow)
-          case .standard: .theme(.standard)
-          case .summerfruit: .theme(.summerfruit)
-          case .synthMidnightTerminal: .theme(.synthMidnightTerminal)
-          case .tokyoNight: .theme(.tokyoNight)
-          case .unikitty: .theme(.unikitty)
-          case .xcode: .theme(.xcode)
-
-          case .custom(let lightCSS, let darkCSS):
-            .custom(dark: .custom(css: darkCSS), light: .custom(css: lightCSS))
-          }
-        }
-      }
     }
   }
 }
@@ -327,7 +251,6 @@ extension Theming {
           light: Color(hexadecimal6: 0xDCDDDE),
           dark: Color(hexadecimal6: 0x373745)
         ),
-        codeBlockSyntaxTheme: .xcode
       )
     ),
     // below are just auto's variants with constants for light and dark respectively
@@ -359,7 +282,6 @@ extension Theming {
         codeSpanBackground: .gray.opacity(0.2),
         codeBlockBackground: .init(hexadecimal6: 0xF1F3F5),
         codeBlockBorder: .init(hexadecimal6: 0xDCDDDE),
-        codeBlockSyntaxTheme: .xcode
       )
     ),
     .init(
@@ -390,7 +312,6 @@ extension Theming {
         codeSpanBackground: .gray.opacity(0.2),
         codeBlockBackground: .init(hexadecimal6: 0x1f202f),
         codeBlockBorder: .init(hexadecimal6: 0x373745),
-        codeBlockSyntaxTheme: .xcode
       )
     ),
   ]

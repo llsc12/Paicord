@@ -177,8 +177,7 @@ extension AnySnowflake: CodingKeyRepresentable {
   }
 }
 
-public func == (lhs: any SnowflakeProtocol, rhs: any SnowflakeProtocol) -> Bool
-{
+public func == (lhs: any SnowflakeProtocol, rhs: any SnowflakeProtocol) -> Bool {
   lhs.rawValue == rhs.rawValue
 }
 
@@ -336,8 +335,7 @@ public struct SnowflakeInfo: Sendable {
   }
 
   @inlinable
-  internal func toSnowflake<S: SnowflakeProtocol>(as type: S.Type = S.self) -> S
-  {
+  internal func toSnowflake<S: SnowflakeProtocol>(as type: S.Type = S.self) -> S {
     let timestamp = (self.timestamp - SnowflakeInfo.discordEpochConstant) << 22
     let workerId = UInt64(self.workerId) << 17
     let processId = UInt64(self.processId) << 12

@@ -136,24 +136,24 @@ struct LoginForm: View {
         VStack(alignment: .leading, spacing: 5) {
           Text("Email or Phone Number")
           TextField(text: $viewModel.login)
-          .textFieldStyle(.plain)
-          .padding(10)
-          .frame(maxWidth: .infinity)
-          .focused($loginFocused)
-          .background(theme.common.primaryBackground.opacity(0.75))
-          .clipShape(.rounded)
-          .overlay {
-            RoundedRectangle()
-              .stroke(
-                loginFocused ? theme.common.primaryButton : Color.clear,
-                lineWidth: 1
-              )
-              .fill(.clear)
-          }
-          .padding(.bottom, 10)
-          .onSubmit {
-            passwordFocused = true
-          }
+            .textFieldStyle(.plain)
+            .padding(10)
+            .frame(maxWidth: .infinity)
+            .focused($loginFocused)
+            .background(theme.common.primaryBackground.opacity(0.75))
+            .clipShape(.rounded)
+            .overlay {
+              RoundedRectangle()
+                .stroke(
+                  loginFocused ? theme.common.primaryButton : Color.clear,
+                  lineWidth: 1
+                )
+                .fill(.clear)
+            }
+            .padding(.bottom, 10)
+            .onSubmit {
+              passwordFocused = true
+            }
 
           Text("Password")
           SecureField(text: $viewModel.password)
@@ -173,7 +173,7 @@ struct LoginForm: View {
                 .fill(.clear)
             }
             .onSubmit {
-              Task { // FIXME: this and login button need to share tasks for blocking login button spam when tasks are ongoing from here.
+              Task {  // FIXME: this and login button need to share tasks for blocking login button spam when tasks are ongoing from here.
                 await viewModel.loginAction()
               }
             }

@@ -10,22 +10,22 @@ import SwiftUI
 
 struct PaicordCommands: Commands {
   @Environment(\.gateway) var gatewayStore
-#if os(macOS)
-  @Environment(\.openWindow) var openWindow
-#endif
+  #if os(macOS)
+    @Environment(\.openWindow) var openWindow
+  #endif
   @FocusedValue(\.appState) var appState
 
   var body: some Commands {
     CommandGroup(replacing: .appSettings) {
       Button("Settings") {
-#if os(macOS)
-        openWindow(id: "settings")
-#elseif os(iOS)
-        NotificationCenter.default.post(
-          name: .presentSettingsSheet,
-          object: nil
-        )
-#endif
+        #if os(macOS)
+          openWindow(id: "settings")
+        #elseif os(iOS)
+          NotificationCenter.default.post(
+            name: .presentSettingsSheet,
+            object: nil
+          )
+        #endif
       }
       .keyboardShortcut(",", modifiers: .command)
       .disabled(gatewayStore.state != .connected)
@@ -63,7 +63,7 @@ struct PaicordCommands: Commands {
         }
       }
       .disabled(
-        gatewayStore.accounts.currentAccountID == nil 
+        gatewayStore.accounts.currentAccountID == nil
       )
     }
     // add reload button to the system's View menu

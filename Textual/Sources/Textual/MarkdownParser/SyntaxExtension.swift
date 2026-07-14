@@ -12,10 +12,11 @@ extension AttributedStringMarkdownParser {
 
     init(
       patterns: [PatternTokenizer.Pattern],
-      replace: @escaping (
-        _ token: PatternTokenizer.Token,
-        _ attributes: AttributeContainer
-      ) -> AttributedString?
+      replace:
+        @escaping (
+          _ token: PatternTokenizer.Token,
+          _ attributes: AttributeContainer
+        ) -> AttributedString?
     ) {
       self.patterns = patterns
       self.replace = replace
@@ -38,7 +39,8 @@ extension AttributedStringMarkdownParser {
     public init(
       regex: Regex<(Substring, Substring)>,
       tokenType: String,
-      replace: @escaping (_ capturedContent: String, _ attributes: AttributeContainer) ->
+      replace:
+        @escaping (_ capturedContent: String, _ attributes: AttributeContainer) ->
         AttributedString?
     ) {
       self.patterns = [.init(regex: regex, tokenType: .init(rawValue: tokenType))]

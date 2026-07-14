@@ -23,9 +23,9 @@ class MessageDrainStore: DiscordDataStore {
 
   func setupEventHandling() {
     guard let gateway = gateway?.gateway else { return }
-
+    let events = gateway.events
     eventTask = Task { @MainActor in
-      for await event in await gateway.events {
+      for await event in events {
         switch event.data {
         case .messageCreate(let message):
           // when a message is created, we check if its in pendingMessages, and its nonce matches.
@@ -477,7 +477,7 @@ class MessageDrainStore: DiscordDataStore {
         //        }
         self.failedMessages.removeValue(forKey: nonce)
         self.messageTasks.removeValue(forKey: nonce)
-        
+
         vm.cleanupAllTempFiles()
       } catch {
         print("[SendTask] Message send FAILED nonce:", nonce)

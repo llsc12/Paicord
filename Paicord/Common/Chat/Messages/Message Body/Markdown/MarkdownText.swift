@@ -6,6 +6,8 @@
 //
 
 import PaicordLib
+import SDWebImageSwiftUI
+import SwiftEmojiIndex
 import SwiftUI
 import SwiftUIX
 import Textual
@@ -20,9 +22,11 @@ struct MarkdownText: View {
   @Environment(\.theme) var theme
   @State private var revealedSpoilers: Set<String> = []
   @State private var userPopover: PartialUser?
+  @State private var emojiPopover: DiscordModels.Emoji?
+  @State private var unicodeEmojiPopover: String?
 
   @ViewStorage private var documentFrame: CGRect = .zero
-  @State private var tapLocalPoint: CGPoint = .zero
+  @State private var tapLocalPoint: (point: CGPoint, size: CGSize) = (.zero, .zero)
 
   init(
     content: String,
@@ -43,6 +47,18 @@ struct MarkdownText: View {
 
   private var guildStore: GuildStore? { channelStore?.guildStore }
 
+  private var isJumboEmoji: Bool {
+    allowsJumboEmoji && DiscordMarkdown.isEmojiOnlyContent(content)
+  }
+
+  private var handleInteractions: Bool = true
+
+  func handlesInteractions(_ bool: Bool = true) -> Self {
+    var copy = self
+    copy.handleInteractions = bool
+    return copy
+  }
+
   var body: some View {
     StructuredText(
       content,
@@ -53,12 +69,10 @@ struct MarkdownText: View {
     .textual.structuredTextStyle(.discord)
     .textual.highlighterTheme(highlighterTheme)
     .textual.codeBlockStyle(PaicordCodeBlockStyle())
-    .textual.emojiProperties(
-      allowsJumboEmoji && DiscordMarkdown.isEmojiOnlyContent(content)
-        ? .discordJumbo : .discordStandard
-    )
+    .textual.emojiProperties(isJumboEmoji ? .discordJumbo : .discordStandard)
     .textual.roundedBackgroundStyle(RoundedBackgroundStyle(cornerRadius: 4, padding: 1))
     .textual.textSelection(.enabled)
+    .textual.overflowMode(.wrap)
     .foregroundStyle(foregroundColorOverride ?? theme.markdown.text)
     .background(
       GeometryReader { geometry in
@@ -68,7 +82,8 @@ struct MarkdownText: View {
     )
     .popover(
       isPresented: isPopoverPresented,
-      attachmentAnchor: .rect(.rect(CGRect(origin: tapLocalPoint, size: .zero)))
+      attachmentAnchor: .rect(.rect(CGRect(origin: tapLocalPoint.point, size: tapLocalPoint.size))),
+      arrowEdge: popoverEdgePreference
     ) {
       if let userPopover {
         ProfilePopoutView(
@@ -76,15 +91,21 @@ struct MarkdownText: View {
           member: channelStore?.guildStore?.member(userPopover.id),
           user: userPopover
         )
+      } else if let emojiPopover {
+        EmojiDetailsView(emoji: emojiPopover)
+      } else if let unicodeEmojiPopover {
+        UnicodeEmojiDetailsView(character: unicodeEmojiPopover)
       }
     }
     .textual.onEntityTap { url, bounds in
+      if !handleInteractions { return }
       handleTap(url: url, bounds: bounds)
     }
     .environment(
       \.openURL,
       OpenURLAction { url in
-        url.scheme == "textual-discord" || PaicordChatLink(url: url) != nil
+        if !handleInteractions { return .handled }
+        return url.scheme == "textual-discord" || PaicordChatLink(url: url) != nil
           ? .handled : .systemAction
       }
     )
@@ -92,16 +113,255 @@ struct MarkdownText: View {
 
   private var isPopoverPresented: Binding<Bool> {
     Binding(
-      get: { userPopover != nil },
-      set: { if !$0 { userPopover = nil } }
+      get: { userPopover != nil || emojiPopover != nil || unicodeEmojiPopover != nil },
+      set: {
+        if !$0 {
+          userPopover = nil
+          emojiPopover = nil
+          unicodeEmojiPopover = nil
+        }
+      }
     )
+  }
+
+  private var popoverEdgePreference: Edge? {
+    if userPopover != nil {
+      return nil
+    } else if emojiPopover != nil || unicodeEmojiPopover != nil {
+      return .trailing
+    } else {
+      return nil
+    }
+  }
+
+  // MARK: - Supplementary Views
+
+  struct EmojiDetailsView: View {
+    var emoji: DiscordModels.Emoji
+    @Environment(\.gateway) var gw
+    @Environment(\.appState) var appState
+
+    @State private var source: SourceState = .loading
+
+    private enum SourceState {
+      case loading
+      case ownGuild(id: GuildSnowflake, name: String, icon: String?)
+      case currentGuild(id: GuildSnowflake, name: String, icon: String?)
+      case foreignGuild(EmojiSource.GuildSource)
+      case application(EmojiSource.ApplicationSource)
+      case unavailable
+    }
+
+    var body: some View {
+      if let id = emoji.id, let name = emoji.name {
+        let animated = emoji.animated ?? false
+        VStack(alignment: .leading, spacing: 0) {
+          HStack {
+            let url = URL(
+              string: CDNEndpoint.customEmoji(emojiId: id).url
+                + ".\(animated ? "gif" : "png")?size=96&animated=\(animated)")
+            WebImage(url: url)
+              .resizable()
+              .scaledToFit()
+              .frame(width: 44, height: 44)
+
+            VStack(alignment: .leading) {
+              Text(":\(name):")
+                .bold()
+              sourceDetail
+                .fixedSize(horizontal: false, vertical: true)
+            }
+          }
+          .padding(12)
+
+          sourceRow
+        }
+        .frame(minWidth: 290, maxWidth: 290, alignment: .leading)
+        .task(id: id) {
+          await loadSource(id: id)
+        }
+      }
+    }
+
+    @ViewBuilder
+    private var sourceDetail: some View {
+      switch source {
+      case .loading:
+        ProgressView()
+      case .ownGuild:
+        Text("This emoji is from one of your servers. Type its name in the chat bar to use it.")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+      case .currentGuild:
+        Text("This emoji is from this server. You can use it everywhere.")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+      case .foreignGuild:
+        Text("Want to use this emoji everywhere? Join the server.")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+      case .application(let app):
+        Text("This emoji is from the \(app.name) app")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+      case .unavailable:
+        Text("This emoji is from a server that is either invite-only or unavailable.")
+          .font(.caption)
+          .foregroundStyle(.secondary)
+      }
+    }
+
+    @ViewBuilder
+    private var sourceRow: some View {
+      switch source {
+      case .loading, .application(_), .unavailable:
+        EmptyView()
+      case .currentGuild(let id, let name, let icon), .ownGuild(let id, let name, let icon):
+        let guild = gw.user.guilds[id]
+        guildRow(
+          name: name, icon: icon, guildId: id,
+          hasDiscovery: guild?.features.contains(.discoverable) ?? false)
+      case .foreignGuild(let guild):
+        guildRow(
+          name: guild.name, icon: guild.icon, guildId: guild.id,
+          hasDiscovery: guild.features.contains(.discoverable))
+      }
+    }
+
+    @ViewBuilder
+    private func guildRow(name: String, icon: String?, guildId: GuildSnowflake?, hasDiscovery: Bool)
+      -> some View
+    {
+      VStack(alignment: .leading) {
+        Text("This emoji is from")
+          .font(.callout.bold())
+          .foregroundStyle(.secondary)
+
+        HStack(spacing: 4) {
+          if let icon, let guildId {
+            let url = URL(
+              string: CDNEndpoint.guildIcon(guildId: guildId, icon: icon).url
+                + ".webp?size=128&animated=true")
+            WebImage(url: url)
+              .resizable()
+              .scaledToFit()
+              .frame(width: 36, height: 36)
+              .clipShape(.rounded)
+              .padding(.trailing, 6)
+          }
+          VStack(alignment: .leading) {
+            Text(name)
+              .font(.headline.bold())
+            HStack {
+              if hasDiscovery {
+                Text("Discoverable")
+              } else {
+                Text("Invite-Only Server")
+              }
+            }
+            .font(.caption)
+          }
+        }
+      }
+      .padding(12)
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .background(.black.tertiary)
+    }
+
+    private func loadSource(id: EmojiSnowflake) async {
+      // check locally first
+      if let guild = GatewayStore.shared.user.guilds.values.first(where: {
+        $0.emojis.contains(where: { $0.id == id })
+      }) {
+        if appState.selectedGuild == guild.id {
+          source = .currentGuild(id: guild.id, name: guild.name, icon: guild.icon)
+        } else {
+          source = .ownGuild(id: guild.id, name: guild.name, icon: guild.icon)
+        }
+        return
+      }
+
+      // load source
+      do {
+        let req = try await gw.client.getEmojiSource(emojiID: id)
+        if let error = req.asError() { throw error }
+        let data = try req.decode()
+        switch data.type {
+        case .guild:
+          if let guild = data.guild {
+            source = .foreignGuild(guild)
+          } else {
+            source = .unavailable
+          }
+        case .application:
+          if let application = data.application {
+            source = .application(application)
+          } else {
+            source = .unavailable
+          }
+        default:
+          source = .unavailable
+        }
+      } catch {
+        source = .unavailable
+      }
+    }
+  }
+
+  struct UnicodeEmojiDetailsView: View {
+    var character: String
+    @State private var fallbackEmoji: SwiftEmojiIndex.Emoji?
+    @State private var loadedFallback = false
+
+    private var discordName: String? {
+      DiscordEmojiNameIndex.names(for: character)?.first
+    }
+
+    var body: some View {
+      HStack {
+        Text(character)
+          .font(.system(size: 44))
+
+        VStack(alignment: .leading) {
+          if let discordName {
+            Text(":\(discordName):")
+              .bold()
+          } else if let fallbackEmoji {
+            Text(":\(fallbackEmoji.shortcodes.first ?? character):")
+              .bold()
+            Text(fallbackEmoji.name.capitalized)
+              .font(.caption)
+              .foregroundStyle(.secondary)
+          } else if loadedFallback {
+            Text(character)
+              .bold()
+          } else {
+            ProgressView()
+          }
+
+          Text("A default emoji. You can use this emoji everywhere on Discord.")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+        }
+      }
+      .padding(12)
+      .frame(minWidth: 220, maxWidth: 290, alignment: .leading)
+      .task(id: character) {
+        guard discordName == nil else { return }
+        fallbackEmoji = await SwiftEmojiIndex.Emoji.lookup(character)
+        loadedFallback = true
+      }
+    }
   }
 
   // MARK: - Styling
 
   private var inlineStyle: InlineStyle {
     InlineStyle()
-      .code(.monospaced, .fontScale(0.94), .backgroundColor(DynamicColor(theme.markdown.codeSpanBackground)))
+      .code(
+        .monospaced, .fontScale(0.94),
+        .backgroundColor(DynamicColor(theme.markdown.codeSpanBackground))
+      )
       .strong(.fontWeight(.semibold))
       .link(.foregroundColor(DynamicColor(theme.common.hyperlink)))
       .subtext(.fontScale(0.75), .foregroundColor(DynamicColor(theme.markdown.secondaryText)))
@@ -146,11 +406,14 @@ struct MarkdownText: View {
       theme: theme
     )
     extensions.append(
-      .discordEmoji { id, animated in
+      .discordEmoji(jumbo: isJumboEmoji) { id, animated, jumbo in
+        // apparently using gif files is unreliable now. discord cdn amazing fr
         let base = CDNEndpoint.customEmoji(emojiId: EmojiSnowflake(id)).url
-        return URL(string: base + (animated ? ".gif" : ".png") + "?size=44")!
+        let size = jumbo ? 96 : 44
+        return URL(string: base + ".webp?size=\(size)&animated=\(animated)")!
       }
     )
+    extensions.append(.discordUnicodeEmoji)
     extensions.append(.discordTimestamps)
     extensions.append(.discordNoEmbedLinks)
     extensions.append(.discordSpoilers(revealed: revealedSpoilers))
@@ -172,6 +435,44 @@ struct MarkdownText: View {
         revealedSpoilers.insert(
           AttributedStringMarkdownParser.SyntaxExtension.spoilerRevealKey(index: index, text: text)
         )
+      } else if url.host == "emoji",
+        url.pathComponents.last == "unicode",
+        let query = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems,
+        let character = query.first(where: { $0.name == "char" })?.value
+      {
+        ImpactGenerator.impact(style: .light)
+        unicodeEmojiPopover = character
+        tapLocalPoint = (
+          CGPoint(
+            x: bounds.minX - documentFrame.minX,
+            y: bounds.minY - documentFrame.minY
+          ),
+          CGSize(
+            width: bounds.width,
+            height: bounds.height
+          )
+        )
+      } else if url.host == "emoji",
+        let encoded = url.pathComponents.last,
+        let text = encoded.removingPercentEncoding,
+        let query = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems,
+        let name = query.first(where: { $0.name == "name" })?.value,
+        let animatedString = query.first(where: { $0.name == "animated" })?.value,
+        let animated: Bool = Bool(animatedString)
+      {
+        let emoji = Emoji(id: .init(text), name: name, animated: animated)
+        ImpactGenerator.impact(style: .light)
+        emojiPopover = emoji
+        tapLocalPoint = (
+          CGPoint(
+            x: bounds.minX - documentFrame.minX,
+            y: bounds.minY - documentFrame.minY
+          ),
+          CGSize(
+            width: bounds.width,
+            height: bounds.height
+          )
+        )
       }
     }
 
@@ -185,9 +486,15 @@ struct MarkdownText: View {
       if let user = gw.user.users[userID] {
         ImpactGenerator.impact(style: .light)
         userPopover = user
-        tapLocalPoint = CGPoint(
-          x: bounds.midX - documentFrame.minX,
-          y: bounds.minY - documentFrame.minY
+        tapLocalPoint = (
+          CGPoint(
+            x: bounds.minX - documentFrame.minX,
+            y: bounds.minY - documentFrame.minY
+          ),
+          CGSize(
+            width: bounds.width,
+            height: bounds.height
+          )
         )
       }
     default:
@@ -307,7 +614,8 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
       )
     }
 
-    let everyoneMention = Self(regex: /@(everyone)/, tokenType: "paicordEveryoneMention") { _, base in
+    let everyoneMention = Self(regex: /@(everyone)/, tokenType: "paicordEveryoneMention") {
+      _, base in
       mention(
         text: "@everyone",
         link: "paicord://mention/everyone",
@@ -449,14 +757,4 @@ enum PaicordChatLink {
       return nil
     }
   }
-}
-
-#Preview("Rounded backgrounds") {
-  MarkdownText(content: "Hey <@123>, use `git status` to check for `uncommitted` changes")
-    .padding()
-}
-
-#Preview("Dash line is not a heading") {
-  MarkdownText(content: "test\n---\ntest")
-    .padding()
 }

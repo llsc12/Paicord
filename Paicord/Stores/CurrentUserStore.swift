@@ -31,7 +31,7 @@ class CurrentUserStore: DiscordDataStore {
   var premiumKind: DiscordUser.PremiumKind = .none
 
   // MARK: - Presence boxed helpers
-  
+
   /// Get a box for this presence data. Store the box and read the underlying value.
   func presenceBox(for id: UserSnowflake) -> PresenceBox? {
     presenceBoxes[id]
@@ -60,8 +60,9 @@ class CurrentUserStore: DiscordDataStore {
   func setupEventHandling() {
     guard let gateway = gateway?.gateway else { return }
 
+    let events = gateway.events
     eventTask = Task { @MainActor in
-      for await event in await gateway.events {
+      for await event in events {
         switch event.data {
         case .ready(let readyData):
           handleReady(readyData)

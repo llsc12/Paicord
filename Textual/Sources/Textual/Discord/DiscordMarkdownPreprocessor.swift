@@ -51,12 +51,15 @@ public enum DiscordMarkdown {
   static let protectedTokenStart: Character = "\u{E002}"
   static let protectedTokenEnd: Character = "\u{E003}"
 
+  static let emphasisFlankingFixMarker: Character = "\u{E004}"
+
   /// Rewrites raw Discord message content so it parses correctly through
   /// `StructuredText`/`AttributedStringMarkdownParser`.
   public static func preprocess(_ raw: String) -> String {
     quoteGroups(in: raw)
       .map { group in
-        let processed = applyNonQuoteLineRules(normalizeCodeFences(group.lines.joined(separator: "\n")))
+        let processed = applyNonQuoteLineRules(
+          normalizeCodeFences(group.lines.joined(separator: "\n")))
         guard group.isQuoted else {
           return processed
         }
@@ -248,7 +251,8 @@ public enum DiscordMarkdown {
       }
 
       let line = preservingLeadingWhitespace(
-        in: escapingTableDelimiterLines(escapingDeepHeadingLines(escapingThematicBreakLikeLines(line)))
+        in: escapingTableDelimiterLines(
+          escapingDeepHeadingLines(escapingThematicBreakLikeLines(line)))
       )
 
       var processed: String
@@ -259,6 +263,7 @@ public enum DiscordMarkdown {
       }
 
       processed = convertingUnderlineMarkers(in: processed)
+      processed = fixingEmphasisFlanking(in: processed)
 
       if !processed.isEmpty {
         // A CommonMark hard-break: forces this line break to survive as a real line break
@@ -284,7 +289,8 @@ public enum DiscordMarkdown {
     let leadingSpaceCount = line.prefix { $0 == " " }.count
     let rest = line.dropFirst(leadingSpaceCount)
     // A line that's nothing but spaces has no content whose indentation needs preserving.
-    guard leadingSpaceCount > 0, !rest.isEmpty, rest.firstMatch(of: /^(?:[-*+]|\d{1,9}[.)])[ \t]/) == nil
+    guard leadingSpaceCount > 0, !rest.isEmpty,
+      rest.firstMatch(of: /^(?:[-*+]|\d{1,9}[.)])[ \t]/) == nil
     else {
       return line
     }
@@ -361,6 +367,17 @@ public enum DiscordMarkdown {
     /__([^_]+?)__/
   }
 
+  private static func fixingEmphasisFlanking(in line: String) -> String {
+    guard line.contains("**") || line.contains("__") else { return line }
+    return line.replacing(emphasisFlankingFixPattern) { match in
+      "\(match.1)\(emphasisFlankingFixMarker)\(match.2)"
+    }
+  }
+
+  private static var emphasisFlankingFixPattern: Regex<(Substring, Substring, Substring)> {
+    /([^\x20\t\S])(\*\*|__)/
+  }
+
   // MARK: Autolink-ambiguous tokens
 
   private static func protectingAmbiguousAngleBracketTokens(in line: String) -> String {
@@ -374,7 +391,8 @@ public enum DiscordMarkdown {
       "\(protectedTokenStart)\(match.1)\(protectedTokenEnd)"
     }
     line.replace(noEmbedLinkPattern) { match in
-      "\(protectedTokenStart)\(match.1)\(protectedTokenEnd)"
+      let escaped = match.1.replacing("/", with: "\\/")
+      return "\(protectedTokenStart)\(escaped)\(protectedTokenEnd)"
     }
     return line
   }

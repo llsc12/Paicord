@@ -11,6 +11,8 @@ import SwiftUI
 
 struct MFASheet: View {
   @Environment(\.theme) var theme
+  @Environment(\.appState) var appState
+  @Environment(\.gateway) var gw
   let verificationData: MFAVerificationData
   let onToken: (MFAResponse) -> Void
 
@@ -19,6 +21,8 @@ struct MFASheet: View {
 
   @State var chosenMethod: MFAVerificationData.MFAMethod? = nil
   @State var input = ""
+  @FocusState var inputFocused: Bool
+
   var body: some View {
     ZStack {
       VStack {
@@ -34,6 +38,7 @@ struct MFASheet: View {
                 chosenMethod = method
               } label: {
                 userFriendlyName(for: method.type)
+                  .foregroundStyle(.white)
                   .frame(maxWidth: .infinity)
                   .padding(10)
                   .background(theme.common.primaryButton)
@@ -110,18 +115,116 @@ struct MFASheet: View {
             .font(.caption)
 
           SixDigitInput(input: $input) {
-            let input = $0
-            self.taskInProgress = true
-            self.mfaTask = .init {
-              defer { self.taskInProgress = false }
-              try? await Task.sleep(for: .seconds(2))
-              print("auth \(input)")
-              #warning("implement totp")
-            }
+            submit(type: chosenMethod.type, code: $0)
           }
           .disabled(taskInProgress)
         }
-      default: Text("wip bro go do totp")
+      case .backup:
+        VStack {
+          Text("Enter your backup code")
+            .foregroundStyle(.secondary)
+            .font(.caption)
+          Text("You can only use each backup code once.")
+            .foregroundStyle(.tertiary)
+            .font(.caption2)
+
+          TextField(text: $input)
+            .textFieldStyle(.plain)
+            .padding(10)
+            .frame(maxWidth: .infinity)
+            .focused($inputFocused)
+            .background(theme.common.primaryBackground.opacity(0.75))
+            .clipShape(.rounded)
+            .overlay {
+              RoundedRectangle()
+                .stroke(
+                  inputFocused ? theme.common.primaryButton : Color.clear,
+                  lineWidth: 1
+                )
+                .fill(.clear)
+            }
+            .disabled(taskInProgress)
+            .onChange(of: input) {
+              input = String(
+                input.replacingOccurrences(of: "-", with: "").prefix(8)
+              ).lowercased()
+              guard input.count == 8 else { return }
+              submit(type: chosenMethod.type, code: input)
+            }
+        }
+      case .sms:
+        VStack {
+          Text("Enter the code sent to your phone")
+            .foregroundStyle(.secondary)
+            .font(.caption)
+
+          HStack {
+            TextField(text: $input)
+              .textFieldStyle(.plain)
+              .keyboardType(.numberPad)
+              .padding(10)
+              .frame(maxWidth: .infinity)
+              .focused($inputFocused)
+
+            Divider()
+              .maxHeight(10)
+
+            AsyncButton("Send SMS") {
+              let req = try await gw.client.verifySendSMS(
+                ticket: verificationData.ticket
+              )
+              if let error = req.asError() { throw error }
+              try? await Task.sleep(for: .seconds(30))  // throttle
+            } catch: { error in
+              self.appState.error = error
+            }
+            .padding(.trailing, 8)
+          }
+          .background(theme.common.primaryBackground.opacity(0.75))
+          .clipShape(.rounded)
+          .overlay {
+            RoundedRectangle()
+              .stroke(
+                inputFocused ? theme.common.primaryButton : Color.clear,
+                lineWidth: 1
+              )
+              .fill(.clear)
+          }
+          .disabled(taskInProgress)
+          .onChange(of: input) {
+            input = String(input.filter { $0.isNumber }.prefix(6))
+            guard input.count == 6 else { return }
+            submit(type: chosenMethod.type, code: input)
+          }
+        }
+      default:
+        Text("This MFA method is not currently supported.")
+      }
+    }
+  }
+
+  // MARK: - Submission
+
+  func submit(type: MFAVerificationData.MFAMethod.MFAKind, code: String) {
+    guard let submitKind = Payloads.MFASubmitData.MFAKind(rawValue: type.rawValue) else {
+      return
+    }
+    self.taskInProgress = true
+    self.mfaTask = .init {
+      defer { self.taskInProgress = false }
+      do {
+        let req = try await gw.client.verifyMFA(
+          payload: .init(
+            ticket: verificationData.ticket,
+            mfa_type: submitKind,
+            data: code
+          )
+        )
+        if let error = req.asError() { throw error }
+        let response = try req.decode()
+        onToken(response)
+      } catch {
+        self.appState.error = error
       }
     }
   }
