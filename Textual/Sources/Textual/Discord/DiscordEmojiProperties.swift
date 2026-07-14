@@ -62,7 +62,7 @@ extension DiscordMarkdown {
 }
 
 extension Character {
-  fileprivate var isEmojiLike: Bool {
+  var isEmojiLike: Bool {
     guard let firstScalar = unicodeScalars.first else {
       return false
     }

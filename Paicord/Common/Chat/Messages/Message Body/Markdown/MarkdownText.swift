@@ -10,6 +10,7 @@ import SwiftUI
 import SwiftUIX
 import Textual
 import SDWebImageSwiftUI
+import SwiftEmojiIndex
 
 struct MarkdownText: View {
   let content: String
@@ -22,6 +23,7 @@ struct MarkdownText: View {
   @State private var revealedSpoilers: Set<String> = []
   @State private var userPopover: PartialUser?
   @State private var emojiPopover: DiscordModels.Emoji?
+  @State private var unicodeEmojiPopover: String?
 
   @ViewStorage private var documentFrame: CGRect = .zero
   @State private var tapLocalPoint: (point: CGPoint, size: CGSize) = (.zero, .zero)
@@ -91,6 +93,8 @@ struct MarkdownText: View {
         )
       } else if let emojiPopover {
         EmojiDetailsView(emoji: emojiPopover)
+      } else if let unicodeEmojiPopover {
+        UnicodeEmojiDetailsView(character: unicodeEmojiPopover)
       }
     }
     .textual.onEntityTap { url, bounds in
@@ -109,15 +113,21 @@ struct MarkdownText: View {
 
   private var isPopoverPresented: Binding<Bool> {
     Binding(
-      get: { userPopover != nil || emojiPopover != nil },
-      set: { if !$0 { userPopover = nil; emojiPopover = nil } }
+      get: { userPopover != nil || emojiPopover != nil || unicodeEmojiPopover != nil },
+      set: {
+        if !$0 {
+          userPopover = nil
+          emojiPopover = nil
+          unicodeEmojiPopover = nil
+        }
+      }
     )
   }
   
   private var popoverEdgePreference: Edge? {
     if userPopover != nil {
       return nil
-    } else if emojiPopover != nil {
+    } else if emojiPopover != nil || unicodeEmojiPopover != nil {
       return .trailing
     } else {
       return nil
@@ -289,6 +299,52 @@ struct MarkdownText: View {
     }
   }
 
+  struct UnicodeEmojiDetailsView: View {
+    var character: String
+    @State private var fallbackEmoji: SwiftEmojiIndex.Emoji?
+    @State private var loadedFallback = false
+
+    private var discordName: String? {
+      DiscordEmojiNameIndex.names(for: character)?.first
+    }
+
+    var body: some View {
+      HStack {
+        Text(character)
+          .font(.system(size: 44))
+
+        VStack(alignment: .leading) {
+          if let discordName {
+            Text(":\(discordName):")
+              .bold()
+          } else if let fallbackEmoji {
+            Text(":\(fallbackEmoji.shortcodes.first ?? character):")
+              .bold()
+            Text(fallbackEmoji.name.capitalized)
+              .font(.caption)
+              .foregroundStyle(.secondary)
+          } else if loadedFallback {
+            Text(character)
+              .bold()
+          } else {
+            ProgressView()
+          }
+          
+          Text("A default emoji. You can use this emoji everywhere on Discord.")
+            .font(.caption)
+            .foregroundStyle(.secondary)
+        }
+      }
+      .padding(12)
+      .frame(minWidth: 220, maxWidth: 290, alignment: .leading)
+      .task(id: character) {
+        guard discordName == nil else { return }
+        fallbackEmoji = await SwiftEmojiIndex.Emoji.lookup(character)
+        loadedFallback = true
+      }
+    }
+  }
+
   // MARK: - Styling
 
   private var inlineStyle: InlineStyle {
@@ -345,6 +401,7 @@ struct MarkdownText: View {
         return URL(string: base + ".webp?size=\(size)&animated=\(animated)")!
       }
     )
+    extensions.append(.discordUnicodeEmoji)
     extensions.append(.discordTimestamps)
     extensions.append(.discordNoEmbedLinks)
     extensions.append(.discordSpoilers(revealed: revealedSpoilers))
@@ -366,6 +423,20 @@ struct MarkdownText: View {
         revealedSpoilers.insert(
           AttributedStringMarkdownParser.SyntaxExtension.spoilerRevealKey(index: index, text: text)
         )
+      } else if url.host == "emoji",
+                url.pathComponents.last == "unicode",
+                let query = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems,
+                let character = query.first(where: { $0.name == "char" })?.value
+      {
+        ImpactGenerator.impact(style: .light)
+        unicodeEmojiPopover = character
+        tapLocalPoint = (CGPoint(
+          x: bounds.minX - documentFrame.minX,
+          y: bounds.minY - documentFrame.minY
+        ), CGSize(
+          width: bounds.width,
+          height: bounds.height
+        ))
       } else if url.host == "emoji",
                 let encoded = url.pathComponents.last,
                 let text = encoded.removingPercentEncoding,
