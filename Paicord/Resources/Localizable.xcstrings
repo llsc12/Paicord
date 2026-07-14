@@ -302,6 +302,9 @@
         }
       }
     },
+    "Close" : {
+
+    },
     "ComponentsV2 unsupported" : {
       "localizations" : {
         "de" : {
@@ -444,6 +447,9 @@
           }
         }
       }
+    },
+    "Download" : {
+
     },
     "Download IPA" : {
       "localizations" : {

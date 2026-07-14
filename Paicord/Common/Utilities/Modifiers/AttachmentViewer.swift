@@ -10,7 +10,6 @@ import AVFoundation
 import AVKit
 import PaicordLib
 import SDWebImageSwiftUI
-@_spi(Advanced) import SwiftUIIntrospect
 import SwiftUIX
 
 #if os(macOS)
@@ -61,7 +60,7 @@ private struct AttachmentViewerModifier: ViewModifier {
         .animation(.default.speed(1.5), value: appState.showingAttachmentViewer)
     #else
       content
-        .sheet(isPresented: $appState.showingAttachmentViewer) {
+        .fullScreenCover(isPresented: $appState.showingAttachmentViewer) {
           AttachmentViewer(
             contextMessage: appState.attachmentViewerContextMessage,
             attachments: $appState.attachmentViewerAttachments,
@@ -80,17 +79,159 @@ private struct AttachmentViewer: View {
   @Binding var selectedIndex: Int?
   @Binding var isPresented: Bool
 
+  @FocusState private var isFocused: Bool
+  @State private var showsControls = true
+  #if os(iOS)
+    @State private var downloadedFileForSharing: URL?
+    @State private var showingShareSheet = false
+    @GestureState private var dismissDragTranslation: CGSize = .zero
+  #endif
+
   var body: some View {
+    #if os(macOS)
+      content
+        .focusable()
+        .focused($isFocused)
+        .focusEffectDisabled()
+        .onAppear { isFocused = true }
+        .onKeyPress(.escape) {
+          isPresented = false
+          return .handled
+        }
+        .onKeyPress(.leftArrow) {
+          goToPrevious()
+          return .handled
+        }
+        .onKeyPress(.rightArrow) {
+          goToNext()
+          return .handled
+        }
+        .overlay(alignment: .leading) {
+          navigationButton(
+            systemImage: "chevron.left",
+            isEnabled: canGoPrevious,
+            action: goToPrevious
+          )
+        }
+        .overlay(alignment: .trailing) {
+          navigationButton(
+            systemImage: "chevron.right",
+            isEnabled: canGoNext,
+            action: goToNext
+          )
+        }
+        .overlay(alignment: .topTrailing) {
+          controlBar
+        }
+    #else
+      NavigationStack {
+        content
+          .toolbarBackground(.hidden, for: .navigationBar)
+          .toolbar(showsControls ? .visible : .hidden, for: .navigationBar)
+          .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+              Button {
+                isPresented = false
+              } label: {
+                Image(systemName: "xmark")
+              }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+              Menu {
+                Button {
+                  copyAttachmentURL()
+                } label: {
+                  Label("Copy Link", systemImage: "doc.on.doc")
+                }
+
+                Button {
+                  downloadCurrentAttachment()
+                } label: {
+                  Label("Download", systemImage: "arrow.down.circle")
+                }
+              } label: {
+                Image(systemName: "ellipsis.circle")
+              }
+              .disabled(currentAttachment == nil)
+            }
+          }
+      }
+      .ignoresSafeArea(.container)
+      .toolbarColorScheme(.dark, for: .navigationBar)
+      .background {
+        if !showsControls {
+          Color.black.ignoresSafeArea()
+        }
+      }
+      .persistentSystemOverlays(showsControls ? .automatic : .hidden)
+      .sheet(isPresented: $showingShareSheet) {
+        if let downloadedFileForSharing {
+          ActivityViewController(activityItems: [downloadedFileForSharing])
+            .presentationDetents([.medium, .large])
+        }
+      }
+      .offset(y: dismissDragTranslation.height)
+      .scaleEffect(1 - dismissDragProgress * 0.15)
+      .opacity(1 - dismissDragProgress * 0.6)
+      .animation(.interactiveSpring(), value: dismissDragTranslation)
+      .simultaneousGesture(dismissDragGesture)
+    #endif
+  }
+
+  private func toggleControls() {
+    withAnimation { showsControls.toggle() }
+  }
+
+  #if os(iOS)
+    private var dismissDragProgress: CGFloat {
+      min(dismissDragTranslation.height / 300, 1)
+    }
+
+    private var dismissDragGesture: some Gesture {
+      DragGesture(minimumDistance: 15)
+        .updating($dismissDragTranslation) { value, state, _ in
+          guard value.translation.height > abs(value.translation.width) else {
+            return
+          }
+          state = value.translation
+        }
+        .onEnded { value in
+          guard value.translation.height > abs(value.translation.width) else {
+            return
+          }
+          let farEnough = value.translation.height > 120
+          let fastEnough = value.predictedEndTranslation.height > 500
+          if farEnough || fastEnough {
+            isPresented = false
+          }
+        }
+    }
+  #endif
+
+  @ViewBuilder
+  private var content: some View {
     #if os(iOS)
       TabView(selection: $selectedIndex) {
         ForEach(attachments.indices, id: \.self) { index in
-          attachmentItemView(for: attachments[index], isPresented: $isPresented)
-            .ignoresSafeArea(.container)
-            .tag(index)
+          attachmentItemView(
+            for: attachments[index],
+            isPresented: $isPresented,
+            onSingleTap: toggleControls
+          )
+          .ignoresSafeArea(.container)
+          .tag(index)
         }
       }
       .tabViewStyle(.page(indexDisplayMode: .never))
       .ignoresSafeArea(.container)
+      .onTapGesture(perform: toggleControls)
+      .overlay(alignment: .bottom) {
+        if showsControls, attachments.count > 1 {
+          Carousel(attachments: attachments, selectedIndex: $selectedIndex)
+            .padding()
+            .transition(.opacity)
+        }
+      }
     #else
       VStack(spacing: 0) {
         if let selectedIndex, attachments.indices.contains(selectedIndex) {
@@ -107,8 +248,10 @@ private struct AttachmentViewer: View {
 
       }
       .safeAreaInset(edge: .bottom, spacing: 0) {
-        Carousel(attachments: attachments, selectedIndex: $selectedIndex)
-          .padding()
+        if attachments.count > 1 {
+          Carousel(attachments: attachments, selectedIndex: $selectedIndex)
+            .padding()
+        }
       }
     #endif
   }
@@ -116,71 +259,209 @@ private struct AttachmentViewer: View {
   @ViewBuilder
   func attachmentItemView(
     for attachment: DiscordMedia,
-    isPresented: Binding<Bool>
+    isPresented: Binding<Bool>,
+    onSingleTap: (() -> Void)? = nil
   ) -> some View {
     if attachment.isGifv {
-      ZoomableGifvView(attachment: attachment, isPresented: isPresented)
+      ZoomableGifvView(
+        attachment: attachment,
+        isPresented: isPresented,
+        onSingleTap: onSingleTap
+      )
     } else {
       switch attachment.mediaKind {
       case .video, .audio:
         VideoPlayerView(attachment: attachment)
       case .image:
-        ZoomableImageView(attachment: attachment, isPresented: isPresented)
+        ZoomableImageView(
+          attachment: attachment,
+          isPresented: isPresented,
+          onSingleTap: onSingleTap
+        )
       case .other:
         Text("Unsupported attachment type")
       }
     }
   }
 
-  #if os(macOS)
-    struct Carousel: View {
-      let attachments: [DiscordMedia]
-      @Binding var selectedIndex: Int?
+  private var canGoPrevious: Bool {
+    guard let selectedIndex else { return false }
+    return selectedIndex > attachments.startIndex
+  }
 
-      @State private var scrollViewSize: CGSize = .zero
-      @State private var contentSize: CGSize = .zero
+  private var canGoNext: Bool {
+    guard let selectedIndex else { return false }
+    return selectedIndex < attachments.index(before: attachments.endIndex)
+  }
 
-      var body: some View {
-        ScrollFadeMask(.horizontal) {
-          LazyHStack(spacing: 2) {
-            ForEach(attachments.indices, id: \.self) { index in
-              if let attachment = attachments[safe: index] {
-                Button {
-                  selectedIndex = index
-                } label: {
-                  Color.clear
-                    .frame(width: 38 * 1.5, height: 38 * 1.5)
-                    .overlay {
-                      MessageCell.AttachmentsView.AttachmentItemPreview(
-                        attachment: attachment
-                      )
-                      .displayMode(asPoster: true)
-                      .scaledToFill()
-                      .clipped()
-                    }
-                    .clipShape(RoundedRectangle(cornerRadius: 4))
-                }
-                .buttonStyle(.borderless)
+  private func goToPrevious() {
+    guard canGoPrevious, let selectedIndex else { return }
+    withAnimation { self.selectedIndex = selectedIndex - 1 }
+  }
+
+  private func goToNext() {
+    guard canGoNext, let selectedIndex else { return }
+    withAnimation { self.selectedIndex = selectedIndex + 1 }
+  }
+
+  @ViewBuilder
+  private func navigationButton(
+    systemImage: String,
+    isEnabled: Bool,
+    action: @escaping () -> Void
+  ) -> some View {
+    if isEnabled {
+      Button(action: action) {
+        Image(systemName: systemImage)
+          .font(.title2.weight(.semibold))
+          .foregroundStyle(.white)
+          .padding(14)
+          .background(.ultraThinMaterial, in: Circle())
+      }
+      .buttonStyle(.plain)
+      .padding()
+    }
+  }
+
+  private var currentAttachment: DiscordMedia? {
+    guard let selectedIndex else { return nil }
+    return attachments[safe: selectedIndex]
+  }
+
+  private var controlBar: some View {
+    HStack(spacing: 8) {
+      HStack(spacing: 12) {
+        Button {
+          copyAttachmentURL()
+        } label: {
+          Image(systemName: "doc.on.doc")
+            .frame(width: 20, height: 20)
+        }
+        .help("Copy URL")
+        .disabled(currentAttachment == nil)
+
+        Button {
+          downloadCurrentAttachment()
+        } label: {
+          Image(systemName: "arrow.down.circle")
+            .frame(width: 20, height: 20)
+        }
+        .help("Download")
+        .disabled(currentAttachment == nil)
+      }
+      .padding(.horizontal, 12)
+      .padding(.vertical, 8)
+      .background(.ultraThinMaterial, in: .capsule)
+
+      Button {
+        isPresented = false
+      } label: {
+        Image(systemName: "xmark")
+          .frame(width: 20, height: 20)
+      }
+      .help("Close")
+      .padding(8)
+      .background(.ultraThinMaterial, in: .circle)
+    }
+    .buttonStyle(.plain)
+    .font(.title3)
+    .foregroundStyle(.white)
+    .padding()
+  }
+
+  private func copyAttachmentURL() {
+    guard let url = currentAttachment?.cdnURL else { return }
+    #if os(macOS)
+      NSPasteboard.general.clearContents()
+      NSPasteboard.general.setString(url, forType: .string)
+    #else
+      UIPasteboard.general.string = url
+    #endif
+  }
+
+  private func downloadCurrentAttachment() {
+    guard let sourceURL = currentAttachment.flatMap({ URL(string: $0.cdnURL) })
+    else { return }
+    Task {
+      do {
+        let (tempURL, response) = try await URLSession.shared.download(
+          from: sourceURL
+        )
+        let suggestedName =
+          response.suggestedFilename ?? sourceURL.lastPathComponent
+        #if os(macOS)
+          let destination = URL.downloadsDirectory.appendingPathComponent(
+            suggestedName
+          )
+          if FileManager.default.fileExists(atPath: destination.path) {
+            try FileManager.default.removeItem(at: destination)
+          }
+          try FileManager.default.moveItem(at: tempURL, to: destination)
+          NSWorkspace.shared.activateFileViewerSelecting([destination])
+        #else
+          let destination = URL.temporaryDirectory.appendingPathComponent(
+            suggestedName
+          )
+          if FileManager.default.fileExists(atPath: destination.path) {
+            try FileManager.default.removeItem(at: destination)
+          }
+          try FileManager.default.moveItem(at: tempURL, to: destination)
+          downloadedFileForSharing = destination
+          showingShareSheet = true
+        #endif
+      } catch {
+        PaicordAppState.instances.first?.value.error = error
+      }
+    }
+  }
+
+  struct Carousel: View {
+    let attachments: [DiscordMedia]
+    @Binding var selectedIndex: Int?
+
+    @State private var scrollViewSize: CGSize = .zero
+    @State private var contentSize: CGSize = .zero
+
+    var body: some View {
+      ScrollFadeMask(.horizontal) {
+        LazyHStack(spacing: 2) {
+          ForEach(attachments.indices, id: \.self) { index in
+            if let attachment = attachments[safe: index] {
+              Button {
+                selectedIndex = index
+              } label: {
+                Color.clear
+                  .frame(width: 38 * 1.5, height: 38 * 1.5)
+                  .overlay {
+                    MessageCell.AttachmentsView.AttachmentItemPreview(
+                      attachment: attachment
+                    )
+                    .displayMode(asPoster: true)
+                    .scaledToFill()
+                    .clipped()
+                  }
+                  .clipShape(RoundedRectangle(cornerRadius: 4))
               }
+              .buttonStyle(.borderless)
             }
           }
-          .maxHeight(38 * 1.5)
-          .onGeometryChange(for: CGSize.self) {
-            $0.size
-          } action: {
-            contentSize = $0
-          }
         }
-        .scrollIndicators(.hidden)
+        .maxHeight(38 * 1.5)
         .onGeometryChange(for: CGSize.self) {
           $0.size
         } action: {
-          scrollViewSize = $0
+          contentSize = $0
         }
-        .maxWidth(min(contentSize.width, 380))
       }
+      .scrollIndicators(.hidden)
+      .onGeometryChange(for: CGSize.self) {
+        $0.size
+      } action: {
+        scrollViewSize = $0
+      }
+      .maxWidth(min(contentSize.width, 380))
     }
-  #endif
+  }
 }
 
 private struct VideoPlayerView: View {
@@ -198,9 +479,10 @@ private struct VideoPlayerView: View {
 private struct ZoomableImageView: View {
   let attachment: DiscordMedia
   @Binding var isPresented: Bool
+  var onSingleTap: (() -> Void)? = nil
   var body: some View {
     #if os(iOS)
-      IOSZoomableImageView(attachment: attachment)
+      IOSZoomableImageView(attachment: attachment, onSingleTap: onSingleTap)
     #elseif os(macOS)
       MacOSZoomableImageView(attachment: attachment, isPresented: $isPresented)
     #endif
@@ -209,6 +491,7 @@ private struct ZoomableImageView: View {
   #if os(iOS)
     struct IOSZoomableImageView: UIViewRepresentable {
       let attachment: DiscordMedia
+      var onSingleTap: (() -> Void)? = nil
       var url: URL? {
         URL(string: attachment.proxyurl)
       }
@@ -245,10 +528,19 @@ private struct ZoomableImageView: View {
         doubleTap.numberOfTapsRequired = 2
         scrollView.addGestureRecognizer(doubleTap)
 
+        let singleTap = UITapGestureRecognizer(
+          target: context.coordinator,
+          action: #selector(Coordinator.handleSingleTap(_:))
+        )
+        singleTap.numberOfTapsRequired = 1
+        singleTap.require(toFail: doubleTap)
+        scrollView.addGestureRecognizer(singleTap)
+
         return scrollView
       }
 
       func updateUIView(_ uiView: UIScrollView, context: Context) {
+        context.coordinator.onSingleTap = onSingleTap
         if let url = url, context.coordinator.currentURL != url {
           context.coordinator.currentURL = url
           context.coordinator.imageView?.sd_setImage(with: url) {
@@ -326,6 +618,7 @@ private struct ZoomableImageView: View {
         var imageView: SDAnimatedImageView?
         var scrollView: UIScrollView?
         var currentURL: URL?
+        var onSingleTap: (() -> Void)?
 
         func viewForZooming(in scrollView: UIScrollView) -> UIView? {
           return imageView
@@ -339,49 +632,23 @@ private struct ZoomableImageView: View {
           guard let imageView = imageView else { return }
 
           let boundsSize = scrollView.bounds.size
-          let contentSize = scrollView.contentSize
+          var frameToCenter = imageView.frame
 
-          let horizontalPadding = max(
-            (boundsSize.width - contentSize.width) / 2.0,
-            0
-          )
-          let verticalPadding = max(
-            (boundsSize.height - contentSize.height) / 2.0,
-            0
-          )
-          scrollView.contentInset = UIEdgeInsets(
-            top: verticalPadding,
-            left: horizontalPadding,
-            bottom: verticalPadding,
-            right: horizontalPadding
-          )
-
-          var desiredOffset = scrollView.contentOffset
-          let maxOffsetX = max(0, contentSize.width - boundsSize.width)
-          let maxOffsetY = max(0, contentSize.height - boundsSize.height)
-          if contentSize.width <= boundsSize.width {
-            desiredOffset.x = -horizontalPadding
+          if frameToCenter.width < boundsSize.width {
+            frameToCenter.origin.x =
+              (boundsSize.width - frameToCenter.width) / 2
           } else {
-            desiredOffset.x = min(
-              max(scrollView.contentOffset.x, 0),
-              maxOffsetX
-            )
+            frameToCenter.origin.x = 0
           }
 
-          if contentSize.height <= boundsSize.height {
-            desiredOffset.y = -verticalPadding
+          if frameToCenter.height < boundsSize.height {
+            frameToCenter.origin.y =
+              (boundsSize.height - frameToCenter.height) / 2
           } else {
-            desiredOffset.y = min(
-              max(scrollView.contentOffset.y, 0),
-              maxOffsetY
-            )
+            frameToCenter.origin.y = 0
           }
 
-          if desiredOffset != scrollView.contentOffset {
-            DispatchQueue.main.async {
-              scrollView.setContentOffset(desiredOffset, animated: false)
-            }
-          }
+          imageView.frame = frameToCenter
         }
 
         @objc func handleDoubleTap(_ gesture: UITapGestureRecognizer) {
@@ -409,6 +676,10 @@ private struct ZoomableImageView: View {
               animated: true
             )
           }
+        }
+
+        @objc func handleSingleTap(_ gesture: UITapGestureRecognizer) {
+          onSingleTap?()
         }
       }
     }
@@ -687,15 +958,17 @@ private struct ZoomableImageView: View {
 private struct ZoomableGifvView: View {
   let attachment: DiscordMedia
   @Binding var isPresented: Bool
+  var onSingleTap: (() -> Void)? = nil
   var body: some View {
     #if os(iOS)
-      IOSZoomableGifvView(attachment: attachment)
+      IOSZoomableGifvView(attachment: attachment, onSingleTap: onSingleTap)
     #elseif os(macOS)
       MacOSZoomableGifvView(attachment: attachment, isPresented: $isPresented)
     #endif
   }
 
-  static func fittedSize(for aspectRatio: CGFloat?, in bounds: CGSize) -> CGSize {
+  static func fittedSize(for aspectRatio: CGFloat?, in bounds: CGSize) -> CGSize
+  {
     guard bounds.width > 0, bounds.height > 0 else { return .zero }
     let ratio = aspectRatio ?? (bounds.width / bounds.height)
     if bounds.width / bounds.height > ratio {
@@ -708,6 +981,7 @@ private struct ZoomableGifvView: View {
   #if os(iOS)
     struct IOSZoomableGifvView: UIViewRepresentable {
       let attachment: DiscordMedia
+      var onSingleTap: (() -> Void)? = nil
       var url: URL? {
         URL(string: attachment.proxyurl)
       }
@@ -743,6 +1017,14 @@ private struct ZoomableGifvView: View {
         doubleTap.numberOfTapsRequired = 2
         scrollView.addGestureRecognizer(doubleTap)
 
+        let singleTap = UITapGestureRecognizer(
+          target: context.coordinator,
+          action: #selector(Coordinator.handleSingleTap(_:))
+        )
+        singleTap.numberOfTapsRequired = 1
+        singleTap.require(toFail: doubleTap)
+        scrollView.addGestureRecognizer(singleTap)
+
         if let url {
           context.coordinator.attach(url: url, to: playerView)
         }
@@ -751,13 +1033,16 @@ private struct ZoomableGifvView: View {
       }
 
       func updateUIView(_ uiView: UIScrollView, context: Context) {
+        context.coordinator.onSingleTap = onSingleTap
         guard let playerView = context.coordinator.playerView else { return }
         uiView.layoutIfNeeded()
         let fittedSize = ZoomableGifvView.fittedSize(
           for: attachment.aspectRatio,
           in: uiView.bounds.size
         )
-        guard fittedSize != .zero, playerView.frame.size != fittedSize else { return }
+        guard fittedSize != .zero, playerView.frame.size != fittedSize else {
+          return
+        }
         playerView.frame = CGRect(origin: .zero, size: fittedSize)
         uiView.contentSize = fittedSize
         context.coordinator.centerVideo(in: uiView)
@@ -768,6 +1053,7 @@ private struct ZoomableGifvView: View {
       class Coordinator: NSObject, UIScrollViewDelegate {
         var playerView: GifvPlayerView?
         weak var scrollView: UIScrollView?
+        var onSingleTap: (() -> Void)?
         private var player: AVPlayer?
         private var loopObserver: NSObjectProtocol?
 
@@ -796,16 +1082,26 @@ private struct ZoomableGifvView: View {
         }
 
         func centerVideo(in scrollView: UIScrollView) {
+          guard let playerView else { return }
+
           let boundsSize = scrollView.bounds.size
-          let contentSize = scrollView.contentSize
-          let horizontalPadding = max((boundsSize.width - contentSize.width) / 2.0, 0)
-          let verticalPadding = max((boundsSize.height - contentSize.height) / 2.0, 0)
-          scrollView.contentInset = UIEdgeInsets(
-            top: verticalPadding,
-            left: horizontalPadding,
-            bottom: verticalPadding,
-            right: horizontalPadding
-          )
+          var frameToCenter = playerView.frame
+
+          if frameToCenter.width < boundsSize.width {
+            frameToCenter.origin.x =
+              (boundsSize.width - frameToCenter.width) / 2
+          } else {
+            frameToCenter.origin.x = 0
+          }
+
+          if frameToCenter.height < boundsSize.height {
+            frameToCenter.origin.y =
+              (boundsSize.height - frameToCenter.height) / 2
+          } else {
+            frameToCenter.origin.y = 0
+          }
+
+          playerView.frame = frameToCenter
         }
 
         @objc func handleDoubleTap(_ gesture: UITapGestureRecognizer) {
@@ -831,6 +1127,10 @@ private struct ZoomableGifvView: View {
               animated: true
             )
           }
+        }
+
+        @objc func handleSingleTap(_ gesture: UITapGestureRecognizer) {
+          onSingleTap?()
         }
 
         deinit {
@@ -862,9 +1162,13 @@ private struct ZoomableGifvView: View {
 
       func makeNSView(context: Context) -> NSScrollView {
         let scrollView = GifvScrollView()
-        scrollView.onLayout = { [weak scrollView, coordinator = context.coordinator] in
+        scrollView.onLayout = {
+          [weak scrollView, coordinator = context.coordinator] in
           guard let scrollView else { return }
-          coordinator.applyLayout(aspectRatio: attachment.aspectRatio, in: scrollView)
+          coordinator.applyLayout(
+            aspectRatio: attachment.aspectRatio,
+            in: scrollView
+          )
         }
         scrollView.wantsLayer = true
         scrollView.layer?.backgroundColor = .clear
@@ -922,7 +1226,10 @@ private struct ZoomableGifvView: View {
       }
 
       func updateNSView(_ nsView: NSScrollView, context: Context) {
-        context.coordinator.applyLayout(aspectRatio: attachment.aspectRatio, in: nsView)
+        context.coordinator.applyLayout(
+          aspectRatio: attachment.aspectRatio,
+          in: nsView
+        )
       }
 
       func makeCoordinator() -> Coordinator {
@@ -944,7 +1251,10 @@ private struct ZoomableGifvView: View {
         func applyLayout(aspectRatio: CGFloat?, in scrollView: NSScrollView) {
           guard let playerView, let containerView else { return }
           let bounds = scrollView.bounds.size
-          let fittedSize = ZoomableGifvView.fittedSize(for: aspectRatio, in: bounds)
+          let fittedSize = ZoomableGifvView.fittedSize(
+            for: aspectRatio,
+            in: bounds
+          )
           guard fittedSize != .zero else { return }
           let origin = CGPoint(
             x: (bounds.width - fittedSize.width) / 2,
@@ -1214,3 +1524,21 @@ private struct ZoomableGifvView: View {
     isPresented: .constant(true)
   )
 }
+
+#if os(iOS)
+  private struct ActivityViewController: UIViewControllerRepresentable {
+    let activityItems: [URL]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+      UIActivityViewController(
+        activityItems: activityItems,
+        applicationActivities: nil
+      )
+    }
+
+    func updateUIViewController(
+      _ uiViewController: UIActivityViewController,
+      context: Context
+    ) {}
+  }
+#endif

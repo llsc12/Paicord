@@ -42,6 +42,7 @@ extension Embed: @retroactive Identifiable {
 
 protocol DiscordMedia {
   var proxyurl: String { get }
+  var cdnURL: String { get }
   var height: Int? { get }
   var width: Int? { get }
   var placeholder: String? { get }
@@ -57,10 +58,16 @@ extension Embed.Media: DiscordMedia {
   var proxyurl: String {
     self.proxy_url ?? self.url.asString
   }
+  var cdnURL: String {
+    self.url.asString
+  }
 }
 extension DiscordChannel.Message.Attachment: DiscordMedia {
   var proxyurl: String {
     self.proxy_url
+  }
+  var cdnURL: String {
+    self.url
   }
 }
 
@@ -68,6 +75,7 @@ struct GifvAttachmentMedia: DiscordMedia {
   let media: Embed.Media
 
   var proxyurl: String { media.proxyurl }
+  var cdnURL: String { media.cdnURL }
   var height: Int? { media.height }
   var width: Int? { media.width }
   var placeholder: String? { media.placeholder }
