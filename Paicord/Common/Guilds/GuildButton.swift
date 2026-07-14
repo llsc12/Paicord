@@ -376,6 +376,7 @@ struct GuildButton: View {
       .clipShape(.rect(cornerRadius: isSelected ? 10 : 32, style: .continuous))
       .animation(.default, value: isSelected)
     }
+    .help(guild == nil ? "Direct Messages" : guild!.name)
     .buttonStyle(.borderless)
     .contextMenu {
       if let id = guild?.id {
