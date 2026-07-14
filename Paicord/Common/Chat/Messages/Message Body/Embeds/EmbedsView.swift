@@ -118,6 +118,10 @@ extension MessageCell {
         }
       }
 
+      private var showsThumbnailSquare: Bool {
+        embed.type != .article && embed.video == nil
+      }
+
       private var authorIconURL: URL? {
         if let icon = embed.author?.proxy_icon_url,
           let url = URL(string: icon)
@@ -197,9 +201,9 @@ extension MessageCell {
                   MarkdownText(content: desc, channelStore: channelStore)
                 }
               }
-              .padding(.trailing, embed.thumbnail == nil ? 40 : 0)
+              .padding(.trailing, showsThumbnailSquare ? 0 : 40)
 
-              if embed.type != .article, let thumbnail = embed.thumbnail {
+              if showsThumbnailSquare, let thumbnail = embed.thumbnail {
                 Button {
                   openViewer(showing: [thumbnail], at: 0)
                 } label: {
@@ -250,6 +254,18 @@ extension MessageCell {
 
             if !items.isEmpty {
               images
+            } else if embed.type != .gifv, let video = embed.video {
+              Button {
+                openViewer(showing: [video], at: 0)
+              } label: {
+                AttachmentsView.AttachmentSizedView(attachment: video) {
+                  AttachmentsView.AttachmentItemPreview(
+                    attachment: video,
+                    posterURLOverride: embed.thumbnail.flatMap { URL(string: $0.proxyurl) }
+                  )
+                }
+              }
+              .buttonStyle(.borderless)
             } else if let image =
               (embed.type == .article
                 ? embed.image ?? embed.thumbnail : embed.image)

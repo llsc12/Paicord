@@ -475,9 +475,11 @@ private struct VideoPlayerView: View {
   var body: some View {
     if let url = URL(string: attachment.proxyurl) {
       VideoPlayer(player: AVPlayer(url: url))
+        .aspectRatio(attachment.aspectRatio, contentMode: .fit)
         #if os(macOS)
-          .padding(.top, 70)
+          .padding(.vertical, 70)
         #endif
+          .maxWidth(.infinity)
     } else {
       Text("Invalid video URL")
     }

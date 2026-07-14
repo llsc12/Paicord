@@ -300,6 +300,8 @@ extension MessageCell {
     struct AttachmentItemPreview: View {
       var attachment: DiscordMedia
 
+      var posterURLOverride: URL? = nil
+
       var displayPoster = false
       func displayMode(asPoster: Bool) -> some View {
         var copy = self
@@ -315,7 +317,7 @@ extension MessageCell {
           if displayPoster {
             ImageView(attachment: attachment, needsPoster: true)
           } else {
-            VideoView(attachment: attachment)
+            VideoView(attachment: attachment, posterURLOverride: posterURLOverride)
           }
         default:
           // unknown type. sadly discord can sometimes not provide content type.
@@ -368,11 +370,17 @@ extension MessageCell {
         }
       }
 
+      // currently videos will always open in the beeg player,
+      // not sure when to play inline vs play in attachment viewer.
       struct VideoView: View {
         var attachment: DiscordMedia
+        var posterURLOverride: URL? = nil
         @State var wantsPlayback: Bool = false
 
         var poster: URL {
+          if let posterURLOverride {
+            return posterURLOverride
+          }
           let url = URL(string: attachment.proxyurl)!
           var urlcomponents = URLComponents(
             url: url,
@@ -404,6 +412,7 @@ extension MessageCell {
                     .scaledToFit()
                     .foregroundStyle(.white)
                     .padding(20)
+                    .offset(x: 2)
                     .background(.ultraThinMaterial)
                     .clipShape(.circle)
                     .frame(width: 64, height: 64)
