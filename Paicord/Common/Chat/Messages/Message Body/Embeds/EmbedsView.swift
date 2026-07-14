@@ -53,7 +53,7 @@ extension MessageCell {
                   AttachmentsView.AttachmentItemPreview(attachment: image)
                 }
               }
-              .buttonStyle(.plain)
+              .buttonStyle(.borderless)
             }
           case .gifv:
             if let video = embed.video {
@@ -62,7 +62,7 @@ extension MessageCell {
               } label: {
                 AttachmentsView.GifvView(media: video, staticMedia: embed.image)
               }
-              .buttonStyle(.plain)
+              .buttonStyle(.borderless)
             }
           case .link:
             LinkEmbedView(embed: embed, items: embedData.items, message: message)
@@ -209,7 +209,7 @@ extension MessageCell {
                     .clipped()
                     .cornerRadius(6)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.borderless)
               }
             }
 
@@ -261,7 +261,7 @@ extension MessageCell {
                   AttachmentsView.AttachmentItemPreview(attachment: image)
                 }
               }
-              .buttonStyle(.plain)
+              .buttonStyle(.borderless)
             }
 
             if embed.footer != nil || embed.timestamp != nil {
@@ -311,7 +311,7 @@ extension MessageCell {
           AttachmentsView.AttachmentItemPreview(attachment: item)
             .scaledToFill()
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.borderless)
       }
 
       @ViewBuilder var images: some View {
@@ -325,7 +325,7 @@ extension MessageCell {
               AttachmentsView.AttachmentItemPreview(attachment: items[0])
             }
           }
-          .buttonStyle(.plain)
+          .buttonStyle(.borderless)
           .clipShape(.rounded)
         case 2:
           HStack(spacing: 4) {

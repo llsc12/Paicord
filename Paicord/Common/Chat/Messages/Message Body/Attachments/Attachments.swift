@@ -117,7 +117,7 @@ extension MessageCell {
             )
           }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.borderless)
         .debugRender()
         .debugCompute()
       }
@@ -293,7 +293,7 @@ extension MessageCell {
           .clipShape(.rect(cornerRadius: 4))
           .clipped()
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.borderless)
       }
     }
 

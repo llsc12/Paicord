@@ -475,6 +475,9 @@ private struct VideoPlayerView: View {
   var body: some View {
     if let url = URL(string: attachment.proxyurl) {
       VideoPlayer(player: AVPlayer(url: url))
+        #if os(macOS)
+          .padding(.top, 70)
+        #endif
     } else {
       Text("Invalid video URL")
     }
