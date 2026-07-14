@@ -128,7 +128,6 @@ enum MediaKind {
   }
 }
 
-
 extension Payloads.CreateMessage: @retroactive Identifiable {
   public var id: MessageSnowflake {
     .init(self.nonce?.asString ?? "unknown")

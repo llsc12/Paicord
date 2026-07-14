@@ -6,11 +6,11 @@
 //
 
 import PaicordLib
+import SDWebImageSwiftUI
+import SwiftEmojiIndex
 import SwiftUI
 import SwiftUIX
 import Textual
-import SDWebImageSwiftUI
-import SwiftEmojiIndex
 
 struct MarkdownText: View {
   let content: String
@@ -27,7 +27,7 @@ struct MarkdownText: View {
 
   @ViewStorage private var documentFrame: CGRect = .zero
   @State private var tapLocalPoint: (point: CGPoint, size: CGSize) = (.zero, .zero)
-  
+
   init(
     content: String,
     channelStore: ChannelStore? = nil,
@@ -50,9 +50,9 @@ struct MarkdownText: View {
   private var isJumboEmoji: Bool {
     allowsJumboEmoji && DiscordMarkdown.isEmojiOnlyContent(content)
   }
-  
+
   private var handleInteractions: Bool = true
-  
+
   func handlesInteractions(_ bool: Bool = true) -> Self {
     var copy = self
     copy.handleInteractions = bool
@@ -123,7 +123,7 @@ struct MarkdownText: View {
       }
     )
   }
-  
+
   private var popoverEdgePreference: Edge? {
     if userPopover != nil {
       return nil
@@ -133,9 +133,9 @@ struct MarkdownText: View {
       return nil
     }
   }
-  
+
   // MARK: - Supplementary Views
-  
+
   struct EmojiDetailsView: View {
     var emoji: DiscordModels.Emoji
     @Environment(\.gateway) var gw
@@ -157,7 +157,9 @@ struct MarkdownText: View {
         let animated = emoji.animated ?? false
         VStack(alignment: .leading, spacing: 0) {
           HStack {
-            let url = URL(string: CDNEndpoint.customEmoji(emojiId: id).url + ".\(animated ? "gif" : "png")?size=96&animated=\(animated)")
+            let url = URL(
+              string: CDNEndpoint.customEmoji(emojiId: id).url
+                + ".\(animated ? "gif" : "png")?size=96&animated=\(animated)")
             WebImage(url: url)
               .resizable()
               .scaledToFit()
@@ -209,7 +211,6 @@ struct MarkdownText: View {
       }
     }
 
-
     @ViewBuilder
     private var sourceRow: some View {
       switch source {
@@ -217,22 +218,30 @@ struct MarkdownText: View {
         EmptyView()
       case .currentGuild(let id, let name, let icon), .ownGuild(let id, let name, let icon):
         let guild = gw.user.guilds[id]
-        guildRow(name: name, icon: icon, guildId: id, hasDiscovery: guild?.features.contains(.discoverable) ?? false)
+        guildRow(
+          name: name, icon: icon, guildId: id,
+          hasDiscovery: guild?.features.contains(.discoverable) ?? false)
       case .foreignGuild(let guild):
-        guildRow(name: guild.name, icon: guild.icon, guildId: guild.id, hasDiscovery: guild.features.contains(.discoverable))
+        guildRow(
+          name: guild.name, icon: guild.icon, guildId: guild.id,
+          hasDiscovery: guild.features.contains(.discoverable))
       }
     }
-    
+
     @ViewBuilder
-    private func guildRow(name: String, icon: String?, guildId: GuildSnowflake?, hasDiscovery: Bool) -> some View {
+    private func guildRow(name: String, icon: String?, guildId: GuildSnowflake?, hasDiscovery: Bool)
+      -> some View
+    {
       VStack(alignment: .leading) {
         Text("This emoji is from")
           .font(.callout.bold())
           .foregroundStyle(.secondary)
-        
+
         HStack(spacing: 4) {
           if let icon, let guildId {
-            let url = URL(string: CDNEndpoint.guildIcon(guildId: guildId, icon: icon).url + ".webp?size=128&animated=true")
+            let url = URL(
+              string: CDNEndpoint.guildIcon(guildId: guildId, icon: icon).url
+                + ".webp?size=128&animated=true")
             WebImage(url: url)
               .resizable()
               .scaledToFit()
@@ -329,7 +338,7 @@ struct MarkdownText: View {
           } else {
             ProgressView()
           }
-          
+
           Text("A default emoji. You can use this emoji everywhere on Discord.")
             .font(.caption)
             .foregroundStyle(.secondary)
@@ -349,7 +358,10 @@ struct MarkdownText: View {
 
   private var inlineStyle: InlineStyle {
     InlineStyle()
-      .code(.monospaced, .fontScale(0.94), .backgroundColor(DynamicColor(theme.markdown.codeSpanBackground)))
+      .code(
+        .monospaced, .fontScale(0.94),
+        .backgroundColor(DynamicColor(theme.markdown.codeSpanBackground))
+      )
       .strong(.fontWeight(.semibold))
       .link(.foregroundColor(DynamicColor(theme.common.hyperlink)))
       .subtext(.fontScale(0.75), .foregroundColor(DynamicColor(theme.markdown.secondaryText)))
@@ -424,37 +436,43 @@ struct MarkdownText: View {
           AttributedStringMarkdownParser.SyntaxExtension.spoilerRevealKey(index: index, text: text)
         )
       } else if url.host == "emoji",
-                url.pathComponents.last == "unicode",
-                let query = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems,
-                let character = query.first(where: { $0.name == "char" })?.value
+        url.pathComponents.last == "unicode",
+        let query = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems,
+        let character = query.first(where: { $0.name == "char" })?.value
       {
         ImpactGenerator.impact(style: .light)
         unicodeEmojiPopover = character
-        tapLocalPoint = (CGPoint(
-          x: bounds.minX - documentFrame.minX,
-          y: bounds.minY - documentFrame.minY
-        ), CGSize(
-          width: bounds.width,
-          height: bounds.height
-        ))
+        tapLocalPoint = (
+          CGPoint(
+            x: bounds.minX - documentFrame.minX,
+            y: bounds.minY - documentFrame.minY
+          ),
+          CGSize(
+            width: bounds.width,
+            height: bounds.height
+          )
+        )
       } else if url.host == "emoji",
-                let encoded = url.pathComponents.last,
-                let text = encoded.removingPercentEncoding,
-                let query = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems,
-                let name = query.first(where: { $0.name == "name" })?.value,
-                let animatedString = query.first(where: { $0.name == "animated" })?.value,
-                let animated: Bool = Bool(animatedString)
+        let encoded = url.pathComponents.last,
+        let text = encoded.removingPercentEncoding,
+        let query = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems,
+        let name = query.first(where: { $0.name == "name" })?.value,
+        let animatedString = query.first(where: { $0.name == "animated" })?.value,
+        let animated: Bool = Bool(animatedString)
       {
         let emoji = Emoji(id: .init(text), name: name, animated: animated)
         ImpactGenerator.impact(style: .light)
         emojiPopover = emoji
-        tapLocalPoint = (CGPoint(
-          x: bounds.minX - documentFrame.minX,
-          y: bounds.minY - documentFrame.minY
-        ), CGSize(
-          width: bounds.width,
-          height: bounds.height
-        ))
+        tapLocalPoint = (
+          CGPoint(
+            x: bounds.minX - documentFrame.minX,
+            y: bounds.minY - documentFrame.minY
+          ),
+          CGSize(
+            width: bounds.width,
+            height: bounds.height
+          )
+        )
       }
     }
 
@@ -468,13 +486,16 @@ struct MarkdownText: View {
       if let user = gw.user.users[userID] {
         ImpactGenerator.impact(style: .light)
         userPopover = user
-        tapLocalPoint = (CGPoint(
-          x: bounds.minX - documentFrame.minX,
-          y: bounds.minY - documentFrame.minY
-        ), CGSize(
-          width: bounds.width,
-          height: bounds.height
-        ))
+        tapLocalPoint = (
+          CGPoint(
+            x: bounds.minX - documentFrame.minX,
+            y: bounds.minY - documentFrame.minY
+          ),
+          CGSize(
+            width: bounds.width,
+            height: bounds.height
+          )
+        )
       }
     default:
       print("[MarkdownText] Unhandled special link: \(cmd)")
@@ -593,7 +614,8 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
       )
     }
 
-    let everyoneMention = Self(regex: /@(everyone)/, tokenType: "paicordEveryoneMention") { _, base in
+    let everyoneMention = Self(regex: /@(everyone)/, tokenType: "paicordEveryoneMention") {
+      _, base in
       mention(
         text: "@everyone",
         link: "paicord://mention/everyone",

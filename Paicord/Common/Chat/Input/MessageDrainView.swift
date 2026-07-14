@@ -301,9 +301,11 @@ extension ChatView {
 
     @ViewBuilder var content: some View {
       VStack(alignment: .leading, spacing: 4) {
-        MarkdownText(content: message.content ?? "", channelStore: channelStore, allowsJumboEmoji: true)
-          .errorColor(error != nil ? .red : nil)
-          .frame(maxWidth: .infinity, alignment: .leading)
+        MarkdownText(
+          content: message.content ?? "", channelStore: channelStore, allowsJumboEmoji: true
+        )
+        .errorColor(error != nil ? .red : nil)
+        .frame(maxWidth: .infinity, alignment: .leading)
       }
       .opacity(0.6)  // indicate pending state
     }

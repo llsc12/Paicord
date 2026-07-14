@@ -67,8 +67,12 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
   ///   attachment here instead of used on its own.
   public static func discordEmoji(
     jumbo: Bool = false,
-    cdnURL: @escaping @Sendable (_ id: String, _ animated: Bool, _ jumbo: Bool) -> URL = { id, animated, jumbo in
-      URL(string: "https://cdn.discordapp.com/emojis/\(id).webp?size=\(jumbo ? 88 : 44)&animated=\(animated)")!
+    cdnURL: @escaping @Sendable (_ id: String, _ animated: Bool, _ jumbo: Bool) -> URL = {
+      id, animated, jumbo in
+      URL(
+        string:
+          "https://cdn.discordapp.com/emojis/\(id).webp?size=\(jumbo ? 88 : 44)&animated=\(animated)"
+      )!
     }
   ) -> Self {
     .init(patterns: [.discordEmoji]) { token, attributes in
@@ -122,7 +126,8 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
       let format = components.count > 1 ? String(components[1]) : "f"
       let date = Date(timeIntervalSince1970: epoch)
 
-      return AttributedString(DiscordTimestampFormatter.string(for: date, format: format), attributes: attributes)
+      return AttributedString(
+        DiscordTimestampFormatter.string(for: date, format: format), attributes: attributes)
     }
   }
 
@@ -170,7 +175,8 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
       var linkComponents = URLComponents()
       linkComponents.scheme = "textual-discord"
       linkComponents.host = "spoiler"
-      linkComponents.path = "/\(content.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? "")"
+      linkComponents.path =
+        "/\(content.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? "")"
       linkComponents.queryItems = [URLQueryItem(name: "index", value: String(index))]
       attributes.link = linkComponents.url
 

@@ -140,8 +140,8 @@ public struct EmojiSource: Sendable, Codable {
 
   @UnstableEnum<String>
   public enum SourceType: Sendable, Codable {
-    case guild // GUILD
-    case application // APPLICATION
+    case guild  // GUILD
+    case application  // APPLICATION
     case __undocumented(String)
   }
 

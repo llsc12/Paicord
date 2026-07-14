@@ -31,7 +31,7 @@ class CurrentUserStore: DiscordDataStore {
   var premiumKind: DiscordUser.PremiumKind = .none
 
   // MARK: - Presence boxed helpers
-  
+
   /// Get a box for this presence data. Store the box and read the underlying value.
   func presenceBox(for id: UserSnowflake) -> PresenceBox? {
     presenceBoxes[id]

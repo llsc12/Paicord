@@ -181,7 +181,9 @@ enum Profile {
                     holeRadius: scaledHoleRadius
                   )
                   .fill(style: FillStyle(eoFill: true))
-                } else { Rectangle() }
+                } else {
+                  Rectangle()
+                }
               }
               .scaleEffect(scaleUp)
 

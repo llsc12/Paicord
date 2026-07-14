@@ -107,13 +107,13 @@ extension View {
   ) -> some View {
     if #available(iOS 18.0, *) {
       #if os(iOS)
-      self.gesture(
-        SlideoverUIKitGesture(
-          isEnabled: isEnabled,
-          onChanged: onChanged,
-          onEnded: onEnded
+        self.gesture(
+          SlideoverUIKitGesture(
+            isEnabled: isEnabled,
+            onChanged: onChanged,
+            onEnded: onEnded
+          )
         )
-      )
       #endif
     } else {
       self.gesture(

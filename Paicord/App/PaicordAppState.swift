@@ -13,7 +13,7 @@ import SwiftUIX
 final class PaicordAppState {
   // each window gets its own app state
   static var instances: [UUID: PaicordAppState] = [:]
-  
+
   static var sharedEphemeral = PaicordAppState()
 
   init() {
@@ -39,7 +39,7 @@ final class PaicordAppState {
 
   // MARK: - General
   var showingQuickSwitcher: Bool = false
-  
+
   // MARK: - Attachment Viewer
   var showingAttachmentViewer: Bool = false
   var attachmentViewerAttachments: [DiscordMedia] = []

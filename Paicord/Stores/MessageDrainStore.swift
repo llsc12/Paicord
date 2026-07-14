@@ -477,7 +477,7 @@ class MessageDrainStore: DiscordDataStore {
         //        }
         self.failedMessages.removeValue(forKey: nonce)
         self.messageTasks.removeValue(forKey: nonce)
-        
+
         vm.cleanupAllTempFiles()
       } catch {
         print("[SendTask] Message send FAILED nonce:", nonce)

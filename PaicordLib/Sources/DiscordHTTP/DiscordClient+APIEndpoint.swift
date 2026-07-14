@@ -804,7 +804,7 @@ extension DiscordClient {
   public func triggerTypingIndicator(channelId: ChannelSnowflake) async throws
     -> DiscordHTTPResponse
   {
-    // TODO: May need response data structs 
+    // TODO: May need response data structs
     let endpoint = APIEndpoint.triggerTypingIndicator(channelId: channelId)
     return try await self.send(request: .init(to: endpoint))
   }
@@ -2709,8 +2709,7 @@ extension DiscordClient {
 
   /// https://discord.com/developers/docs/resources/user#leave-guild
   @inlinable
-  public func leaveGuild(id: GuildSnowflake) async throws -> DiscordHTTPResponse
-  {
+  public func leaveGuild(id: GuildSnowflake) async throws -> DiscordHTTPResponse {
     let endpoint = APIEndpoint.leaveGuild(guildId: id)
     return try await self.send(request: .init(to: endpoint))
   }

@@ -41,8 +41,8 @@ struct MessageCell: View {
     guard let currentUserID = gw.user.currentUser?.id else { return false }
 
     if !message.mention_everyone,
-       message.mentions.isEmpty,
-       message.mention_roles.isEmpty
+      message.mentions.isEmpty,
+      message.mention_roles.isEmpty
     {
       return false
     }

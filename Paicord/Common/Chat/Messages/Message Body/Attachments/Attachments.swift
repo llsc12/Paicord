@@ -94,7 +94,7 @@ extension MessageCell {
 
     @ViewBuilder
     var mosaic: some View {
-      if previewableAttachments.count == 1 { // full size single-attachment case
+      if previewableAttachments.count == 1 {  // full size single-attachment case
         list
       } else {
         AttachmentMosaic(
@@ -187,7 +187,7 @@ extension MessageCell {
 
       var body: some View {
         if items.isEmpty {
-          EmptyView() // ???
+          EmptyView()  // ???
         } else if items.count == 3 {
           HStack(spacing: spacing) {
             tile(items[0], contentMode: .fill)
@@ -595,8 +595,7 @@ extension MessageCell {
           // set up session delegate to track progress
           final class SessionDelegate: NSObject, URLSessionDownloadDelegate {
             let proxy: DownloadProxyType
-            nonisolated(unsafe) var continuation:
-              CheckedContinuation<String, Error>?
+            nonisolated(unsafe) var continuation: CheckedContinuation<String, Error>?
 
             func urlSession(
               _ session: URLSession,
@@ -867,8 +866,7 @@ extension MessageCell {
           DownloadButton { proxy in
             final class SessionDelegate: NSObject, URLSessionDownloadDelegate {
               let proxy: DownloadButton<URL>.DownloadProxy
-              nonisolated(unsafe) var continuation:
-                CheckedContinuation<URL, Error>?
+              nonisolated(unsafe) var continuation: CheckedContinuation<URL, Error>?
               let destinationURL: URL
 
               func urlSession(
@@ -877,8 +875,7 @@ extension MessageCell {
                 didFinishDownloadingTo location: URL
               ) {
                 do {
-                  if FileManager.default.fileExists(atPath: destinationURL.path)
-                  {
+                  if FileManager.default.fileExists(atPath: destinationURL.path) {
                     try FileManager.default.removeItem(at: destinationURL)
                   }
                   try FileManager.default.moveItem(

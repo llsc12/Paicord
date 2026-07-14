@@ -234,16 +234,16 @@ public enum Payloads {
       case applicationCommandAutoCompleteResult = 8
       /// A modal.
       case modal = 9
-//      /// Indication that user needs to unlock/buy this capability.
-//      @available(
-//        *,
-//        deprecated,
-//        message: """
-//          Deprecated by Discord; See the official docs for more info:
-//          https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type
-//          """
-//      )
-//      case premiumRequired = 10
+      //      /// Indication that user needs to unlock/buy this capability.
+      //      @available(
+      //        *,
+      //        deprecated,
+      //        message: """
+      //          Deprecated by Discord; See the official docs for more info:
+      //          https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type
+      //          """
+      //      )
+      //      case premiumRequired = 10
     }
 
     /// https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-messages
@@ -487,13 +487,13 @@ public enum Payloads {
       .init(type: .modal, data: .modal(modal))
     }
 
-//    /// Creates a response of type `Kind.premiumRequired`.
-//    public static func premiumRequired(isEphemeral: Bool = false) -> Self {
-//      .init(
-//        type: .premiumRequired,
-//        data: .flags(.init(isEphemeral: isEphemeral))
-//      )
-//    }
+    //    /// Creates a response of type `Kind.premiumRequired`.
+    //    public static func premiumRequired(isEphemeral: Bool = false) -> Self {
+    //      .init(
+    //        type: .premiumRequired,
+    //        data: .flags(.init(isEphemeral: isEphemeral))
+    //      )
+    //    }
   }
 
   public struct ImageData: Sendable, Codable {

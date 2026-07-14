@@ -12,7 +12,7 @@ import PaicordLib
 import SwiftUI
 
 extension EnvironmentValues {
-  @Entry var appState: PaicordAppState = .sharedEphemeral // only really used by login page.
+  @Entry var appState: PaicordAppState = .sharedEphemeral  // only really used by login page.
   @Entry var gateway: GatewayStore = .shared
 
   @Entry var guildStore: GuildStore?

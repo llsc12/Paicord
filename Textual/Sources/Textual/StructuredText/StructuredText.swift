@@ -125,7 +125,7 @@ public struct StructuredText: View {
   }
 
   public var body: some View {
-    if #available(macOS 26.0, *) { // fixes a warning.
+    if #available(macOS 26.0, *) {  // fixes a warning.
       WithAttachments(attributedString) {
         BlockContent(content: $0)
           .modifier(TextSelectionInteraction())

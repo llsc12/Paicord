@@ -48,8 +48,7 @@
         }
     }
 
-    private func updateCursor(for phase: HoverPhase, model: TextSelectionModel)
-    {
+    private func updateCursor(for phase: HoverPhase, model: TextSelectionModel) {
       switch phase {
       case .active(let location):
         let cursor =

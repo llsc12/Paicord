@@ -14,13 +14,13 @@ extension MemberSidebarView {
     @Environment(\.guildStore) var guildStore
     @Environment(\.memberListAccumulator) var accumulator: ChannelStore.MemberListAccumulator?
     @Environment(\.memberListItemIndex) var row: Int?
-    
+
     var member: Guild.PartialMember?
     var user: DiscordUser
 
     @State var isHovering: Bool = false
     @State var showPopover: Bool = false
-    
+
     var isOffline: Bool {
       let status: Gateway.Status? = {
         if user.id == gw.user.currentUser?.id {
@@ -33,17 +33,19 @@ extension MemberSidebarView {
       }()
       if let status {
         return status == .offline
-      } else { return true }
+      } else {
+        return true
+      }
     }
-    
+
     var isOfflineGroupMember: Bool {
       if let accumulator, let row {
         return accumulator.group(of: row)?.rawValue == "offline"
       } else {
-        return false // idk
+        return false  // idk
       }
     }
-    
+
     var body: some View {
       Button {
         showPopover = true

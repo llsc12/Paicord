@@ -58,7 +58,8 @@ public enum DiscordMarkdown {
   public static func preprocess(_ raw: String) -> String {
     quoteGroups(in: raw)
       .map { group in
-        let processed = applyNonQuoteLineRules(normalizeCodeFences(group.lines.joined(separator: "\n")))
+        let processed = applyNonQuoteLineRules(
+          normalizeCodeFences(group.lines.joined(separator: "\n")))
         guard group.isQuoted else {
           return processed
         }
@@ -250,7 +251,8 @@ public enum DiscordMarkdown {
       }
 
       let line = preservingLeadingWhitespace(
-        in: escapingTableDelimiterLines(escapingDeepHeadingLines(escapingThematicBreakLikeLines(line)))
+        in: escapingTableDelimiterLines(
+          escapingDeepHeadingLines(escapingThematicBreakLikeLines(line)))
       )
 
       var processed: String
@@ -287,7 +289,8 @@ public enum DiscordMarkdown {
     let leadingSpaceCount = line.prefix { $0 == " " }.count
     let rest = line.dropFirst(leadingSpaceCount)
     // A line that's nothing but spaces has no content whose indentation needs preserving.
-    guard leadingSpaceCount > 0, !rest.isEmpty, rest.firstMatch(of: /^(?:[-*+]|\d{1,9}[.)])[ \t]/) == nil
+    guard leadingSpaceCount > 0, !rest.isEmpty,
+      rest.firstMatch(of: /^(?:[-*+]|\d{1,9}[.)])[ \t]/) == nil
     else {
       return line
     }

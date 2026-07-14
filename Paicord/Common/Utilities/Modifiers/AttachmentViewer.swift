@@ -976,8 +976,7 @@ private struct ZoomableGifvView: View {
     #endif
   }
 
-  static func fittedSize(for aspectRatio: CGFloat?, in bounds: CGSize) -> CGSize
-  {
+  static func fittedSize(for aspectRatio: CGFloat?, in bounds: CGSize) -> CGSize {
     guard bounds.width > 0, bounds.height > 0 else { return .zero }
     let ratio = aspectRatio ?? (bounds.width / bounds.height)
     if bounds.width / bounds.height > ratio {

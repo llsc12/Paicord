@@ -29,7 +29,7 @@ extension EmojiProperties {
     .init(
       size: .fontScaled(width: 3, height: 3),
       baselineOffset: .fontScaled(-0.2)
-//      minimumSize: CGSize(width: 44, height: 44)
+      //      minimumSize: CGSize(width: 44, height: 44)
     )
   }
 }
@@ -66,6 +66,7 @@ extension Character {
     guard let firstScalar = unicodeScalars.first else {
       return false
     }
-    return firstScalar.properties.isEmoji && (firstScalar.value > 0x238C || unicodeScalars.count > 1)
+    return firstScalar.properties.isEmoji
+      && (firstScalar.value > 0x238C || unicodeScalars.count > 1)
   }
 }

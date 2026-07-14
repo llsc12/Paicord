@@ -943,8 +943,7 @@ extension DiscordChannel {
 }
 
 /// https://discord.com/developers/docs/resources/message#embed-object
-public struct Embed: Sendable, Codable, Equatable, Hashable, ValidatablePayload
-{
+public struct Embed: Sendable, Codable, Equatable, Hashable, ValidatablePayload {
 
   /// https://discord.com/developers/docs/resources/message#embed-object-embed-types
   @UnstableEnum<String>

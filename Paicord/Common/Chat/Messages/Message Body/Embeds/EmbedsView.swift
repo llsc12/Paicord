@@ -850,7 +850,7 @@ extension [Embed] {
     for embed in self {
       // ensure type is rich, url is the same as focused embed, has image. every other field nil. else add embed as new entry.
       if let currentEmbedFocused = combined.last?.embed,  // 2nd embed or later.
-         currentEmbedFocused.type == .link || currentEmbedFocused.type == .rich,
+        currentEmbedFocused.type == .link || currentEmbedFocused.type == .rich,
         embed.type == .rich,
         let image = embed.image,
         embed.url == currentEmbedFocused.url,

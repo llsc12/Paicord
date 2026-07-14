@@ -118,12 +118,12 @@ extension ChatView.InputBar {
         HStack(spacing: 0) {
           if let image {
             image
-            .resizable()
-            .scaledToFit()
-            .padding(10)
-            .height(60)
-            .aspectRatio(1, contentMode: .fill)
-            .background(Color.gray.opacity(0.3))
+              .resizable()
+              .scaledToFit()
+              .padding(10)
+              .height(60)
+              .aspectRatio(1, contentMode: .fill)
+              .background(Color.gray.opacity(0.3))
           } else {
             Image(systemName: "doc.fill")
               .resizable()

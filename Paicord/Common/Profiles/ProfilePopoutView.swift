@@ -80,7 +80,7 @@ struct ProfilePopoutView: View {
     )
     .ignoresSafeArea(.container, edges: .bottom)
     .overlay(alignment: .top) {
-      if (profile?.private == true) {
+      if profile?.private == true {
         ProfileBannerView()
       }
     }

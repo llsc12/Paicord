@@ -7,9 +7,10 @@
 //
 
 import MeshGradient
-import struct MeshGradient.Grid
-import simd
 import SwiftUI
+import simd
+
+import struct MeshGradient.Grid
 
 extension LoginView {
   struct MeshGradientBackground: View {

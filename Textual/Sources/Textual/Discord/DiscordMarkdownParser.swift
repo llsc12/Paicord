@@ -59,7 +59,10 @@ public struct DiscordMarkdownParser: MarkupParser {
   }
 
   private func applyingUnderline(to attributedString: AttributedString) -> AttributedString {
-    guard attributedString.runs.contains(where: { $0.inlinePresentationIntent?.contains(.inlineHTML) == true })
+    guard
+      attributedString.runs.contains(where: {
+        $0.inlinePresentationIntent?.contains(.inlineHTML) == true
+      })
     else {
       return attributedString
     }

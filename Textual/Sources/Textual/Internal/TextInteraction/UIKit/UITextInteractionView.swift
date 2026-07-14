@@ -88,8 +88,8 @@
       UIPasteboard.general.setItems(
         [
           [
-            UTType.plainText.identifier: formatter.plainText(),
-//            UTType.html.identifier: formatter.html(), // we don't want html copying 
+            UTType.plainText.identifier: formatter.plainText()
+              //            UTType.html.identifier: formatter.html(), // we don't want html copying
           ]
         ]
       )
