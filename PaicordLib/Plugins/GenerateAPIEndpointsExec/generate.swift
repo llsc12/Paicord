@@ -19,7 +19,7 @@ let cases = grouped.map { tag, infos in
 
 let urlPrefixString = """
   var urlPrefix: String {
-      "https://discord.com/api/v\\(DiscordGlobalConfiguration.apiVersion)/"
+      "\\(DiscordGlobalConfiguration.apiBaseURL)/v\\(DiscordGlobalConfiguration.apiVersion)/"
   }
   """
 

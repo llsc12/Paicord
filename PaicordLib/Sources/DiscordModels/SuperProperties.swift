@@ -18,8 +18,8 @@ import UInt128
   import Bionic
 #endif
 
-#if canImport(Playgrounds)
-  import Playgrounds
+#if canImport(WatchKit)
+  import WatchKit
 #endif
 
 // Discord clients send a horrific header containing your host machine information,
@@ -50,7 +50,7 @@ extension Gateway.Identify.ConnectionProperties {
     self.browser_version = SuperProperties.browser_version()
     self.os_sdk_version = SuperProperties.os_sdk_version()
     self.client_build_number = SuperProperties.client_build_number()
-    self.native_build_number = nil
+    self.native_build_number = SuperProperties.native_build_number()
     self.client_launch_id = SuperProperties.client_launch_id()
     self.launch_signature = SuperProperties.launch_signature()
     self.device_vendor_id = SuperProperties.device_vendor_id()
@@ -160,6 +160,7 @@ public enum SuperProperties {
   }
 
   /// If ws is false this will never return nil.
+  /// ios app doesn't specify browser_user_agent when identifying in gateway.
   public static func useragent(ws: Bool) -> String? {
     // for these useragents, we will sub in values from the other functions
     #if os(macOS)
@@ -204,12 +205,8 @@ public enum SuperProperties {
     #endif
   }
 
-  public static func chromeVer() -> String {
-    "138.0.7204.251"
-  }
-
-  public static func webkitVer() -> String {
-    "537.36"
+  public static func chromeMajorVer() -> String {
+    chromeVer().split(separator: ".").first.map(String.init) ?? "138"
   }
 
   public static func device() -> String? {
@@ -288,6 +285,14 @@ public enum SuperProperties {
     #endif
   }
 
+  public static func chromeVer() -> String {
+    "138.0.7204.251"
+  }
+
+  public static func webkitVer() -> String {
+    "537.36"
+  }
+  
   public static func os_arch() -> String? {
     #if os(macOS)  // discord only wants to see what arch their mac client is running on
       #if arch(x86_64)
@@ -327,20 +332,31 @@ public enum SuperProperties {
   public static func client_version() -> String {
     switch Gateway.Identify.ConnectionProperties.__defaultOS {
     case "iOS", "watchOS":
-      return "318.0"
+      return "336.0"
     case "Mac OS X":
-      return "0.0.379"
+      return "0.0.398"
     default:
-      return "0.0.379"
+      return "0.0.398"
     }
   }
 
   public static func client_build_number() -> Int? {
     switch Gateway.Identify.ConnectionProperties.__defaultOS {
     case "iOS", "watchOS":
-      return 94578
+      return 105180
     case "Mac OS X":
-      return 507104
+      return 575562
+    default:
+      return nil
+    }
+  }
+  
+  public static func native_build_number() -> Int? {
+    switch Gateway.Identify.ConnectionProperties.__defaultOS {
+    case "iOS", "watchOS":
+      return nil
+    case "Mac OS X":
+      return 85861
     default:
       return nil
     }
@@ -405,9 +421,16 @@ public enum SuperProperties {
   }
 
   public static func device_vendor_id() -> String? {
-    #if os(iOS) || os(watchOS)
+    #if os(iOS)
       DispatchQueue.main.sync {
         if let uuid = UIDevice.current.identifierForVendor {
+          return uuid.uuidString.uppercased()
+        }
+        return UUID().uuidString.uppercased()  // fallback
+      }
+    #elseif os(watchOS)
+      DispatchQueue.main.sync {
+        if let uuid = WKInterfaceDevice.current().identifierForVendor {
           return uuid.uuidString.uppercased()
         }
         return UUID().uuidString.uppercased()  // fallback
@@ -459,9 +482,3 @@ extension UUID {
     return UUID.init(finalUInt)
   }
 }
-
-#if canImport(Playgrounds)
-#Playground {
-  SuperProperties.GenerateContextPropertiesHeader(context: .createDM)
-}
-#endif

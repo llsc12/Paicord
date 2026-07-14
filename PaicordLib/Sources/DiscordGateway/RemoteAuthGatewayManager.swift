@@ -241,7 +241,7 @@ public actor RemoteAuthGatewayManager {
     self.stateCallback?(.connecting)
 
     await self.sendQueue.reset()
-    let gatewayURL = "wss://remote-auth-gateway.discord.gg/"
+    let gatewayURL = DiscordGlobalConfiguration.remoteAuthURL
     let queries: [(String, String)] = [
       ("v", "2")
     ]

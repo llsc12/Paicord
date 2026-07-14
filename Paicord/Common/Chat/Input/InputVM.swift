@@ -27,7 +27,26 @@ extension ChatView.InputBar {
     }
 
     /// The text field content
-    var content: String = ""
+    var content: String = "" {
+      didSet {
+        guard !content.isEmpty else { return }
+        sendTypingIndicatorIfNeeded()
+      }
+    }
+
+    private var lastTypingIndicatorSentAt: Date?
+    private func sendTypingIndicatorIfNeeded() {
+      let now = Date()
+      if let lastTypingIndicatorSentAt, now.timeIntervalSince(lastTypingIndicatorSentAt) < 8 {
+        return
+      }
+      lastTypingIndicatorSentAt = now
+      guard let client = channelStore.gateway?.client else { return }
+      let channelId = channelStore.channelId
+      Task.detached {
+        try? await client.triggerTypingIndicator(channelId: channelId)
+      }
+    }
 
     private var appCreatedTempFiles: Set<URL> = []
 

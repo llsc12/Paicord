@@ -74,9 +74,15 @@ struct ProfileView: View {
       WebImage(url: bannerURL) { phase in
         switch phase {
         case .success(let image):
-          image
-            .resizable()
-            .aspectRatio(3, contentMode: .fill)
+          Color.clear
+            .aspectRatio(3, contentMode: .fit)
+            .overlay(
+              image
+                .resizable()
+                .scaledToFill()
+            )
+            .frame(maxWidth: .infinity)
+            .clipped()
         default:
           let color =
             profile?.user_profile?.theme_colors?.first
@@ -150,7 +156,6 @@ struct ProfileView: View {
         : profileMeta?.bio ?? profile?.user_profile?.bio
       {
         MarkdownText(content: bio)
-          .equatable()
       }
     }
   }

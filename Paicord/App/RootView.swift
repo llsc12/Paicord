@@ -58,6 +58,7 @@ struct RootView: View {
         .quickSwitcher()
         .sponsorSheet()
         .updateSheet()
+        .settingsSheet()
         .task {
           appState.loadPrevGuild()
           #if os(iOS)
@@ -70,7 +71,7 @@ struct RootView: View {
     .focusedSceneValue(\.appState, appState)
     .navigationTitle(Text(verbatim: ""))
     .animation(.default, value: gatewayStore.state.hashValue)
-    .fontDesign(.rounded)
+//    .fontDesign(.rounded) // causes issues with markdown
     .modifier(
       PaicordSheetsAlerts(
         gatewayStore: gatewayStore,

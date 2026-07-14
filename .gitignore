@@ -7,3 +7,6 @@ target
 Package.resolved
 **/xcuserdata/
 **/*.xcuserstate
+/.gradle
+/.idea
+/PaicordLib/build

@@ -9,6 +9,13 @@
 import DiscordModels
 @_spi(Advanced) import SwiftUIIntrospect
 import SwiftUIX
+  
+// makes a fallback to .automatic on iOS because topBarLeading is not available on macOS
+@available(iOS, unavailable)
+extension ToolbarItemPlacement {
+  @_disfavoredOverload
+  static var topBarLeading: Self { .automatic }
+}
 
 // if on macos or ipad
 struct LargeBaseplate: View {
@@ -33,20 +40,22 @@ struct LargeBaseplate: View {
         }
         .toolbar(removing: .sidebarToggle)
         .toolbar {
-          Group {
-            if columnVisibility != .detailOnly {
-              if let currentGuildStore {
-                Text(currentGuildStore.guild?.name ?? "Direct Messages")
-                  .font(.title2)
-                  .bold()
-              } else {
-                Text("Direct Messages")
-                  .font(.title2)
-                  .bold()
+          ToolbarItem(placement: .topBarLeading) {
+            Group {
+              if columnVisibility != .detailOnly {
+                if let currentGuildStore {
+                  Text(currentGuildStore.guild?.name ?? "Direct Messages")
+                    .font(.title2)
+                    .bold()
+                } else {
+                  Text("Direct Messages")
+                    .font(.title2)
+                    .bold()
+                }
               }
             }
+            .minimumScaleFactor(0.5)
           }
-          .minimumScaleFactor(0.5)
         }
         .navigationSplitViewColumnWidth(min: 280, ideal: 310, max: 360)
 

@@ -79,6 +79,11 @@ struct ProfilePopoutView: View {
       .overlay(.ultraThinMaterial)
     )
     .ignoresSafeArea(.container, edges: .bottom)
+    .overlay(alignment: .top) {
+      if (profile?.private == true) {
+        ProfileBannerView()
+      }
+    }
     .environment(\.colorScheme, colorScheme ?? systemColorScheme)
     #if os(iOS)
       .presentationBackground(.ultraThinMaterial)
@@ -96,9 +101,15 @@ struct ProfilePopoutView: View {
       WebImage(url: bannerURL) { phase in
         switch phase {
         case .success(let image):
-          image
-            .resizable()
-            .aspectRatio(3, contentMode: .fill)
+          Color.clear
+            .aspectRatio(3, contentMode: .fit)
+            .overlay(
+              image
+                .resizable()
+                .scaledToFill()
+            )
+            .frame(maxWidth: .infinity)
+            .clipped()
         default:
           let color =
             showMainProfile
@@ -181,7 +192,6 @@ struct ProfilePopoutView: View {
         : profileMeta?.bio ?? profile?.user_profile?.bio
       {
         MarkdownText(content: bio, channelStore: channel)
-          .equatable()
       }
     }
   }

@@ -35,6 +35,8 @@ extension MemberSidebarView {
           }
         }
       }
+      // macos 26/27 bug workaround
+      .padding(.top, 1)
       .background(
         Profile.ThemeColorsBackground(
           colors: profile?.user_profile?.theme_colors
@@ -50,9 +52,15 @@ extension MemberSidebarView {
         WebImage(url: bannerURL) { phase in
           switch phase {
           case .success(let image):
-            image
-              .resizable()
-              .aspectRatio(3, contentMode: .fill)
+            Color.clear
+              .aspectRatio(3, contentMode: .fit)
+              .overlay(
+                image
+                  .resizable()
+                  .scaledToFill()
+              )
+              .frame(maxWidth: .infinity)
+              .clipped()
           default:
             let color =
               profile?.user_profile?.accent_color ?? user.accent_color
@@ -110,7 +118,6 @@ extension MemberSidebarView {
 
         if let bio = profileMeta?.bio ?? profile?.user_profile?.bio {
           MarkdownText(content: bio)
-            .equatable()
         }
       }
     }

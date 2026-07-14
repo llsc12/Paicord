@@ -227,18 +227,34 @@ class ChannelStore: DiscordDataStore {
     currentChannel.last_message_id = message.id
     channel = currentChannel
 
+    // sending a message in a channel counts as reading up to it
+    if message.author?.id == gateway?.user.currentUser?.id {
+      gateway?.readStates.applyAck(channelId: channelId, messageId: message.id)
+      if let client = gateway?.client {
+        let channelId = channelId
+        let messageId = message.id
+        Task.detached {
+          try? await client.acknowledgeMessage(
+            channelId: channelId,
+            messageId: messageId,
+            payload: Payloads.AcknowledgeMessage()
+          )
+        }
+      }
+    }
+
     // Update guild member info if we have a guild store
     if let guildStore, let authorId = message.author?.id,
       let member = message.member
     {
-      guildStore.members[authorId, default: member].update(with: member)
+      guildStore.mergeMember(member, for: authorId)
     }
 
     // Get unknown member data from mentions if we have a guild store
     if let guildStore {
       var unknownMemberIds: Set<UserSnowflake> = []
       for mention in messageData.mentions {
-        if guildStore.members[mention.id] == nil {
+        if guildStore.member(mention.id) == nil {
           unknownMemberIds.insert(mention.id)
         }
       }
@@ -275,7 +291,7 @@ class ChannelStore: DiscordDataStore {
     if let guildStore {
       var unknownMemberIds: Set<UserSnowflake> = []
       for mention in message.mentions ?? [] {
-        if guildStore.members[mention.id] == nil {
+        if guildStore.member(mention.id) == nil {
           unknownMemberIds.insert(mention.id)
         }
       }
@@ -308,7 +324,7 @@ class ChannelStore: DiscordDataStore {
       let userId = member.user?.id
     {
       // Update guild member info
-      guildStore.members[userId, default: member].update(with: member)
+      guildStore.mergeMember(member, for: userId)
     }
     if let user = reactionAdd.member?.user?.toPartialUser(), let gateway {
       // Update user info
@@ -639,7 +655,7 @@ class ChannelStore: DiscordDataStore {
               .compactMap {
                 $0
               }
-          }.flatMap { $0 }.filter { guildStore.members[$0] == nil }
+          }.flatMap { $0 }.filter { guildStore.member($0) == nil }
         )
         if !unknownMembers.isEmpty {
           print(
@@ -968,6 +984,11 @@ extension ChannelStore {
 }
 
 extension ChannelStore {
+  typealias MixedItem = Gateway.GuildMemberListUpdate.MemberListOp
+    .GuildMemberListMixedItem
+
+  typealias MemberListRow = ObservableBox<MixedItem?>
+
   // class representing member list items and where the groups lie
   @Observable
   class MemberListAccumulator {
@@ -988,10 +1009,18 @@ extension ChannelStore {
       self.primaryChannelStore = primaryChannelStore
     }
 
-    private var items: [Int: MixedItem] = [:]
+    private var items: [Int: MemberListRow] = [:]
 
-    subscript(row index: Int) -> MixedItem? {
+    func row(at index: Int) -> MemberListRow? {
       items[index]
+    }
+
+    private func setItem(_ item: MixedItem, at index: Int) {
+      if let existing = items[index] {
+        existing.value = item
+      } else {
+        items[index] = MemberListRow(item)
+      }
     }
 
     func update(with update: Gateway.GuildMemberListUpdate) {
@@ -1004,11 +1033,11 @@ extension ChannelStore {
       for op in update.ops {
         switch op {
         case .sync(let pair, let newItems):
-          for i in pair.first..<pair.second {
+          for i in pair.first...pair.second {
             items.removeValue(forKey: i)
           }
           for (i, item) in newItems.enumerated() {
-            items[pair.first + i] = item
+            setItem(item, at: pair.first + i)
           }
           let members = newItems.compactMap { item -> Guild.Member? in
             if case .member(let member) = item { return member }
@@ -1016,7 +1045,7 @@ extension ChannelStore {
           }
           handleMemberData(members)
         case .insert(let index, let item):
-          var updated: [Int: MixedItem] = [:]
+          var updated: [Int: MemberListRow] = [:]
           for (key, value) in items {
             if key >= index {
               updated[key + 1] = value
@@ -1024,20 +1053,20 @@ extension ChannelStore {
               updated[key] = value
             }
           }
-          updated[index] = item
+          updated[index] = MemberListRow(item)
           items = updated
           if case .member(let member) = item {
             handleMemberData(member)
           }
         case .update(let index, let item):
-          items[index] = item
+          setItem(item, at: index)
           if case .member(let member) = item {
             handleMemberData(member)
           }
         case .delete(let index):
           items.removeValue(forKey: index)
           // Shift everything above down by 1
-          var updated: [Int: MixedItem] = [:]
+          var updated: [Int: MemberListRow] = [:]
           for (key, value) in items {
             if key > index {
               updated[key - 1] = value
@@ -1047,7 +1076,7 @@ extension ChannelStore {
           }
           items = updated
         case .invalidate(let range):
-          for i in range.first..<range.second {
+          for i in range.first...range.second {
             items.removeValue(forKey: i)
           }
         }
@@ -1064,17 +1093,15 @@ extension ChannelStore {
         // add member data to guildstore and user data to user store
         guard let user = member.user?.toPartialUser() else { continue }
         let member = member.toPartialMember()
-        primaryChannelStore.guildStore?.members[user.id, default: member]
-          .update(with: member)
+        primaryChannelStore.guildStore?.mergeMember(member, for: user.id)
         primaryChannelStore.gateway?.user.users[user.id, default: user].update(
           with: user
         )
-        primaryChannelStore.gateway?.user.presences[user.id] = member.presence
+        if let presence = member.presence {
+          primaryChannelStore.gateway?.user.setPresence(presence, for: user.id)
+        }
       }
     }
-
-    typealias MixedItem = Gateway.GuildMemberListUpdate.MemberListOp
-      .GuildMemberListMixedItem
   }
 }
 
