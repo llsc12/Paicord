@@ -274,7 +274,7 @@ extension MessageCell {
       private func tile(
         _ attachment: DiscordChannel.Message.Attachment,
         aspectRatio: CGFloat? = Self.tileAspectRatio,
-        contentMode: ContentMode = .fit
+        contentMode: ContentMode = .fill
       ) -> some View {
         Button {
           onTap(attachment)

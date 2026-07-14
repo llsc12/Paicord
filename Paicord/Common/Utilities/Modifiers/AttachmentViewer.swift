@@ -20,6 +20,10 @@ import SwiftUIX
   import SDWebImage
 #endif
 
+#if os(macOS)
+  private let attachmentEdgePadding: CGFloat = 100
+#endif
+
 extension View {
   @ViewBuilder
   func attachmentViewer() -> some View {
@@ -441,6 +445,7 @@ private struct AttachmentViewer: View {
                     .clipped()
                   }
                   .clipShape(RoundedRectangle(cornerRadius: 4))
+                  .opacity(selectedIndex == index ? 1 : 0.5)
               }
               .buttonStyle(.borderless)
             }
@@ -762,9 +767,13 @@ private struct ZoomableImageView: View {
               let bounds = nsView.bounds.size
               guard bounds.width > 0, bounds.height > 0 else { return }
               let imageSize = image.size
+              let fittingBounds = CGSize(
+                width: max(bounds.width - attachmentEdgePadding * 2, 0),
+                height: max(bounds.height - attachmentEdgePadding * 2, 0)
+              )
               let scale = min(
-                bounds.width / imageSize.width,
-                bounds.height / imageSize.height
+                fittingBounds.width / imageSize.width,
+                fittingBounds.height / imageSize.height
               )
               let fittedSize = CGSize(
                 width: imageSize.width * scale,
@@ -1251,9 +1260,13 @@ private struct ZoomableGifvView: View {
         func applyLayout(aspectRatio: CGFloat?, in scrollView: NSScrollView) {
           guard let playerView, let containerView else { return }
           let bounds = scrollView.bounds.size
+          let fittingBounds = CGSize(
+            width: max(bounds.width - attachmentEdgePadding * 2, 0),
+            height: max(bounds.height - attachmentEdgePadding * 2, 0)
+          )
           let fittedSize = ZoomableGifvView.fittedSize(
             for: aspectRatio,
-            in: bounds
+            in: fittingBounds
           )
           guard fittedSize != .zero else { return }
           let origin = CGPoint(
