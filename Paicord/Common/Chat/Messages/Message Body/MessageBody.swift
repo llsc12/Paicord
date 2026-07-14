@@ -53,13 +53,13 @@ extension MessageCell {
         // Attachments
         let attachments = message.attachments ?? []
         if !attachments.isEmpty {
-          AttachmentsView(attachments: attachments)
+          AttachmentsView(message: message, attachments: attachments)
         }
 
         // Embeds
         let embeds = message.embeds ?? []
         if !embeds.isEmpty {
-          EmbedsView(embeds: embeds)
+          EmbedsView(embeds: embeds, message: message)
         }
 
         // Stickers
@@ -69,7 +69,9 @@ extension MessageCell {
 
         // Reactions
         let reactions = channelStore.reactions[message.id, default: [:]]
-        ReactionsView(reactions: reactions)
+        if !reactions.isEmpty {
+          ReactionsView(reactions: reactions)
+        }
 
         if let msgSnapshot = message.partialMessageForSnapshot() {
           VStack(alignment: .leading, spacing: 4) {
@@ -111,4 +113,16 @@ extension MessageCell {
       return false
     }
   }
+}
+
+#Preview {
+  @Previewable @State var yea = false
+  Text("gm")
+    .popover(isPresented: $yea) {
+      MarkdownText.EmojiDetailsView.init(
+        emoji: .init(id: .init("724374128777494608"), name: "AyameLove"))
+    }
+    .onAppear {
+      yea = true
+    }
 }

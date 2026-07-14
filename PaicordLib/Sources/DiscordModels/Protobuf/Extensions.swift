@@ -30,8 +30,7 @@ extension DiscordProtos_DiscordUsers_V1_PreloadedUserSettings.StatusSettings {
     }
   }
 
-  public func gatewayCustomStatusActivity(now: Date = Date()) -> Gateway.Activity?
-  {
+  public func gatewayCustomStatusActivity(now: Date = Date()) -> Gateway.Activity? {
     guard hasCustomStatus else { return nil }
     guard !customStatusIsExpired(now: now) else { return nil }
 

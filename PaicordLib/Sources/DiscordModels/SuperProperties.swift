@@ -105,8 +105,7 @@ public enum SuperProperties {
   nonisolated(unsafe) private static
     var _client_heartbeat_session_id_last_generated: Date = Date
       .distantPast
-  nonisolated(unsafe) private static var _client_heartbeat_session_id_cached:
-    UUID? = nil
+  nonisolated(unsafe) private static var _client_heartbeat_session_id_cached: UUID? = nil
   static var _client_heartbeat_session_id: UUID {
     let now = Date.now
     if now.timeIntervalSince(_client_heartbeat_session_id_last_generated)
@@ -292,7 +291,7 @@ public enum SuperProperties {
   public static func webkitVer() -> String {
     "537.36"
   }
-  
+
   public static func os_arch() -> String? {
     #if os(macOS)  // discord only wants to see what arch their mac client is running on
       #if arch(x86_64)
@@ -350,7 +349,7 @@ public enum SuperProperties {
       return nil
     }
   }
-  
+
   public static func native_build_number() -> Int? {
     switch Gateway.Identify.ConnectionProperties.__defaultOS {
     case "iOS", "watchOS":

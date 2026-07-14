@@ -88,7 +88,7 @@ public struct InlineStyle: Sendable, Hashable {
 }
 
 private struct InlineStyleKey: EnvironmentKey {
-  nonisolated(unsafe) static let defaultValue: InlineStyle = .default
+  static let defaultValue: InlineStyle = .default
 }
 
 extension EnvironmentValues {

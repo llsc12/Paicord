@@ -81,14 +81,14 @@ struct ProfileBar: View {
       }
 
       Button {
-#if os(macOS)
-        openWindow(id: "settings")
-#elseif os(iOS)
-        NotificationCenter.default.post(
-          name: .presentSettingsSheet,
-          object: nil
-        )
-#endif
+        #if os(macOS)
+          openWindow(id: "settings")
+        #elseif os(iOS)
+          NotificationCenter.default.post(
+            name: .presentSettingsSheet,
+            object: nil
+          )
+        #endif
       } label: {
         Image(systemName: "gearshape.fill")
           .font(.title2)

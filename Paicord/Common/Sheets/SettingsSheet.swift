@@ -21,7 +21,7 @@ extension NSNotification.Name {
 
 private struct SettingsSheetModifier: ViewModifier {
   @State private var isPresented: Bool = false
-  
+
   func body(content: Content) -> some View {
     content
       .sheet(isPresented: $isPresented) {

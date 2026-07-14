@@ -174,13 +174,17 @@ enum Profile {
           ZStack(alignment: .bottomTrailing) {
             Avatar(member: member, user: user)
               .scaleEffect(scaleDown)
-              .mask(
-                RectWithCircleHole(
-                  holeCenter: scaledHole,
-                  holeRadius: scaledHoleRadius
-                )
-                .fill(style: FillStyle(eoFill: true))
-              )
+              .mask {
+                if !hideOffline || status != .offline {
+                  RectWithCircleHole(
+                    holeCenter: scaledHole,
+                    holeRadius: scaledHoleRadius
+                  )
+                  .fill(style: FillStyle(eoFill: true))
+                } else {
+                  Rectangle()
+                }
+              }
               .scaleEffect(scaleUp)
 
             if let status {

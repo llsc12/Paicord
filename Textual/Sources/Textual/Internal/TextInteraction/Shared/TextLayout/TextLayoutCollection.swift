@@ -1,8 +1,8 @@
 #if TEXTUAL_ENABLE_TEXT_SELECTION
   import SwiftUI
 
-@available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
-protocol TextLayoutCollection {
+  @available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
+  protocol TextLayoutCollection {
     var layouts: [any TextLayout] { get }
 
     func isEqual(to other: any TextLayoutCollection) -> Bool
@@ -10,8 +10,8 @@ protocol TextLayoutCollection {
     func index(of layout: Text.Layout) -> Int?
   }
 
-@available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
-struct AnyTextLayoutCollection: TextLayoutCollection, Equatable {
+  @available(iOS 18, macOS 15, tvOS 18, watchOS 11, visionOS 2, *)
+  struct AnyTextLayoutCollection: TextLayoutCollection, Equatable {
     private let base: any TextLayoutCollection
 
     init(_ base: any TextLayoutCollection) {

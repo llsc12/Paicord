@@ -42,6 +42,7 @@ public enum UserAPIEndpoint: Endpoint {
 
   // MARK: - Emoji
   case getGuildTopEmojis(guildId: GuildSnowflake)
+  case getEmojiSource(emojiId: EmojiSnowflake)
 
   // MARK: - Entitlements
 
@@ -199,6 +200,8 @@ public enum UserAPIEndpoint: Endpoint {
     // MARK: - Emojis
     case .getGuildTopEmojis(let guildId):
       suffix = "guilds/\(guildId.rawValue)/top-emojis"
+    case .getEmojiSource(let emojiId):
+      suffix = "emojis/\(emojiId.rawValue)/source"
 
     // MARK: - Invites
     case .acceptInvite(let code):
@@ -360,6 +363,8 @@ public enum UserAPIEndpoint: Endpoint {
       suffix = "guilds/\(guildId.rawValue)/auto-moderation/alert-action"
     case .getGuildTopEmojis(let guildId):
       suffix = "/guilds/\(guildId.rawValue)/top-emojis"
+    case .getEmojiSource(let emojiId):
+      suffix = "emojis/\(emojiId.rawValue)/source"
     case .acceptInvite(let code):
       suffix = "invites/\(code)"
     case .getUserInvites,
@@ -481,6 +486,7 @@ public enum UserAPIEndpoint: Endpoint {
     case .validateAutoModRule: return .POST
     case .executeAutoModAlertAction: return .POST
     case .getGuildTopEmojis: return .GET
+    case .getEmojiSource: return .GET
     case .acceptInvite: return .POST
     case .getUserInvites: return .GET
     case .createUserInvite: return .POST
@@ -542,6 +548,7 @@ public enum UserAPIEndpoint: Endpoint {
     case .validateAutoModRule: return true
     case .executeAutoModAlertAction: return true
     case .getGuildTopEmojis: return true
+    case .getEmojiSource: return true
     case .acceptInvite: return true
     case .getUserInvites: return true
     case .createUserInvite: return true
@@ -603,6 +610,7 @@ public enum UserAPIEndpoint: Endpoint {
     case .validateAutoModRule: return true
     case .executeAutoModAlertAction: return true
     case .getGuildTopEmojis: return true
+    case .getEmojiSource: return true
     case .acceptInvite: return true
     case .getUserInvites: return true
     case .createUserInvite: return true
@@ -665,6 +673,7 @@ public enum UserAPIEndpoint: Endpoint {
     case .validateAutoModRule(let guildId): return [guildId.rawValue]
     case .executeAutoModAlertAction(let guildId): return [guildId.rawValue]
     case .getGuildTopEmojis(let guildId): return [guildId.rawValue]
+    case .getEmojiSource(let emojiId): return [emojiId.rawValue]
     case .acceptInvite(let code): return [code]
     case .getUserInvites: return []
     case .createUserInvite: return []
@@ -753,6 +762,7 @@ public enum UserAPIEndpoint: Endpoint {
     case .executeAutoModAlertAction: return 16
     // ... space for ignored endpoints i didn't implement
     case .getGuildTopEmojis: return 41
+    case .getEmojiSource: return 42
     case .acceptInvite: return 51
     case .getUserInvites: return 52
     case .createUserInvite: return 53
@@ -828,6 +838,8 @@ public enum UserAPIEndpoint: Endpoint {
       return "executeAutoModAlertAction(guildId: \(guildId.rawValue), ..."
     case .getGuildTopEmojis(let guildId):
       return "getGuildTopEmojis(guildId: \(guildId.rawValue))"
+    case .getEmojiSource(let emojiId):
+      return "getEmojiSource(emojiId: \(emojiId.rawValue))"
     case .acceptInvite(let code):
       return "acceptInvite(code: \(code))"
     case .getUserInvites: return "getUserInvites"
@@ -929,6 +941,7 @@ public enum CacheableUserAPIEndpointIdentity: Int, Sendable, Hashable,
 
   // MARK: - Emojis
   case getGuildTopEmojis
+  case getEmojiSource
 
   // MARK: - Users
   case getUserProfile
@@ -966,6 +979,8 @@ public enum CacheableUserAPIEndpointIdentity: Int, Sendable, Hashable,
       return "getStickerGuild"
     case .getGuildTopEmojis:
       return "getGuildTopEmojis"
+    case .getEmojiSource:
+      return "getEmojiSource"
     case .getUserProfile:
       return "getUserProfile"
     case .__DO_NOT_USE_THIS_CASE:
@@ -985,6 +1000,7 @@ public enum CacheableUserAPIEndpointIdentity: Int, Sendable, Hashable,
     case .getStickerPack: self = .getStickerPack
     case .getStickerGuild: self = .getStickerGuild
     case .getGuildTopEmojis: self = .getGuildTopEmojis
+    case .getEmojiSource: self = .getEmojiSource
     case .getUserProfile: self = .getUserProfile
     case .__DO_NOT_USE_THIS_CASE:
       fatalError(

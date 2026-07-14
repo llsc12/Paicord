@@ -51,7 +51,8 @@ struct TextSelectionInteraction: ViewModifier {
   }
 
   private struct TextSelectionKey: EnvironmentKey {
-    nonisolated(unsafe) static let defaultValue: any TextSelectability.Type = DisabledTextSelectability.self
+    nonisolated(unsafe) static let defaultValue: any TextSelectability.Type =
+      DisabledTextSelectability.self
   }
 
   extension EnvironmentValues {

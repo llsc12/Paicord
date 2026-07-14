@@ -120,6 +120,7 @@ struct ChatView: View {
             name: .chatViewShouldScrollToBottom,
             object: ["channelId": vm.channelId, "immediate": true]
           )
+          InputBar.inputVMs[vm.channelId]?.uploadItems = []
           return .handled
         }
         .introspect(.scrollView, on: .macOS(.v14...)) { scrollView in
@@ -206,7 +207,6 @@ struct ChatView: View {
     .scrollDismissesKeyboard(.interactively)
     .background(theme.common.secondaryBackground)
     .ignoresSafeArea(.keyboard, edges: .all)
-
     #if os(macOS)
       .onDisappear {
         if let observer = scrollObserver {
@@ -306,7 +306,7 @@ struct ChatView: View {
     ackTask = Task {
       try? await Task.sleep(for: .seconds(1.5))
       guard !Task.isCancelled else { return }
-      try await gw.client.acknowledgeMessage(
+      _ = try await gw.client.acknowledgeMessage(
         channelId: channelId,
         messageId: messageId,
         payload: Payloads.AcknowledgeMessage()

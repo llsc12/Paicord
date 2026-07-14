@@ -181,7 +181,7 @@ extension ChatView.InputBar {
         }
       }
     }
-    
+
     var isResetting = false
 
     /// The input bar displays items from this.

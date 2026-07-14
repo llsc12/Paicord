@@ -25,13 +25,14 @@ struct DiscordMarkdownParserTests {
     let runs = Array(result.runs)
 
     #expect(String(result.characters[...]) == "#### H4\n##### H5\n###### H6")
-    #expect(runs.allSatisfy { run in
-      guard let intent = run.presentationIntent else { return true }
-      return !intent.components.contains { component in
-        if case .header = component.kind { return true }
-        return false
-      }
-    })
+    #expect(
+      runs.allSatisfy { run in
+        guard let intent = run.presentationIntent else { return true }
+        return !intent.components.contains { component in
+          if case .header = component.kind { return true }
+          return false
+        }
+      })
   }
 
   @Test func tableSyntaxIsNotATable() throws {
@@ -40,13 +41,14 @@ struct DiscordMarkdownParserTests {
     let runs = Array(result.runs)
 
     #expect(String(result.characters[...]) == input)
-    #expect(runs.allSatisfy { run in
-      guard let intent = run.presentationIntent else { return true }
-      return !intent.components.contains { component in
-        if case .table = component.kind { return true }
-        return false
-      }
-    })
+    #expect(
+      runs.allSatisfy { run in
+        guard let intent = run.presentationIntent else { return true }
+        return !intent.components.contains { component in
+          if case .table = component.kind { return true }
+          return false
+        }
+      })
   }
 
   @Test func plainUnderline() throws {
@@ -76,9 +78,10 @@ struct DiscordMarkdownParserTests {
     )
     let runs = Array(result.runs)
 
-    #expect(runs.map { String(result[$0.range].characters[...]) } == [
-      "bold italics", " and ", "bold underlined italics", "!",
-    ])
+    #expect(
+      runs.map { String(result[$0.range].characters[...]) } == [
+        "bold italics", " and ", "bold underlined italics", "!",
+      ])
     #expect(runs.map(\.underlineStyle).map { $0 != nil } == [false, false, true, false])
   }
 
