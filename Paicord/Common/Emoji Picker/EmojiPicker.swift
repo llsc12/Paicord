@@ -186,17 +186,29 @@ struct EmojiPicker: View {
               Group {
                 switch section {
                 case .favourites:
-                  Image(systemName: "star.fill")
-                    .resizable()
+                  Color.clear
+                    .overlay {
+                      Image(systemName: "star.fill")
+                        .font(.system(size: 24))
+                    }
                 case .frequents:
-                  Image(systemName: "clock.fill")
-                    .resizable()
+                  Color.clear
+                    .overlay {
+                      Image(systemName: "clock.fill")
+                        .font(.system(size: 24))
+                    }
                 case .top:
-                  Image(systemName: "trophy.fill")
-                    .resizable()
+                  Color.clear
+                    .overlay {
+                      Image(systemName: "trophy.fill")
+                        .font(.system(size: 24))
+                    }
                 case .unicodeCategory(let category):
-                  Image(systemName: category.symbolName)
-                    .resizable()
+                  Color.clear
+                    .overlay {
+                      Image(systemName: category.symbolName)
+                        .font(.system(size: 24))
+                    }
                 case .guild(let id):
                   if let guild = gw.user.guilds[id] {
                     guildButton(from: guild)
@@ -226,6 +238,7 @@ struct EmojiPicker: View {
           WebImage(url: url)
             .resizable()
             .scaledToFill()
+            .clipShape(.circle)
         } else {
           Rectangle()
             .fill(.clear)
@@ -243,6 +256,7 @@ struct EmojiPicker: View {
                 .minimumScaleFactor(0.1)
                 .foregroundStyle(.primary)
             }
+            .clipShape(.circle)
         }
       }
     }
