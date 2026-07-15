@@ -228,6 +228,9 @@ struct EmojiPicker: View {
     @State private var scrollPosition: String?
     @FocusState private var focus: FocusTarget?
 
+    @State private var cachedGridSections: [GridSection] = []
+    @State private var cachedRenderSections: [RenderSection] = []
+
     private let columnCount = 8
     private var gridColumns: [GridItem] {
       Array(repeating: GridItem(.flexible(), spacing: 4), count: columnCount)
@@ -249,8 +252,16 @@ struct EmojiPicker: View {
         }
         .padding([.horizontal, .bottom], -15)
       }
-      .task { try? await EmojiIndexProvider.shared.load() }
-      .onAppear { focus = .search }
+      .task {
+        try? await EmojiIndexProvider.shared.load()
+        rebuildGridSections()
+      }
+      .onAppear {
+        focus = .search
+        rebuildGridSections()
+      }
+      .onChange(of: gw.user.emojis) { _, _ in rebuildGridSections() }
+      .onChange(of: gw.settings.frecencySettings) { _, _ in rebuildGridSections() }
       .onChange(of: searchText) { _, newValue in
         highlightedIndex = 0
         Task { await performSearch(newValue) }
@@ -281,7 +292,7 @@ struct EmojiPicker: View {
         ScrollView {
           LazyVStack(alignment: .leading, spacing: 4) {
             if searchText.isEmpty {
-              ForEach(renderSections) { rs in
+              ForEach(cachedRenderSections) { rs in
                 LazyVStack(alignment: .leading, spacing: 4) {
                   sectionHeader(rs.section.section)
                   LazyVGrid(columns: gridColumns, spacing: 4) {
@@ -392,7 +403,7 @@ struct EmojiPicker: View {
             if case .custom(_, let guild) = item,
               let guild = gw.user.guilds[guild]
             {
-              Text("from") + Text(verbatim: guild.name).bold()
+              Text("from ") + Text(verbatim: guild.name).bold()
             }
           }
           
@@ -564,7 +575,7 @@ struct EmojiPicker: View {
       return guilds
     }
 
-    var guildSections: [(GuildSnowflake, [PickerEmoji])] {
+    func computeGuildSections() -> [(GuildSnowflake, [PickerEmoji])] {
       orderedGuildIDs.compactMap { guildID in
         guard let emojis = gw.user.emojis[guildID], !emojis.isEmpty else {
           return nil
@@ -578,7 +589,7 @@ struct EmojiPicker: View {
       }
     }
 
-    var unicodeSections: [(EmojiCategory, [PickerEmoji])] {
+    func computeUnicodeSections() -> [(EmojiCategory, [PickerEmoji])] {
       EmojiCategory.allCases.compactMap {
         category -> (EmojiCategory, [PickerEmoji])? in
         guard
@@ -627,7 +638,7 @@ struct EmojiPicker: View {
       return nil
     }
 
-    var gridSections: [GridSection] {
+    func rebuildGridSections() {
       var result: [GridSection] = []
       let favourites = favouriteEmojis
       if !favourites.isEmpty {
@@ -637,23 +648,21 @@ struct EmojiPicker: View {
       if !frequents.isEmpty {
         result.append(.init(section: .frequents, items: frequents))
       }
-      for (guildID, items) in guildSections {
+      for (guildID, items) in computeGuildSections() {
         result.append(.init(section: .guild(guildID), items: items))
       }
-      for (category, items) in unicodeSections {
+      for (category, items) in computeUnicodeSections() {
         result.append(.init(section: .unicodeCategory(category), items: items))
       }
-      return result
-    }
+      cachedGridSections = result
 
-    var renderSections: [RenderSection] {
       var running = 0
-      var result: [RenderSection] = []
-      for section in gridSections {
-        result.append(.init(section: section, startIndex: running))
+      var rendered: [RenderSection] = []
+      for section in result {
+        rendered.append(.init(section: section, startIndex: running))
         running += section.items.count
       }
-      return result
+      cachedRenderSections = rendered
     }
     
     var scrollbarSections: [EmojiPickerSection] {
@@ -664,7 +673,12 @@ struct EmojiPicker: View {
       if !frequentEmojis.isEmpty {
         result.append(.frequents)
       }
-      result.append(contentsOf: orderedGuildIDs.map { .guild($0) })
+      result.append(
+        contentsOf: cachedGridSections.compactMap { section in
+          if case .guild = section.section { return section.section }
+          return nil
+        }
+      )
       result.append(
         contentsOf: EmojiCategory.allCases.map { .unicodeCategory($0) }
       )
@@ -672,7 +686,7 @@ struct EmojiPicker: View {
     }
 
     var flatItems: [PickerEmoji] {
-      searchText.isEmpty ? gridSections.flatMap(\.items) : searchResults
+      searchText.isEmpty ? cachedGridSections.flatMap(\.items) : searchResults
     }
 
     @MainActor
@@ -682,7 +696,7 @@ struct EmojiPicker: View {
         return
       }
       let lower = query.lowercased()
-      let customMatches = guildSections.flatMap(\.1).filter { item in
+      let customMatches = computeGuildSections().flatMap(\.1).filter { item in
         if case .custom = item {
           return item.name.lowercased().contains(lower)
         }
