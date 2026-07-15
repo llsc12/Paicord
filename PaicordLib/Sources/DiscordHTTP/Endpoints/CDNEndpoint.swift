@@ -340,12 +340,6 @@ public enum CDNEndpoint: Endpoint {
       )
     }
   }
-
-  public var specialisedRatelimit: (maxRequests: Int, for: Duration)? {
-    switch self {
-    default: return nil
-    }
-  }
 }
 
 public enum CDNEndpointIdentity: Int, Sendable, Hashable,

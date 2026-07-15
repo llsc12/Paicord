@@ -176,7 +176,11 @@ struct MarkdownText: View {
 
           sourceRow
         }
+        #if os(macOS)
         .frame(minWidth: 290, maxWidth: 290, alignment: .leading)
+        #else
+        .presentationDetents([.height(150)])
+        #endif
         .task(id: id) {
           await loadSource(id: id)
         }

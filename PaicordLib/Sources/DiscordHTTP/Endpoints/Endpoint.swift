@@ -15,8 +15,6 @@ public protocol Endpoint: Sendable, CustomStringConvertible {
   /// Path parameters.
   var parameters: [String] { get }
   var id: Int { get }
-
-  var specialisedRatelimit: (maxRequests: Int, for: Duration)? { get }
 }
 
 /// Just to switch between the 4 endpoint types.
@@ -158,23 +156,6 @@ public enum AnyEndpoint: Endpoint {
       return "AnyEndpoint.cdn(\(endpoint))"
     case .loose(let endpoint):
       return "AnyEndpoint.loose(\(endpoint))"
-    case .__DO_NOT_USE_THIS_CASE:
-      fatalError(
-        "If the case name wasn't already clear enough: '__DO_NOT_USE_THIS_CASE' MUST NOT be used"
-      )
-    }
-  }
-
-  public var specialisedRatelimit: (maxRequests: Int, for: Duration)? {
-    switch self {
-    case .api(let endpoint):
-      return endpoint.specialisedRatelimit
-    case .userApi(let endpoint):
-      return endpoint.specialisedRatelimit
-    case .cdn(let endpoint):
-      return endpoint.specialisedRatelimit
-    case .loose(let endpoint):
-      return endpoint.specialisedRatelimit
     case .__DO_NOT_USE_THIS_CASE:
       fatalError(
         "If the case name wasn't already clear enough: '__DO_NOT_USE_THIS_CASE' MUST NOT be used"

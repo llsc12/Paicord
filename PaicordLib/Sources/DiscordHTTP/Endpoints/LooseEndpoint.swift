@@ -42,8 +42,4 @@ public struct LooseEndpoint: Endpoint, Hashable {
   public init(url: String) {
     self.url = url
   }
-
-  public var specialisedRatelimit: (maxRequests: Int, for: Duration)? {
-    nil
-  }
 }

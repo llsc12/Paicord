@@ -1911,7 +1911,8 @@ extension Gateway {
       case proto  // the string b64 value
       case type  // the type hint
     }
-
+    
+    /// https://docs.discord.food/resources/user-settings-proto#user-settings-proto-type
     #if Non64BitSystemsCompatibility
       @UnstableEnum<UInt64>
     #else

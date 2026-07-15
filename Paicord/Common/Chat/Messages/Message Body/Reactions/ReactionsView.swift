@@ -46,8 +46,10 @@ struct ReactionsView: View {
           Reaction(reaction: reaction)
         }
         .buttonStyle(.plain)
+        .transition(.offset(x: -12).combined(with: .opacity.combined(with: .scale(scale: 0.8, anchor: .leading))))
       }
     }
+    .animation(.default.speed(2.5), value: reactions)
   }
 
   struct Reaction: View {
