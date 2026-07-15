@@ -455,9 +455,15 @@ extension ChatView {
         .buttonStyle(.borderless)
         .tint(.secondary)
         .padding(.vertical, 6)
+        #if os(iOS)
+        .popover(isPresented: properties.$showEmojiPicker, arrowEdge: .bottom) {
+          EmojiPicker()
+        }
+        #else
         .popover(isPresented: $showingEmojiPicker, arrowEdge: .bottom) {
           EmojiPicker()
         }
+        #endif
       }
       .background(.background.secondary.opacity(0.8))
       .clipShape(.rect(cornerRadius: 18))
