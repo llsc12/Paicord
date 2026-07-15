@@ -456,7 +456,7 @@ extension ChatView {
         .tint(.secondary)
         .padding(.vertical, 6)
         #if os(iOS)
-        .popover(isPresented: properties.$showEmojiPicker, arrowEdge: .bottom) {
+        .popover(isPresented: $properties.showEmojiPicker, arrowEdge: .bottom) {
           EmojiPicker()
         }
         #else
