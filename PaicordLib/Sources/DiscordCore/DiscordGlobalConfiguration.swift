@@ -19,7 +19,7 @@ public enum DiscordGlobalConfiguration {
   public static let apiVersion = 9
 
   /// https://docs.discord.food/topics/gateway-events#qos-payload-structure
-  public static let qosVersion = 27
+  public static let qosVersion = 29
 
   public static let gatewayURL = "wss://gateway.discord.gg"
   public static let apiBaseURL = "https://discord.com/api"
