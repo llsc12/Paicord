@@ -60,6 +60,42 @@ struct EmojiPicker: View {
   @ViewBuilder
   var popoverLayout: some View {
     VStack {
+      if variant != .reactions {
+        typePickerRow
+      }
+
+      // pickers content
+      VStack(spacing: 0) {
+        if variant == .reactions {
+          EmojiGridView(
+            onEmojiPicked: onEmojiPicked,
+            allowsShiftToKeepOpen: allowsShiftToKeepOpen
+          )
+        } else {
+          switch chosenPicker {
+          case .emoji:
+            EmojiGridView(
+              onEmojiPicked: onEmojiPicked,
+              allowsShiftToKeepOpen: allowsShiftToKeepOpen
+            )
+          case .gif:
+            GifGridView { gifURL in
+              onGIFPicked?(gifURL)
+            }
+          case .sticker:
+            StickerGridView { sticker in
+              onStickerPicked?(sticker)
+            }
+          }
+        }
+      }
+    }
+    .padding()
+  }
+
+  @ViewBuilder
+  var typePickerRow: some View {
+    VStack {
       HStack {
         Button("GIFS") {
           self.chosenPicker = .gif
@@ -127,27 +163,7 @@ struct EmojiPicker: View {
         .speed(5.0),
         value: chosenPicker
       )
-
-      // pickers content
-      VStack(spacing: 0) {
-        switch chosenPicker {
-        case .emoji:
-          EmojiGridView(
-            onEmojiPicked: onEmojiPicked,
-            allowsShiftToKeepOpen: allowsShiftToKeepOpen
-          )
-        case .gif:
-          GifGridView { gifURL in
-            onGIFPicked?(gifURL)
-          }
-        case .sticker:
-          StickerGridView { sticker in
-            onStickerPicked?(sticker)
-          }
-        }
-      }
     }
-    .padding()
   }
 
   /// An emoji as displayed in the picker grid, either a guild custom emoji or a unicode emoji.
@@ -873,41 +889,51 @@ struct EmojiPicker: View {
     @ViewBuilder
     var sheetLayout: some View {
       VStack(spacing: 0) {
-        Picker("", selection: $chosenPicker) {
-          Text("Emojis").tag(ChosenPicker.emoji)
-          Text("GIFS").tag(ChosenPicker.gif)
-          Text("Stickers").tag(ChosenPicker.sticker)
+        // reactions can only ever be emoji, so there's nothing to switch between
+        if variant != .reactions {
+          Picker("", selection: $chosenPicker) {
+            Text("Emojis").tag(ChosenPicker.emoji)
+            Text("GIFS").tag(ChosenPicker.gif)
+            Text("Stickers").tag(ChosenPicker.sticker)
+          }
+          .pickerStyle(.segmented)
+          .padding([.top, .horizontal], 8)
+          .padding(.top, 7)
+          .padding(.bottom, detent == .large ? 0 : 8)
         }
-        .pickerStyle(.segmented)
-        .padding([.top, .horizontal], 8)
-        .padding(.top, 7)
-        .padding(.bottom, detent == .large ? 0 : 8)
 
         // pickers
         VStack(spacing: 0) {
-          TabView(selection: $chosenPicker) {
+          if variant == .reactions {
             SheetEmojiGridView(detent: $detent, variant: variant) { emoji in
               onEmojiPicked?(emoji)
             }
-            .tag(ChosenPicker.emoji)
-            SheetGifGridView(detent: $detent) { gifURL in
-              onGIFPicked?(gifURL)
+          } else {
+            TabView(selection: $chosenPicker) {
+              SheetEmojiGridView(detent: $detent, variant: variant) { emoji in
+                onEmojiPicked?(emoji)
+              }
+              .tag(ChosenPicker.emoji)
+              SheetGifGridView(detent: $detent) { gifURL in
+                onGIFPicked?(gifURL)
+              }
+              .tag(ChosenPicker.gif)
+              SheetStickerGridView(detent: $detent) { sticker in
+                onStickerPicked?(sticker)
+              }
+              .tag(ChosenPicker.sticker)
             }
-            .tag(ChosenPicker.gif)
-            SheetStickerGridView(detent: $detent) { sticker in
-              onStickerPicked?(sticker)
+            .tabViewStyle(.page(indexDisplayMode: .never))
+            .animation(.default, value: chosenPicker)
+            // disable switching tabs via swipe, only allow via picker
+            .introspect(.tabView(style: .page), on: .iOS(.v17...)) { tabView in
+              tabView.isScrollEnabled = false
             }
-            .tag(ChosenPicker.sticker)
-          }
-          .tabViewStyle(.page(indexDisplayMode: .never))
-          .animation(.default, value: chosenPicker)
-          // disable switching tabs via swipe, only allow via picker
-          .introspect(.tabView(style: .page), on: .iOS(.v17...)) { tabView in
-            tabView.isScrollEnabled = false
           }
         }
         .maxHeight(.infinity)
       }
+      .ignoresSafeArea(.container, edges: .bottom)
     }
 
     struct SheetEmojiGridView: View {
@@ -923,6 +949,12 @@ struct EmojiPicker: View {
       @State private var scrollPosition: String?
 
       private var builder: SectionBuilder { .init(gw: gw) }
+
+      private var bottomSafeAreaInset: CGFloat {
+        UIApplication.shared.connectedScenes
+          .compactMap { ($0 as? UIWindowScene)?.keyWindow }
+          .first?.safeAreaInsets.bottom ?? 0
+      }
 
       private let columnCount = 8
       private var gridColumns: [GridItem] {
@@ -941,6 +973,7 @@ struct EmojiPicker: View {
           grid
         }
         .safeAreaInset(edge: .bottom, spacing: 0) { sectionBar }
+        .ignoresSafeArea(.container, edges: .bottom)
         .animation(.spring(), value: detent)
         .task {
           try? await EmojiIndexProvider.shared.load()
@@ -1043,6 +1076,7 @@ struct EmojiPicker: View {
           }
           .scrollIndicators(.never)
           .height(35)
+          .padding(.bottom, bottomSafeAreaInset)
           .background(.bar)
           .onChange(of: scrollPosition) { _, newValue in
             guard let newValue else { return }
