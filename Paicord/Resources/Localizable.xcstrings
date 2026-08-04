@@ -338,6 +338,9 @@
         }
       }
     },
+    "Copy Link" : {
+
+    },
     "Copy Message ID" : {
       "localizations" : {
         "de" : {
@@ -590,6 +593,9 @@
         }
       }
     },
+    "Find the perfect emoji" : {
+
+    },
     "Forgot Password" : {
       "localizations" : {
         "de" : {
@@ -620,6 +626,9 @@
         }
       }
     },
+    "from " : {
+
+    },
     "Further MFA restricted actions will be allowed for the next 5 minutes." : {
       "localizations" : {
         "de" : {
@@ -649,9 +658,6 @@
           }
         }
       }
-    },
-    "highlighted" : {
-
     },
     "Home" : {
       "localizations" : {

@@ -79,7 +79,7 @@ class SettingsStore: DiscordDataStore {
         let res = try await gateway.client.getUserSettingsProto(type: .frecency)
         try res.guardSuccess()
         let frecencyProto = try res.decode()
-        if case let .frecency(proto) = frecencyProto.settings {
+        if case .frecency(let proto) = frecencyProto.settings {
           frecencySettings = proto
         }
       } catch {
