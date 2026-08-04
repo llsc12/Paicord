@@ -3665,13 +3665,6 @@ public enum APIEndpoint: Endpoint {
       )
     }
   }
-
-  public var specialisedRatelimit: (maxRequests: Int, for: Duration)? {
-    switch self {
-    case .createDm: return (maxRequests: 10, for: .minutes(10))
-    default: return nil
-    }
-  }
 }
 
 public enum CacheableAPIEndpointIdentity: Int, Sendable, Hashable,

@@ -85,8 +85,17 @@ extension ChatView {
           false, false, false, false
         )
       @State var cameraPickerPresented: Bool = false
+      @State var emojiPickerSheetHeight: CGFloat = 300
+      @State var emojiPickerDetent: PresentationDetent = .height(300)
+
+      func presentEmojiPicker() {
+        emojiPickerSheetHeight = properties.keyboardHeight
+        emojiPickerDetent = .height(properties.keyboardHeight)
+        properties.showEmojiPicker = true
+      }
     #else
       @State private var fileImporterPresented: Bool = false
+      @State private var showingEmojiPicker: Bool = false
     #endif
 
     @State private var isFocused: Bool = false
@@ -221,12 +230,13 @@ extension ChatView {
           )
         }
         .sheet(isPresented: $properties.showEmojiPicker) {
-          EmojiPicker()
-          .presentationDetents([
-            .height(properties.keyboardHeight), .large,
-          ])
+          EmojiPicker(detent: $emojiPickerDetent)
+          .presentationDetents(
+            [.height(emojiPickerSheetHeight), .large],
+            selection: $emojiPickerDetent
+          )
           .presentationBackgroundInteraction(
-            .enabled(upThrough: .height(properties.keyboardHeight))
+            .enabled(upThrough: .height(emojiPickerSheetHeight))
           )
         }
         .fullScreenCover(isPresented: $cameraPickerPresented) {
@@ -237,25 +247,6 @@ extension ChatView {
           .onVideoCaptured(onVideoCaptured)
           .startSession()
         }
-        .alert(
-          "Some files were not added",
-          isPresented: Binding(
-            get: { self.filesRemovedDuringSelection != nil },
-            set: { newValue in
-              if newValue == false {
-                self.filesRemovedDuringSelection = nil
-              }
-            }
-          )
-        ) {
-          Button("OK", role: .cancel) {}
-        } message: {
-          if let error = filesRemovedDuringSelection {
-            Text(error.localizedDescription)
-          } else {
-            Text("idk bro ur files cooked")
-          }
-        }  // show errors for removed files
         .onChange(of: isFocused) {
           guard !isManualUpdate else { return }
           if isFocused {
@@ -290,7 +281,7 @@ extension ChatView {
               properties.showFilePicker = true
             }
             if pickersClosedWhenChatClosed.emoji {
-              properties.showEmojiPicker = true
+              presentEmojiPicker()
             }
             if pickersClosedWhenChatClosed.keyboardFocused {
               isFocused = true
@@ -313,6 +304,25 @@ extension ChatView {
         }
         .fileDialogImportsUnresolvedAliases(false)
       #endif
+      .alert(
+        "Some files were not added",
+        isPresented: Binding(
+          get: { self.filesRemovedDuringSelection != nil },
+          set: { newValue in
+            if newValue == false {
+              self.filesRemovedDuringSelection = nil
+            }
+          }
+        )
+      ) {
+        Button("OK", role: .cancel) {}
+      } message: {
+        if let error = filesRemovedDuringSelection {
+          Text(error.localizedDescription)
+        } else {
+          Text("idk bro ur files cooked")
+        }
+      }  // show errors for removed files
     }
 
     @Namespace private var mediaPickerNamespace
@@ -432,7 +442,7 @@ extension ChatView {
           #if os(iOS)
             isManualUpdate = true
             if !properties.showEmojiPicker {
-              properties.showEmojiPicker = true
+              presentEmojiPicker()
               isFocused = false
             } else {
               properties.showEmojiPicker = false
@@ -441,6 +451,8 @@ extension ChatView {
               isFocused = true
             }
             isManualUpdate = false
+          #else
+            showingEmojiPicker.toggle()
           #endif
         } label: {
           Image(systemName: "face.smiling")
@@ -450,6 +462,11 @@ extension ChatView {
         .buttonStyle(.borderless)
         .tint(.secondary)
         .padding(.vertical, 6)
+        #if !os(iOS)
+          .popover(isPresented: $showingEmojiPicker, arrowEdge: .bottom) {
+            EmojiPicker()
+          }
+        #endif
       }
       .background(.background.secondary.opacity(0.8))
       .clipShape(.rect(cornerRadius: 18))

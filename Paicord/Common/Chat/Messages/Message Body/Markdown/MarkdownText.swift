@@ -173,13 +173,27 @@ struct MarkdownText: View {
             }
           }
           .padding(12)
-
+          #if os(iOS)
+          .padding(.horizontal, 5)
+          #endif
+          
           sourceRow
+          #if os(iOS)
+            .padding(.bottom, -30)
+          #endif
         }
-        .frame(minWidth: 290, maxWidth: 290, alignment: .leading)
+        .modify(for: .macOS, modify: { view in
+          view
+            .frame(minWidth: 290, maxWidth: 290, alignment: .leading)
+        })
+        .modify(for: .iOS, modify: { view in
+          view
+            .sheetFitted()
+        })
         .task(id: id) {
           await loadSource(id: id)
         }
+        .ignoresSafeArea()
       }
     }
 
@@ -264,6 +278,9 @@ struct MarkdownText: View {
         }
       }
       .padding(12)
+      #if os(iOS)
+      .padding(.horizontal, 5)
+      #endif
       .frame(maxWidth: .infinity, alignment: .leading)
       .background(.black.tertiary)
     }
@@ -345,12 +362,20 @@ struct MarkdownText: View {
         }
       }
       .padding(12)
-      .frame(minWidth: 220, maxWidth: 290, alignment: .leading)
+      .modify(for: .macOS, modify: { view in
+        view
+          .frame(minWidth: 290, maxWidth: 290, alignment: .leading)
+      })
+      .modify(for: .iOS, modify: { view in
+        view
+          .sheetFitted()
+      })
       .task(id: character) {
         guard discordName == nil else { return }
         fallbackEmoji = await SwiftEmojiIndex.Emoji.lookup(character)
         loadedFallback = true
       }
+      .ignoresSafeArea()
     }
   }
 
@@ -507,23 +532,24 @@ struct MarkdownText: View {
 
     func makeBody(configuration: Configuration) -> some View {
       StructuredText.DefaultCodeBlockStyle().makeBody(configuration: configuration)
-        .overlay(alignment: .topTrailing) {
-          #if os(macOS)
-            if isHovered {
-              Button {
-                configuration.codeBlock.copyToPasteboard()
-              } label: {
-                Image(systemName: "doc.on.doc")
+        .modify(for: .macOS) { view in
+          view
+            .overlay(alignment: .topTrailing) {
+                if isHovered {
+                  Button {
+                    configuration.codeBlock.copyToPasteboard()
+                  } label: {
+                    Image(systemName: "doc.on.doc")
+                      .padding(6)
+                      .background(.ultraThinMaterial)
+                      .clipShape(Circle())
+                  }
+                  .buttonStyle(.plain)
                   .padding(6)
-                  .background(.ultraThinMaterial)
-                  .clipShape(Circle())
-              }
-              .buttonStyle(.plain)
-              .padding(6)
+                }
             }
-          #endif
+            .onHover { isHovered = $0 }
         }
-        .onHover { isHovered = $0 }
     }
   }
 }
@@ -641,28 +667,6 @@ extension AttributedStringMarkdownParser.SyntaxExtension {
   }
 }
 
-// MARK: - Lightweight fallback
-
-/// A cheap, non-interactive rendering of Discord markdown for contexts (like reply previews)
-/// where full `MarkdownText` parsing would be wasted work.
-extension Text {
-  init(
-    markdown: String,
-    fallback: AttributedString = "",
-    syntax: AttributedString.MarkdownParsingOptions.InterpretedSyntax =
-      .inlineOnlyPreservingWhitespace
-  ) {
-    self.init(
-      (try? AttributedString(
-        markdown: markdown,
-        options: AttributedString.MarkdownParsingOptions(
-          interpretedSyntax: syntax
-        )
-      )) ?? fallback
-    )
-  }
-}
-
 // MARK: - Link parsing
 
 enum PaicordChatLink {
@@ -756,5 +760,23 @@ enum PaicordChatLink {
     default:
       return nil
     }
+  }
+}
+
+extension View {
+  @ViewBuilder
+  func sheetFitted() -> some View {
+    self
+      .modifier(SheetFitted())
+  }
+}
+
+
+private struct SheetFitted: ViewModifier {
+  @State var size: CGFloat = .zero
+  func body(content: Content) -> some View {
+    content
+      .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { size = $0 }
+      .presentationDetents([size == .zero ? .medium : .height(size)])
   }
 }

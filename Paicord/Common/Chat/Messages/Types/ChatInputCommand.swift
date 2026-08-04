@@ -37,8 +37,10 @@ extension MessageCell {
     private var replyPreview: (name: String, content: String)? {
       guard let ref = message.referenced_message else { return nil }
       let mention = ref.mentions.map(\.id).contains(ref.author?.id) ? "@" : ""
-      let name = ref.member?.nick ?? ref.author?.global_name ?? ref.author?.username ?? "Unknown"
-      let content = ref.content
+      let name =
+        ref.member?.nick ?? ref.author?.global_name ?? ref.author?.username
+        ?? "Unknown"
+      let content = ref.content.components(separatedBy: "\n").first ?? ref.content
       return (name: "\(mention)\(name)", content: content)
     }
 
@@ -99,10 +101,20 @@ extension MessageCell {
           Text(verbatim: "•")
             .foregroundStyle(.secondary)
             .font(.caption2)
-          Text(markdown: preview.content)
-            .lineLimit(1)
-            .foregroundStyle(.secondary)
+          MarkdownText(content: preview.content, channelStore: channelStore)
+            .handlesInteractions(false)
             .font(.caption2)
+            .lineLimit(1)
+            .onTapGesture {
+              NotificationCenter.default.post(
+                name: .chatViewShouldScrollToID,
+                object: [
+                  "channelId": message.referenced_message?.channel_id
+                    ?? message.channel_id,
+                  "messageId": message.referenced_message?.id ?? message.id,
+                ]
+              )
+            }
         }
         .opacity(0.7)
       }

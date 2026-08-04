@@ -479,7 +479,7 @@ private struct VideoPlayerView: View {
         #if os(macOS)
           .padding(.vertical, 70)
         #endif
-          .maxWidth(.infinity)
+        .maxWidth(.infinity)
     } else {
       Text("Invalid video URL")
     }
@@ -1000,7 +1000,15 @@ private struct ZoomableGifvView: View {
       }
 
       func makeUIView(context: Context) -> UIScrollView {
-        let scrollView = UIScrollView()
+        let scrollView = GifvScrollView()
+        scrollView.onLayout = {
+          [weak scrollView, coordinator = context.coordinator] in
+          guard let scrollView else { return }
+          coordinator.applyLayout(
+            aspectRatio: attachment.aspectRatio,
+            in: scrollView
+          )
+        }
         scrollView.delegate = context.coordinator
         scrollView.maximumZoomScale = 8.0
         scrollView.minimumZoomScale = 1.0
@@ -1047,18 +1055,10 @@ private struct ZoomableGifvView: View {
 
       func updateUIView(_ uiView: UIScrollView, context: Context) {
         context.coordinator.onSingleTap = onSingleTap
-        guard let playerView = context.coordinator.playerView else { return }
-        uiView.layoutIfNeeded()
-        let fittedSize = ZoomableGifvView.fittedSize(
-          for: attachment.aspectRatio,
-          in: uiView.bounds.size
+        context.coordinator.applyLayout(
+          aspectRatio: attachment.aspectRatio,
+          in: uiView
         )
-        guard fittedSize != .zero, playerView.frame.size != fittedSize else {
-          return
-        }
-        playerView.frame = CGRect(origin: .zero, size: fittedSize)
-        uiView.contentSize = fittedSize
-        context.coordinator.centerVideo(in: uiView)
       }
 
       func makeCoordinator() -> Coordinator { Coordinator() }
@@ -1091,6 +1091,20 @@ private struct ZoomableGifvView: View {
         }
 
         func scrollViewDidZoom(_ scrollView: UIScrollView) {
+          centerVideo(in: scrollView)
+        }
+
+        func applyLayout(aspectRatio: CGFloat?, in scrollView: UIScrollView) {
+          guard let playerView else { return }
+          let fittedSize = ZoomableGifvView.fittedSize(
+            for: aspectRatio,
+            in: scrollView.bounds.size
+          )
+          guard fittedSize != .zero, playerView.frame.size != fittedSize else {
+            return
+          }
+          playerView.frame = CGRect(origin: .zero, size: fittedSize)
+          scrollView.contentSize = fittedSize
           centerVideo(in: scrollView)
         }
 
@@ -1152,6 +1166,14 @@ private struct ZoomableGifvView: View {
           }
           player?.pause()
         }
+      }
+    }
+
+    final class GifvScrollView: UIScrollView {
+      var onLayout: (() -> Void)?
+      override func layoutSubviews() {
+        super.layoutSubviews()
+        onLayout?()
       }
     }
 

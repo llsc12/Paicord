@@ -113,7 +113,7 @@ extension DiscordClient {
     )
   }
 
-  /// Initiates the password reset process for the given email or phone number. Returns a 204 empty response on success.
+  /// Initiates the password rea process for the given email or phone number. Returns a 204 empty response on success.
   /// https://docs.discord.food/authentication#forgot-password
   @inlinable
   public func forgotPassword(
@@ -610,6 +610,29 @@ extension DiscordClient {
       withMutualFriendsCount: withMutualFriendsCount,
       guildId: guildID
     )
+    return try await self.send(request: .init(to: endpoint))
+  }
+
+  @inlinable
+  public func getUserSettingsProto(
+    type: Gateway.UserSettingsProto.Kind
+  ) async throws -> DiscordClientResponse<UserSettingsProtoResponse> {
+    let endpoint = UserAPIEndpoint.getUserSettingsProto(type: type)
+    return try await self.send(request: .init(to: endpoint))
+  }
+
+  /// Modifies the requester's user settings protobuf for the specified type. Fires a User Settings Proto Update and User Settings Update Gateway event.
+  /// https://docs.discord.food/resources/user-settings-proto#modify-user-settings-proto
+  /// - Parameters:
+  ///   - type: The type of user settings proto being modified.
+  ///   - payload: The new user settings proto data for the specified type.
+  /// - Returns: The updated user settings proto for the specified type, and whether or not it was discarded.
+  @inlinable
+  public func modifyUserSettingsProto(
+    type: Gateway.UserSettingsProto.Kind,
+    payload: Payloads.ModifyUserSettingsProto
+  ) async throws -> DiscordClientResponse<UserSettingsProtoResponse> {
+    let endpoint = UserAPIEndpoint.modifyUserSettingsProto(type: type)
     return try await self.send(request: .init(to: endpoint))
   }
 

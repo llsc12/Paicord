@@ -162,6 +162,9 @@ class CurrentUserStore: DiscordDataStore {
         .reduce(into: stickers) { $0[guild.id, default: [:]][$1.id] = $1 }
         ?? stickers
     }
+
+    self.emojis = emojis
+    self.stickers = stickers
   }
 
   private func handleUserUpdate(_ user: DiscordUser) {
