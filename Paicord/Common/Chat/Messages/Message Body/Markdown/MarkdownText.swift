@@ -764,7 +764,7 @@ enum PaicordChatLink {
 }
 
 extension View {
-  @ContentBuilder
+  @ViewBuilder
   func sheetFitted() -> some View {
     self
       .modifier(SheetFitted())
