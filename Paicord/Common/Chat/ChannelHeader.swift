@@ -23,12 +23,9 @@ extension ChatView {
         HStack(spacing: 8) {
           Group {
             if let icon = channel?.icon {
-              let url = URL(
-                string: CDNEndpoint.channelIcon(
-                  channelId: vm.channelId,
-                  icon: icon
-                )
-                .url + ".png?size=80"
+              let url = DiscordImageURL.channelIcon(
+                id: vm.channelId,
+                icon: icon
               )
               NukeImage(url: url)
                 .resizable()

@@ -39,29 +39,12 @@ enum Utils {
     user: PartialUser?,
     animated: Bool
   ) -> URL? {
-    guard let id = member?.user?.id ?? user?.id else { return nil }
-    if member?.avatar ?? user?.avatar != nil {
-      if let guildId, let avatar = member?.avatar {
-        return URL(
-          string: CDNEndpoint.guildMemberAvatar(
-            guildId: guildId,
-            userId: id,
-            avatar: avatar
-          ).url
-            + ".\(animated && avatar.starts(with: "a_") ? "gif" : "png")?size=128&animated=\(animated.description)"
-        )
-      } else if let avatar = user?.avatar {
-        return URL(
-          string: CDNEndpoint.userAvatar(userId: id, avatar: avatar).url
-            + ".\(animated && avatar.starts(with: "a_") ? "gif" : "png")?size=128&animated=\(animated.description)"
-        )
-      }
-    } else {
-      return URL(
-        string: CDNEndpoint.defaultUserAvatar(userId: id).url + ".png"
-      )
-    }
-    return nil
+    DiscordImageURL.userAvatar(
+      member: member,
+      guildId: guildId,
+      user: user,
+      animated: animated
+    )
   }
 
   struct UserBannerURL<Content: View>: View {
@@ -89,31 +72,12 @@ enum Utils {
     mainProfileBanner: Bool,
     animated: Bool
   ) -> URL? {
-    guard let userId = user?.id ?? profile?.user.id else { return nil }
-    if let guildProfile = profile?.guild_member_profile,
-      let guildId = profile?.guild_member_profile?.guild_id,
-      let banner = guildProfile.banner, mainProfileBanner == false
-    {
-      return URL(
-        string: CDNEndpoint.guildMemberBanner(
-          guildId: guildId,
-          userId: userId,
-          banner: banner
-        ).url
-          + ((banner.hasPrefix("a_") && animated)
-            ? ".gif" : ".png") + "?size=600"
-      )
-    } else if let banner = profile?.user_profile?.banner {
-      return URL(
-        string: CDNEndpoint.userBanner(
-          userId: userId,
-          banner: banner
-        ).url
-          + ((banner.hasPrefix("a_") && animated)
-            ? ".gif" : ".png") + "?size=600"
-      )
-    }
-    return nil
+    DiscordImageURL.userBanner(
+      user: user,
+      profile: profile,
+      mainProfileBanner: mainProfileBanner,
+      animated: animated
+    )
   }
 
   struct GuildBannerURL<Content: View>: View {
@@ -132,21 +96,10 @@ enum Utils {
   }
 
   static func fetchGuildBannerURL(guild: GuildStore?, animated: Bool) -> URL? {
-    guard let guildId = guild?.guildId, let banner = guild?.guild?.banner else {
-      return nil
-    }
-    if banner.starts(with: "a_"), animated {
-      return URL(
-        string: CDNEndpoint.guildBanner(guildId: guildId, banner: banner)
-          .url
-          + ".\(animated ? "gif" : "png")?size=600&animated=true"
-      )
-    } else {
-      return URL(
-        string: CDNEndpoint.guildBanner(guildId: guildId, banner: banner)
-          .url
-          + ".png?size=600&animated=false"
-      )
-    }
+    DiscordImageURL.guildBanner(
+      guildId: guild?.guildId,
+      banner: guild?.guild?.banner,
+      animated: animated
+    )
   }
 }

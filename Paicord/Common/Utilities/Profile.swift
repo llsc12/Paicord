@@ -49,26 +49,18 @@ enum Profile {
     @Environment(\.profileShowAvatarDecoration) var showDecoration
 
     var body: some View {
-      Group {
-        Utils.UserAvatarURL(member: member, user: user, animated: false) {
-          url in
-          if animated {
-            Utils.UserAvatarURL(member: member, user: user, animated: true) {
-              animatedURL in
-              NukeImage(url: animatedURL)
-                .resizable()
-                .scaledToFit()
-            }
-          } else {
-            NukeImage(url: url) {
-              Circle()
-                .foregroundStyle(.gray.opacity(0.3))
-            }
-            .resizable()
-            .scaledToFit()
-          }
-        }
+      NukeImage(animation: .enabled(animated)) { wantsAnimation in
+        DiscordImageURL.userAvatar(
+          member: member,
+          user: user,
+          animated: wantsAnimation
+        )
+      } placeholder: {
+        Circle()
+          .foregroundStyle(.gray.opacity(0.3))
       }
+      .resizable()
+      .scaledToFit()
       .clipShape(Circle())
       .overlay {
         if showDecoration,
@@ -311,15 +303,7 @@ enum Profile {
         }
     }
     func badgeURL() -> URL? {
-      // check if icon is already a url
-      if badge.icon.starts(with: "http") {
-        return URL(string: badge.icon)
-      }
-
-      // else fetch from cdn
-      return URL(
-        string: CDNEndpoint.profileBadge(icon: badge.icon).url + ".png"
-      )
+      DiscordImageURL.profileBadge(icon: badge.icon)
     }
   }
 
@@ -435,20 +419,15 @@ struct AvatarDecorationView: View {
   var decoration: DiscordUser.AvatarDecoration
   var animated: Bool
   var body: some View {
-    NukeImage(url: avatarDecorationURL(animated: animated)) {
-      NukeImage(url: avatarDecorationURL(animated: false))
-        .resizable()
+    NukeImage(animation: .enabled(animated)) { wantsAnimation in
+      DiscordImageURL.avatarDecoration(
+        asset: decoration.asset,
+        animated: wantsAnimation
+      )
     }
     .resizable()
     .scaledToFit()
     .aspectRatio(1, contentMode: .fit)
-  }
-
-  func avatarDecorationURL(animated: Bool) -> URL? {
-    URL(
-      string: CDNEndpoint.avatarDecoration(asset: decoration.asset).url
-        + ".png?size=128&passthrough=\(animated.description)"
-    )
   }
 }
 

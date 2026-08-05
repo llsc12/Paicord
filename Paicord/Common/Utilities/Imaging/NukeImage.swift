@@ -10,18 +10,40 @@ import Nuke
 import NukeUI
 import SwiftUI
 
-/// Loads a remote image, playing it if the data turns out to be animated.
+enum ImageAnimation {
+  case never
+  case always
+  case enabled(Bool)
+
+  var wantsAnimation: Bool {
+    switch self {
+    case .never: false
+    case .always: true
+    case .enabled(let enabled): enabled
+    }
+  }
+}
+
 struct NukeImage<Placeholder: View>: View {
-  let url: URL?
-  var isAnimating: Bool = true
+  let urlForVariant: (_ animated: Bool) -> URL?
+  var animation: ImageAnimation = .always
   var placeholder: (() -> Placeholder)?
 
   private var isResizable = false
 
+  private var wantsAnimation: Bool { animation.wantsAnimation }
+
   var body: some View {
-    LazyImage(url: url) { state in
+    LazyImage(url: urlForVariant(wantsAnimation)) { state in
       if let container = state.imageContainer {
         content(for: container)
+      } else if wantsAnimation, let stillURL = urlForVariant(false),
+        stillURL != urlForVariant(true)
+      {
+        // the animated variant is the heavy one, so hold the still (usually already cached from
+        // before the policy flipped on) rather than blanking out while it loads.
+        // old paicord problem i wanted to fix for a while.
+        stillContent(for: stillURL)
       } else if let placeholder {
         placeholder()
       } else {
@@ -32,7 +54,8 @@ struct NukeImage<Placeholder: View>: View {
 
   @ViewBuilder
   private func content(for container: ImageContainer) -> some View {
-    if let data = container.data,
+    // only build animation setup work if the image is even animated
+    if wantsAnimation, let data = container.data,
       let source = AnimatedImageFrameSource(
         data: data,
         utType: container.type?.rawValue as CFString?
@@ -41,16 +64,33 @@ struct NukeImage<Placeholder: View>: View {
     {
       AnimatedImageRenderer(
         source: source,
-        isAnimating: isAnimating,
+        isAnimating: true,
         isResizable: isResizable
       )
     } else {
-      let image = Image(platformImage: container.image)
-      if isResizable {
-        image.resizable()
+      resized(Image(platformImage: container.image))
+    }
+  }
+
+  @ViewBuilder
+  private func stillContent(for url: URL) -> some View {
+    LazyImage(url: url) { state in
+      if let container = state.imageContainer {
+        resized(Image(platformImage: container.image))
+      } else if let placeholder {
+        placeholder()
       } else {
-        image
+        Color.clear
       }
+    }
+  }
+
+  @ViewBuilder
+  private func resized(_ image: Image) -> some View {
+    if isResizable {
+      image.resizable()
+    } else {
+      image
     }
   }
 
@@ -61,10 +101,35 @@ struct NukeImage<Placeholder: View>: View {
   }
 }
 
+// extra initialisers
+
+extension NukeImage where Placeholder == EmptyView {
+  init(
+    animation: ImageAnimation = .always,
+    url urlForVariant: @escaping (_ animated: Bool) -> URL?
+  ) {
+    self.urlForVariant = urlForVariant
+    self.animation = animation
+    self.placeholder = nil
+  }
+}
+
+extension NukeImage {
+  init(
+    animation: ImageAnimation = .always,
+    url urlForVariant: @escaping (_ animated: Bool) -> URL?,
+    @ViewBuilder placeholder: @escaping () -> Placeholder
+  ) {
+    self.urlForVariant = urlForVariant
+    self.animation = animation
+    self.placeholder = placeholder
+  }
+}
+
 extension NukeImage where Placeholder == EmptyView {
   init(url: URL?, isAnimating: Bool = true) {
-    self.url = url
-    self.isAnimating = isAnimating
+    self.urlForVariant = { _ in url }
+    self.animation = isAnimating ? .always : .never
     self.placeholder = nil
   }
 }
@@ -75,8 +140,8 @@ extension NukeImage {
     isAnimating: Bool = true,
     @ViewBuilder placeholder: @escaping () -> Placeholder
   ) {
-    self.url = url
-    self.isAnimating = isAnimating
+    self.urlForVariant = { _ in url }
+    self.animation = isAnimating ? .always : .never
     self.placeholder = placeholder
   }
 }

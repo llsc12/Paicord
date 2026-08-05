@@ -128,13 +128,12 @@ struct ReactionsView: View {
     }
 
     func emojiURL(emoji id: EmojiSnowflake?, animated: Bool?) -> URL? {
-      if let id {
-        return URL(
-          string: CDNEndpoint.customEmoji(emojiId: id).url
-            + ".\((animated ?? false) ? "gif" : "png")?size=64"
-        )
-      }
-      return nil
+      guard let id else { return nil }
+      return DiscordImageURL.customEmoji(
+        id: id,
+        animated: animated ?? false,
+        size: 64
+      )
     }
   }
 }

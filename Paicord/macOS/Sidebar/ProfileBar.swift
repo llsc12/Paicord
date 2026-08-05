@@ -114,9 +114,10 @@ struct ProfileBar: View {
     -> URL?
   {
     guard let id = emoji.id else { return nil }
-    return URL(
-      string: CDNEndpoint.customEmoji(emojiId: id).url
-        + (animated && emoji.animated == true ? ".gif" : ".png") + "?size=44"
+    return DiscordImageURL.customEmoji(
+      id: id,
+      animated: animated && emoji.animated == true,
+      size: 44
     )
   }
 

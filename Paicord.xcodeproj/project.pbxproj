@@ -165,6 +165,7 @@
 		AAFACE0400000000000000A4 /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = AAFACE0200000000000000A2 /* Nuke */; };
 		AAFACE0500000000000000A5 /* NukeUI in Frameworks */ = {isa = PBXBuildFile; productRef = AAFACE0300000000000000A3 /* NukeUI */; };
 		AAFACE2000000000000000C1 /* AnimatedImageRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFACE1000000000000000B1 /* AnimatedImageRenderer.swift */; };
+		AAFACE4100000000000000E2 /* DiscordImageURL.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFACE4000000000000000E1 /* DiscordImageURL.swift */; };
 		AAFACE2100000000000000C2 /* NukeImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFACE1100000000000000B2 /* NukeImage.swift */; };
 		AAFACE2200000000000000C3 /* PaicordImagePipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFACE1200000000000000B3 /* PaicordImagePipeline.swift */; };
 		AAFC9DDA2EB7DAE300BB8028 /* VariableBlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFC9DD92EB7DAE200BB8028 /* VariableBlurView.swift */; };
@@ -312,6 +313,7 @@
 		AAEEC71E2E6511F800EB5FC9 /* TokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenStore.swift; sourceTree = "<group>"; };
 		AAEEF5002E9900E50034FA04 /* Default.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Default.swift; sourceTree = "<group>"; };
 		AAFACE1000000000000000B1 /* AnimatedImageRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedImageRenderer.swift; sourceTree = "<group>"; };
+		AAFACE4000000000000000E1 /* DiscordImageURL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscordImageURL.swift; sourceTree = "<group>"; };
 		AAFACE1100000000000000B2 /* NukeImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NukeImage.swift; sourceTree = "<group>"; };
 		AAFACE1200000000000000B3 /* PaicordImagePipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaicordImagePipeline.swift; sourceTree = "<group>"; };
 		AAFC9DD92EB7DAE200BB8028 /* VariableBlurView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariableBlurView.swift; sourceTree = "<group>"; };
@@ -1024,6 +1026,7 @@
 			isa = PBXGroup;
 			children = (
 				AAFACE1000000000000000B1 /* AnimatedImageRenderer.swift */,
+				AAFACE4000000000000000E1 /* DiscordImageURL.swift */,
 				AAFACE1100000000000000B2 /* NukeImage.swift */,
 				AAFACE1200000000000000B3 /* PaicordImagePipeline.swift */,
 			);
@@ -1257,6 +1260,7 @@
 				AABED59E2E7F463A005BDD63 /* ChannelStore.swift in Sources */,
 				AAEB3D952ED60816008BDD1D /* ImpactGenerator.swift in Sources */,
 				AAFACE2000000000000000C1 /* AnimatedImageRenderer.swift in Sources */,
+				AAFACE4100000000000000E2 /* DiscordImageURL.swift in Sources */,
 				AAFACE2100000000000000C2 /* NukeImage.swift in Sources */,
 				AAFACE2200000000000000C3 /* PaicordImagePipeline.swift in Sources */,
 				AA7B0B6A2EE5D809003F0CE9 /* ChatHeaders.swift in Sources */,

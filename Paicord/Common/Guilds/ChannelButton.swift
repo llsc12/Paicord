@@ -75,9 +75,9 @@ struct ChannelButton: View {
       textChannelButton { _ in
         HStack {
           if let icon = channel.icon {
-            let url = URL(
-              string: CDNEndpoint.channelIcon(channelId: channel.id, icon: icon)
-                .url + ".png?size=80"
+            let url = DiscordImageURL.channelIcon(
+              id: channel.id,
+              icon: icon
             )
             NukeImage(url: url)
               .resizable()
