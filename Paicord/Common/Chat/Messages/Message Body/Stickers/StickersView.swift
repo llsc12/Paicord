@@ -8,7 +8,6 @@
 
 import Lottie
 import PaicordLib
-import SDWebImageSwiftUI
 import SwiftUIX
 
 extension MessageCell {
@@ -32,7 +31,7 @@ extension MessageCell {
             .playing(loopMode: .loop)
             .frame(maxWidth: 160, maxHeight: 160)
           } else {
-            AnimatedImage(url: url)
+            NukeImage(url: url)
               .resizable()
               .scaledToFit()
               .frame(maxWidth: 160, maxHeight: 160)

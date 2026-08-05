@@ -7,7 +7,6 @@
 //
 
 import PaicordLib
-import SDWebImageSwiftUI
 import SwiftUIX
 
 extension ChatView {
@@ -31,7 +30,7 @@ extension ChatView {
                 )
                 .url + ".png?size=80"
               )
-              WebImage(url: url)
+              NukeImage(url: url)
                 .resizable()
                 .scaledToFit()
                 .clipShape(.circle)

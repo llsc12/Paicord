@@ -7,7 +7,6 @@
 //
 
 import PaicordLib
-import SDWebImageSwiftUI
 import SwiftUIX
 
 extension View {
@@ -333,7 +332,7 @@ struct QuickSwitcherView: View {
                 )
                 .url + ".png?size=80"
               )
-              WebImage(url: url)
+              NukeImage(url: url)
                 .resizable()
                 .scaledToFit()
                 .clipShape(.circle)
@@ -431,7 +430,7 @@ struct QuickSwitcherView: View {
                   guildId: guild.id,
                   icon: icon
                 ).url + "?size=80"
-              WebImage(url: URL(string: url))
+              NukeImage(url: URL(string: url))
                 .resizable()
                 .scaledToFit()
             } else {

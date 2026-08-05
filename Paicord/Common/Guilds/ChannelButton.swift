@@ -7,7 +7,6 @@
 //
 
 import PaicordLib
-import SDWebImageSwiftUI
 import SwiftUIX
 
 struct ChannelButton: View {
@@ -80,7 +79,7 @@ struct ChannelButton: View {
               string: CDNEndpoint.channelIcon(channelId: channel.id, icon: icon)
                 .url + ".png?size=80"
             )
-            WebImage(url: url)
+            NukeImage(url: url)
               .resizable()
               .scaledToFit()
               .clipShape(.circle)

@@ -9,7 +9,6 @@
 import ColorCube
 import DiscordModels
 import PaicordLib
-import SDWebImageSwiftUI
 import SwiftUIX
 
 struct MemberSidebarView: View {

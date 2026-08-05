@@ -9,7 +9,6 @@
 import Collections
 import PaicordLib
 import Playgrounds
-import SDWebImageSwiftUI
 import SwiftUIX
 
 struct ReactionsView: View {
@@ -95,7 +94,7 @@ struct ReactionsView: View {
       HStack(spacing: 2) {
         if let emojiURL = emojiURL(emoji: emoji.id, animated: emoji.animated) {
           VStack {
-            AnimatedImage(url: emojiURL)
+            NukeImage(url: emojiURL)
               .resizable()
               .scaledToFit()
           }

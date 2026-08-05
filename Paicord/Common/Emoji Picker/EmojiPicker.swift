@@ -7,7 +7,6 @@
 //
 
 import PaicordLib
-import SDWebImageSwiftUI
 import SwiftEmojiIndex
 @_spi(Advanced) import SwiftUIIntrospect
 import SwiftUIX
@@ -404,7 +403,7 @@ struct EmojiPicker: View {
       case .custom(let emoji, _):
         if let url = Self.customEmojiURL(id: emoji.id, animated: emoji.animated)
         {
-          WebImage(url: url)
+          NukeImage(url: url)
             .resizable()
             .scaledToFit()
         }
@@ -434,7 +433,7 @@ struct EmojiPicker: View {
         if let icon = guild.icon,
           let url = Self.iconURL(id: guild.id, icon: icon, animated: false)
         {
-          WebImage(url: url)
+          NukeImage(url: url)
             .resizable()
             .scaledToFill()
         } else {

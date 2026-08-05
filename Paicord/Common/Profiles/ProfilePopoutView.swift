@@ -7,8 +7,8 @@
 //
 
 import ColorCube
+import Nuke
 import PaicordLib
-import SDWebImageSwiftUI
 import SwiftPrettyPrint
 import SwiftUIX
 
@@ -98,19 +98,9 @@ struct ProfilePopoutView: View {
       mainProfileBanner: showMainProfile,
       animated: true
     ) { bannerURL in
-      WebImage(url: bannerURL) { phase in
-        switch phase {
-        case .success(let image):
-          Color.clear
-            .aspectRatio(3, contentMode: .fit)
-            .overlay(
-              image
-                .resizable()
-                .scaledToFill()
-            )
-            .frame(maxWidth: .infinity)
-            .clipped()
-        default:
+      Color.clear
+        .aspectRatio(3, contentMode: .fit)
+        .overlay {
           let color =
             showMainProfile
             ? profile?.user_profile?.theme_colors?.first
@@ -119,12 +109,16 @@ struct ProfilePopoutView: View {
               .user_profile?.theme_colors?.first ?? profile?
               .guild_member_profile?.accent_color
               ?? profile?.user_profile?.accent_color
-          Rectangle()
-            .aspectRatio(3, contentMode: .fit)
-            .foregroundStyle(color?.asColor() ?? accentColor)
+          NukeImage(url: bannerURL) {
+            Rectangle()
+              .foregroundStyle(color?.asColor() ?? accentColor)
+          }
+          .resizable()
+          .scaledToFill()
         }
-      }
-      .reverseMask(alignment: .bottomLeading) {
+        .frame(maxWidth: .infinity)
+        .clipped()
+        .reverseMask(alignment: .bottomLeading) {
         Circle()
           .frame(width: 80, height: 80)
           .padding(.leading, 16)
@@ -225,7 +219,7 @@ struct ProfilePopoutView: View {
   @Sendable
   func grabColor() async {
     let cc = CCColorCube()
-    // use sdwebimage's image manager, get the avatar image and extract colors using colorcube
+    // shares the pipeline with every image on screen, avatar probably cached.
     let m: Guild.PartialMember? = showMainProfile ? nil : member
     guard
       let avatarURL = Utils.fetchUserAvatarURL(
@@ -233,28 +227,17 @@ struct ProfilePopoutView: View {
         guildId: guild?.guildId,
         user: user,
         animated: false
-      )
+      ),
+      let image = try? await ImagePipeline.shared.image(for: avatarURL)
     else {
       return
     }
-    let imageManager: SDWebImageManager = .shared
-    imageManager.loadImage(
-      with: avatarURL,
-      progress: nil
-    ) { image, _, error, _, _, _ in
-      guard let image else {
-        return
-      }
-      let colors = cc.extractColors(
-        from: image,
-        flags: [.orderByBrightness, .avoidBlack, .avoidWhite]
-      )
-      if let firstColor = colors?.first {
-        DispatchQueue.main.async {
-          self.accentColor = Color(firstColor)
-        }
-      } else {
-      }
+    let colors = cc.extractColors(
+      from: image,
+      flags: [.orderByBrightness, .avoidBlack, .avoidWhite]
+    )
+    if let firstColor = colors?.first {
+      await MainActor.run { self.accentColor = Color(firstColor) }
     }
   }
 }

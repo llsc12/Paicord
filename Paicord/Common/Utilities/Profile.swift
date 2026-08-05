@@ -7,7 +7,6 @@
 //
 
 import PaicordLib
-import SDWebImageSwiftUI
 import SwiftUIX
 
 extension EnvironmentValues {
@@ -56,29 +55,17 @@ enum Profile {
           if animated {
             Utils.UserAvatarURL(member: member, user: user, animated: true) {
               animatedURL in
-              WebImage(url: animatedURL) { phase in
-                switch phase {
-                case .success(let image):
-                  image
-                    .resizable()
-                    .scaledToFit()
-                default:
-                  EmptyView()
-                }
-              }
+              NukeImage(url: animatedURL)
+                .resizable()
+                .scaledToFit()
             }
           } else {
-            WebImage(url: url) { phase in
-              switch phase {
-              case .success(let image):
-                image
-                  .resizable()
-                  .scaledToFit()
-              default:
-                Circle()
-                  .foregroundStyle(.gray.opacity(0.3))
-              }
+            NukeImage(url: url) {
+              Circle()
+                .foregroundStyle(.gray.opacity(0.3))
             }
+            .resizable()
+            .scaledToFit()
           }
         }
       }
@@ -285,22 +272,16 @@ enum Profile {
         if animated,
           let animatedURL
         {
-          WebImage(url: animatedURL) { phase in
-            switch phase {
-            case .success(let image):
-              image
-                .resizable()
-                .scaledToFill()
-                .clipped()
-            default:
-              WebImage(url: staticURL)
-                .resizable()
-                .scaledToFill()
-                .clipped()
-            }
+          NukeImage(url: animatedURL) {
+            NukeImage(url: staticURL)
+              .resizable()
+              .scaledToFill()
           }
+          .resizable()
+          .scaledToFill()
+          .clipped()
         } else {
-          WebImage(url: staticURL)
+          NukeImage(url: staticURL)
             .resizable()
             .scaledToFill()
             .clipped()
@@ -319,7 +300,7 @@ enum Profile {
     var badge: DiscordUser.Profile.Badge
     @State private var isHovered: Bool = false
     var body: some View {
-      WebImage(url: badgeURL())
+      NukeImage(url: badgeURL())
         .resizable()
         .scaledToFit()
         .frame(width: 16, height: 16)
@@ -454,16 +435,11 @@ struct AvatarDecorationView: View {
   var decoration: DiscordUser.AvatarDecoration
   var animated: Bool
   var body: some View {
-    WebImage(url: avatarDecorationURL(animated: animated)) { phase in
-      switch phase {
-      case .success(let image):
-        image
-          .resizable()
-      default:
-        WebImage(url: avatarDecorationURL(animated: false))
-          .resizable()
-      }
+    NukeImage(url: avatarDecorationURL(animated: animated)) {
+      NukeImage(url: avatarDecorationURL(animated: false))
+        .resizable()
     }
+    .resizable()
     .scaledToFit()
     .aspectRatio(1, contentMode: .fit)
   }

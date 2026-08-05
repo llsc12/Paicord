@@ -6,7 +6,6 @@
 //
 
 import PaicordLib
-import SDWebImageSwiftUI
 import SwiftEmojiIndex
 import SwiftUI
 import SwiftUIX
@@ -160,7 +159,7 @@ struct MarkdownText: View {
             let url = URL(
               string: CDNEndpoint.customEmoji(emojiId: id).url
                 + ".\(animated ? "gif" : "png")?size=96&animated=\(animated)")
-            WebImage(url: url)
+            NukeImage(url: url)
               .resizable()
               .scaledToFit()
               .frame(width: 44, height: 44)
@@ -256,7 +255,7 @@ struct MarkdownText: View {
             let url = URL(
               string: CDNEndpoint.guildIcon(guildId: guildId, icon: icon).url
                 + ".webp?size=128&animated=true")
-            WebImage(url: url)
+            NukeImage(url: url)
               .resizable()
               .scaledToFit()
               .frame(width: 36, height: 36)

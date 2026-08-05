@@ -48,6 +48,7 @@ struct PaicordApp: App {
 
   init() {
     console.startIntercepting()
+    PaicordImagePipeline.configure()
     //    #if DEBUG
     //      DiscordGlobalConfiguration.makeLogger = { loggerLabel in
     //        var logger = Logger(label: loggerLabel)

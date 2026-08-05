@@ -8,7 +8,6 @@
 
 import PaicordLib
 import Playgrounds
-import SDWebImageSwiftUI
 import SwiftUIX
 
 /// Shows a guild folder or standalone guild
@@ -266,7 +265,7 @@ struct GuildButton: View {
           animated: false
         )
       {
-        AnimatedImage(url: url)
+        NukeImage(url: url)
           .resizable()
           .scaledToFill()
           .aspectRatio(1, contentMode: .fit)
@@ -323,9 +322,9 @@ struct GuildButton: View {
             if let icon = guild?.icon,
               let url = iconURL(id: id, icon: icon, animated: shouldAnimate)
             {
-              AnimatedImage(
+              NukeImage(
                 url: url,
-                isAnimating: .constant(shouldAnimate)
+                isAnimating: shouldAnimate
               )
               .resizable()
               .scaledToFill()

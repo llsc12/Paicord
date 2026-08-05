@@ -10,7 +10,6 @@ import AVKit
 import Foundation
 import Loupe
 import PaicordLib
-import SDWebImageSwiftUI
 import SwiftPrettyPrint
 import SwiftUIX
 
@@ -168,7 +167,7 @@ extension MessageCell {
                 if let author = embed.author {
                   HStack(spacing: 8) {
                     if let url = authorIconURL {
-                      AnimatedImage(url: url)
+                      NukeImage(url: url)
                         .resizable()
                         .scaledToFill()
                         .background(Color.gray.opacity(0.12))
@@ -285,7 +284,7 @@ extension MessageCell {
                 if let footer = embed.footer {
                   HStack(spacing: 6) {
                     if let url = footerIconURL {
-                      AnimatedImage(url: url)
+                      NukeImage(url: url)
                         .resizable()
                         .scaledToFit()
                         .clipShape(Circle())

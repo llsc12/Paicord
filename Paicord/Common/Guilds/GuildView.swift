@@ -7,7 +7,6 @@
 //
 
 import PaicordLib
-import SDWebImageSwiftUI
 import SwiftUIX
 
 struct GuildView: View {
@@ -22,7 +21,7 @@ struct GuildView: View {
             Color.clear
               .aspectRatio(16 / 9, contentMode: .fit)
               .overlay(
-                AnimatedImage(url: bannerURL)
+                NukeImage(url: bannerURL)
                   .resizable()
                   .scaledToFill()
               )

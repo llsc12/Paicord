@@ -94,7 +94,6 @@
 		AA49F5172EF2CF7200C46339 /* NitroHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA49F5162EF2CF6E00C46339 /* NitroHelper.swift */; };
 		AA5CA6522E9BCCFF00C7C82A /* Maths.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5CA6512E9BCCFC00C7C82A /* Maths.swift */; };
 		AA5CA6542E9BD37D00C7C82A /* ComponentsV2.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5CA6532E9BD37500C7C82A /* ComponentsV2.swift */; };
-		AA5CA6602E9D435800C7C82A /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = AA5CA65F2E9D435800C7C82A /* SDWebImageSwiftUI */; };
 		AA5DC55A2E9482ED00D81EB5 /* MessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5DC5592E9482ED00D81EB5 /* MessageCell.swift */; };
 		AA5F76EB2F3E5E2100A7A003 /* QuickSwitcherProviderStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5F76EA2F3E5E1900A7A003 /* QuickSwitcherProviderStore.swift */; };
 		AA5F76EE2F3EA53300A7A003 /* QuickSwitcherModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5F76ED2F3EA52D00A7A003 /* QuickSwitcherModifier.swift */; };
@@ -163,6 +162,11 @@
 		AAEEC71F2E65120000EB5FC9 /* TokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEEC71E2E6511F800EB5FC9 /* TokenStore.swift */; };
 		AAEEC7222E6515C400EB5FC9 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = AAEEC7212E6515C400EB5FC9 /* KeychainAccess */; };
 		AAEEF5012E9900F60034FA04 /* Default.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEEF5002E9900E50034FA04 /* Default.swift */; };
+		AAFACE0400000000000000A4 /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = AAFACE0200000000000000A2 /* Nuke */; };
+		AAFACE0500000000000000A5 /* NukeUI in Frameworks */ = {isa = PBXBuildFile; productRef = AAFACE0300000000000000A3 /* NukeUI */; };
+		AAFACE2000000000000000C1 /* AnimatedImageRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFACE1000000000000000B1 /* AnimatedImageRenderer.swift */; };
+		AAFACE2100000000000000C2 /* NukeImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFACE1100000000000000B2 /* NukeImage.swift */; };
+		AAFACE2200000000000000C3 /* PaicordImagePipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFACE1200000000000000B3 /* PaicordImagePipeline.swift */; };
 		AAFC9DDA2EB7DAE300BB8028 /* VariableBlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFC9DD92EB7DAE200BB8028 /* VariableBlurView.swift */; };
 		AAFD41382E92FA43002BC9BE /* Array+safe.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFD41372E92FA42002BC9BE /* Array+safe.swift */; };
 		B0664996F9A32151DFDE9092 /* DiscordEmojiNameIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C8C74A1FC4BEBBF1319A625 /* DiscordEmojiNameIndex.swift */; };
@@ -307,6 +311,9 @@
 		AAEB3D942ED60812008BDD1D /* ImpactGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImpactGenerator.swift; sourceTree = "<group>"; };
 		AAEEC71E2E6511F800EB5FC9 /* TokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenStore.swift; sourceTree = "<group>"; };
 		AAEEF5002E9900E50034FA04 /* Default.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Default.swift; sourceTree = "<group>"; };
+		AAFACE1000000000000000B1 /* AnimatedImageRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedImageRenderer.swift; sourceTree = "<group>"; };
+		AAFACE1100000000000000B2 /* NukeImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NukeImage.swift; sourceTree = "<group>"; };
+		AAFACE1200000000000000B3 /* PaicordImagePipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaicordImagePipeline.swift; sourceTree = "<group>"; };
 		AAFC9DD92EB7DAE200BB8028 /* VariableBlurView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariableBlurView.swift; sourceTree = "<group>"; };
 		AAFD41372E92FA42002BC9BE /* Array+safe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+safe.swift"; sourceTree = "<group>"; };
 		CD0FCDF43CEB925D98D9DEB7 /* DiscordEmojiNames.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = DiscordEmojiNames.json; sourceTree = "<group>"; };
@@ -318,7 +325,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA8ABACF2F2A79B500557278 /* Loupe in Frameworks */,
-				AA5CA6602E9D435800C7C82A /* SDWebImageSwiftUI in Frameworks */,
+				AAFACE0400000000000000A4 /* Nuke in Frameworks */,
+				AAFACE0500000000000000A5 /* NukeUI in Frameworks */,
 				AA8ABAD22F2A7A0800557278 /* MijickCamera in Frameworks */,
 				5783AA902E6B8F6500F73F6D /* MeshGradient in Frameworks */,
 				AA1878F92E81FC1A009C7E40 /* FLEX in Frameworks */,
@@ -922,6 +930,7 @@
 				AAEB3D942ED60812008BDD1D /* ImpactGenerator.swift */,
 				AA2278C62EA448BD002C335F /* Profile.swift */,
 				AA9D26B22EC97714006071FE /* ViewUtils.swift */,
+				AAFACE3000000000000000D1 /* Imaging */,
 				AA74E4372EBC40F40031B285 /* Modifiers */,
 				AA9C81812E6660AB0086B1DA /* Components */,
 			);
@@ -1011,6 +1020,16 @@
 			path = Types;
 			sourceTree = "<group>";
 		};
+		AAFACE3000000000000000D1 /* Imaging */ = {
+			isa = PBXGroup;
+			children = (
+				AAFACE1000000000000000B1 /* AnimatedImageRenderer.swift */,
+				AAFACE1100000000000000B2 /* NukeImage.swift */,
+				AAFACE1200000000000000B3 /* PaicordImagePipeline.swift */,
+			);
+			path = Imaging;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1038,7 +1057,8 @@
 				AA1878F82E81FC1A009C7E40 /* FLEX */,
 				AA1378082E969A9000100969 /* Lottie */,
 				8C1C53B8654B3E3FFA5055A8 /* Textual */,
-				AA5CA65F2E9D435800C7C82A /* SDWebImageSwiftUI */,
+				AAFACE0200000000000000A2 /* Nuke */,
+				AAFACE0300000000000000A3 /* NukeUI */,
 				AA21D2822EAA557C00C75093 /* Sparkle */,
 				AAB22FD72EAD0A2400413310 /* SwiftPrettyPrint */,
 				AAB22FDA2EAD86B700413310 /* ColorCube */,
@@ -1087,7 +1107,7 @@
 				57CDD87D2E71CB6000022203 /* XCRemoteSwiftPackageReference "hcaptcha" */,
 				AA1878F72E81FC1A009C7E40 /* XCRemoteSwiftPackageReference "FLEX" */,
 				AA1378072E969A9000100969 /* XCRemoteSwiftPackageReference "lottie-spm" */,
-				AA5CA65E2E9D435800C7C82A /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
+				AAFACE0100000000000000A1 /* XCRemoteSwiftPackageReference "Nuke" */,
 				AA21D2812EAA557C00C75093 /* XCRemoteSwiftPackageReference "Sparkle" */,
 				AAB22FD62EAD0A2300413310 /* XCRemoteSwiftPackageReference "SwiftPrettyPrint" */,
 				AAB22FD92EAD86B600413310 /* XCRemoteSwiftPackageReference "ColorCube" */,
@@ -1236,6 +1256,9 @@
 				AAD73EB62E93E29E00470158 /* DMsView.swift in Sources */,
 				AABED59E2E7F463A005BDD63 /* ChannelStore.swift in Sources */,
 				AAEB3D952ED60816008BDD1D /* ImpactGenerator.swift in Sources */,
+				AAFACE2000000000000000C1 /* AnimatedImageRenderer.swift in Sources */,
+				AAFACE2100000000000000C2 /* NukeImage.swift in Sources */,
+				AAFACE2200000000000000C3 /* PaicordImagePipeline.swift in Sources */,
 				AA7B0B6A2EE5D809003F0CE9 /* ChatHeaders.swift in Sources */,
 				AA5DC55A2E9482ED00D81EB5 /* MessageCell.swift in Sources */,
 				57F5AF532E7CBDD000AD5674 /* AccountPicker.swift in Sources */,
@@ -1594,14 +1617,6 @@
 				minimumVersion = 1.2.0;
 			};
 		};
-		AA5CA65E2E9D435800C7C82A /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 3.1.3;
-			};
-		};
 		AA8ABAC82F2A794E00557278 /* XCRemoteSwiftPackageReference "SwiftEmoji" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Aeastr/SwiftEmoji";
@@ -1674,6 +1689,14 @@
 				kind = branch;
 			};
 		};
+		AAFACE0100000000000000A1 /* XCRemoteSwiftPackageReference "Nuke" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kean/Nuke.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 13.0.6;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1725,11 +1748,6 @@
 			package = AA47AF602EDF1FF7008A50C9 /* XCRemoteSwiftPackageReference "Conditionals" */;
 			productName = Conditionals;
 		};
-		AA5CA65F2E9D435800C7C82A /* SDWebImageSwiftUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = AA5CA65E2E9D435800C7C82A /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
-			productName = SDWebImageSwiftUI;
-		};
 		AA8ABAC92F2A794E00557278 /* SwiftEmoji */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = AA8ABAC82F2A794E00557278 /* XCRemoteSwiftPackageReference "SwiftEmoji" */;
@@ -1779,6 +1797,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AAEEC7202E6515C400EB5FC9 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
 			productName = KeychainAccess;
+		};
+		AAFACE0200000000000000A2 /* Nuke */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AAFACE0100000000000000A1 /* XCRemoteSwiftPackageReference "Nuke" */;
+			productName = Nuke;
+		};
+		AAFACE0300000000000000A3 /* NukeUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AAFACE0100000000000000A1 /* XCRemoteSwiftPackageReference "Nuke" */;
+			productName = NukeUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
