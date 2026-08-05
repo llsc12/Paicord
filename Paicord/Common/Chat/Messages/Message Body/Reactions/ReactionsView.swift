@@ -9,7 +9,6 @@
 import Collections
 import PaicordLib
 import Playgrounds
-import SDWebImageSwiftUI
 import SwiftUIX
 
 struct ReactionsView: View {
@@ -95,7 +94,7 @@ struct ReactionsView: View {
       HStack(spacing: 2) {
         if let emojiURL = emojiURL(emoji: emoji.id, animated: emoji.animated) {
           VStack {
-            AnimatedImage(url: emojiURL)
+            NukeImage(url: emojiURL)
               .resizable()
               .scaledToFit()
           }
@@ -129,13 +128,12 @@ struct ReactionsView: View {
     }
 
     func emojiURL(emoji id: EmojiSnowflake?, animated: Bool?) -> URL? {
-      if let id {
-        return URL(
-          string: CDNEndpoint.customEmoji(emojiId: id).url
-            + ".\((animated ?? false) ? "gif" : "png")?size=64"
-        )
-      }
-      return nil
+      guard let id else { return nil }
+      return DiscordImageURL.customEmoji(
+        id: id,
+        animated: animated ?? false,
+        size: 64
+      )
     }
   }
 }

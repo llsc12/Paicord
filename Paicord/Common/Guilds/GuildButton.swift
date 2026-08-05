@@ -8,7 +8,6 @@
 
 import PaicordLib
 import Playgrounds
-import SDWebImageSwiftUI
 import SwiftUIX
 
 /// Shows a guild folder or standalone guild
@@ -259,16 +258,16 @@ struct GuildButton: View {
 
     @ViewBuilder
     func icon(for guild: Guild) -> some View {
-      if let icon = guild.icon,
-        let url = iconURL(
-          id: guild.id,
-          icon: icon,
-          animated: false
-        )
-      {
-        AnimatedImage(url: url)
-          .resizable()
-          .scaledToFill()
+      if let icon = guild.icon {
+        NukeImage(animation: .never) { animated in
+          DiscordImageURL.guildIcon(
+            id: guild.id,
+            icon: icon,
+            animated: animated
+          )
+        }
+        .resizable()
+        .scaledToFill()
           .aspectRatio(1, contentMode: .fit)
           .clipShape(.circle)
       } else {
@@ -294,19 +293,6 @@ struct GuildButton: View {
       }
     }
 
-    func iconURL(id: GuildSnowflake, icon: String, animated: Bool) -> URL? {
-      if icon.starts(with: "a_") {
-        return URL(
-          string: CDNEndpoint.guildIcon(guildId: id, icon: icon).url
-            + ".\(animated ? "gif" : "png")?size=128&animated=\(animated.description)"
-        )
-      } else {
-        return URL(
-          string: CDNEndpoint.guildIcon(guildId: id, icon: icon).url
-            + ".png?size=128&animated=false"
-        )
-      }
-    }
   }
 
   /// A button representing a guild or DMs
@@ -320,13 +306,14 @@ struct GuildButton: View {
         if let id = guild?.id {
           Group {
             let shouldAnimate = appState.selectedGuild == id
-            if let icon = guild?.icon,
-              let url = iconURL(id: id, icon: icon, animated: shouldAnimate)
-            {
-              AnimatedImage(
-                url: url,
-                isAnimating: .constant(shouldAnimate)
-              )
+            if let icon = guild?.icon {
+              NukeImage(animation: .enabled(shouldAnimate)) { animated in
+                DiscordImageURL.guildIcon(
+                  id: id,
+                  icon: icon,
+                  animated: animated
+                )
+              }
               .resizable()
               .scaledToFill()
             } else {
@@ -393,19 +380,6 @@ struct GuildButton: View {
     }
   }
 
-  func iconURL(id: GuildSnowflake, icon: String, animated: Bool) -> URL? {
-    if icon.starts(with: "a_") {
-      return URL(
-        string: CDNEndpoint.guildIcon(guildId: id, icon: icon).url
-          + ".\(animated ? "gif" : "png")?size=128&animated=\(animated.description)"
-      )
-    } else {
-      return URL(
-        string: CDNEndpoint.guildIcon(guildId: id, icon: icon).url
-          + ".png?size=128&animated=false"
-      )
-    }
-  }
 
   func hasUnreadChannels(_ guild: Guild) -> Bool {
     GuildButton.hasUnreadChannels(guild, readStates: gw.readStates)

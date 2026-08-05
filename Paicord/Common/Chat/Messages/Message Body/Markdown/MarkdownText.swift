@@ -6,7 +6,6 @@
 //
 
 import PaicordLib
-import SDWebImageSwiftUI
 import SwiftEmojiIndex
 import SwiftUI
 import SwiftUIX
@@ -157,10 +156,12 @@ struct MarkdownText: View {
         let animated = emoji.animated ?? false
         VStack(alignment: .leading, spacing: 0) {
           HStack {
-            let url = URL(
-              string: CDNEndpoint.customEmoji(emojiId: id).url
-                + ".\(animated ? "gif" : "png")?size=96&animated=\(animated)")
-            WebImage(url: url)
+            let url = DiscordImageURL.customEmoji(
+              id: id,
+              animated: animated,
+              size: 96
+            )
+            NukeImage(url: url)
               .resizable()
               .scaledToFit()
               .frame(width: 44, height: 44)
@@ -253,10 +254,12 @@ struct MarkdownText: View {
 
         HStack(spacing: 4) {
           if let icon, let guildId {
-            let url = URL(
-              string: CDNEndpoint.guildIcon(guildId: guildId, icon: icon).url
-                + ".webp?size=128&animated=true")
-            WebImage(url: url)
+            let url = DiscordImageURL.guildIcon(
+              id: guildId,
+              icon: icon,
+              animated: true
+            )
+            NukeImage(url: url)
               .resizable()
               .scaledToFit()
               .frame(width: 36, height: 36)
@@ -432,10 +435,11 @@ struct MarkdownText: View {
     )
     extensions.append(
       .discordEmoji(jumbo: isJumboEmoji) { id, animated, jumbo in
-        // apparently using gif files is unreliable now. discord cdn amazing fr
-        let base = CDNEndpoint.customEmoji(emojiId: EmojiSnowflake(id)).url
-        let size = jumbo ? 96 : 44
-        return URL(string: base + ".webp?size=\(size)&animated=\(animated)")!
+        DiscordImageURL.customEmoji(
+          id: EmojiSnowflake(id),
+          animated: animated,
+          size: jumbo ? 96 : 44
+        )!
       }
     )
     extensions.append(.discordUnicodeEmoji)

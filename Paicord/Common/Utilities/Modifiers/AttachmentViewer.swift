@@ -9,15 +9,12 @@
 import AVFoundation
 import AVKit
 import PaicordLib
-import SDWebImageSwiftUI
 import SwiftUIX
 
 #if os(macOS)
   import AppKit
-  import SDWebImage
 #elseif os(iOS)
   import UIKit
-  import SDWebImage
 #endif
 
 #if os(macOS)
@@ -519,8 +516,7 @@ private struct ZoomableImageView: View {
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.showsVerticalScrollIndicator = false
 
-        let imageView = SDAnimatedImageView()
-        imageView.contentMode = .scaleAspectFit
+        let imageView = AnimatedImagePlayerView()
         imageView.isUserInteractionEnabled = true
         imageView.translatesAutoresizingMaskIntoConstraints = true
         imageView.frame = .zero
@@ -553,42 +549,34 @@ private struct ZoomableImageView: View {
         context.coordinator.onSingleTap = onSingleTap
         if let url = url, context.coordinator.currentURL != url {
           context.coordinator.currentURL = url
-          context.coordinator.imageView?.sd_setImage(with: url) {
-            image,
-            _,
-            _,
-            _ in
-            guard let image = image else { return }
-            DispatchQueue.main.async {
-              guard let imageView = context.coordinator.imageView else {
-                return
-              }
-              let bounds = uiView.bounds.size
-              guard bounds.width > 0, bounds.height > 0 else { return }
-
-              let imageSize = image.size
-              let scale = min(
-                bounds.width / imageSize.width,
-                bounds.height / imageSize.height
-              )
-              let fittedSize = CGSize(
-                width: imageSize.width * scale,
-                height: imageSize.height * scale
-              )
-
-              imageView.frame = CGRect(origin: .zero, size: fittedSize)
-              uiView.contentSize = fittedSize
-
-              uiView.minimumZoomScale = 1.0
-              uiView.maximumZoomScale = 8.0
-              uiView.zoomScale = 1.0
-
-              context.coordinator.centerImage(in: uiView)
+          context.coordinator.imageView?.load(url: url) { imageSize in
+            guard let imageView = context.coordinator.imageView else {
+              return
             }
+            let bounds = uiView.bounds.size
+            guard bounds.width > 0, bounds.height > 0 else { return }
+
+            let scale = min(
+              bounds.width / imageSize.width,
+              bounds.height / imageSize.height
+            )
+            let fittedSize = CGSize(
+              width: imageSize.width * scale,
+              height: imageSize.height * scale
+            )
+
+            imageView.frame = CGRect(origin: .zero, size: fittedSize)
+            uiView.contentSize = fittedSize
+
+            uiView.minimumZoomScale = 1.0
+            uiView.maximumZoomScale = 8.0
+            uiView.zoomScale = 1.0
+
+            context.coordinator.centerImage(in: uiView)
           }
         } else {
           if let imageView = context.coordinator.imageView,
-            let image = imageView.image
+            let imageSize = imageView.naturalSize
           {
             let bounds = uiView.bounds.size
             guard bounds.width > 0, bounds.height > 0 else {
@@ -596,7 +584,6 @@ private struct ZoomableImageView: View {
               return
             }
 
-            let imageSize = image.size
             let scale = min(
               bounds.width / imageSize.width,
               bounds.height / imageSize.height
@@ -625,7 +612,7 @@ private struct ZoomableImageView: View {
       }
 
       class Coordinator: NSObject, UIScrollViewDelegate {
-        var imageView: SDAnimatedImageView?
+        var imageView: AnimatedImagePlayerView?
         var scrollView: UIScrollView?
         var currentURL: URL?
         var onSingleTap: (() -> Void)?
@@ -722,8 +709,7 @@ private struct ZoomableImageView: View {
         clipView.drawsBackground = false
         scrollView.contentView = clipView
 
-        let imageView = SDAnimatedImageView()
-        imageView.imageScaling = .scaleProportionallyUpOrDown
+        let imageView = AnimatedImagePlayerView()
 
         let containerView = FlippedView()
         containerView.wantsLayer = true
@@ -761,39 +747,33 @@ private struct ZoomableImageView: View {
       func updateNSView(_ nsView: NSScrollView, context: Context) {
         if let url = url, context.coordinator.currentURL != url {
           context.coordinator.currentURL = url
-          context.coordinator.imageView?.sd_setImage(with: url) {
-            [weak nsView, context] image, _, _, _ in
+          context.coordinator.imageView?.load(url: url) {
+            [weak nsView, context] imageSize in
             guard let nsView = nsView,
               let imageView = context.coordinator.imageView,
-              let containerView = context.coordinator.containerView,
-              let image = image
+              let containerView = context.coordinator.containerView
             else { return }
-            DispatchQueue.main.async {
-              let bounds = nsView.bounds.size
-              guard bounds.width > 0, bounds.height > 0 else { return }
-              let imageSize = image.size
-              let fittingBounds = CGSize(
-                width: max(bounds.width - attachmentEdgePadding * 2, 0),
-                height: max(bounds.height - attachmentEdgePadding * 2, 0)
-              )
-              let scale = min(
-                fittingBounds.width / imageSize.width,
-                fittingBounds.height / imageSize.height
-              )
-              let fittedSize = CGSize(
-                width: imageSize.width * scale,
-                height: imageSize.height * scale
-              )
-              // Make the container fill the scroll view so the image can be centered
-              containerView.frame = CGRect(origin: .zero, size: bounds)
-              // Center the image within the container (FlippedView: y=0 is top)
-              let originX = (bounds.width - fittedSize.width) / 2
-              let originY = (bounds.height - fittedSize.height) / 2
-              imageView.frame = CGRect(
-                origin: CGPoint(x: originX, y: originY),
-                size: fittedSize
-              )
-            }
+            let bounds = nsView.bounds.size
+            guard bounds.width > 0, bounds.height > 0 else { return }
+            let fittingBounds = CGSize(
+              width: max(bounds.width - attachmentEdgePadding * 2, 0),
+              height: max(bounds.height - attachmentEdgePadding * 2, 0)
+            )
+            let scale = min(
+              fittingBounds.width / imageSize.width,
+              fittingBounds.height / imageSize.height
+            )
+            let fittedSize = CGSize(
+              width: imageSize.width * scale,
+              height: imageSize.height * scale
+            )
+            containerView.frame = CGRect(origin: .zero, size: bounds)
+            let originX = (bounds.width - fittedSize.width) / 2
+            let originY = (bounds.height - fittedSize.height) / 2
+            imageView.frame = CGRect(
+              origin: CGPoint(x: originX, y: originY),
+              size: fittedSize
+            )
           }
         }
       }
@@ -803,7 +783,7 @@ private struct ZoomableImageView: View {
       }
 
       class Coordinator: NSObject {
-        var imageView: NSImageView?
+        var imageView: AnimatedImagePlayerView?
         var containerView: NSView?
         var scrollView: NSScrollView?
         var currentURL: URL?

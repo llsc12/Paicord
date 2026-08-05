@@ -7,7 +7,6 @@
 //
 
 import PaicordLib
-import SDWebImageSwiftUI
 import SwiftPrettyPrint
 import SwiftUIX
 
@@ -54,7 +53,7 @@ struct ProfileBar: View {
               {
                 if let emoji = status.emoji {
                   if let url = emojiURL(for: emoji, animated: true) {
-                    AnimatedImage(url: url)
+                    NukeImage(url: url)
                       .resizable()
                       .scaledToFit()
                       .frame(width: 16, height: 16)
@@ -115,9 +114,10 @@ struct ProfileBar: View {
     -> URL?
   {
     guard let id = emoji.id else { return nil }
-    return URL(
-      string: CDNEndpoint.customEmoji(emojiId: id).url
-        + (animated && emoji.animated == true ? ".gif" : ".png") + "?size=44"
+    return DiscordImageURL.customEmoji(
+      id: id,
+      animated: animated && emoji.animated == true,
+      size: 44
     )
   }
 

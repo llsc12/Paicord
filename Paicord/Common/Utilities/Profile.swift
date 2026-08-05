@@ -7,7 +7,6 @@
 //
 
 import PaicordLib
-import SDWebImageSwiftUI
 import SwiftUIX
 
 extension EnvironmentValues {
@@ -50,38 +49,18 @@ enum Profile {
     @Environment(\.profileShowAvatarDecoration) var showDecoration
 
     var body: some View {
-      Group {
-        Utils.UserAvatarURL(member: member, user: user, animated: false) {
-          url in
-          if animated {
-            Utils.UserAvatarURL(member: member, user: user, animated: true) {
-              animatedURL in
-              WebImage(url: animatedURL) { phase in
-                switch phase {
-                case .success(let image):
-                  image
-                    .resizable()
-                    .scaledToFit()
-                default:
-                  EmptyView()
-                }
-              }
-            }
-          } else {
-            WebImage(url: url) { phase in
-              switch phase {
-              case .success(let image):
-                image
-                  .resizable()
-                  .scaledToFit()
-              default:
-                Circle()
-                  .foregroundStyle(.gray.opacity(0.3))
-              }
-            }
-          }
-        }
+      NukeImage(animation: .enabled(animated)) { wantsAnimation in
+        DiscordImageURL.userAvatar(
+          member: member,
+          user: user,
+          animated: wantsAnimation
+        )
+      } placeholder: {
+        Circle()
+          .foregroundStyle(.gray.opacity(0.3))
       }
+      .resizable()
+      .scaledToFit()
       .clipShape(Circle())
       .overlay {
         if showDecoration,
@@ -285,22 +264,16 @@ enum Profile {
         if animated,
           let animatedURL
         {
-          WebImage(url: animatedURL) { phase in
-            switch phase {
-            case .success(let image):
-              image
-                .resizable()
-                .scaledToFill()
-                .clipped()
-            default:
-              WebImage(url: staticURL)
-                .resizable()
-                .scaledToFill()
-                .clipped()
-            }
+          NukeImage(url: animatedURL) {
+            NukeImage(url: staticURL)
+              .resizable()
+              .scaledToFill()
           }
+          .resizable()
+          .scaledToFill()
+          .clipped()
         } else {
-          WebImage(url: staticURL)
+          NukeImage(url: staticURL)
             .resizable()
             .scaledToFill()
             .clipped()
@@ -319,7 +292,7 @@ enum Profile {
     var badge: DiscordUser.Profile.Badge
     @State private var isHovered: Bool = false
     var body: some View {
-      WebImage(url: badgeURL())
+      NukeImage(url: badgeURL())
         .resizable()
         .scaledToFit()
         .frame(width: 16, height: 16)
@@ -330,15 +303,7 @@ enum Profile {
         }
     }
     func badgeURL() -> URL? {
-      // check if icon is already a url
-      if badge.icon.starts(with: "http") {
-        return URL(string: badge.icon)
-      }
-
-      // else fetch from cdn
-      return URL(
-        string: CDNEndpoint.profileBadge(icon: badge.icon).url + ".png"
-      )
+      DiscordImageURL.profileBadge(icon: badge.icon)
     }
   }
 
@@ -454,25 +419,15 @@ struct AvatarDecorationView: View {
   var decoration: DiscordUser.AvatarDecoration
   var animated: Bool
   var body: some View {
-    WebImage(url: avatarDecorationURL(animated: animated)) { phase in
-      switch phase {
-      case .success(let image):
-        image
-          .resizable()
-      default:
-        WebImage(url: avatarDecorationURL(animated: false))
-          .resizable()
-      }
+    NukeImage(animation: .enabled(animated)) { wantsAnimation in
+      DiscordImageURL.avatarDecoration(
+        asset: decoration.asset,
+        animated: wantsAnimation
+      )
     }
+    .resizable()
     .scaledToFit()
     .aspectRatio(1, contentMode: .fit)
-  }
-
-  func avatarDecorationURL(animated: Bool) -> URL? {
-    URL(
-      string: CDNEndpoint.avatarDecoration(asset: decoration.asset).url
-        + ".png?size=128&passthrough=\(animated.description)"
-    )
   }
 }
 

@@ -7,7 +7,6 @@
 //
 
 import PaicordLib
-import SDWebImageSwiftUI
 import SwiftUIX
 
 struct ChannelButton: View {
@@ -76,11 +75,11 @@ struct ChannelButton: View {
       textChannelButton { _ in
         HStack {
           if let icon = channel.icon {
-            let url = URL(
-              string: CDNEndpoint.channelIcon(channelId: channel.id, icon: icon)
-                .url + ".png?size=80"
+            let url = DiscordImageURL.channelIcon(
+              id: channel.id,
+              icon: icon
             )
-            WebImage(url: url)
+            NukeImage(url: url)
               .resizable()
               .scaledToFit()
               .clipShape(.circle)

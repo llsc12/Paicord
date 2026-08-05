@@ -9,7 +9,6 @@
 import AVKit
 import Loupe
 import PaicordLib
-import SDWebImageSwiftUI
 import Speech
 import SwiftUIX
 
@@ -343,7 +342,7 @@ extension MessageCell {
               return URL(string: attachment.proxyurl)
             }
           }()
-          AnimatedImage(url: url) {
+          NukeImage(url: url) {
             if let placeholder = attachment.placeholder,
               let data = Data(base64Encoded: placeholder)
             {
@@ -397,7 +396,7 @@ extension MessageCell {
         }
         var body: some View {
           if !wantsPlayback {
-            WebImage(url: poster)
+            NukeImage(url: poster)
               .resizable()
               .scaledToFill()
               .overlay(

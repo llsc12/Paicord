@@ -7,7 +7,6 @@
 //
 
 import PaicordLib
-import SDWebImageSwiftUI
 import SwiftUIX
 
 extension ChatView {
@@ -24,14 +23,11 @@ extension ChatView {
         HStack(spacing: 8) {
           Group {
             if let icon = channel?.icon {
-              let url = URL(
-                string: CDNEndpoint.channelIcon(
-                  channelId: vm.channelId,
-                  icon: icon
-                )
-                .url + ".png?size=80"
+              let url = DiscordImageURL.channelIcon(
+                id: vm.channelId,
+                icon: icon
               )
-              WebImage(url: url)
+              NukeImage(url: url)
                 .resizable()
                 .scaledToFit()
                 .clipShape(.circle)

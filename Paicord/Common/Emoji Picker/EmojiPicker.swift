@@ -7,7 +7,6 @@
 //
 
 import PaicordLib
-import SDWebImageSwiftUI
 import SwiftEmojiIndex
 @_spi(Advanced) import SwiftUIIntrospect
 import SwiftUIX
@@ -404,7 +403,7 @@ struct EmojiPicker: View {
       case .custom(let emoji, _):
         if let url = Self.customEmojiURL(id: emoji.id, animated: emoji.animated)
         {
-          WebImage(url: url)
+          NukeImage(url: url)
             .resizable()
             .scaledToFit()
         }
@@ -417,10 +416,10 @@ struct EmojiPicker: View {
 
     static func customEmojiURL(id: EmojiSnowflake?, animated: Bool?) -> URL? {
       guard let id else { return nil }
-      let animated = animated ?? false
-      return URL(
-        string: CDNEndpoint.customEmoji(emojiId: id).url
-          + ".\(animated ? "gif" : "png")?size=64&animated=\(animated.description)"
+      return DiscordImageURL.customEmoji(
+        id: id,
+        animated: animated ?? false,
+        size: 64
       )
     }
   }
@@ -431,12 +430,16 @@ struct EmojiPicker: View {
 
     var body: some View {
       Group {
-        if let icon = guild.icon,
-          let url = Self.iconURL(id: guild.id, icon: icon, animated: false)
-        {
-          WebImage(url: url)
-            .resizable()
-            .scaledToFill()
+        if let icon = guild.icon {
+          NukeImage(animation: .never) { animated in
+            DiscordImageURL.guildIcon(
+              id: guild.id,
+              icon: icon,
+              animated: animated
+            )
+          }
+          .resizable()
+          .scaledToFill()
         } else {
           Rectangle()
             .fill(.clear)
@@ -457,22 +460,6 @@ struct EmojiPicker: View {
         }
       }
       .clipShape(shape)
-    }
-
-    static func iconURL(id: GuildSnowflake, icon: String, animated: Bool)
-      -> URL?
-    {
-      if icon.starts(with: "a_") {
-        return URL(
-          string: CDNEndpoint.guildIcon(guildId: id, icon: icon).url
-            + ".\(animated ? "gif" : "png")?size=128&animated=\(animated.description)"
-        )
-      } else {
-        return URL(
-          string: CDNEndpoint.guildIcon(guildId: id, icon: icon).url
-            + ".png?size=128&animated=false"
-        )
-      }
     }
   }
 

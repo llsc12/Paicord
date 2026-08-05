@@ -7,7 +7,6 @@
 //
 
 import PaicordLib
-import SDWebImageSwiftUI
 import SwiftUIX
 
 extension View {
@@ -326,14 +325,11 @@ struct QuickSwitcherView: View {
         HStack(spacing: 8) {
           Group {
             if let icon = channel.icon {
-              let url = URL(
-                string: CDNEndpoint.channelIcon(
-                  channelId: channel.id,
-                  icon: icon
-                )
-                .url + ".png?size=80"
+              let url = DiscordImageURL.channelIcon(
+                id: channel.id,
+                icon: icon
               )
-              WebImage(url: url)
+              NukeImage(url: url)
                 .resizable()
                 .scaledToFit()
                 .clipShape(.circle)
@@ -426,12 +422,13 @@ struct QuickSwitcherView: View {
         HStack {
           Group {
             if let icon = guild.icon {
-              let url =
-                CDNEndpoint.guildIcon(
-                  guildId: guild.id,
-                  icon: icon
-                ).url + "?size=80"
-              WebImage(url: URL(string: url))
+              let url = DiscordImageURL.guildIcon(
+                id: guild.id,
+                icon: icon,
+                animated: false,
+                size: 80
+              )
+              NukeImage(url: url)
                 .resizable()
                 .scaledToFit()
             } else {

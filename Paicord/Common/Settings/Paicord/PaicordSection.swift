@@ -6,7 +6,6 @@
 //  Copyright © 2025 Lakhan Lothiyi.
 //
 
-import SDWebImageSwiftUI
 import SettingsKit
 import SwiftUIX
 
@@ -26,7 +25,7 @@ extension SettingsView {
           }
           Spacer()
 
-          WebImage(
+          NukeImage(
             url: .init(
               string:
                 "https://media.discordapp.net/stickers/1039992459209490513.png?size=240&passthrough=true"
