@@ -309,22 +309,13 @@ public struct JSONError: Sendable, Codable {
       var fieldErrors: [String: [FieldError]] = [:]
 
       for key in container.allKeys {
-        // get errors for each field
-        do {
-          let fieldContainer = try container.nestedContainer(
-            keyedBy: DynamicCodingKeys.self,
-            forKey: key
-          )
-          let errorsArray = try fieldContainer.decodeIfPresent(
-            [FieldError].self,
-            forKey: DynamicCodingKeys(stringValue: "_errors")!
-          )
-          fieldErrors[key.stringValue] = errorsArray ?? []
-        } catch {
-          print(
-            "Failed to decode field errors for key \(key.stringValue): \(error)"
-          )
-          fieldErrors[key.stringValue] = []
+        if key.stringValue == "_errors" {
+          fieldErrors["$"] = try container.decode([FieldError].self, forKey: key)
+        } else {
+          let nested = try container.decode(Errors.self, forKey: key)
+          for (path, errors) in nested.fieldErrors {
+            fieldErrors[path == "$" ? key.stringValue : "\(key.stringValue).\(path)"] = errors
+          }
         }
       }
 
@@ -340,6 +331,19 @@ public struct JSONError: Sendable, Codable {
     }
   }
 
+  public var detailedMessage: String {
+    var lines = [message]
+    if let code { lines.append("Discord \(code.rawValue)") }
+    if let errors {
+      for path in errors.fieldErrors.keys.sorted() {
+        for error in errors.fieldErrors[path] ?? [] {
+          lines.append("\(path): \(error.message) (\(error.code))")
+        }
+      }
+    }
+    return lines.joined(separator: "\n")
+  }
+
   public init(from decoder: any Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     self.message = try container.decode(String.self, forKey: .message)
@@ -349,13 +353,7 @@ public struct JSONError: Sendable, Codable {
       forKey: .mfa
     )
 
-    do {
-      self.errors = try container.decodeIfPresent(Errors.self, forKey: .errors)
-    } catch {
-      print("Failed to decode errors: \(error)")
-      // this isnt critical and i'd rather not fail decoding the entire error
-      self.errors = nil
-    }
+    self.errors = try? container.decodeIfPresent(Errors.self, forKey: .errors)
   }
 
   enum CodingKeys: String, CodingKey {

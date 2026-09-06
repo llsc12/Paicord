@@ -68,7 +68,7 @@ public struct DiscordUser: Sendable, Codable, Equatable, Hashable {
   #if Non64BitSystemsCompatibility
     @UnstableEnum<UInt64>
   #else
-    @UnstableEnum<UInt>
+    @UnstableEnum<UInt64>
   #endif
   public enum Flag: Sendable {
     case staff  // 0
@@ -90,7 +90,7 @@ public struct DiscordUser: Sendable, Codable, Equatable, Hashable {
     #if Non64BitSystemsCompatibility
       case __undocumented(UInt64)
     #else
-      case __undocumented(UInt)
+      case __undocumented(UInt64)
     #endif
   }
 

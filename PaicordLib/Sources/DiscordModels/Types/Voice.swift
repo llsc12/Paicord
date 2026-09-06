@@ -126,7 +126,7 @@ public struct VoiceStateUpdate: Sendable, Codable {
   #if Non64BitSystemsCompatibility
     @UnstableEnum<UInt64>
   #else
-    @UnstableEnum<UInt>
+    @UnstableEnum<UInt64>
   #endif
   public enum Flags: Sendable {
     case clipsEnabled  // 0
@@ -136,7 +136,7 @@ public struct VoiceStateUpdate: Sendable, Codable {
     #if Non64BitSystemsCompatibility
       case __undocumented(UInt64)
     #else
-      case __undocumented(UInt)
+      case __undocumented(UInt64)
     #endif
   }
 }

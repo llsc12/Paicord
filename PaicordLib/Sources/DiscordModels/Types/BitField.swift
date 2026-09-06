@@ -1,7 +1,7 @@
-public protocol BitField: OptionSet, Hashable, CustomStringConvertible where RawValue == UInt {
+public protocol BitField: OptionSet, Hashable, CustomStringConvertible where RawValue == UInt64 {
   associatedtype R: RawRepresentable & LosslessRawRepresentable
-  where R: Hashable, R.RawValue == UInt
-  var rawValue: UInt { get set }
+  where R: Hashable, R.RawValue == UInt64
+  var rawValue: UInt64 { get set }
 }
 
 extension BitField {
@@ -49,7 +49,7 @@ extension BitField {
   public func representableValues() -> Set<R> {
     var bitValue = self.rawValue
     var values: [R] = []
-    var counter: UInt = 0
+    var counter: UInt64 = 0
     while bitValue != 0 {
       if (bitValue & 1) == 1 {
         /// `R` is ``LosslessRawRepresentable``. Safe to force-unwrap.
@@ -82,17 +82,17 @@ extension BitField {
 
 /// A bit-field that decode/encodes itself as an integer.
 public struct IntBitField<R>: BitField
-where R: RawRepresentable & LosslessRawRepresentable & Hashable, R.RawValue == UInt {
-  public var rawValue: UInt
+where R: RawRepresentable & LosslessRawRepresentable & Hashable, R.RawValue == UInt64 {
+  public var rawValue: UInt64
 
-  public init(rawValue: UInt = 0) {
+  public init(rawValue: UInt64 = 0) {
     self.rawValue = rawValue
   }
 }
 
 extension IntBitField: Codable {
   public init(from decoder: any Decoder) throws {
-    self.rawValue = try UInt(from: decoder)
+    self.rawValue = try UInt64(from: decoder)
   }
 
   public func encode(to encoder: any Encoder) throws {
@@ -104,10 +104,10 @@ extension IntBitField: Sendable where R: Sendable {}
 
 /// A bit-field that decode/encodes itself as a string.
 public struct StringBitField<R>: BitField
-where R: RawRepresentable & LosslessRawRepresentable & Hashable, R.RawValue == UInt {
-  public var rawValue: UInt
+where R: RawRepresentable & LosslessRawRepresentable & Hashable, R.RawValue == UInt64 {
+  public var rawValue: UInt64
 
-  public init(rawValue: UInt = 0) {
+  public init(rawValue: UInt64 = 0) {
     self.rawValue = rawValue
   }
 }
@@ -128,7 +128,7 @@ extension StringBitField: Codable {
 
   public init(from decoder: any Decoder) throws {
     let string = try String(from: decoder)
-    guard let int = UInt(string) else {
+    guard let int = UInt64(string) else {
       throw DecodingError.notRepresentingUInt(string)
     }
     self.rawValue = int

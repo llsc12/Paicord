@@ -97,7 +97,7 @@ public struct DiscordChannel: Sendable, Codable, Equatable, Hashable {
   #if Non64BitSystemsCompatibility
     @UnstableEnum<UInt64>
   #else
-    @UnstableEnum<UInt>
+    @UnstableEnum<UInt64>
   #endif
   public enum Flag: Sendable {
     case guildFeedRemoved  // 0
@@ -119,7 +119,7 @@ public struct DiscordChannel: Sendable, Codable, Equatable, Hashable {
     #if Non64BitSystemsCompatibility
       case __undocumented(UInt64)
     #else
-      case __undocumented(UInt)
+      case __undocumented(UInt64)
     #endif
   }
 
@@ -426,7 +426,7 @@ extension DiscordChannel {
     #if Non64BitSystemsCompatibility
       @UnstableEnum<UInt64>
     #else
-      @UnstableEnum<UInt>
+      @UnstableEnum<UInt64>
     #endif
     public enum Flag: Sendable {
       case crossposted  // 0
@@ -446,7 +446,7 @@ extension DiscordChannel {
       #if Non64BitSystemsCompatibility
         case __undocumented(UInt64)
       #else
-        case __undocumented(UInt)
+        case __undocumented(UInt64)
       #endif
     }
 
@@ -501,7 +501,7 @@ extension DiscordChannel {
       #if Non64BitSystemsCompatibility
         @UnstableEnum<UInt64>
       #else
-        @UnstableEnum<UInt>
+        @UnstableEnum<UInt64>
       #endif
       public enum Flag: Sendable {
         case isRemix  // 2
@@ -509,7 +509,7 @@ extension DiscordChannel {
         #if Non64BitSystemsCompatibility
           case __undocumented(UInt64)
         #else
-          case __undocumented(UInt)
+          case __undocumented(UInt64)
         #endif
       }
 
@@ -878,7 +878,7 @@ public struct ThreadMember: Sendable, Codable, Equatable, Hashable {
   #if Non64BitSystemsCompatibility
     @UnstableEnum<UInt64>
   #else
-    @UnstableEnum<UInt>
+    @UnstableEnum<UInt64>
   #endif
   public enum Flag: Sendable {
     case hasInteracted  // 0
@@ -889,7 +889,7 @@ public struct ThreadMember: Sendable, Codable, Equatable, Hashable {
     #if Non64BitSystemsCompatibility
       case __undocumented(UInt64)
     #else
-      case __undocumented(UInt)
+      case __undocumented(UInt64)
     #endif
   }
 }
@@ -1252,7 +1252,7 @@ public struct ConversationSummary: Sendable, Codable {
   #if Non64BitSystemsCompatibility
     @UnstableEnum<UInt64>
   #else
-    @UnstableEnum<UInt>
+    @UnstableEnum<UInt64>
   #endif
   public enum Source: Sendable, Codable {
     case source0  // 0
@@ -1262,14 +1262,14 @@ public struct ConversationSummary: Sendable, Codable {
     #if Non64BitSystemsCompatibility
       case __undocumented(UInt64)
     #else
-      case __undocumented(UInt)
+      case __undocumented(UInt64)
     #endif
   }
 
   #if Non64BitSystemsCompatibility
     @UnstableEnum<UInt64>
   #else
-    @UnstableEnum<UInt>
+    @UnstableEnum<UInt64>
   #endif
   public enum Kind: Sendable, Codable {
     case unset  // 0
@@ -1280,7 +1280,7 @@ public struct ConversationSummary: Sendable, Codable {
     #if Non64BitSystemsCompatibility
       case __undocumented(UInt64)
     #else
-      case __undocumented(UInt)
+      case __undocumented(UInt64)
     #endif
   }
 }

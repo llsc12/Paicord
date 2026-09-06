@@ -113,7 +113,7 @@ public struct Guild: Sendable, Codable, Hashable, Equatable, Identifiable {
     #if Non64BitSystemsCompatibility
       @UnstableEnum<UInt64>
     #else
-      @UnstableEnum<UInt>
+      @UnstableEnum<UInt64>
     #endif
     public enum Flag: Sendable {
       case didRejoin  // 0
@@ -129,7 +129,7 @@ public struct Guild: Sendable, Codable, Hashable, Equatable, Identifiable {
       #if Non64BitSystemsCompatibility
         case __undocumented(UInt64)
       #else
-        case __undocumented(UInt)
+        case __undocumented(UInt64)
       #endif
     }
 
@@ -366,7 +366,7 @@ public struct Guild: Sendable, Codable, Hashable, Equatable, Identifiable {
   #if Non64BitSystemsCompatibility
     @UnstableEnum<UInt64>
   #else
-    @UnstableEnum<UInt>
+    @UnstableEnum<UInt64>
   #endif
   public enum SystemChannelFlag: Sendable {
     case suppressJoinNotifications  // 0
@@ -379,7 +379,7 @@ public struct Guild: Sendable, Codable, Hashable, Equatable, Identifiable {
     #if Non64BitSystemsCompatibility
       case __undocumented(UInt64)
     #else
-      case __undocumented(UInt)
+      case __undocumented(UInt64)
     #endif
   }
 
@@ -813,7 +813,7 @@ extension Guild {
       #if Non64BitSystemsCompatibility
         @UnstableEnum<UInt64>
       #else
-        @UnstableEnum<UInt>
+        @UnstableEnum<UInt64>
       #endif
       public enum Flag: Sendable {
         case unreadsOnlyMentions  // 9
@@ -826,14 +826,14 @@ extension Guild {
         #if Non64BitSystemsCompatibility
           case __undocumented(UInt64)
         #else
-          case __undocumented(UInt)
+          case __undocumented(UInt64)
         #endif
       }
 
       #if Non64BitSystemsCompatibility
         @UnstableEnum<UInt64>
       #else
-        @UnstableEnum<UInt>
+        @UnstableEnum<UInt64>
       #endif
       public enum MessageNotifications: Sendable, Codable {
         case allMessages  // 0
@@ -844,7 +844,7 @@ extension Guild {
         #if Non64BitSystemsCompatibility
           case __undocumented(UInt64)
         #else
-          case __undocumented(UInt)
+          case __undocumented(UInt64)
         #endif
       }
     }
@@ -852,7 +852,7 @@ extension Guild {
     #if Non64BitSystemsCompatibility
       @UnstableEnum<UInt64>
     #else
-      @UnstableEnum<UInt>
+      @UnstableEnum<UInt64>
     #endif
     public enum Flag: Sendable {
       case unreadsAllMessages  // 11
@@ -863,7 +863,7 @@ extension Guild {
       #if Non64BitSystemsCompatibility
         case __undocumented(UInt64)
       #else
-        case __undocumented(UInt)
+        case __undocumented(UInt64)
       #endif
     }
 

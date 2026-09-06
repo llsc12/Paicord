@@ -421,19 +421,21 @@ public enum SuperProperties {
 
   public static func device_vendor_id() -> String? {
     #if os(iOS)
-      DispatchQueue.main.sync {
+      let readID = {
         if let uuid = UIDevice.current.identifierForVendor {
           return uuid.uuidString.uppercased()
         }
         return UUID().uuidString.uppercased()  // fallback
       }
+      return Thread.isMainThread ? readID() : DispatchQueue.main.sync(execute: readID)
     #elseif os(watchOS)
-      DispatchQueue.main.sync {
+      let readID = {
         if let uuid = WKInterfaceDevice.current().identifierForVendor {
           return uuid.uuidString.uppercased()
         }
         return UUID().uuidString.uppercased()  // fallback
       }
+      return Thread.isMainThread ? readID() : DispatchQueue.main.sync(execute: readID)
     #elseif os(macOS)
       return nil
     #else

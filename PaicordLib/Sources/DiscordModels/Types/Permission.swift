@@ -3,7 +3,7 @@
 #if Non64BitSystemsCompatibility
   @UnstableEnum<UInt64>
 #else
-  @UnstableEnum<UInt>
+  @UnstableEnum<UInt64>
 #endif
 public enum Permission: Sendable, Codable {
   case createInstantInvite  // 0
@@ -57,7 +57,7 @@ public enum Permission: Sendable, Codable {
   case sendPolls  // 49
   case useExternalApps  // 50
   case pinMessages  // 51
-  case __undocumented(UInt)
+  case __undocumented(UInt64)
 }
 
 /// https://discord.com/developers/docs/topics/permissions#role-object
@@ -80,7 +80,7 @@ public struct Role: Sendable, Codable, Equatable, Hashable {
   #if Non64BitSystemsCompatibility
     @UnstableEnum<UInt64>
   #else
-    @UnstableEnum<UInt>
+    @UnstableEnum<UInt64>
   #endif
   public enum Flag: Sendable {
     case inPrompt  // 0
@@ -88,7 +88,7 @@ public struct Role: Sendable, Codable, Equatable, Hashable {
     #if Non64BitSystemsCompatibility
       case __undocumented(UInt64)
     #else
-      case __undocumented(UInt)
+      case __undocumented(UInt64)
     #endif
   }
 

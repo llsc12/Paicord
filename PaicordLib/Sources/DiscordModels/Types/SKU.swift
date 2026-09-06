@@ -23,7 +23,7 @@ public struct SKU: Sendable, Codable {
   #if Non64BitSystemsCompatibility
     @UnstableEnum<UInt64>
   #else
-    @UnstableEnum<UInt>
+    @UnstableEnum<UInt64>
   #endif
   public enum Flag: Sendable {
     case available  // 2
@@ -33,7 +33,7 @@ public struct SKU: Sendable, Codable {
     #if Non64BitSystemsCompatibility
       case __undocumented(UInt64)
     #else
-      case __undocumented(UInt)
+      case __undocumented(UInt64)
     #endif
   }
 
