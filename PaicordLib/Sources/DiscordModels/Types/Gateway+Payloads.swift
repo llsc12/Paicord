@@ -2138,6 +2138,7 @@ extension Gateway {
       public var threads: Bool?
       public var member_updates: Bool?
 
+      public var members: [UserSnowflake]?
       public var channels: [ChannelSnowflake: [IntPair]]?
       public var thread_member_lists: [ChannelSnowflake]?
 
@@ -2146,12 +2147,14 @@ extension Gateway {
         activities: Bool? = nil,
         threads: Bool? = nil,
         member_updates: Bool? = nil,
+        members: [UserSnowflake]? = nil,
         channels: [ChannelSnowflake: [IntPair]]? = nil,
         thread_member_lists: [ChannelSnowflake]? = nil
       ) {
         self.typing = typing
         self.activities = activities
         self.threads = threads
+        self.members = members
         self.channels = channels
         self.member_updates = member_updates
         self.thread_member_lists = thread_member_lists
