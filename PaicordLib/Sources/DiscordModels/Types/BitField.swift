@@ -127,9 +127,10 @@ extension StringBitField: Codable {
   }
 
   public init(from decoder: any Decoder) throws {
-    let string = try String(from: decoder)
+    let container = try decoder.singleValueContainer()
+    let string = try container.decode(String.self)
     guard let int = UInt64(string) else {
-      throw DecodingError.notRepresentingUInt(string)
+      throw Swift.DecodingError.dataCorruptedError(in: container, debugDescription: "Expected an unsigned 64-bit permission value, received \(string).")
     }
     self.rawValue = int
   }

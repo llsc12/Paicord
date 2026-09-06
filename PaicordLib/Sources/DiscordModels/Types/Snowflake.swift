@@ -40,7 +40,12 @@ extension SnowflakeProtocol {
   }
 
   public init(from decoder: any Decoder) throws {
-    try self.init(variable: .init(from: decoder))
+    let container = try decoder.singleValueContainer()
+    if let string = try? container.decode(String.self) {
+      self.init(string)
+    } else {
+      self.init(try container.decode(UInt64.self))
+    }
     #if DISCORDBM_ENABLE_LOGGING_DURING_DECODE
       if self.parse() == nil {
         DiscordGlobalConfiguration.makeDecodeLogger("SnowflakeProtocol")
@@ -184,11 +189,18 @@ public func == (lhs: any SnowflakeProtocol, rhs: any SnowflakeProtocol) -> Bool 
 /// The parsed info of a snowflake.
 public struct SnowflakeInfo: Sendable {
 
-  public enum Error: Swift.Error, CustomStringConvertible {
+  public enum Error: LocalizedError, CustomStringConvertible {
     /// Entered field '\(name)' is bigger than expected. It has a value of '\(value)', but max accepted is '\(max)'
-    case fieldTooBig(_ name: String, value: String, max: Int)
+    case fieldTooBig(_ name: String, value: String, max: UInt64)
     /// Entered field '\(name)' is smaller than expected. It has a value of '\(value)', but min accepted is '\(min)'
     case fieldTooSmall(_ name: String, value: String, min: UInt64)
+
+    public var errorDescription: String? {
+      switch self {
+      case .fieldTooBig(let name, let value, let max): return "Snowflake \(name) is \(value); the maximum is \(max)."
+      case .fieldTooSmall(let name, let value, let min): return "Snowflake \(name) is \(value); the minimum is \(min)."
+      }
+    }
 
     public var description: String {
       switch self {
@@ -232,21 +244,21 @@ public struct SnowflakeInfo: Sendable {
     processId: UInt8,
     sequenceNumber: UInt16
   ) throws {
-    guard timestamp <= (1 << 42) else {
-      throw Error.fieldTooBig("timestamp", value: "\(timestamp)", max: 1 << 42)
+    let maximum = Self.discordEpochConstant + (UInt64(1) << 42) - 1
+    guard timestamp >= Self.discordEpochConstant else {
+      throw Error.fieldTooSmall("timestamp", value: "\(timestamp)", min: Self.discordEpochConstant)
     }
-    guard workerId <= (1 << 5) else {
-      throw Error.fieldTooBig("workerId", value: "\(workerId)", max: 1 << 5)
+    guard timestamp <= maximum else {
+      throw Error.fieldTooBig("timestamp", value: "\(timestamp)", max: maximum)
     }
-    guard processId <= (1 << 5) else {
-      throw Error.fieldTooBig("processId", value: "\(processId)", max: 1 << 5)
+    guard workerId < 32 else {
+      throw Error.fieldTooBig("workerId", value: "\(workerId)", max: 31)
     }
-    guard sequenceNumber <= (1 << 12) else {
-      throw Error.fieldTooBig(
-        "sequenceNumber",
-        value: "\(sequenceNumber)",
-        max: 1 << 12
-      )
+    guard processId < 32 else {
+      throw Error.fieldTooBig("processId", value: "\(processId)", max: 31)
+    }
+    guard sequenceNumber < 4096 else {
+      throw Error.fieldTooBig("sequenceNumber", value: "\(sequenceNumber)", max: 4095)
     }
 
     self.timestamp = timestamp
@@ -268,49 +280,15 @@ public struct SnowflakeInfo: Sendable {
     processId: UInt8,
     sequenceNumber: UInt16
   ) throws {
-    guard
-      date.timeIntervalSince1970
-        >= Double(SnowflakeInfo.discordEpochConstant / 1_000)
-    else {
-      throw Error.fieldTooSmall(
-        "date",
-        value: "\(date.timeIntervalSince1970)",
-        min: SnowflakeInfo.discordEpochConstant / 1_000
-      )
+    let milliseconds = date.timeIntervalSince1970 * 1000
+    let maximum = Self.discordEpochConstant + (UInt64(1) << 42) - 1
+    guard milliseconds.isFinite, milliseconds < Double(maximum) + 1 else {
+      throw Error.fieldTooBig("date", value: "\(milliseconds)", max: maximum)
     }
-
-    let timeSince1970 = UInt64(date.timeIntervalSince1970)
-    guard timeSince1970 <= (1 << 42 / 1_000) else {
-      throw Error.fieldTooBig(
-        "date",
-        value: "\(timeSince1970)",
-        max: (1 << 42 / 1_000)
-      )
+    guard milliseconds >= Double(Self.discordEpochConstant) else {
+      throw Error.fieldTooSmall("date", value: "\(milliseconds)", min: Self.discordEpochConstant)
     }
-
-    self.timestamp = UInt64(date.timeIntervalSince1970 * 1_000)
-
-    guard timestamp < (1 << 42) else {
-      let max = (1 << 42 / 1_000) - 1
-      throw Error.fieldTooBig("date", value: "\(timestamp)", max: max)
-    }
-    guard workerId <= (1 << 5) else {
-      throw Error.fieldTooBig("workerId", value: "\(workerId)", max: 1 << 5)
-    }
-    guard processId <= (1 << 5) else {
-      throw Error.fieldTooBig("processId", value: "\(processId)", max: 1 << 5)
-    }
-    guard sequenceNumber <= (1 << 12) else {
-      throw Error.fieldTooBig(
-        "sequenceNumber",
-        value: "\(sequenceNumber)",
-        max: 1 << 12
-      )
-    }
-
-    self.workerId = workerId
-    self.processId = processId
-    self.sequenceNumber = sequenceNumber
+    try self.init(timestamp: UInt64(milliseconds), workerId: workerId, processId: processId, sequenceNumber: sequenceNumber)
   }
 
   /// Makes a fake snowflake.
@@ -535,7 +513,7 @@ public func murmurhash32(
   key: String,
   seed: Int = 0,
   signed: Bool = true
-) -> Int {
+) -> Int64 {
   // port of https://github.com/dolfies/discord.py-self/blob/530e72e03eebb2dff6f31ea456c7379ae88272bf/discord/utils.py#L1675-L1725
   // which is a modification of murmurhash3 function from https://github.com/wc-duck/pymmh3/blob/master/pymmh3.py
 
@@ -543,7 +521,7 @@ public func murmurhash32(
   let length = keyData.count
   let nblocks = length / 4
 
-  var h1 = UInt32(seed)
+  var h1 = UInt32(truncatingIfNeeded: seed)
   let c1: UInt32 = 0xCC9E_2D51
   let c2: UInt32 = 0x1B87_3593
 
@@ -589,9 +567,5 @@ public func murmurhash32(
   unsignedVal ^= unsignedVal >> 13
   unsignedVal = unsignedVal &* 0xC2B2_AE35
   unsignedVal ^= unsignedVal >> 16
-  if !signed || (unsignedVal & 0x8000_0000 == 0) {
-    return Int(unsignedVal)
-  } else {
-    return -Int((unsignedVal ^ 0xFFFF_FFFF) + 1)
-  }
+  return signed ? Int64(Int32(bitPattern: unsignedVal)) : Int64(unsignedVal)
 }

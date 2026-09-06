@@ -221,7 +221,7 @@ public struct DiscordChannel: Sendable, Codable, Equatable, Hashable {
   public var available_tags: [ForumTag]?
   public var template: String?
   public var member_ids_preview: [String]?
-  public var version: Int?
+  public var version: Int64?
   /// Thread-only:
   public var member: ThreadMember?
   public var newly_created: Bool?
@@ -334,6 +334,17 @@ extension DiscordChannel {
       public var channel_id: ChannelSnowflake?
       public var guild_id: GuildSnowflake?
       public var fail_if_not_exists: Bool?
+
+      private enum CodingKeys: String, CodingKey { case type, message_id, channel_id, guild_id, fail_if_not_exists }
+      public init(from decoder: any Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        type = try values.decodeIfPresent(Kind.self, forKey: .type) ?? .reply
+        message_id = try values.decodeIfPresent(MessageSnowflake.self, forKey: .message_id)
+        channel_id = try values.decodeIfPresent(ChannelSnowflake.self, forKey: .channel_id)
+        guild_id = try values.decodeIfPresent(GuildSnowflake.self, forKey: .guild_id)
+        fail_if_not_exists = try values.decodeIfPresent(Bool.self, forKey: .fail_if_not_exists)
+      }
+
 
       public init(
         type: Kind,

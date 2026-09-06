@@ -21,7 +21,7 @@ public struct GuildTemplate: Codable, Sendable {
     public var managed: Bool?
     public var mentionable: Bool
     public var tags: DiscordModels.Role.Tags?
-    public var version: Int?
+    public var version: Int64?
   }
 
   /// https://discord.com/developers/docs/resources/guild#guild-object-guild-structure
@@ -75,7 +75,7 @@ public struct GuildTemplate: Codable, Sendable {
     public var nsfw: Bool?
     public var application_command_counts: [String: Int]?
     public var embedded_activities: [Gateway.Activity]?
-    public var version: Int?
+    public var version: Int64?
     public var guild_id: GuildSnowflake?
   }
 

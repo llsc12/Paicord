@@ -68,11 +68,11 @@ actor HTTPRateLimiter {
   private var buckets: [String: Bucket] = [:]
 
   /// To take care of the global rate limit.
-  private var requestsThisSecond: (id: Int, count: Int) = (0, 0)
+  private var requestsThisSecond: (id: Int64, count: Int) = (0, 0)
 
   /// Only 10K invalid requests allowed each 10 minutes.
   /// We keep track of 500 / 1 minute so we can prevent hitting the limit easier.
-  private var invalidRequestsIn1Minute: (id: Int, count: Int) = (0, 0)
+  private var invalidRequestsIn1Minute: (id: Int64, count: Int) = (0, 0)
 
   /// Hitting the invalid requests limit will ban you for one day.
   /// Your code should be good enough not to send that many invalid requests.
@@ -83,12 +83,12 @@ actor HTTPRateLimiter {
     self.label = label
   }
 
-  private func currentGlobalRateLimitId() -> Int {
-    Int(Date().timeIntervalSince1970)
+  private func currentGlobalRateLimitId() -> Int64 {
+    Int64(Date().timeIntervalSince1970)
   }
 
-  private func currentMinutelyRateLimitId() -> Int {
-    Int(Date().timeIntervalSince1970) / 60
+  private func currentMinutelyRateLimitId() -> Int64 {
+    Int64(Date().timeIntervalSince1970) / 60
   }
 
   private func minutelyInvalidRequestsLimitAllows() -> Bool {
@@ -173,16 +173,12 @@ actor HTTPRateLimiter {
   @usableFromInline
   func shouldRequest(to endpoint: AnyEndpoint) -> ShouldRequest {
     guard minutelyInvalidRequestsLimitAllows() else { return .false }
-    if endpoint.countsAgainstGlobalRateLimit {
-      guard globalRateLimitAllows() else { return .false }
-    }
     if let bucketId = self.endpoints[endpoint.id],
       let bucket = self.buckets[bucketId]
     {
       switch bucket.shouldRequest() {
       case .true:
-        self.addGlobalRateLimitRecord()
-        return .true
+        break
       case .false:
         logger.warning(
           "Hit HTTP Bucket rate-limit",
@@ -198,9 +194,11 @@ actor HTTPRateLimiter {
         /// Also need to log necessary info to users, when e.g. we can't make the request.
         return .after(after)
       }
-    } else {
-      return .true
     }
+    if endpoint.countsAgainstGlobalRateLimit {
+      guard globalRateLimitAllows() else { return .false }
+    }
+    return .true
   }
 
   @usableFromInline

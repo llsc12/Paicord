@@ -104,6 +104,6 @@ public struct Role: Sendable, Codable, Equatable, Hashable {
   public var managed: Bool
   public var mentionable: Bool
   public var tags: Tags?
-  public var version: Int?
+  public var version: Int64?
   public var flags: IntBitField<Flag>
 }

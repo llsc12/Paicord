@@ -18,7 +18,7 @@ public enum StringIntDoubleBool: Sendable, Codable {
   }
 
   case string(String)
-  case int(Int)
+  case int(Int64)
   case double(Double)
   case bool(Bool)
 
@@ -44,7 +44,9 @@ public enum StringIntDoubleBool: Sendable, Codable {
   @inlinable
   public func requireInt() throws -> Int {
     switch self {
-    case .int(let int): return int
+    case .int(let int):
+      guard let value = Int(exactly: int) else { throw Error.valueIsNotOfType(Int.self, value: self) }
+      return value
     default: throw Error.valueIsNotOfType(Int.self, value: self)
     }
   }
@@ -71,7 +73,7 @@ public enum StringIntDoubleBool: Sendable, Codable {
     let container = try decoder.singleValueContainer()
     if let string = try? container.decode(String.self) {
       self = .string(string)
-    } else if let int = try? container.decode(Int.self) {
+    } else if let int = try? container.decode(Int64.self) {
       self = .int(int)
     } else if let bool = try? container.decode(Bool.self) {
       self = .bool(bool)
@@ -101,7 +103,7 @@ public enum StringIntDoubleBool: Sendable, Codable {
 /// To dynamically decode/encode String or Int.
 public enum StringOrInt: Sendable, Codable, Equatable, Hashable {
   case string(String)
-  case int(Int)
+  case int(Int64)
 
   public var asString: String {
     switch self {
@@ -115,7 +117,7 @@ public enum StringOrInt: Sendable, Codable, Equatable, Hashable {
     if let string = try? container.decode(String.self) {
       self = .string(string)
     } else {
-      let int = try container.decode(Int.self)
+      let int = try container.decode(Int64.self)
       self = .int(int)
     }
   }
@@ -134,12 +136,12 @@ public enum StringOrInt: Sendable, Codable, Equatable, Hashable {
 //MARK: - IntOrDouble
 
 public enum IntOrDouble: Sendable, Codable {
-  case int(Int)
+  case int(Int64)
   case double(Double)
 
   public init(from decoder: any Decoder) throws {
     let container = try decoder.singleValueContainer()
-    if let int = try? container.decode(Int.self) {
+    if let int = try? container.decode(Int64.self) {
       self = .int(int)
     } else {
       let double = try container.decode(Double.self)
@@ -283,7 +285,7 @@ public struct DiscordTimestamp: Codable, Hashable {
     if let string = try? container.decode(String.self) {
       guard let parsed = (try? Date.ISO8601FormatStyle(includingFractionalSeconds: true).parse(string))
         ?? (try? Date.ISO8601FormatStyle().parse(string)) else {
-        throw DecodingError.unexpectedFormat(container.codingPath, string)
+        throw Swift.DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid ISO 8601 timestamp: \(string)")
       }
       date = parsed
     } else {

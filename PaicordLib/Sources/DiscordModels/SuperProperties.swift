@@ -377,9 +377,7 @@ public enum SuperProperties {
   }
 
   public static func cfnetwork_version() -> String {
-    let dictionary = Bundle(identifier: "com.apple.CFNetwork")?.infoDictionary!
-    let version = dictionary?["CFBundleShortVersionString"] as! String
-    return version
+    Bundle(identifier: "com.apple.CFNetwork")?.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0"
   }
 
   #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS) || os(visionOS)
