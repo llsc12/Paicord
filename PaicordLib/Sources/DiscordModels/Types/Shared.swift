@@ -18,7 +18,7 @@ public enum StringIntDoubleBool: Sendable, Codable {
   }
 
   case string(String)
-  case int(Int)
+  case int(Int64)
   case double(Double)
   case bool(Bool)
 
@@ -44,7 +44,9 @@ public enum StringIntDoubleBool: Sendable, Codable {
   @inlinable
   public func requireInt() throws -> Int {
     switch self {
-    case .int(let int): return int
+    case .int(let int):
+      guard let value = Int(exactly: int) else { throw Error.valueIsNotOfType(Int.self, value: self) }
+      return value
     default: throw Error.valueIsNotOfType(Int.self, value: self)
     }
   }
@@ -71,7 +73,7 @@ public enum StringIntDoubleBool: Sendable, Codable {
     let container = try decoder.singleValueContainer()
     if let string = try? container.decode(String.self) {
       self = .string(string)
-    } else if let int = try? container.decode(Int.self) {
+    } else if let int = try? container.decode(Int64.self) {
       self = .int(int)
     } else if let bool = try? container.decode(Bool.self) {
       self = .bool(bool)
@@ -101,7 +103,7 @@ public enum StringIntDoubleBool: Sendable, Codable {
 /// To dynamically decode/encode String or Int.
 public enum StringOrInt: Sendable, Codable, Equatable, Hashable {
   case string(String)
-  case int(Int)
+  case int(Int64)
 
   public var asString: String {
     switch self {
@@ -115,7 +117,7 @@ public enum StringOrInt: Sendable, Codable, Equatable, Hashable {
     if let string = try? container.decode(String.self) {
       self = .string(string)
     } else {
-      let int = try container.decode(Int.self)
+      let int = try container.decode(Int64.self)
       self = .int(int)
     }
   }
@@ -134,12 +136,12 @@ public enum StringOrInt: Sendable, Codable, Equatable, Hashable {
 //MARK: - IntOrDouble
 
 public enum IntOrDouble: Sendable, Codable {
-  case int(Int)
+  case int(Int64)
   case double(Double)
 
   public init(from decoder: any Decoder) throws {
     let container = try decoder.singleValueContainer()
-    if let int = try? container.decode(Int.self) {
+    if let int = try? container.decode(Int64.self) {
       self = .int(int)
     } else {
       let double = try container.decode(Double.self)
@@ -281,72 +283,13 @@ public struct DiscordTimestamp: Codable, Hashable {
   public init(from decoder: any Decoder) throws {
     let container = try decoder.singleValueContainer()
     if let string = try? container.decode(String.self) {
-
-      let startIndex = string.startIndex
-      func index(_ offset: Int) -> String.Index {
-        string.index(startIndex, offsetBy: offset)
+      guard let parsed = (try? Date.ISO8601FormatStyle(includingFractionalSeconds: true).parse(string))
+        ?? (try? Date.ISO8601FormatStyle().parse(string)) else {
+        throw Swift.DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid ISO 8601 timestamp: \(string)")
       }
-
-      let components: DateComponents
-
-      if string.count == 32 {
-        guard let year = Int(string[startIndex...index(3)]),
-          let month = Int(string[index(5)...index(6)]),
-          let day = Int(string[index(8)...index(9)]),
-          let hour = Int(string[index(11)...index(12)]),
-          let minute = Int(string[index(14)...index(15)]),
-          let second = Int(string[index(17)...index(18)]),
-          let microSecond = Int(string[index(20)...index(25)])
-        else {
-          throw DecodingError.unexpectedFormat(container.codingPath, string)
-        }
-        components = DateComponents(
-          calendar: .utc,
-          year: year,
-          month: month,
-          day: day,
-          hour: hour,
-          minute: minute,
-          second: second,
-          nanosecond: microSecond * 1_000
-        )
-      } else if string.count == 25 {
-        guard let year = Int(string[startIndex...index(3)]),
-          let month = Int(string[index(5)...index(6)]),
-          let day = Int(string[index(8)...index(9)]),
-          let hour = Int(string[index(11)...index(12)]),
-          let minute = Int(string[index(14)...index(15)]),
-          let second = Int(string[index(17)...index(18)])
-        else {
-          throw DecodingError.unexpectedFormat(container.codingPath, string)
-        }
-        components = DateComponents(
-          calendar: .utc,
-          year: year,
-          month: month,
-          day: day,
-          hour: hour,
-          minute: minute,
-          second: second
-        )
-      } else {
-        throw DecodingError.unexpectedFormat(container.codingPath, string)
-      }
-      guard let date = Calendar.utc.date(from: components) else {
-        throw DecodingError.conversionFailure(
-          container.codingPath,
-          string,
-          components
-        )
-      }
-      self.date = date
-    } else if let int = try? container.decode(Int.self) {
-      self.date = Date(timeIntervalSince1970: TimeInterval(int))
+      date = parsed
     } else {
-      throw DecodingError.unexpectedFormat(
-        container.codingPath,
-        "Non String/Int value"
-      )
+      date = Date(timeIntervalSince1970: TimeInterval(try container.decode(Int64.self)))
     }
   }
 

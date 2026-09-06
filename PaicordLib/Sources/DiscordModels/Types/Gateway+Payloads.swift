@@ -215,7 +215,7 @@ extension Gateway {
 
     /// https://discord.com/developers/docs/topics/gateway-events#update-presence-gateway-presence-update-structure
     public struct Presence: Sendable, Codable {
-      public var since: Int?
+      public var since: Int64?
       public var activities: [Activity]
       public var status: Status
       public var afk: Bool
@@ -226,7 +226,7 @@ extension Gateway {
         status: Status,
         afk: Bool
       ) {
-        self.since = since == nil ? nil : Int(since!.timeIntervalSince1970)
+        self.since = since.map { Int64($0.timeIntervalSince1970 * 1000) }
         self.activities = activities
         self.status = status
         self.afk = afk
@@ -324,7 +324,7 @@ extension Gateway {
   #if Non64BitSystemsCompatibility
     @UnstableEnum<UInt64>
   #else
-    @UnstableEnum<UInt>
+    @UnstableEnum<UInt64>
   #endif
   public enum Intent: Sendable, Codable, CaseIterable {
     case guilds  // 0
@@ -352,7 +352,7 @@ extension Gateway {
     #if Non64BitSystemsCompatibility
       case __undocumented(UInt64)
     #else
-      case __undocumented(UInt)
+      case __undocumented(UInt64)
     #endif
   }
 
@@ -360,7 +360,7 @@ extension Gateway {
   #if Non64BitSystemsCompatibility
     @UnstableEnum<UInt64>
   #else
-    @UnstableEnum<UInt>
+    @UnstableEnum<UInt64>
   #endif
   public enum Capability: Sendable, Codable, CaseIterable {
     case lazyUserNotes  // 0
@@ -383,7 +383,7 @@ extension Gateway {
     #if Non64BitSystemsCompatibility
       case __undocumented(UInt64)
     #else
-      case __undocumented(UInt)
+      case __undocumented(UInt64)
     #endif
   }
 
@@ -419,7 +419,7 @@ extension Gateway {
   /// https://docs.discord.food/topics/gateway-events#update-time-spent-session-id
   public struct UpdateTimeSpentSessionID: Sendable, Codable {
     // Unix timestamp (in milliseconds) of when the session ID was generated
-    public var initialization_timestamp: Int = Int(
+    public var initialization_timestamp: Int64 = Int64(
       SuperProperties._initialisation_date.timeIntervalSince1970 * 1000
     )
     // A client-generated UUID, same as client_heartbeat_session_id in client properties
@@ -589,7 +589,7 @@ extension Gateway {
     public var nsfw: Bool
     public var application_command_counts: [String: Int]?
     public var embedded_activities: [Gateway.Activity]?
-    public var version: Int?
+    public var version: Int64?
     public var guild_id: GuildSnowflake?
     /// Extra fields:
     public var joined_at: DiscordTimestamp
@@ -807,7 +807,7 @@ extension Gateway {
   public struct GuildRoleDelete: Sendable, Codable {
     public var guild_id: GuildSnowflake
     public var role_id: RoleSnowflake
-    public var version: Int?
+    public var version: Int64?
   }
 
   /// Not the same as what Discord calls `Guild Scheduled Event User`.
@@ -1257,10 +1257,10 @@ extension Gateway {
 
     /// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-timestamps
     public struct Timestamps: Sendable, Codable, Equatable, Hashable {
-      public var start: Int?
-      public var end: Int?
+      public var start: Int64?
+      public var end: Int64?
 
-      public init(start: Int? = nil, end: Int? = nil) {
+      public init(start: Int64? = nil, end: Int64? = nil) {
         self.start = start
         self.end = end
       }
@@ -1335,7 +1335,7 @@ extension Gateway {
     #if Non64BitSystemsCompatibility
       @UnstableEnum<UInt64>
     #else
-      @UnstableEnum<UInt>
+      @UnstableEnum<UInt64>
     #endif
     public enum Flag: Sendable {
       case instance  // 0
@@ -1351,7 +1351,7 @@ extension Gateway {
       #if Non64BitSystemsCompatibility
         case __undocumented(UInt64)
       #else
-        case __undocumented(UInt)
+        case __undocumented(UInt64)
       #endif
     }
 
@@ -1379,7 +1379,7 @@ extension Gateway {
     public var name: String?
     public var type: Kind?
     public var url: String?
-    public var created_at: Int?
+    public var created_at: Int64?
     public var timestamps: Timestamps?
     public var application_id: ApplicationSnowflake?
     public var details: String?
@@ -1398,7 +1398,7 @@ extension Gateway {
       self.type = try container.decodeIfPresent(Kind.self, forKey: .type)
       self.url = try container.decodeIfPresent(String.self, forKey: .url)
       self.created_at = try container.decodeIfPresent(
-        Int.self,
+        Int64.self,
         forKey: .created_at
       )
       self.timestamps = try container.decodeIfPresent(
@@ -1441,7 +1441,7 @@ extension Gateway {
         )
       } catch let error as DecodingError {
         if case .typeMismatch = error {
-          let number = try container.decode(Int.self, forKey: .application_id)
+          let number = try container.decode(UInt64.self, forKey: .application_id)
           self.application_id = .init("\(number)")
         } else {
           throw error
@@ -1478,7 +1478,7 @@ extension Gateway {
     public var channel_id: ChannelSnowflake
     public var guild_id: GuildSnowflake?
     public var user_id: UserSnowflake
-    public var timestamp: Int
+    public var timestamp: Int64
     public var member: Guild.Member?
   }
 
@@ -1619,7 +1619,7 @@ extension Gateway {
     #if Non64BitSystemsCompatibility
       @UnstableEnum<UInt64>
     #else
-      @UnstableEnum<UInt>
+      @UnstableEnum<UInt64>
     #endif
     public enum Reason: Sendable, Codable {
       case unknown  // 1
@@ -1646,7 +1646,7 @@ extension Gateway {
       #if Non64BitSystemsCompatibility
         case __undocumented(UInt64)
       #else
-        case __undocumented(UInt)
+        case __undocumented(UInt64)
       #endif
     }
   }
@@ -1688,7 +1688,7 @@ extension Gateway {
     #if Non64BitSystemsCompatibility
       @UnstableEnum<UInt64>
     #else
-      @UnstableEnum<UInt>
+      @UnstableEnum<UInt64>
     #endif
     public enum ModalSize: Sendable, Codable {
       case small  // 1
@@ -1698,7 +1698,7 @@ extension Gateway {
       #if Non64BitSystemsCompatibility
         case __undocumented(UInt64)
       #else
-        case __undocumented(UInt)
+        case __undocumented(UInt64)
       #endif
     }
   }
@@ -1721,7 +1721,7 @@ extension Gateway {
     #if Non64BitSystemsCompatibility
       @UnstableEnum<UInt64>
     #else
-      @UnstableEnum<UInt>
+      @UnstableEnum<UInt64>
     #endif
     public enum Flag: Sendable {
       case useNewNotifications  // 4
@@ -1730,7 +1730,7 @@ extension Gateway {
       #if Non64BitSystemsCompatibility
         case __undocumented(UInt64)
       #else
-        case __undocumented(UInt)
+        case __undocumented(UInt64)
       #endif
     }
   }
@@ -1916,7 +1916,7 @@ extension Gateway {
     #if Non64BitSystemsCompatibility
       @UnstableEnum<UInt64>
     #else
-      @UnstableEnum<UInt>
+      @UnstableEnum<UInt64>
     #endif
     public enum Kind: Sendable, Codable {
       case preloaded  // 1
@@ -1925,7 +1925,7 @@ extension Gateway {
       #if Non64BitSystemsCompatibility
         case __undocumented(UInt64)
       #else
-        case __undocumented(UInt)
+        case __undocumented(UInt64)
       #endif
     }
   }
@@ -2003,7 +2003,7 @@ extension Gateway {
     #if Non64BitSystemsCompatibility
       @UnstableEnum<UInt64>
     #else
-      @UnstableEnum<UInt>
+      @UnstableEnum<UInt64>
     #endif
     public enum Kind: Sendable, Codable {
       case channel  // 0
@@ -2016,14 +2016,14 @@ extension Gateway {
       #if Non64BitSystemsCompatibility
         case __undocumented(UInt64)
       #else
-        case __undocumented(UInt)
+        case __undocumented(UInt64)
       #endif
     }
 
     #if Non64BitSystemsCompatibility
       @UnstableEnum<UInt64>
     #else
-      @UnstableEnum<UInt>
+      @UnstableEnum<UInt64>
     #endif
     public enum Flags: Sendable, Codable {
       case isGuildChannel  // 0
@@ -2033,7 +2033,7 @@ extension Gateway {
       #if Non64BitSystemsCompatibility
         case __undocumented(UInt64)
       #else
-        case __undocumented(UInt)
+        case __undocumented(UInt64)
       #endif
     }
   }
@@ -2047,14 +2047,14 @@ extension Gateway {
     public var mention_count: Int?
     public var flags: IntBitField<ReadState.Flags>?
     public var last_viewed: Int?
-    public var version: Int
+    public var version: Int64
   }
 
   /// https://docs.discord.food/topics/gateway-events#channel-pins-ack
   public struct ChannelPinsAcknowledge: Sendable, Codable {
     public var channel_id: ChannelSnowflake
     public var timestamp: DiscordTimestamp
-    public var version: Int
+    public var version: Int64
   }
 
   /// https://docs.discord.food/topics/gateway-events#user-non-channel-ack-structure
@@ -2062,7 +2062,7 @@ extension Gateway {
     public var ack_type: ReadState.Kind
     public var resource_id: UserSnowflake
     public var entity_id: AnySnowflake
-    public var version: Int
+    public var version: Int64
   }
 
   /// https://docs.discord.food/resources/message#create-attachments
@@ -2138,6 +2138,7 @@ extension Gateway {
       public var threads: Bool?
       public var member_updates: Bool?
 
+      public var members: [UserSnowflake]?
       public var channels: [ChannelSnowflake: [IntPair]]?
       public var thread_member_lists: [ChannelSnowflake]?
 
@@ -2146,12 +2147,14 @@ extension Gateway {
         activities: Bool? = nil,
         threads: Bool? = nil,
         member_updates: Bool? = nil,
+        members: [UserSnowflake]? = nil,
         channels: [ChannelSnowflake: [IntPair]]? = nil,
         thread_member_lists: [ChannelSnowflake]? = nil
       ) {
         self.typing = typing
         self.activities = activities
         self.threads = threads
+        self.members = members
         self.channels = channels
         self.member_updates = member_updates
         self.thread_member_lists = thread_member_lists

@@ -7,7 +7,7 @@ public struct ApplicationCommand: Sendable, Codable {
   #if Non64BitSystemsCompatibility
     @UnstableEnum<UInt64>
   #else
-    @UnstableEnum<UInt>
+    @UnstableEnum<UInt64>
   #endif
   public enum Kind: Sendable, Codable {
     case chatInput  // 1
@@ -17,7 +17,7 @@ public struct ApplicationCommand: Sendable, Codable {
     #if Non64BitSystemsCompatibility
       case __undocumented(UInt64)
     #else
-      case __undocumented(UInt)
+      case __undocumented(UInt64)
     #endif
   }
 
@@ -28,7 +28,7 @@ public struct ApplicationCommand: Sendable, Codable {
     #if Non64BitSystemsCompatibility
       @UnstableEnum<UInt64>
     #else
-      @UnstableEnum<UInt>
+      @UnstableEnum<UInt64>
     #endif
     public enum Kind: Sendable, Codable {
       case subCommand  // 1
@@ -46,7 +46,7 @@ public struct ApplicationCommand: Sendable, Codable {
       #if Non64BitSystemsCompatibility
         case __undocumented(UInt64)
       #else
-        case __undocumented(UInt)
+        case __undocumented(UInt64)
       #endif
     }
 

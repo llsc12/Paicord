@@ -5,7 +5,7 @@ public struct DiscordApplication: Sendable, Codable {
   #if Non64BitSystemsCompatibility
     @UnstableEnum<UInt64>
   #else
-    @UnstableEnum<UInt>
+    @UnstableEnum<UInt64>
   #endif
   public enum Flag: Sendable {
     case applicationAutoModerationRuleCreateBadge  // 6
@@ -22,7 +22,7 @@ public struct DiscordApplication: Sendable, Codable {
     #if Non64BitSystemsCompatibility
       case __undocumented(UInt64)
     #else
-      case __undocumented(UInt)
+      case __undocumented(UInt64)
     #endif
   }
 
@@ -106,7 +106,7 @@ public struct DiscordApplication: Sendable, Codable {
     #if Non64BitSystemsCompatibility
       @UnstableEnum<UInt64>
     #else
-      @UnstableEnum<UInt>
+      @UnstableEnum<UInt64>
     #endif
     public enum Kind: Sendable, Codable {
       case one  // 1
@@ -115,7 +115,7 @@ public struct DiscordApplication: Sendable, Codable {
       #if Non64BitSystemsCompatibility
         case __undocumented(UInt64)
       #else
-        case __undocumented(UInt)
+        case __undocumented(UInt64)
       #endif
     }
   }
@@ -186,7 +186,7 @@ public struct EmbeddedActivities: Sendable, Codable, Equatable, Hashable {
     #if Non64BitSystemsCompatibility
       @UnstableEnum<UInt64>
     #else
-      @UnstableEnum<UInt>
+      @UnstableEnum<UInt64>
     #endif
     public enum OrientationLockState: Sendable, Codable {
       case unlocked  // 0
@@ -196,7 +196,7 @@ public struct EmbeddedActivities: Sendable, Codable, Equatable, Hashable {
       #if Non64BitSystemsCompatibility
         case __undocumented(UInt64)
       #else
-        case __undocumented(UInt)
+        case __undocumented(UInt64)
       #endif
     }
 
@@ -209,7 +209,7 @@ public struct EmbeddedActivities: Sendable, Codable, Equatable, Hashable {
       #if Non64BitSystemsCompatibility
         @UnstableEnum<UInt64>
       #else
-        @UnstableEnum<UInt>
+        @UnstableEnum<UInt64>
       #endif
       public enum LabelType: Sendable, Codable {
         case none  // 0
@@ -219,7 +219,7 @@ public struct EmbeddedActivities: Sendable, Codable, Equatable, Hashable {
         #if Non64BitSystemsCompatibility
           case __undocumented(UInt64)
         #else
-          case __undocumented(UInt)
+          case __undocumented(UInt64)
         #endif
       }
 

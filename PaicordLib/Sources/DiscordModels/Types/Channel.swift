@@ -97,7 +97,7 @@ public struct DiscordChannel: Sendable, Codable, Equatable, Hashable {
   #if Non64BitSystemsCompatibility
     @UnstableEnum<UInt64>
   #else
-    @UnstableEnum<UInt>
+    @UnstableEnum<UInt64>
   #endif
   public enum Flag: Sendable {
     case guildFeedRemoved  // 0
@@ -119,7 +119,7 @@ public struct DiscordChannel: Sendable, Codable, Equatable, Hashable {
     #if Non64BitSystemsCompatibility
       case __undocumented(UInt64)
     #else
-      case __undocumented(UInt)
+      case __undocumented(UInt64)
     #endif
   }
 
@@ -221,7 +221,7 @@ public struct DiscordChannel: Sendable, Codable, Equatable, Hashable {
   public var available_tags: [ForumTag]?
   public var template: String?
   public var member_ids_preview: [String]?
-  public var version: Int?
+  public var version: Int64?
   /// Thread-only:
   public var member: ThreadMember?
   public var newly_created: Bool?
@@ -335,6 +335,17 @@ extension DiscordChannel {
       public var guild_id: GuildSnowflake?
       public var fail_if_not_exists: Bool?
 
+      private enum CodingKeys: String, CodingKey { case type, message_id, channel_id, guild_id, fail_if_not_exists }
+      public init(from decoder: any Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        type = try values.decodeIfPresent(Kind.self, forKey: .type) ?? .reply
+        message_id = try values.decodeIfPresent(MessageSnowflake.self, forKey: .message_id)
+        channel_id = try values.decodeIfPresent(ChannelSnowflake.self, forKey: .channel_id)
+        guild_id = try values.decodeIfPresent(GuildSnowflake.self, forKey: .guild_id)
+        fail_if_not_exists = try values.decodeIfPresent(Bool.self, forKey: .fail_if_not_exists)
+      }
+
+
       public init(
         type: Kind,
         message_id: MessageSnowflake? = nil,
@@ -426,7 +437,7 @@ extension DiscordChannel {
     #if Non64BitSystemsCompatibility
       @UnstableEnum<UInt64>
     #else
-      @UnstableEnum<UInt>
+      @UnstableEnum<UInt64>
     #endif
     public enum Flag: Sendable {
       case crossposted  // 0
@@ -446,7 +457,7 @@ extension DiscordChannel {
       #if Non64BitSystemsCompatibility
         case __undocumented(UInt64)
       #else
-        case __undocumented(UInt)
+        case __undocumented(UInt64)
       #endif
     }
 
@@ -501,7 +512,7 @@ extension DiscordChannel {
       #if Non64BitSystemsCompatibility
         @UnstableEnum<UInt64>
       #else
-        @UnstableEnum<UInt>
+        @UnstableEnum<UInt64>
       #endif
       public enum Flag: Sendable {
         case isRemix  // 2
@@ -509,7 +520,7 @@ extension DiscordChannel {
         #if Non64BitSystemsCompatibility
           case __undocumented(UInt64)
         #else
-          case __undocumented(UInt)
+          case __undocumented(UInt64)
         #endif
       }
 
@@ -878,7 +889,7 @@ public struct ThreadMember: Sendable, Codable, Equatable, Hashable {
   #if Non64BitSystemsCompatibility
     @UnstableEnum<UInt64>
   #else
-    @UnstableEnum<UInt>
+    @UnstableEnum<UInt64>
   #endif
   public enum Flag: Sendable {
     case hasInteracted  // 0
@@ -889,7 +900,7 @@ public struct ThreadMember: Sendable, Codable, Equatable, Hashable {
     #if Non64BitSystemsCompatibility
       case __undocumented(UInt64)
     #else
-      case __undocumented(UInt)
+      case __undocumented(UInt64)
     #endif
   }
 }
@@ -1252,7 +1263,7 @@ public struct ConversationSummary: Sendable, Codable {
   #if Non64BitSystemsCompatibility
     @UnstableEnum<UInt64>
   #else
-    @UnstableEnum<UInt>
+    @UnstableEnum<UInt64>
   #endif
   public enum Source: Sendable, Codable {
     case source0  // 0
@@ -1262,14 +1273,14 @@ public struct ConversationSummary: Sendable, Codable {
     #if Non64BitSystemsCompatibility
       case __undocumented(UInt64)
     #else
-      case __undocumented(UInt)
+      case __undocumented(UInt64)
     #endif
   }
 
   #if Non64BitSystemsCompatibility
     @UnstableEnum<UInt64>
   #else
-    @UnstableEnum<UInt>
+    @UnstableEnum<UInt64>
   #endif
   public enum Kind: Sendable, Codable {
     case unset  // 0
@@ -1280,7 +1291,7 @@ public struct ConversationSummary: Sendable, Codable {
     #if Non64BitSystemsCompatibility
       case __undocumented(UInt64)
     #else
-      case __undocumented(UInt)
+      case __undocumented(UInt64)
     #endif
   }
 }

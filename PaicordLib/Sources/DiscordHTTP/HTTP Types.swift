@@ -346,3 +346,49 @@ public enum DiscordHTTPError: Error, CustomStringConvertible {
     }
   }
 }
+
+extension DiscordHTTPError: LocalizedError, CustomNSError {
+  public var errorDescription: String? {
+    switch self {
+    case .rateLimited:
+      return "Discord is limiting requests. Wait before trying again."
+    case .badStatusCode(let response):
+      return "Discord request failed (HTTP \(response.status.code))."
+    case .cantDecodeJSONErrorFromSuccessfulResponse(let response):
+      return "Expected an error response, but Discord reported success (HTTP \(response.status.code))."
+    case .emptyBody(let response):
+      return "Discord returned an empty response (HTTP \(response.status.code))."
+    case .noContentTypeHeader(let response):
+      return "Discord didn't specify the response format (HTTP \(response.status.code))."
+    case .authenticationHeaderRequired:
+      return "This request requires authentication. Sign in before trying again."
+    case .decodingError(let typeName, let response, _):
+      return "Couldn't decode \(typeName) from Discord's response (HTTP \(response.status.code))."
+    case .appIdParameterRequired:
+      return "This request requires an application ID."
+    case .queryParametersMutuallyExclusive(let queries):
+      return "These request parameters can't be used together: \(queries.map(\.0).joined(separator: ", "))."
+    case .queryParameterOutOfBounds(let name, _, let lower, let upper):
+      return "The request parameter \(name) must be between \(lower) and \(upper)."
+    case .assertionFailureBotOnlyEndpoint:
+      return "This request is only available to bot accounts."
+    case .assertionFailureUserOnlyEndpoint:
+      return "This request is only available to user accounts."
+    }
+  }
+
+  public var errorUserInfo: [String: Any] {
+    var info: [String: Any] = [NSLocalizedDescriptionKey: errorDescription ?? "Discord request failed."]
+    if case .decodingError(_, _, let error) = self { info[NSUnderlyingErrorKey] = error }
+    return info
+  }
+}
+
+extension DiscordHTTPErrorResponse: LocalizedError {
+  public var errorDescription: String? {
+    switch self {
+    case .jsonError(let error): return error.detailedMessage
+    case .badStatusCode(let response): return "Discord request failed (HTTP \(response.status.code))."
+    }
+  }
+}

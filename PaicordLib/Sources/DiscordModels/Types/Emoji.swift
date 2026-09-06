@@ -12,7 +12,7 @@ public struct Emoji: Sendable, Codable, Equatable, Hashable {
   public var managed: Bool?
   public var animated: Bool?
   public var available: Bool?
-  public var version: Int?
+  public var version: Int64?
 
   public init(
     id: EmojiSnowflake? = nil,
@@ -23,7 +23,7 @@ public struct Emoji: Sendable, Codable, Equatable, Hashable {
     managed: Bool? = nil,
     animated: Bool? = nil,
     available: Bool? = nil,
-    version: Int? = nil
+    version: Int64? = nil
   ) {
     self.id = id
     self.name = name

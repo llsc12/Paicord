@@ -471,8 +471,11 @@ public struct Gateway: Sendable, Codable {
       }
 
       switch opcode {
-      case .heartbeat, .heartbeatAccepted, .reconnect:
-        guard try container.decodeNil(forKey: .data) else {
+      case .heartbeat:
+        _ = try container.decodeIfPresent(Int.self, forKey: .data)
+        self.data = nil
+      case .heartbeatAccepted, .reconnect:
+        guard try !container.contains(.data) || container.decodeNil(forKey: .data) else {
           throw DecodingError.typeMismatch(
             Optional<Never>.self,
             .init(

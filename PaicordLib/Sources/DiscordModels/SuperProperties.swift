@@ -377,9 +377,7 @@ public enum SuperProperties {
   }
 
   public static func cfnetwork_version() -> String {
-    let dictionary = Bundle(identifier: "com.apple.CFNetwork")?.infoDictionary!
-    let version = dictionary?["CFBundleShortVersionString"] as! String
-    return version
+    Bundle(identifier: "com.apple.CFNetwork")?.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0"
   }
 
   #if os(iOS) || os(macOS) || os(tvOS) || os(watchOS) || os(visionOS)
@@ -421,19 +419,21 @@ public enum SuperProperties {
 
   public static func device_vendor_id() -> String? {
     #if os(iOS)
-      DispatchQueue.main.sync {
+      let readID = {
         if let uuid = UIDevice.current.identifierForVendor {
           return uuid.uuidString.uppercased()
         }
         return UUID().uuidString.uppercased()  // fallback
       }
+      return Thread.isMainThread ? readID() : DispatchQueue.main.sync(execute: readID)
     #elseif os(watchOS)
-      DispatchQueue.main.sync {
+      let readID = {
         if let uuid = WKInterfaceDevice.current().identifierForVendor {
           return uuid.uuidString.uppercased()
         }
         return UUID().uuidString.uppercased()  // fallback
       }
+      return Thread.isMainThread ? readID() : DispatchQueue.main.sync(execute: readID)
     #elseif os(macOS)
       return nil
     #else

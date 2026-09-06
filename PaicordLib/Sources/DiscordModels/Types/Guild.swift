@@ -51,7 +51,7 @@ public struct Guild: Sendable, Codable, Hashable, Equatable, Identifiable {
     application_command_counts: [String: Int]? = nil,
     embedded_activities: [Gateway.Activity]? = nil,
     members: [Guild.Member]? = nil,
-    version: Int? = nil,
+    version: Int64? = nil,
     guild_id: GuildSnowflake? = nil
   ) {
     self.id = id
@@ -113,7 +113,7 @@ public struct Guild: Sendable, Codable, Hashable, Equatable, Identifiable {
     #if Non64BitSystemsCompatibility
       @UnstableEnum<UInt64>
     #else
-      @UnstableEnum<UInt>
+      @UnstableEnum<UInt64>
     #endif
     public enum Flag: Sendable {
       case didRejoin  // 0
@@ -129,7 +129,7 @@ public struct Guild: Sendable, Codable, Hashable, Equatable, Identifiable {
       #if Non64BitSystemsCompatibility
         case __undocumented(UInt64)
       #else
-        case __undocumented(UInt)
+        case __undocumented(UInt64)
       #endif
     }
 
@@ -366,7 +366,7 @@ public struct Guild: Sendable, Codable, Hashable, Equatable, Identifiable {
   #if Non64BitSystemsCompatibility
     @UnstableEnum<UInt64>
   #else
-    @UnstableEnum<UInt>
+    @UnstableEnum<UInt64>
   #endif
   public enum SystemChannelFlag: Sendable {
     case suppressJoinNotifications  // 0
@@ -379,7 +379,7 @@ public struct Guild: Sendable, Codable, Hashable, Equatable, Identifiable {
     #if Non64BitSystemsCompatibility
       case __undocumented(UInt64)
     #else
-      case __undocumented(UInt)
+      case __undocumented(UInt64)
     #endif
   }
 
@@ -474,6 +474,7 @@ public struct Guild: Sendable, Codable, Hashable, Equatable, Identifiable {
   public var owner: Bool?
   public var owner_id: UserSnowflake
   public var channels: [DiscordChannel]?
+  public var threads: [DiscordChannel]?
   public var permissions: StringBitField<Permission>?
   public var afk_channel_id: ChannelSnowflake?
   public var afk_timeout: AFKTimeout
@@ -515,7 +516,7 @@ public struct Guild: Sendable, Codable, Hashable, Equatable, Identifiable {
   public var application_command_counts: [String: Int]?
   public var embedded_activities: [Gateway.Activity]?
   public var members: [Guild.Member]?
-  public var version: Int?
+  public var version: Int64?
   public var guild_id: GuildSnowflake?
 }
 
@@ -569,7 +570,7 @@ public struct PartialGuild: Sendable, Codable, Equatable, Hashable {
   public var nsfw: Bool?
   public var application_command_counts: [String: Int]?
   public var embedded_activities: [Gateway.Activity]?
-  public var version: Int?
+  public var version: Int64?
   public var guild_id: GuildSnowflake?
 }
 
@@ -782,7 +783,7 @@ extension Guild {
     public var notify_highlights: Int
     public var suppress_everyone: Bool
     public var suppress_roles: Bool
-    public var version: Int
+    public var version: Int64
 
     /// https://docs.discord.food/resources/user-settings#partial-user-guild-settings-structure
     public struct Partial: Sendable, Codable {
@@ -813,7 +814,7 @@ extension Guild {
       #if Non64BitSystemsCompatibility
         @UnstableEnum<UInt64>
       #else
-        @UnstableEnum<UInt>
+        @UnstableEnum<UInt64>
       #endif
       public enum Flag: Sendable {
         case unreadsOnlyMentions  // 9
@@ -826,14 +827,14 @@ extension Guild {
         #if Non64BitSystemsCompatibility
           case __undocumented(UInt64)
         #else
-          case __undocumented(UInt)
+          case __undocumented(UInt64)
         #endif
       }
 
       #if Non64BitSystemsCompatibility
         @UnstableEnum<UInt64>
       #else
-        @UnstableEnum<UInt>
+        @UnstableEnum<UInt64>
       #endif
       public enum MessageNotifications: Sendable, Codable {
         case allMessages  // 0
@@ -844,7 +845,7 @@ extension Guild {
         #if Non64BitSystemsCompatibility
           case __undocumented(UInt64)
         #else
-          case __undocumented(UInt)
+          case __undocumented(UInt64)
         #endif
       }
     }
@@ -852,7 +853,7 @@ extension Guild {
     #if Non64BitSystemsCompatibility
       @UnstableEnum<UInt64>
     #else
-      @UnstableEnum<UInt>
+      @UnstableEnum<UInt64>
     #endif
     public enum Flag: Sendable {
       case unreadsAllMessages  // 11
@@ -863,7 +864,7 @@ extension Guild {
       #if Non64BitSystemsCompatibility
         case __undocumented(UInt64)
       #else
-        case __undocumented(UInt)
+        case __undocumented(UInt64)
       #endif
     }
 
