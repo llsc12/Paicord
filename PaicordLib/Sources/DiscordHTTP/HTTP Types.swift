@@ -1,4 +1,3 @@
-@preconcurrency import AsyncHTTPClient
 import DiscordModels
 import Foundation
 import NIOFoundationCompat
@@ -53,11 +52,11 @@ public struct DiscordHTTPRequest: Sendable {
 
 /// Represents a raw Discord HTTP response.
 public struct DiscordHTTPResponse: Sendable, CustomStringConvertible {
-  let _response: HTTPClient.Response
-
-  internal init(_response: HTTPClient.Response) {
-    self._response = _response
-  }
+  public let host: String
+  public let status: HTTPResponseStatus
+  public let version: HTTPVersion
+  public let headers: HTTPHeaders
+  public let body: ByteBuffer?
 
   public init(
     host: String,
@@ -66,34 +65,11 @@ public struct DiscordHTTPResponse: Sendable, CustomStringConvertible {
     headers: HTTPHeaders = [:],
     body: ByteBuffer? = nil
   ) {
-    self._response = .init(
-      host: host,
-      status: status,
-      version: version,
-      headers: headers,
-      body: body
-    )
-  }
-
-  /// Remote host of the request.
-  public var host: String {
-    _response.host
-  }
-  /// Response HTTP status.
-  public var status: HTTPResponseStatus {
-    _response.status
-  }
-  /// Response HTTP version.
-  public var version: HTTPVersion {
-    _response.version
-  }
-  /// Response HTTP headers.
-  public var headers: HTTPHeaders {
-    _response.headers
-  }
-  /// Response body.
-  public var body: ByteBuffer? {
-    _response.body
+    self.host = host
+    self.status = status
+    self.version = version
+    self.headers = headers
+    self.body = body
   }
 
   public var description: String {

@@ -362,17 +362,22 @@ public struct DefaultDiscordClient: DiscordClient {
   func execute(_ request: HTTPClient.Request) async throws
     -> DiscordHTTPResponse
   {
-    DiscordHTTPResponse(
-      _response: try await self.client.execute(
-        request: request,
-        deadline: .now() + configuration.requestTimeoutAmount,
-        logger: configuration.enableLoggingForRequests
-          ? DiscordGlobalConfiguration.makeLogger("DBM+HTTPClient")
-          : Logger(
-            label: "DBM-no-op-logger",
-            factory: SwiftLogNoOpLogHandler.init
-          )
-      ).get()
+    let response = try await self.client.execute(
+      request: request,
+      deadline: .now() + configuration.requestTimeoutAmount,
+      logger: configuration.enableLoggingForRequests
+        ? DiscordGlobalConfiguration.makeLogger("DBM+HTTPClient")
+        : Logger(
+          label: "DBM-no-op-logger",
+          factory: SwiftLogNoOpLogHandler.init
+        )
+    ).get()
+    return DiscordHTTPResponse(
+      host: response.host,
+      status: response.status,
+      version: response.version,
+      headers: response.headers,
+      body: response.body
     )
   }
 
