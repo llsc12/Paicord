@@ -209,6 +209,11 @@ class DiscordModelsTests: XCTestCase {
       XCTAssertEqual(author.avatar, "845407ec1491b55828cc1f91c2436e8b")
       XCTAssertTrue(message.attachments.isEmpty)
       XCTAssertEqual(message.guild_id, "439103874612675485")
+
+      let channelMessage = DiscordChannel.Message(message)
+      XCTAssertEqual(channelMessage.id, message.id)
+      XCTAssertEqual(channelMessage.content, message.content)
+      XCTAssertEqual(channelMessage.guild_id, message.guild_id)
     }
 
     do {
