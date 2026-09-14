@@ -67,4 +67,23 @@ public enum Responses {
   public struct ListPollAnswerVoters: Sendable, Codable {
     public var users: [DiscordUser]
   }
+
+  public struct ListUserPins: Sendable, Codable {
+    public struct Item: Sendable, Codable {
+      public var pinned_at: DiscordTimestamp
+      public var message: DiscordChannel.Message
+    }
+
+    public var items: [Item]
+    public var has_more: Bool
+  }
+
+  public struct RefreshAttachmentURLs: Sendable, Codable {
+    public struct Item: Sendable, Codable {
+      public var original: String
+      public var refreshed: String
+    }
+
+    public var refreshed_urls: [Item]
+  }
 }

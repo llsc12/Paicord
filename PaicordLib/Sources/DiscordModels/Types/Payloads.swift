@@ -3121,6 +3121,40 @@ public enum Payloads {
     }
   }
 
+  public struct VoteInPoll: Sendable, Encodable, ValidatablePayload {
+    public var answer_ids: [Int]
+
+    public init(answer_ids: [Int]) {
+      self.answer_ids = answer_ids
+    }
+
+    public func validate() -> [ValidationFailure] {
+      validateAssertIsNotEmpty(!answer_ids.isEmpty, name: "answer_ids")
+    }
+  }
+
+  public struct RefreshAttachmentURLs: Sendable, Encodable, ValidatablePayload {
+    public var attachment_urls: [String]
+
+    public init(attachment_urls: [String]) {
+      self.attachment_urls = attachment_urls
+    }
+
+    public func validate() -> [ValidationFailure] {
+      validateAssertIsNotEmpty(!attachment_urls.isEmpty, name: "attachment_urls")
+    }
+  }
+
+  public struct AcceptMessageRequest: Sendable, Encodable, ValidatablePayload {
+    public var consent_status: Int
+
+    public init(consent_status: Int = 2) {
+      self.consent_status = consent_status
+    }
+
+    public func validate() -> [ValidationFailure] {}
+  }
+
   /// https://docs.discord.food/remote-authentication/mobile#create-remote-auth-session
   public struct CreateRemoteAuthSession: Sendable, Encodable, ValidatablePayload {
     public var fingerprint: String

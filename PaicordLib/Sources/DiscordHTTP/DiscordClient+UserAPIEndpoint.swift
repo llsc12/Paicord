@@ -659,6 +659,88 @@ extension DiscordClient {
     return try await self.send(request: .init(to: endpoint))
   }
 
+  @inlinable
+  public func listUserPins(
+    channelID: ChannelSnowflake,
+    before: String? = nil,
+    limit: Int = 25
+  ) async throws -> DiscordClientResponse<Responses.ListUserPins> {
+    let endpoint = UserAPIEndpoint.messaging(.listPins(channelId: channelID))
+    return try await self.send(
+      request: .init(
+        to: endpoint,
+        queries: [("before", before), ("limit", String(limit))]
+      )
+    )
+  }
+
+  @inlinable
+  public func pinUserMessage(
+    channelID: ChannelSnowflake,
+    messageID: MessageSnowflake
+  ) async throws -> DiscordHTTPResponse {
+    let endpoint = UserAPIEndpoint.messaging(
+      .pinMessage(channelId: channelID, messageId: messageID)
+    )
+    return try await self.send(request: .init(to: endpoint))
+  }
+
+  @inlinable
+  public func unpinUserMessage(
+    channelID: ChannelSnowflake,
+    messageID: MessageSnowflake
+  ) async throws -> DiscordHTTPResponse {
+    let endpoint = UserAPIEndpoint.messaging(
+      .unpinMessage(channelId: channelID, messageId: messageID)
+    )
+    return try await self.send(request: .init(to: endpoint))
+  }
+
+  @inlinable
+  public func voteInPoll(
+    channelID: ChannelSnowflake,
+    messageID: MessageSnowflake,
+    answerIDs: [Int]
+  ) async throws -> DiscordHTTPResponse {
+    let endpoint = UserAPIEndpoint.messaging(
+      .voteInPoll(channelId: channelID, messageId: messageID)
+    )
+    return try await self.send(
+      request: .init(to: endpoint),
+      payload: Payloads.VoteInPoll(answer_ids: answerIDs)
+    )
+  }
+
+  @inlinable
+  public func refreshAttachmentURLs(_ urls: [String]) async throws
+    -> DiscordClientResponse<Responses.RefreshAttachmentURLs>
+  {
+    let endpoint = UserAPIEndpoint.messaging(.refreshAttachmentURLs)
+    return try await self.send(
+      request: .init(to: endpoint),
+      payload: Payloads.RefreshAttachmentURLs(attachment_urls: urls)
+    )
+  }
+
+  @inlinable
+  public func acceptMessageRequest(channelID: ChannelSnowflake) async throws
+    -> DiscordHTTPResponse
+  {
+    let endpoint = UserAPIEndpoint.messaging(.acceptMessageRequest(channelId: channelID))
+    return try await self.send(
+      request: .init(to: endpoint),
+      payload: Payloads.AcceptMessageRequest()
+    )
+  }
+
+  @inlinable
+  public func rejectMessageRequest(channelID: ChannelSnowflake) async throws
+    -> DiscordHTTPResponse
+  {
+    let endpoint = UserAPIEndpoint.messaging(.rejectMessageRequest(channelId: channelID))
+    return try await self.send(request: .init(to: endpoint))
+  }
+
   /// Creates a new remote auth session. This sends the current user info to the desktop client.
   /// https://docs.discord.food/remote-authentication/mobile#create-remote-auth-session
   @inlinable

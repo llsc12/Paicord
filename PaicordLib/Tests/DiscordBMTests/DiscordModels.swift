@@ -7,6 +7,16 @@ import XCTest
 
 class DiscordModelsTests: XCTestCase {
 
+  func testUserMessagingEndpoints() {
+    let pin = UserAPIEndpoint.messaging(.pinMessage(channelId: "1", messageId: "2"))
+    XCTAssertTrue(pin.url.hasSuffix("/channels/1/messages/pins/2"))
+    XCTAssertEqual(pin.httpMethod.rawValue, "PUT")
+    XCTAssertTrue(pin.requiresAuthorizationHeader)
+
+    XCTAssertTrue(Payloads.VoteInPoll(answer_ids: [1]).validate().isEmpty)
+    XCTAssertFalse(Payloads.VoteInPoll(answer_ids: []).validate().isEmpty)
+  }
+
   func testPreloadedUserSettingsStatusSettingsGatewayStatus() throws {
     var statusSettings =
       DiscordProtos_DiscordUsers_V1_PreloadedUserSettings.StatusSettings()
