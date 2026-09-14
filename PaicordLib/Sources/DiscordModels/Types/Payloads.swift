@@ -140,6 +140,8 @@ public enum Payloads {
     public var height: Int?
     public var width: Int?
     public var ephemeral: Bool?
+    public var duration_secs: Double?
+    public var waveform: String?
 
     /// `index` is the index of this attachment in the `files` you provide.
     public init(
@@ -154,7 +156,9 @@ public enum Payloads {
       proxy_url: String? = nil,
       height: Int? = nil,
       width: Int? = nil,
-      ephemeral: Bool? = nil
+      ephemeral: Bool? = nil,
+      duration_secs: Double? = nil,
+      waveform: String? = nil
     ) {
       self.id = "\(index)"
       self.filename = filename
@@ -168,6 +172,8 @@ public enum Payloads {
       self.height = height
       self.width = width
       self.ephemeral = ephemeral
+      self.duration_secs = duration_secs
+      self.waveform = waveform
     }
 
     public func validate() -> [ValidationFailure] {
@@ -582,7 +588,7 @@ public enum Payloads {
     public var files: [RawFile]?
     public var attachments: [Attachment]?
     public var flags: IntBitField<DiscordChannel.Message.Flag>?
-    //    public var enforce_nonce: Bool?
+    public var enforce_nonce: Bool?
     public var poll: CreatePollRequest?
 
     enum CodingKeys: String, CodingKey {
@@ -596,7 +602,7 @@ public enum Payloads {
       case sticker_ids
       case attachments
       case flags
-      //      case enforce_nonce
+      case enforce_nonce
       case poll
     }
 
@@ -612,7 +618,7 @@ public enum Payloads {
       files: [RawFile]? = nil,
       attachments: [Attachment]? = nil,
       flags: IntBitField<DiscordChannel.Message.Flag>? = nil,
-      //      enforce_nonce: Bool? = nil,
+      enforce_nonce: Bool? = nil,
       poll: CreatePollRequest? = nil
     ) {
       self.content = content
@@ -626,7 +632,7 @@ public enum Payloads {
       self.files = files
       self.attachments = attachments
       self.flags = flags
-      //      self.enforce_nonce = enforce_nonce
+      self.enforce_nonce = enforce_nonce
       self.poll = poll
     }
 
@@ -645,18 +651,22 @@ public enum Payloads {
       )
       allowed_mentions?.validate()
       validateAtLeastOneIsNotEmpty(
-        content?.isEmpty,
-        embeds?.isEmpty,
-        sticker_ids?.isEmpty,
-        components?.legacy?.isEmpty,
-        files?.isEmpty,
-        poll?.answers.isEmpty,
+        content?.isEmpty ?? true,
+        embeds?.isEmpty ?? true,
+        sticker_ids?.isEmpty ?? true,
+        components?.legacy?.isEmpty ?? true,
+        files?.isEmpty ?? true,
+        poll?.answers.isEmpty ?? true,
+        message_reference?.type != .forward,
+        attachments?.isEmpty ?? true,
         names: "content",
         "embeds",
         "sticker_ids",
         "components",
         "files",
-        "poll"
+        "poll",
+        "message_reference",
+        "attachments"
       )
       validateCombinedCharacterCountDoesNotExceed(
         embeds?.reduce(into: 0, { $0 += $1.contentLength }),
@@ -666,8 +676,8 @@ public enum Payloads {
       validateOnlyContains(
         flags,
         name: "flags",
-        reason: "Can only contain 'suppressEmbeds' or 'suppressNotifications'",
-        allowed: [.suppressEmbeds, .suppressNotifications]
+        reason: "Unsupported message flags",
+        allowed: [.suppressEmbeds, .suppressNotifications, .isVoiceMessage]
       )
       attachments?.validate()
       embeds?.validate()
@@ -2916,13 +2926,16 @@ public enum Payloads {
   public struct CreateRelationship: Sendable, Encodable, ValidatablePayload {
     public var type: DiscordRelationship.Kind?
     public var from_friend_suggestion: Bool?
+    public var confirm_stranger_request: Bool?
 
     public init(
       type: DiscordRelationship.Kind?,
-      from_friend_suggestion: Bool? = nil
+      from_friend_suggestion: Bool? = nil,
+      confirm_stranger_request: Bool? = nil
     ) {
       self.type = type
       self.from_friend_suggestion = from_friend_suggestion
+      self.confirm_stranger_request = confirm_stranger_request
     }
 
     public func validate() -> [ValidationFailure] {}

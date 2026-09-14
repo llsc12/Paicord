@@ -64,10 +64,21 @@ public struct Poll: Sendable, Codable, Equatable, Hashable {
       public var id: Int
       public var count: Int
       public var me_voted: Bool
+
+      public init(id: Int, count: Int, me_voted: Bool) {
+        self.id = id
+        self.count = count
+        self.me_voted = me_voted
+      }
     }
 
     public var is_finalized: Bool
     public var answer_counts: [AnswerCount]
+
+    public init(is_finalized: Bool, answer_counts: [AnswerCount]) {
+      self.is_finalized = is_finalized
+      self.answer_counts = answer_counts
+    }
   }
 
   public var question: Media

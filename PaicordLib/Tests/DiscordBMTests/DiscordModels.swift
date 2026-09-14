@@ -7,6 +7,46 @@ import XCTest
 
 class DiscordModelsTests: XCTestCase {
 
+  func testModernMessagePayloads() throws {
+    let voiceAttachment = Payloads.Attachment(
+      index: 0,
+      filename: "voice-message.m4a",
+      duration_secs: 1.5,
+      waveform: "waveform"
+    )
+    let voiceMessage = Payloads.CreateMessage(
+      attachments: [voiceAttachment],
+      flags: [.isVoiceMessage],
+      enforce_nonce: true
+    )
+    XCTAssertTrue(voiceMessage.validate().isEmpty)
+
+    let data = try JSONEncoder().encode(voiceMessage)
+    let json = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+    XCTAssertEqual(json["enforce_nonce"] as? Bool, true)
+    let attachment = try XCTUnwrap((json["attachments"] as? [[String: Any]])?.first)
+    XCTAssertEqual(attachment["duration_secs"] as? Double, 1.5)
+    XCTAssertEqual(attachment["waveform"] as? String, "waveform")
+
+    let reference = DiscordChannel.Message.MessageReference(type: .forward)
+    XCTAssertTrue(Payloads.CreateMessage(message_reference: reference).validate().isEmpty)
+    XCTAssertFalse(Payloads.CreateMessage().validate().isEmpty)
+  }
+
+  func testModernChannelFields() throws {
+    let data = Data(
+      #"{"id":"1","type":1,"applied_tags":["2"],"is_message_request":true,"is_spam":false}"#.utf8
+    )
+    let channel = try JSONDecoder().decode(DiscordChannel.self, from: data)
+    XCTAssertEqual(channel.applied_tags, ["2"])
+    XCTAssertEqual(channel.is_message_request, true)
+    XCTAssertEqual(channel.is_spam, false)
+
+    let embed = try JSONDecoder().decode(Embed.self, from: Data(#"{"video":{"width":640}}"#.utf8))
+    XCTAssertNil(embed.video?.url)
+    XCTAssertEqual(embed.video?.width, 640)
+  }
+
   func testPreloadedUserSettingsStatusSettingsGatewayStatus() throws {
     var statusSettings =
       DiscordProtos_DiscordUsers_V1_PreloadedUserSettings.StatusSettings()

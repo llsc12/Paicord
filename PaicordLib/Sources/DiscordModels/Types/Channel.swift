@@ -219,9 +219,13 @@ public struct DiscordChannel: Sendable, Codable, Equatable, Hashable {
   public var permissions: StringBitField<Permission>?
   public var flags: IntBitField<Flag>?
   public var available_tags: [ForumTag]?
+  public var applied_tags: [ForumTagSnowflake]?
   public var template: String?
   public var member_ids_preview: [String]?
   public var version: Int?
+  public var is_message_request: Bool?
+  public var is_message_request_timestamp: DiscordTimestamp?
+  public var is_spam: Bool?
   /// Thread-only:
   public var member: ThreadMember?
   public var newly_created: Bool?
@@ -1047,6 +1051,31 @@ public struct Embed: Sendable, Codable, Equatable, Hashable, ValidatablePayload 
     }
   }
 
+  public struct Video: Sendable, Codable, Equatable, Hashable {
+    public var url: DynamicURL?
+    public var proxy_url: String?
+    public var width: Int?
+    public var height: Int?
+    public var placeholder: String?
+    public var content_type: String?
+
+    public init(
+      url: DynamicURL? = nil,
+      proxy_url: String? = nil,
+      width: Int? = nil,
+      height: Int? = nil,
+      placeholder: String? = nil,
+      content_type: String? = nil
+    ) {
+      self.url = url
+      self.proxy_url = proxy_url
+      self.width = width
+      self.height = height
+      self.placeholder = placeholder
+      self.content_type = content_type
+    }
+  }
+
   /// https://discord.com/developers/docs/resources/message#embed-object-embed-provider-structure
   public struct Provider: Sendable, Codable, Equatable, Hashable {
     public var name: String?
@@ -1109,7 +1138,7 @@ public struct Embed: Sendable, Codable, Equatable, Hashable, ValidatablePayload 
   public var footer: Footer?
   public var image: Media?
   public var thumbnail: Media?
-  public var video: Media?
+  public var video: Video?
   public var provider: Provider?
   public var author: Author?
   public var fields: [Field]?
@@ -1136,7 +1165,7 @@ public struct Embed: Sendable, Codable, Equatable, Hashable, ValidatablePayload 
     footer: Embed.Footer? = nil,
     image: Embed.Media? = nil,
     thumbnail: Embed.Media? = nil,
-    video: Embed.Media? = nil,
+    video: Embed.Video? = nil,
     provider: Embed.Provider? = nil,
     author: Embed.Author? = nil,
     fields: [Embed.Field]? = nil
