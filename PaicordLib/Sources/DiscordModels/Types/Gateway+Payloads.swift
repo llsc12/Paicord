@@ -1433,20 +1433,10 @@ extension Gateway {
         forKey: .buttons
       )
 
-      /// Discord sometimes sends a number instead of a valid Snowflake `String`.
-      do {
-        self.application_id = try container.decodeIfPresent(
-          ApplicationSnowflake.self,
-          forKey: .application_id
-        )
-      } catch let error as DecodingError {
-        if case .typeMismatch = error {
-          let number = try container.decode(UInt64.self, forKey: .application_id)
-          self.application_id = .init("\(number)")
-        } else {
-          throw error
-        }
-      }
+      self.application_id = try container.decodeIfPresent(
+        ApplicationSnowflake.self,
+        forKey: .application_id
+      )
     }
 
     /// Bot users are only able to set `name`, `state`, `type`, and `url`.
