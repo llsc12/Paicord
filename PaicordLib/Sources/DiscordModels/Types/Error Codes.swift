@@ -310,9 +310,10 @@ public struct JSONError: Sendable, Codable {
 
       for key in container.allKeys {
         if key.stringValue == "_errors" {
-          fieldErrors["$"] = try container.decode([FieldError].self, forKey: key)
-        } else {
-          let nested = try container.decode(Errors.self, forKey: key)
+          if let errors = try? container.decode([FieldError].self, forKey: key) {
+            fieldErrors["$"] = errors
+          }
+        } else if let nested = try? container.decode(Errors.self, forKey: key) {
           for (path, errors) in nested.fieldErrors {
             fieldErrors[path == "$" ? key.stringValue : "\(key.stringValue).\(path)"] = errors
           }
