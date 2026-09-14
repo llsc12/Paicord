@@ -11,6 +11,7 @@ public struct Guild: Sendable, Codable, Hashable, Equatable, Identifiable {
     owner: Bool? = nil,
     owner_id: UserSnowflake,
     channels: [DiscordChannel]? = nil,
+    threads: [DiscordChannel]? = nil,
     permissions: StringBitField<Permission>? = nil,
     afk_channel_id: ChannelSnowflake? = nil,
     afk_timeout: AFKTimeout,
@@ -63,6 +64,7 @@ public struct Guild: Sendable, Codable, Hashable, Equatable, Identifiable {
     self.owner = owner
     self.owner_id = owner_id
     self.channels = channels
+    self.threads = threads
     self.permissions = permissions
     self.afk_channel_id = afk_channel_id
     self.afk_timeout = afk_timeout
