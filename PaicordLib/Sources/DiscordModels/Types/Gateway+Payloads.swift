@@ -321,11 +321,7 @@ extension Gateway {
   }
 
   /// https://discord.com/developers/docs/topics/gateway#gateway-intents
-  #if Non64BitSystemsCompatibility
-    @UnstableEnum<UInt64>
-  #else
-    @UnstableEnum<UInt64>
-  #endif
+  @UnstableEnum<UInt64>
   public enum Intent: Sendable, Codable, CaseIterable {
     case guilds  // 0
     case guildMembers  // 1
@@ -349,19 +345,11 @@ extension Gateway {
     case guildMessagePolls  // 24
     case directMessagePolls  // 25
 
-    #if Non64BitSystemsCompatibility
-      case __undocumented(UInt64)
-    #else
-      case __undocumented(UInt64)
-    #endif
+    case __undocumented(UInt64)
   }
 
   /// https://docs.discord.food/topics/gateway#list-of-capabilities
-  #if Non64BitSystemsCompatibility
-    @UnstableEnum<UInt64>
-  #else
-    @UnstableEnum<UInt64>
-  #endif
+  @UnstableEnum<UInt64>
   public enum Capability: Sendable, Codable, CaseIterable {
     case lazyUserNotes  // 0
     case noAffineUserIDs  // 1
@@ -380,11 +368,7 @@ extension Gateway {
     case passiveGuildUpdateV2  // 14
     case autoLobbyConnect  // 16
 
-    #if Non64BitSystemsCompatibility
-      case __undocumented(UInt64)
-    #else
-      case __undocumented(UInt64)
-    #endif
+    case __undocumented(UInt64)
   }
 
   /// https://discord.com/developers/docs/topics/gateway-events#resume-resume-structure
@@ -1332,11 +1316,7 @@ extension Gateway {
     }
 
     /// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-flags
-    #if Non64BitSystemsCompatibility
-      @UnstableEnum<UInt64>
-    #else
-      @UnstableEnum<UInt64>
-    #endif
+    @UnstableEnum<UInt64>
     public enum Flag: Sendable {
       case instance  // 0
       case join  // 1
@@ -1348,11 +1328,7 @@ extension Gateway {
       case partyPrivacyVoiceChannel  // 7
       case embedded  // 8
 
-      #if Non64BitSystemsCompatibility
-        case __undocumented(UInt64)
-      #else
-        case __undocumented(UInt64)
-      #endif
+      case __undocumented(UInt64)
     }
 
     /// https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-buttons
@@ -1606,11 +1582,7 @@ extension Gateway {
     public var nonce: String?
     public var reason_code: Reason
 
-    #if Non64BitSystemsCompatibility
-      @UnstableEnum<UInt64>
-    #else
-      @UnstableEnum<UInt64>
-    #endif
+    @UnstableEnum<UInt64>
     public enum Reason: Sendable, Codable {
       case unknown  // 1
       case timeout  // 2
@@ -1633,11 +1605,7 @@ extension Gateway {
       case activityLaunchInvalidLocationType  // 19
       case activityLaunchInvalidUserRegionForApplication  // 20
 
-      #if Non64BitSystemsCompatibility
-        case __undocumented(UInt64)
-      #else
-        case __undocumented(UInt64)
-      #endif
+      case __undocumented(UInt64)
     }
   }
 
@@ -1675,21 +1643,13 @@ extension Gateway {
     public var iframe_path: String
     public var modal_size: ModalSize
 
-    #if Non64BitSystemsCompatibility
-      @UnstableEnum<UInt64>
-    #else
-      @UnstableEnum<UInt64>
-    #endif
+    @UnstableEnum<UInt64>
     public enum ModalSize: Sendable, Codable {
       case small  // 1
       case normal  // 2
       case big  // 3
 
-      #if Non64BitSystemsCompatibility
-        case __undocumented(UInt64)
-      #else
-        case __undocumented(UInt64)
-      #endif
+      case __undocumented(UInt64)
     }
   }
 
@@ -1708,20 +1668,12 @@ extension Gateway {
   public struct NotificationSettings: Sendable, Codable {
     public var flags: IntBitField<Flag>?
 
-    #if Non64BitSystemsCompatibility
-      @UnstableEnum<UInt64>
-    #else
-      @UnstableEnum<UInt64>
-    #endif
+    @UnstableEnum<UInt64>
     public enum Flag: Sendable {
       case useNewNotifications  // 4
       case mentionOnAllMessages  // 5
 
-      #if Non64BitSystemsCompatibility
-        case __undocumented(UInt64)
-      #else
-        case __undocumented(UInt64)
-      #endif
+      case __undocumented(UInt64)
     }
   }
 
@@ -1903,20 +1855,12 @@ extension Gateway {
     }
 
     /// https://docs.discord.food/resources/user-settings-proto#user-settings-proto-type
-    #if Non64BitSystemsCompatibility
-      @UnstableEnum<UInt64>
-    #else
-      @UnstableEnum<UInt64>
-    #endif
+    @UnstableEnum<UInt64>
     public enum Kind: Sendable, Codable {
       case preloaded  // 1
       case frecency  // 2
 
-      #if Non64BitSystemsCompatibility
-        case __undocumented(UInt64)
-      #else
-        case __undocumented(UInt64)
-      #endif
+      case __undocumented(UInt64)
     }
   }
 
@@ -1990,11 +1934,7 @@ extension Gateway {
       self.flags = flags
     }
 
-    #if Non64BitSystemsCompatibility
-      @UnstableEnum<UInt64>
-    #else
-      @UnstableEnum<UInt64>
-    #endif
+    @UnstableEnum<UInt64>
     public enum Kind: Sendable, Codable {
       case channel  // 0
       case guildEvent  // 1
@@ -2003,28 +1943,16 @@ extension Gateway {
       case guildOnboardingQuestion  // 4
       case messageRequests  // 5
 
-      #if Non64BitSystemsCompatibility
-        case __undocumented(UInt64)
-      #else
-        case __undocumented(UInt64)
-      #endif
+      case __undocumented(UInt64)
     }
 
-    #if Non64BitSystemsCompatibility
-      @UnstableEnum<UInt64>
-    #else
-      @UnstableEnum<UInt64>
-    #endif
+    @UnstableEnum<UInt64>
     public enum Flags: Sendable, Codable {
       case isGuildChannel  // 0
       case isThread  // 1
       case isMentionLowImportance  // 2
 
-      #if Non64BitSystemsCompatibility
-        case __undocumented(UInt64)
-      #else
-        case __undocumented(UInt64)
-      #endif
+      case __undocumented(UInt64)
     }
   }
 

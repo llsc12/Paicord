@@ -2,11 +2,7 @@
 public struct DiscordApplication: Sendable, Codable {
 
   /// https://discord.com/developers/docs/resources/application#application-object-application-flags
-  #if Non64BitSystemsCompatibility
-    @UnstableEnum<UInt64>
-  #else
-    @UnstableEnum<UInt64>
-  #endif
+  @UnstableEnum<UInt64>
   public enum Flag: Sendable {
     case applicationAutoModerationRuleCreateBadge  // 6
     case gatewayPresence  // 12
@@ -19,11 +15,7 @@ public struct DiscordApplication: Sendable, Codable {
     case gatewayMessageContentLimited  // 19
     case applicationCommandBadge  // 23
 
-    #if Non64BitSystemsCompatibility
-      case __undocumented(UInt64)
-    #else
-      case __undocumented(UInt64)
-    #endif
+    case __undocumented(UInt64)
   }
 
   /// https://discord.com/developers/docs/resources/application#install-params-object
@@ -103,20 +95,12 @@ public struct DiscordApplication: Sendable, Codable {
     public var name: String
 
     /// https://docs.discord.food/resources/application#application-asset-type
-    #if Non64BitSystemsCompatibility
-      @UnstableEnum<UInt64>
-    #else
-      @UnstableEnum<UInt64>
-    #endif
+    @UnstableEnum<UInt64>
     public enum Kind: Sendable, Codable {
       case one  // 1
       case two  // 2
 
-      #if Non64BitSystemsCompatibility
-        case __undocumented(UInt64)
-      #else
-        case __undocumented(UInt64)
-      #endif
+      case __undocumented(UInt64)
     }
   }
 }
@@ -183,21 +167,13 @@ public struct EmbeddedActivities: Sendable, Codable, Equatable, Hashable {
       case __undocumented(String)
     }
 
-    #if Non64BitSystemsCompatibility
-      @UnstableEnum<UInt64>
-    #else
-      @UnstableEnum<UInt64>
-    #endif
+    @UnstableEnum<UInt64>
     public enum OrientationLockState: Sendable, Codable {
       case unlocked  // 0
       case portrait  // 1
       case landscape  // 2
 
-      #if Non64BitSystemsCompatibility
-        case __undocumented(UInt64)
-      #else
-        case __undocumented(UInt64)
-      #endif
+      case __undocumented(UInt64)
     }
 
     public struct PlatformConfiguration: Sendable, Codable, Equatable, Hashable {
@@ -206,21 +182,13 @@ public struct EmbeddedActivities: Sendable, Codable, Equatable, Hashable {
       public var release_phase: ReleasePhase
       public var omit_badge_from_surfaces: [String]
 
-      #if Non64BitSystemsCompatibility
-        @UnstableEnum<UInt64>
-      #else
-        @UnstableEnum<UInt64>
-      #endif
+      @UnstableEnum<UInt64>
       public enum LabelType: Sendable, Codable {
         case none  // 0
         case new  // 1
         case updated  // 2
 
-        #if Non64BitSystemsCompatibility
-          case __undocumented(UInt64)
-        #else
-          case __undocumented(UInt64)
-        #endif
+        case __undocumented(UInt64)
       }
 
       @UnstableEnum<String>

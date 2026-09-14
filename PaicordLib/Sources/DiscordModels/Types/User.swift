@@ -65,11 +65,7 @@ public struct DiscordUser: Sendable, Codable, Equatable, Hashable {
   }
 
   /// https://discord.com/developers/docs/resources/user#user-object-user-flags
-  #if Non64BitSystemsCompatibility
-    @UnstableEnum<UInt64>
-  #else
-    @UnstableEnum<UInt64>
-  #endif
+  @UnstableEnum<UInt64>
   public enum Flag: Sendable {
     case staff  // 0
     case partner  // 1
@@ -87,11 +83,7 @@ public struct DiscordUser: Sendable, Codable, Equatable, Hashable {
     case botHttpInteractions  // 19
     case activeDeveloper  // 22
 
-    #if Non64BitSystemsCompatibility
-      case __undocumented(UInt64)
-    #else
-      case __undocumented(UInt64)
-    #endif
+    case __undocumented(UInt64)
   }
 
   /// https://discord.com/developers/docs/resources/user#avatar-decoration-data-object

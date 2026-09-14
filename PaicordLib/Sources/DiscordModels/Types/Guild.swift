@@ -112,11 +112,7 @@ public struct Guild: Sendable, Codable, Hashable, Equatable, Identifiable {
   /// https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-structure
   public struct Member: Sendable, Codable, Equatable, Hashable {
     /// https://discord.com/developers/docs/resources/guild#guild-member-object-guild-member-flags
-    #if Non64BitSystemsCompatibility
-      @UnstableEnum<UInt64>
-    #else
-      @UnstableEnum<UInt64>
-    #endif
+    @UnstableEnum<UInt64>
     public enum Flag: Sendable {
       case didRejoin  // 0
       case completedOnboarding  // 1
@@ -128,11 +124,7 @@ public struct Guild: Sendable, Codable, Hashable, Equatable, Identifiable {
       case automodQuarantinedUsername  // 7
       case dmSettingsUpsellAcknowledged  // 9
 
-      #if Non64BitSystemsCompatibility
-        case __undocumented(UInt64)
-      #else
-        case __undocumented(UInt64)
-      #endif
+      case __undocumented(UInt64)
     }
 
     public var user: DiscordUser?
@@ -365,11 +357,7 @@ public struct Guild: Sendable, Codable, Hashable, Equatable, Identifiable {
   }
 
   /// https://discord.com/developers/docs/resources/guild#guild-object-system-channel-flags
-  #if Non64BitSystemsCompatibility
-    @UnstableEnum<UInt64>
-  #else
-    @UnstableEnum<UInt64>
-  #endif
+  @UnstableEnum<UInt64>
   public enum SystemChannelFlag: Sendable {
     case suppressJoinNotifications  // 0
     case suppressPremiumSubscriptions  // 1
@@ -378,11 +366,7 @@ public struct Guild: Sendable, Codable, Hashable, Equatable, Identifiable {
     case suppressRoleSubscriptionPurchaseNotifications  // 4
     case suppressRoleSubscriptionPurchaseNotificationReplies  // 5
 
-    #if Non64BitSystemsCompatibility
-      case __undocumented(UInt64)
-    #else
-      case __undocumented(UInt64)
-    #endif
+    case __undocumented(UInt64)
   }
 
   /// https://discord.com/developers/docs/resources/guild#guild-object-premium-tier
@@ -813,11 +797,7 @@ extension Guild {
       public var muted: Bool
       public var mute_config: MuteConfig??
 
-      #if Non64BitSystemsCompatibility
-        @UnstableEnum<UInt64>
-      #else
-        @UnstableEnum<UInt64>
-      #endif
+      @UnstableEnum<UInt64>
       public enum Flag: Sendable {
         case unreadsOnlyMentions  // 9
         case unreadsAllMessages  // 10
@@ -826,48 +806,28 @@ extension Guild {
         case newForumThreadsOff  // 13
         case newForumThreadsOn  // 14
 
-        #if Non64BitSystemsCompatibility
-          case __undocumented(UInt64)
-        #else
-          case __undocumented(UInt64)
-        #endif
+        case __undocumented(UInt64)
       }
 
-      #if Non64BitSystemsCompatibility
-        @UnstableEnum<UInt64>
-      #else
-        @UnstableEnum<UInt64>
-      #endif
+      @UnstableEnum<UInt64>
       public enum MessageNotifications: Sendable, Codable {
         case allMessages  // 0
         case onlyMentions  // 1
         case noMessages  // 2
         case inherit  // 3
 
-        #if Non64BitSystemsCompatibility
-          case __undocumented(UInt64)
-        #else
-          case __undocumented(UInt64)
-        #endif
+        case __undocumented(UInt64)
       }
     }
 
-    #if Non64BitSystemsCompatibility
-      @UnstableEnum<UInt64>
-    #else
-      @UnstableEnum<UInt64>
-    #endif
+    @UnstableEnum<UInt64>
     public enum Flag: Sendable {
       case unreadsAllMessages  // 11
       case unreadsOnlyMentions  // 12
       case optInChannelsOff  // 13
       case optInChannelsOn  // 14
 
-      #if Non64BitSystemsCompatibility
-        case __undocumented(UInt64)
-      #else
-        case __undocumented(UInt64)
-      #endif
+      case __undocumented(UInt64)
     }
 
     public struct MuteConfig: Sendable, Codable {

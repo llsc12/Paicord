@@ -4,32 +4,20 @@ import Foundation
 public struct ApplicationCommand: Sendable, Codable {
 
   /// https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-types
-  #if Non64BitSystemsCompatibility
-    @UnstableEnum<UInt64>
-  #else
-    @UnstableEnum<UInt64>
-  #endif
+  @UnstableEnum<UInt64>
   public enum Kind: Sendable, Codable {
     case chatInput  // 1
     case user  // 2
     case message  // 3
 
-    #if Non64BitSystemsCompatibility
-      case __undocumented(UInt64)
-    #else
-      case __undocumented(UInt64)
-    #endif
+    case __undocumented(UInt64)
   }
 
   /// https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure
   public struct Option: Sendable, Codable, ValidatablePayload {
 
     /// https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type
-    #if Non64BitSystemsCompatibility
-      @UnstableEnum<UInt64>
-    #else
-      @UnstableEnum<UInt64>
-    #endif
+    @UnstableEnum<UInt64>
     public enum Kind: Sendable, Codable {
       case subCommand  // 1
       case subCommandGroup  // 2
@@ -43,11 +31,7 @@ public struct ApplicationCommand: Sendable, Codable {
       case number  // 10
       case attachment  // 11
 
-      #if Non64BitSystemsCompatibility
-        case __undocumented(UInt64)
-      #else
-        case __undocumented(UInt64)
-      #endif
+      case __undocumented(UInt64)
     }
 
     /// https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure

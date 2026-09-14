@@ -67,19 +67,11 @@ public struct FriendSuggestion: Sendable, Codable {
     //		public var platform: // FIXME: Needs type (string enum of services)
     public var name: String
 
-    #if Non64BitSystemsCompatibility
-      @UnstableEnum<UInt64>
-    #else
-      @UnstableEnum<UInt64>
-    #endif
+    @UnstableEnum<UInt64>
     public enum Kind: Sendable, Codable {
       case externalFriend  // 1
 
-      #if Non64BitSystemsCompatibility
-        case __undocumented(UInt64)
-      #else
-        case __undocumented(UInt64)
-      #endif
+      case __undocumented(UInt64)
     }
   }
 }
