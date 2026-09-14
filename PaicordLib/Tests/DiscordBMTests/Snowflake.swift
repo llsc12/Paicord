@@ -49,6 +49,15 @@ class SnowflakeTests: XCTestCase {
     XCTAssertEqual(parsedSnowflakeInfo.sequenceNumber, snowflakeInfoWithDate.sequenceNumber)
   }
 
+  func testDecodesNumericSnowflake() throws {
+    let snowflake = try JSONDecoder().decode(
+      ApplicationSnowflake.self,
+      from: Data("1030118727418646629".utf8)
+    )
+
+    XCTAssertEqual(snowflake.rawValue, "1030118727418646629")
+  }
+
   func testMakeFake() throws {
     _ = try AnySnowflake.makeFake(date: Date())
     _ = try AnySnowflake.makeFake(date: Date(timeIntervalSince1970: 1_420_070_400))
@@ -57,7 +66,7 @@ class SnowflakeTests: XCTestCase {
     XCTAssertThrowsError(try AnySnowflake.makeFake(date: Date.distantPast)) { error in
       let error = error as! SnowflakeInfo.Error
       switch error {
-      case .fieldTooSmall("date", value: "-62135769600.0", min: 1_420_070_400): break
+      case .fieldTooSmall("date", value: "-62135769600000.0", min: 1_420_070_400_000): break
       default:
         XCTFail("Unexpected SnowflakeInfo.Error: \(error)")
       }
@@ -66,7 +75,7 @@ class SnowflakeTests: XCTestCase {
     XCTAssertThrowsError(try AnySnowflake.makeFake(date: Date.distantFuture)) { error in
       let error = error as! SnowflakeInfo.Error
       switch error {
-      case .fieldTooBig("date", value: "64092211200", max: 4_398_046_511): break
+      case .fieldTooBig("date", value: "64092211200000.0", max: 5_818_116_911_103): break
       default:
         XCTFail("Unexpected SnowflakeInfo.Error: \(error)")
       }
@@ -84,7 +93,7 @@ class SnowflakeTests: XCTestCase {
     ) { error in
       let error = error as! SnowflakeInfo.Error
       switch error {
-      case .fieldTooBig("timestamp", value: "18446744073709551615", max: 4_398_046_511_104): break
+      case .fieldTooBig("timestamp", value: "18446744073709551615", max: 5_818_116_911_103): break
       default:
         XCTFail("Unexpected SnowflakeInfo.Error: \(error)")
       }
@@ -92,7 +101,7 @@ class SnowflakeTests: XCTestCase {
 
     XCTAssertThrowsError(
       try SnowflakeInfo(
-        timestamp: 0,
+        timestamp: SnowflakeInfo.discordEpochConstant,
         workerId: .max,
         processId: 0,
         sequenceNumber: 0
@@ -100,7 +109,7 @@ class SnowflakeTests: XCTestCase {
     ) { error in
       let error = error as! SnowflakeInfo.Error
       switch error {
-      case .fieldTooBig("workerId", value: "255", max: 32): break
+      case .fieldTooBig("workerId", value: "255", max: 31): break
       default:
         XCTFail("Unexpected SnowflakeInfo.Error: \(error)")
       }
@@ -108,7 +117,7 @@ class SnowflakeTests: XCTestCase {
 
     XCTAssertThrowsError(
       try SnowflakeInfo(
-        timestamp: 0,
+        timestamp: SnowflakeInfo.discordEpochConstant,
         workerId: 0,
         processId: .max,
         sequenceNumber: 0
@@ -116,7 +125,7 @@ class SnowflakeTests: XCTestCase {
     ) { error in
       let error = error as! SnowflakeInfo.Error
       switch error {
-      case .fieldTooBig("processId", value: "255", max: 32): break
+      case .fieldTooBig("processId", value: "255", max: 31): break
       default:
         XCTFail("Unexpected SnowflakeInfo.Error: \(error)")
       }
@@ -124,7 +133,7 @@ class SnowflakeTests: XCTestCase {
 
     XCTAssertThrowsError(
       try SnowflakeInfo(
-        timestamp: 0,
+        timestamp: SnowflakeInfo.discordEpochConstant,
         workerId: 0,
         processId: 0,
         sequenceNumber: .max
@@ -132,19 +141,36 @@ class SnowflakeTests: XCTestCase {
     ) { error in
       let error = error as! SnowflakeInfo.Error
       switch error {
-      case .fieldTooBig("sequenceNumber", value: "65535", max: 4096): break
+      case .fieldTooBig("sequenceNumber", value: "65535", max: 4095): break
       default:
         XCTFail("Unexpected SnowflakeInfo.Error: \(error)")
       }
     }
 
-    _ = try SnowflakeInfo(timestamp: .min, workerId: 0, processId: 0, sequenceNumber: 0)
+    XCTAssertThrowsError(
+      try SnowflakeInfo(timestamp: .min, workerId: 0, processId: 0, sequenceNumber: 0)
+    )
 
-    _ = try SnowflakeInfo(timestamp: 0, workerId: .min, processId: 0, sequenceNumber: 0)
+    _ = try SnowflakeInfo(
+      timestamp: SnowflakeInfo.discordEpochConstant,
+      workerId: .min,
+      processId: 0,
+      sequenceNumber: 0
+    )
 
-    _ = try SnowflakeInfo(timestamp: 0, workerId: 0, processId: .min, sequenceNumber: 0)
+    _ = try SnowflakeInfo(
+      timestamp: SnowflakeInfo.discordEpochConstant,
+      workerId: 0,
+      processId: .min,
+      sequenceNumber: 0
+    )
 
-    _ = try SnowflakeInfo(timestamp: 0, workerId: 0, processId: 0, sequenceNumber: .min)
+    _ = try SnowflakeInfo(
+      timestamp: SnowflakeInfo.discordEpochConstant,
+      workerId: 0,
+      processId: 0,
+      sequenceNumber: .min
+    )
   }
 
   func testMemberListIDSnowflakes() throws {
