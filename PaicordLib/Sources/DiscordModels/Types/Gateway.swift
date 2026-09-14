@@ -472,7 +472,7 @@ public struct Gateway: Sendable, Codable {
 
       switch opcode {
       case .heartbeat:
-        _ = try container.decodeIfPresent(Int.self, forKey: .data)
+        _ = try container.decodeIfPresent(Int64.self, forKey: .data)
         self.data = nil
       case .heartbeatAccepted, .reconnect:
         guard try !container.contains(.data) || container.decodeNil(forKey: .data) else {
