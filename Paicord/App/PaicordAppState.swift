@@ -40,6 +40,10 @@ final class PaicordAppState {
   // MARK: - General
   var showingQuickSwitcher: Bool = false
 
+  // MARK: - Reaction Picker
+  /// The message an emoji picker is currently open for, if any.
+  var reactionPickerTarget: ReactionPickerTarget? = nil
+
   // MARK: - Attachment Viewer
   var showingAttachmentViewer: Bool = false
   var attachmentViewerAttachments: [DiscordMedia] = []

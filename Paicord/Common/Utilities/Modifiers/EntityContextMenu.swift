@@ -51,59 +51,16 @@ struct EntityContextMenu<Entity>: ViewModifier {
 
   @ViewBuilder
   func messageContextMenu(message: DiscordChannel.Message) -> some View {
-    //    if hasPermission(.addReactions) {
-    //      ControlGroup {
-    //        Button {
-    //        } label: {
-    //          WebImage(
-    //            url: .init(
-    //              string:
-    //                "https://cdn.discordapp.com/emojis/1026533070955872337.png?size=96"
-    //            )
-    //          )
-    //          .resizable()
-    //          .scaledToFit()
-    //          .frame(width: 36, height: 36)
-    //        }
-    //        Button {
-    //        } label: {
-    //          WebImage(
-    //            url: .init(
-    //              string:
-    //                "https://cdn.discordapp.com/emojis/1026533070955872337.png?size=96"
-    //            )
-    //          )
-    //          .resizable()
-    //          .scaledToFit()
-    //          .frame(width: 36, height: 36)
-    //        }
-    //        Button {
-    //        } label: {
-    //          WebImage(
-    //            url: .init(
-    //              string:
-    //                "https://cdn.discordapp.com/emojis/1026533070955872337.png?size=96"
-    //            )
-    //          )
-    //          .resizable()
-    //          .scaledToFit()
-    //          .frame(width: 36, height: 36)
-    //        }
-    //        Button {
-    //        } label: {
-    //          WebImage(
-    //            url: .init(
-    //              string:
-    //                "https://cdn.discordapp.com/emojis/1024751291504791654.png?size=96"
-    //            )
-    //          )
-    //          .resizable()
-    //          .scaledToFit()
-    //          .frame(width: 36, height: 36)
-    //        }
-    //      }
-    //      .controlGroupStyle(.compactMenu)
-    //    }
+    if hasPermission(.addReactions) {
+      Button {
+        appState.reactionPickerTarget = .init(
+          message: message,
+          guildID: guild?.guildId
+        )
+      } label: {
+        Label("Add Reaction", systemImage: "face.smiling.inverse")
+      }
+    }
 
     #if os(iOS)
       ControlGroup {

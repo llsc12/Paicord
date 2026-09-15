@@ -293,16 +293,21 @@ struct EmojiPicker: View {
           let emojis = EmojiIndexProvider.shared.currentCategories[category],
           !emojis.isEmpty
         else { return nil }
-        return (
-          category,
-          emojis.map {
-            PickerEmoji.unicode(
-              $0,
-              DiscordEmojiNameIndex.names(for: $0.character)?.first
-                ?? $0.name.replacingOccurrences(of: " ", with: "_")
+        // The index carries entries Discord has no emoji for at all (maths and
+        // punctuation symbols); they can't be reacted with, so don't offer them.
+        let items = emojis.compactMap { emoji -> PickerEmoji? in
+          guard
+            let character = DiscordEmojiNameIndex.discordCharacter(
+              matching: emoji.character
             )
-          }
-        )
+          else { return nil }
+          return PickerEmoji.unicode(
+            emoji,
+            DiscordEmojiNameIndex.names(for: character)?.first
+              ?? emoji.name.replacingOccurrences(of: " ", with: "_")
+          )
+        }
+        return items.isEmpty ? nil : (category, items)
       }
     }
 
@@ -383,11 +388,16 @@ struct EmojiPicker: View {
         return false
       }
       let unicodeMatches = await EmojiIndexProvider.shared.search(query)
-        .map {
-          PickerEmoji.unicode(
-            $0,
-            DiscordEmojiNameIndex.names(for: $0.character)?.first
-              ?? $0.name.replacingOccurrences(of: " ", with: "_")
+        .compactMap { emoji -> PickerEmoji? in
+          guard
+            let character = DiscordEmojiNameIndex.discordCharacter(
+              matching: emoji.character
+            )
+          else { return nil }
+          return PickerEmoji.unicode(
+            emoji,
+            DiscordEmojiNameIndex.names(for: character)?.first
+              ?? emoji.name.replacingOccurrences(of: " ", with: "_")
           )
         }
       return customMatches + unicodeMatches

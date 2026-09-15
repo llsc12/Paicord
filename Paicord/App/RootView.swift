@@ -59,6 +59,7 @@ struct RootView: View {
         .sponsorSheet()
         .updateSheet()
         .attachmentViewer()
+        .reactionPicker()
         .settingsSheet()
         .task {
           appState.loadPrevGuild()

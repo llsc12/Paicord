@@ -162,6 +162,7 @@
 		AAEEC71F2E65120000EB5FC9 /* TokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEEC71E2E6511F800EB5FC9 /* TokenStore.swift */; };
 		AAEEC7222E6515C400EB5FC9 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = AAEEC7212E6515C400EB5FC9 /* KeychainAccess */; };
 		AAEEF5012E9900F60034FA04 /* Default.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEEF5002E9900E50034FA04 /* Default.swift */; };
+		AAF0A1022F30A1020000AAA2 /* ReactionPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF0A1012F30A1010000AAA1 /* ReactionPicker.swift */; };
 		AAFACE0400000000000000A4 /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = AAFACE0200000000000000A2 /* Nuke */; };
 		AAFACE0500000000000000A5 /* NukeUI in Frameworks */ = {isa = PBXBuildFile; productRef = AAFACE0300000000000000A3 /* NukeUI */; };
 		AAFACE2000000000000000C1 /* AnimatedImageRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFACE1000000000000000B1 /* AnimatedImageRenderer.swift */; };
@@ -312,6 +313,7 @@
 		AAEB3D942ED60812008BDD1D /* ImpactGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImpactGenerator.swift; sourceTree = "<group>"; };
 		AAEEC71E2E6511F800EB5FC9 /* TokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenStore.swift; sourceTree = "<group>"; };
 		AAEEF5002E9900E50034FA04 /* Default.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Default.swift; sourceTree = "<group>"; };
+		AAF0A1012F30A1010000AAA1 /* ReactionPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReactionPicker.swift; sourceTree = "<group>"; };
 		AAFACE1000000000000000B1 /* AnimatedImageRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedImageRenderer.swift; sourceTree = "<group>"; };
 		AAFACE4000000000000000E1 /* DiscordImageURL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscordImageURL.swift; sourceTree = "<group>"; };
 		AAFACE1100000000000000B2 /* NukeImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NukeImage.swift; sourceTree = "<group>"; };
@@ -883,6 +885,7 @@
 				AA6C77462F1A6B95006BF281 /* AttachmentViewer.swift */,
 				AA74E43A2EBCA8FD0031B285 /* Environment.swift */,
 				AA74E4382EBC410B0031B285 /* EntityContextMenu.swift */,
+				AAF0A1012F30A1010000AAA1 /* ReactionPicker.swift */,
 			);
 			path = Modifiers;
 			sourceTree = "<group>";
@@ -1203,6 +1206,7 @@
 				8702A5382EAA6753008DD55A /* MemberRowView.swift in Sources */,
 				AA49F5172EF2CF7200C46339 /* NitroHelper.swift in Sources */,
 				AA6C77472F1A6B9E006BF281 /* AttachmentViewer.swift in Sources */,
+				AAF0A1022F30A1020000AAA2 /* ReactionPicker.swift in Sources */,
 				AA47AF322EDEF1D5008A50C9 /* KeybindsSection.swift in Sources */,
 				AABED5A02E7F48FD005BDD63 /* CurrentUserStore.swift in Sources */,
 				AA74E43D2EBD0DFE0031B285 /* BitField.swift in Sources */,
