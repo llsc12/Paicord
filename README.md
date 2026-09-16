@@ -37,6 +37,11 @@ These downloads are nightly releases of Paicord, built from source.
 If you've enjoyed using Paicord, I would apprecate a [sponsor](https://github.com/sponsors/llsc12)! I work on Paicord in my free time outside of Uni work, so it would be awesome if you chipped in. Sponsors over $5 get custom profile badges! Refer to sponsor page for information. Benefits are managed via a bot in the [Discord Server](https://discord.gg/fqhPGHPyaK) so be sure to join! Builds are also available here.
 
 [![Github-sponsors](https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#EA4AAA)](https://github.com/sponsors/llsc12)
+
+## Contributing
+
+See [CONTRIBUTING.md](.github/CONTRIBUTING.md) to see how you can help out!
+
 ## Star History
 
 <a href="https://www.star-history.com/?repos=llsc12%2Fpaicord&type=date&legend=top-left">
